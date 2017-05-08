@@ -16,19 +16,19 @@
 		<provider>org.apache.openjpa.persistence.PersistenceProviderImpl
 		</provider>
 
-		<class>gr.upatras.ece.nam.baker.model.InstalledBun</class>
-		<class>gr.upatras.ece.nam.baker.model.BakerUser</class>
-		<class>gr.upatras.ece.nam.baker.model.SubscribedResource</class>
-		<class>gr.upatras.ece.nam.baker.model.Category</class>
-		<class>gr.upatras.ece.nam.baker.model.Product</class>
-		<class>gr.upatras.ece.nam.baker.model.ProductExtensionItem</class>
-		<class>gr.upatras.ece.nam.baker.model.BunMetadata</class>
-		<class>gr.upatras.ece.nam.baker.model.ApplicationMetadata</class>
-		<class>gr.upatras.ece.nam.baker.model.BakerProperty</class>
-		<class>gr.upatras.ece.nam.baker.model.Container</class>
-		<class>gr.upatras.ece.nam.baker.model.DeployArtifact</class>
-		<class>gr.upatras.ece.nam.baker.model.DeploymentDescriptor</class>
-		<class>gr.upatras.ece.nam.baker.model.DeployContainer</class>
+		<class>portal.api.model.InstalledBun</class>
+		<class>portal.api.model.BakerUser</class>
+		<class>portal.api.model.SubscribedResource</class>
+		<class>portal.api.model.Category</class>
+		<class>portal.api.model.Product</class>
+		<class>portal.api.model.ProductExtensionItem</class>
+		<class>portal.api.model.BunMetadata</class>
+		<class>portal.api.model.ApplicationMetadata</class>
+		<class>portal.api.model.BakerProperty</class>
+		<class>portal.api.model.Container</class>
+		<class>portal.api.model.DeployArtifact</class>
+		<class>portal.api.model.DeploymentDescriptor</class>
+		<class>portal.api.model.DeployContainer</class>
 		
 
 

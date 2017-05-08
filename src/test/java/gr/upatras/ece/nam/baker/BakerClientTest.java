@@ -18,12 +18,13 @@ package gr.upatras.ece.nam.baker;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import gr.upatras.ece.nam.baker.impl.BakerInstallationMgmt;
-import gr.upatras.ece.nam.baker.impl.BakerJpaController;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
+
 import gr.upatras.ece.nam.baker.testclasses.MockRepositoryWebClient;
+import portal.api.impl.BakerInstallationMgmt;
+import portal.api.impl.BakerJpaController;
+import portal.api.model.BunMetadata;
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
 
 import java.util.UUID;
 

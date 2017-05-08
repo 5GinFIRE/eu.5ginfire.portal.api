@@ -15,17 +15,17 @@
 
 package gr.upatras.ece.nam.baker.repo;
 
-import gr.upatras.ece.nam.baker.impl.BakerJpaController;
-import gr.upatras.ece.nam.baker.model.ApplicationMetadata;
-import gr.upatras.ece.nam.baker.model.BakerProperty;
-import gr.upatras.ece.nam.baker.model.BakerUser;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
-import gr.upatras.ece.nam.baker.model.Category;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptor;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.Product;
-import gr.upatras.ece.nam.baker.model.SubscribedResource;
-import gr.upatras.ece.nam.baker.model.UserSession;
+import portal.api.impl.BakerJpaController;
+import portal.api.model.ApplicationMetadata;
+import portal.api.model.BakerProperty;
+import portal.api.model.BakerUser;
+import portal.api.model.BunMetadata;
+import portal.api.model.Category;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.InstalledBun;
+import portal.api.model.Product;
+import portal.api.model.SubscribedResource;
+import portal.api.model.UserSession;
 
 import java.util.Collection;
 import java.util.HashMap;

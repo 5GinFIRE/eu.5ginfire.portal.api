@@ -16,8 +16,6 @@
 package gr.upatras.ece.nam.baker;
 
 import static org.junit.Assert.assertEquals;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +31,9 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
 
 public class BakerClientIT {
 

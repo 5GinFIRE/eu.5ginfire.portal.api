@@ -19,12 +19,12 @@ import static org.junit.Assert.*;
 
 import java.util.UUID;
 
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
 
 public class InstalledServiceTest {
 

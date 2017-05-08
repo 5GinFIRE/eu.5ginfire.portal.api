@@ -13,17 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.impl;
-
-import gr.upatras.ece.nam.baker.model.ApplicationMetadata;
-import gr.upatras.ece.nam.baker.model.BakerProperty;
-import gr.upatras.ece.nam.baker.model.BakerUser;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
-import gr.upatras.ece.nam.baker.model.Category;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptor;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.Product;
-import gr.upatras.ece.nam.baker.model.SubscribedResource;
+package portal.api.impl;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +27,16 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.model.ApplicationMetadata;
+import portal.api.model.BakerProperty;
+import portal.api.model.BakerUser;
+import portal.api.model.BunMetadata;
+import portal.api.model.Category;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.InstalledBun;
+import portal.api.model.Product;
+import portal.api.model.SubscribedResource;
 
 /**
  * This class maintains the entity manager and get a broker element from DB

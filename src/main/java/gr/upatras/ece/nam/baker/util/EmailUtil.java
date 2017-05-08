@@ -15,9 +15,9 @@
 
 package gr.upatras.ece.nam.baker.util;
 
-import gr.upatras.ece.nam.baker.impl.BakerJpaController;
 import gr.upatras.ece.nam.baker.repo.BakerRepository;
 import gr.upatras.ece.nam.baker.repo.BakerRepositoryAPIImpl;
+import portal.api.impl.BakerJpaController;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;

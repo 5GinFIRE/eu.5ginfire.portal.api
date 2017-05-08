@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.impl;
-
-import gr.upatras.ece.nam.baker.model.IRepositoryWebClient;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
+package portal.api.impl;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.model.IRepositoryWebClient;
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
 
 public class BakerInstallationMgmt {
 

@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.impl;
-
-import gr.upatras.ece.nam.baker.model.IRepositoryWebClient;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
+package portal.api.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,6 +27,11 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.model.BunMetadata;
+import portal.api.model.IRepositoryWebClient;
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
 
 public class InstalledBunLifecycleMgmt {
 

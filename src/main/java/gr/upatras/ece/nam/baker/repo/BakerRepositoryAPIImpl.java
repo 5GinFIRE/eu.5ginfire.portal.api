@@ -15,27 +15,27 @@
 
 package gr.upatras.ece.nam.baker.repo;
 
-import gr.upatras.ece.nam.baker.fiware.FIWARECloudAccess;
-import gr.upatras.ece.nam.baker.fiware.FIWAREUser;
-import gr.upatras.ece.nam.baker.fiware.FIWAREUtils;
-import gr.upatras.ece.nam.baker.fiware.OAuthClientManager;
-import gr.upatras.ece.nam.baker.model.ApplicationMetadata;
-import gr.upatras.ece.nam.baker.model.BakerProperty;
-import gr.upatras.ece.nam.baker.model.BakerUser;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
-import gr.upatras.ece.nam.baker.model.Category;
-import gr.upatras.ece.nam.baker.model.DeployArtifact;
-import gr.upatras.ece.nam.baker.model.DeployContainer;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptor;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptorStatus;
-import gr.upatras.ece.nam.baker.model.IBakerRepositoryAPI;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-import gr.upatras.ece.nam.baker.model.InstalledBunStatus;
-import gr.upatras.ece.nam.baker.model.Product;
-import gr.upatras.ece.nam.baker.model.ProductExtensionItem;
-import gr.upatras.ece.nam.baker.model.SubscribedResource;
-import gr.upatras.ece.nam.baker.model.UserSession;
 import gr.upatras.ece.nam.baker.util.EmailUtil;
+import portal.api.fiware.FIWARECloudAccess;
+import portal.api.fiware.FIWAREUser;
+import portal.api.fiware.FIWAREUtils;
+import portal.api.fiware.OAuthClientManager;
+import portal.api.model.ApplicationMetadata;
+import portal.api.model.BakerProperty;
+import portal.api.model.BakerUser;
+import portal.api.model.BunMetadata;
+import portal.api.model.Category;
+import portal.api.model.DeployArtifact;
+import portal.api.model.DeployContainer;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.IBakerRepositoryAPI;
+import portal.api.model.InstalledBun;
+import portal.api.model.InstalledBunStatus;
+import portal.api.model.Product;
+import portal.api.model.ProductExtensionItem;
+import portal.api.model.SubscribedResource;
+import portal.api.model.UserSession;
 
 import java.io.File;
 import java.io.FileOutputStream;

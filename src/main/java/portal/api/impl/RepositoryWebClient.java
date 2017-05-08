@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.impl;
-
-import gr.upatras.ece.nam.baker.model.IRepositoryWebClient;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
+package portal.api.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,6 +37,9 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
+
+import portal.api.model.BunMetadata;
+import portal.api.model.IRepositoryWebClient;
 
 public class RepositoryWebClient implements IRepositoryWebClient {
 

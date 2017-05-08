@@ -17,9 +17,10 @@ package gr.upatras.ece.nam.baker;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import gr.upatras.ece.nam.baker.model.BakerUser;
-import gr.upatras.ece.nam.baker.model.UserSession;
+
 import gr.upatras.ece.nam.baker.util.EncryptionUtil;
+import portal.api.model.BakerUser;
+import portal.api.model.UserSession;
 
 import java.io.IOException;
 import java.io.InputStream;

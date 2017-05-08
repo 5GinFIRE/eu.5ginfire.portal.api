@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.fiware;
-
-import gr.upatras.ece.nam.baker.fiware.cloud.osconnector.JaxRs20Connector;
+package portal.api.fiware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +33,8 @@ import com.woorea.openstack.keystone.utils.KeystoneUtils;
 import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Servers;
+
+import portal.api.fiware.cloud.osconnector.JaxRs20Connector;
 
 public class FIWARECloudAccess {
 

@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.impl;
+package portal.api.impl;
 
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-import gr.upatras.ece.nam.baker.model.IBakerClientAPI;
-import gr.upatras.ece.nam.baker.model.InstalledBun;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.model.IBakerClientAPI;
+import portal.api.model.InstalledBun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

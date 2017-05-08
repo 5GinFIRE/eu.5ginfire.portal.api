@@ -15,8 +15,8 @@
 
 package gr.upatras.ece.nam.baker.util;
 
-import gr.upatras.ece.nam.baker.model.BakerUser;
 import gr.upatras.ece.nam.baker.repo.BakerRepository;
+import portal.api.model.BakerUser;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -15,9 +15,6 @@
 
 package gr.upatras.ece.nam.baker.testclasses;
 
-import gr.upatras.ece.nam.baker.model.IRepositoryWebClient;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +24,9 @@ import java.nio.file.Paths;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.model.BunMetadata;
+import portal.api.model.IRepositoryWebClient;
 
 /**
  * A test repository for mocking a repo

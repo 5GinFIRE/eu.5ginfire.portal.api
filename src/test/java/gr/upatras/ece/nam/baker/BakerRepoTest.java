@@ -19,19 +19,19 @@ import static org.junit.Assert.*;
 
 import java.util.UUID;
 
-import gr.upatras.ece.nam.baker.impl.BakerJpaController;
-import gr.upatras.ece.nam.baker.model.ApplicationMetadata;
-import gr.upatras.ece.nam.baker.model.BakerUser;
-import gr.upatras.ece.nam.baker.model.BunMetadata;
-import gr.upatras.ece.nam.baker.model.Category;
-import gr.upatras.ece.nam.baker.model.Container;
-import gr.upatras.ece.nam.baker.model.DeployArtifact;
-import gr.upatras.ece.nam.baker.model.DeployContainer;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptor;
-import gr.upatras.ece.nam.baker.model.DeploymentDescriptorStatus;
-import gr.upatras.ece.nam.baker.model.ProductExtensionItem;
-import gr.upatras.ece.nam.baker.model.SubscribedResource;
 import gr.upatras.ece.nam.baker.util.EncryptionUtil;
+import portal.api.impl.BakerJpaController;
+import portal.api.model.ApplicationMetadata;
+import portal.api.model.BakerUser;
+import portal.api.model.BunMetadata;
+import portal.api.model.Category;
+import portal.api.model.Container;
+import portal.api.model.DeployArtifact;
+import portal.api.model.DeployContainer;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.ProductExtensionItem;
+import portal.api.model.SubscribedResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

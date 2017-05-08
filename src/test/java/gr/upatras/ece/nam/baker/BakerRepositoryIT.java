@@ -18,9 +18,9 @@ package gr.upatras.ece.nam.baker;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import gr.upatras.ece.nam.baker.util.EncryptionUtil;
 import portal.api.model.BakerUser;
 import portal.api.model.UserSession;
+import portal.api.util.EncryptionUtil;
 
 import java.io.IOException;
 import java.io.InputStream;

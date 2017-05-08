@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.util;
+package portal.api.util;
 
 
 import org.apache.shiro.crypto.hash.Hash;

@@ -15,8 +15,6 @@
 
 package portal.api.model;
 
-import gr.upatras.ece.nam.baker.util.EncryptionUtil;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +29,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import portal.api.util.EncryptionUtil;
 
 @Entity(name = "BakerUser")
 @JsonIgnoreProperties(value = { "products", "deployments", "subscribedResources" })

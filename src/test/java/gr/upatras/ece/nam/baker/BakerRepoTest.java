@@ -19,7 +19,6 @@ import static org.junit.Assert.*;
 
 import java.util.UUID;
 
-import gr.upatras.ece.nam.baker.util.EncryptionUtil;
 import portal.api.impl.BakerJpaController;
 import portal.api.model.ApplicationMetadata;
 import portal.api.model.BakerUser;
@@ -32,6 +31,7 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
+import portal.api.util.EncryptionUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

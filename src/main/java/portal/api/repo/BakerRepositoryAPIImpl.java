@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.repo;
+package portal.api.repo;
 
-import gr.upatras.ece.nam.baker.util.EmailUtil;
 import portal.api.fiware.FIWARECloudAccess;
 import portal.api.fiware.FIWAREUser;
 import portal.api.fiware.FIWAREUtils;
@@ -36,6 +35,7 @@ import portal.api.model.Product;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserSession;
+import portal.api.util.EmailUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;

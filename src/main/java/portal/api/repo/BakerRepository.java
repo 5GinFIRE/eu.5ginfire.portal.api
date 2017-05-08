@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.repo;
+package portal.api.repo;
 
 import portal.api.impl.BakerJpaController;
 import portal.api.model.ApplicationMetadata;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.util;
+package portal.api.util;
 
-import gr.upatras.ece.nam.baker.repo.BakerRepository;
 import portal.api.model.BakerUser;
+import portal.api.repo.BakerRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;

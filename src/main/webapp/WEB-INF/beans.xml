@@ -14,13 +14,13 @@
 	<bean
 		class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer" />
 
-	<bean id="portalRepositoryBean" class="gr.upatras.ece.nam.portal.repo.PortalRepository">
+	<bean id="portalRepositoryBean" class="portal.api.repo.PortalRepository">
 		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
 
-	<bean id="repoWebClientBean" class="gr.upatras.ece.nam.portal.impl.RepositoryWebClient" />
+	<bean id="repoWebClientBean" class="portal.api.impl.RepositoryWebClient" />
 
-	<bean id="portalInstallationMgmtBean" class="gr.upatras.ece.nam.portal.impl.PortalInstallationMgmt">
+	<bean id="portalInstallationMgmtBean" class="portal.api.impl.PortalInstallationMgmt">
 		<property name="repoWebClient" ref="repoWebClientBean" />
 		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
@@ -28,14 +28,14 @@
 	<jaxrs:server id="services" address="/api/">
 		<jaxrs:serviceBeans>
 
-			<bean class="gr.upatras.ece.nam.portal.repo.PortalRepositoryAPIImpl" >
+			<bean class="portal.api.repo.PortalRepositoryAPIImpl" >
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 				<property name="oAuthClientManagerRef" ref="oAuthClientManagerBean" />
 				<!-- property name="fiwareService" ref="fiwareServiceClient"  -->
 
 			</bean>
 
-			<bean class="gr.upatras.ece.nam.portal.impl.PortalClientAPIImpl">
+			<bean class="portal.api.impl.PortalClientAPIImpl">
 				<property name="portalInstallationMgmtRef" ref="portalInstallationMgmtBean" />
 			</bean>
 		</jaxrs:serviceBeans>
@@ -51,7 +51,7 @@
 
 	</jaxrs:server>
 
-	<bean id="headersOutInterceptor" class="gr.upatras.ece.nam.portal.util.HeadersOutInterceptor" />
+	<bean id="headersOutInterceptor" class="portal.api.util.HeadersOutInterceptor" />
 
 	<!-- We are adding the interceptors to the bus as we will have only one  endpoint/service/bus. -->
 
@@ -66,14 +66,14 @@
 	<!-- Apapche Shiro -->
  	
 	<!-- 
-	<bean class="gr.upatras.ece.nam.portal.util.ShiroUTValidator" id="utValidator">
+	<bean class="portal.api.util.ShiroUTValidator" id="utValidator">
  		<property name="securityManager" ref="securityManagerBean"/>
 	</bean>
-	<bean id="basicAuthValidator" class="gr.upatras.ece.nam.portal.util.ShiroBasicAuthInterceptor">
+	<bean id="basicAuthValidator" class="portal.api.util.ShiroBasicAuthInterceptor">
 		<property name="validator" ref="utValidator" />
 	</bean>
 	 -->
-	<bean class="gr.upatras.ece.nam.portal.util.AjaxUserFilter" id="ajaxUserFilter">
+	<bean class="portal.api.util.AjaxUserFilter" id="ajaxUserFilter">
 	</bean>
 	
 	<bean id="securityManagerBean" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
@@ -93,7 +93,7 @@
 	
 	<!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
 	<!-- security datasource: -->
-	<bean id="myRealm" class="gr.upatras.ece.nam.portal.util.ShiroUTAuthorizingRealm">
+	<bean id="myRealm" class="portal.api.util.ShiroUTAuthorizingRealm">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 	</bean>
 	
@@ -149,7 +149,7 @@
 
 	<!-- JPA Beans configuration -->
 
-	<bean name="portalJpaControllerRef" class="gr.upatras.ece.nam.portal.impl.PortalJpaController">
+	<bean name="portalJpaControllerRef" class="portal.api.impl.PortalJpaController">
 	</bean>
 
 <!-- 
@@ -213,7 +213,7 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-	<bean id="oAuthClientManagerBean" class="gr.upatras.ece.nam.portal.fiware.OAuthClientManager">
+	<bean id="oAuthClientManagerBean" class="portal.api.fiware.OAuthClientManager">
 		<property name="authorizationURI"
 			value="http://account.lab.fiware.org/oauth2/authorize" />
 		<property name="accessTokenService" ref="atServiceClient" />

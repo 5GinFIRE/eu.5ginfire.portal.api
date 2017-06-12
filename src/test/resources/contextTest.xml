@@ -17,7 +17,7 @@
 
 
 	<bean name="portalJpaControllerTest"
-		class="gr.upatras.ece.nam.portal.impl.PortalJpaController">
+		class="portal.api.impl.PortalJpaController">
 	</bean>
 
 <!-- 
@@ -40,22 +40,21 @@
 	</bean>
 
 
-<!-- MySQL -->
+<!-- MySQL
 	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary" />
 		<property name="showSql" value="true" />
 		<property name="database" value="MYSQL" />
 		<property name="generateDdl" value="true" />
 	</bean>
-	
-	<!-- H2 
+ -->	
+	<!-- H2 -->	
 	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
 		<property name="showSql" value="true" />
 		<property name="database" value="H2" />
 		<property name="generateDdl" value="true" />
 	</bean>
-	-->	
 
 <!-- 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

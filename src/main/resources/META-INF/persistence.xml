@@ -32,7 +32,7 @@
 		
 
 
-		<properties>
+		<!-- properties>
 			<property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver" />
 			<property name="openjpa.ConnectionURL"
 				value="jdbc:mysql://localhost/portaldb" />
@@ -41,10 +41,10 @@
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.Log" value="none" />
 
-		</properties>
+		</properties-->
 
 
-		<!-- properties>
+		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
 			<property name="openjpa.ConnectionURL"
 				value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE" />
@@ -53,7 +53,7 @@
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
 			<property name="openjpa.Log" value="none" />
-		</properties -->
+		</properties>
 
 	</persistence-unit>
 
@@ -78,7 +78,7 @@
 
 
 
-		<properties>
+		<!-- properties>
 			<property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver" />
 			<property name="openjpa.ConnectionURL"
 				value="jdbc:mysql://localhost/portaldb_test" />
@@ -87,9 +87,9 @@
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" />
 
-		</properties>
+		</properties -->
 
-		<!-- properties>
+		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
 			<property name="openjpa.ConnectionURL"
 				value="jdbc:h2:~/.portal/db/portaldb_test;CIPHER=AES;AUTO_SERVER=TRUE" />
@@ -99,7 +99,7 @@
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
 			<property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" />
 
-		</properties -->
+		</properties>
 		
 	</persistence-unit>
 

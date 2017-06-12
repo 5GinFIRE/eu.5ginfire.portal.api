@@ -1,4 +1,4 @@
 .*IT
-.*BakerClientTest
-.*BakerRepoTest
+.*PortalClientTest
+.*PortalRepoTest
 .*InstalledServiceTest

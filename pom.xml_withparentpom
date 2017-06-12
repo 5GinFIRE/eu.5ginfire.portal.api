@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>gr.upatras.ece.nam.baker</artifactId>
+	<artifactId>gr.upatras.ece.nam.portal</artifactId>
 	<packaging>war</packaging>
-	<name>Baker</name>
-	<description>Baker is a simple CXF JAX-RS webapp service using spring configuration</description>
+	<name>Portal</name>
+	<description>Portal is a simple CXF JAX-RS webapp service using spring configuration</description>
 
 	<parent>
-		<groupId>gr.upatras.ece.nam.baker</groupId>
-		<artifactId>gr.upatras.ece.nam.baker.project</artifactId>
+		<groupId>gr.upatras.ece.nam.portal</groupId>
+		<artifactId>gr.upatras.ece.nam.portal.project</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../gr.upatras.ece.nam.baker.project/pom.xml</relativePath>
+		<relativePath>../gr.upatras.ece.nam.portal.project/pom.xml</relativePath>
 	</parent>
 
 
@@ -181,8 +181,8 @@
 				<artifactId>openjpa-maven-plugin</artifactId>
 				<version>${openjpa.version}</version>
 				<configuration>
-					<includes>gr.upatras.ece.nam.baker.model</includes>
-					<excludes>**/gr.upatras.ece.nam.baker/*.class</excludes>
+					<includes>gr.upatras.ece.nam.portal.model</includes>
+					<excludes>**/gr.upatras.ece.nam.portal/*.class</excludes>
 					<addDefaultConstructor>true</addDefaultConstructor>
 					<enforcePropertyRestrictions>true</enforcePropertyRestrictions>
 
@@ -267,16 +267,16 @@
 						</dependencies>
 						<configuration>
 							<preProcess>
-								<copy todir="target/docs/html/baker_manual/images">
+								<copy todir="target/docs/html/portal_manual/images">
 									<fileset dir="src/documentation/docbkx/images" />
 								</copy>
-								<copy todir="target/docs/html/baker_manual/css">
+								<copy todir="target/docs/html/portal_manual/css">
 									<fileset dir="src/documentation/docbkx/css" />
 								</copy>
-								<copy todir="target/docs/html/baker_manual/font">
+								<copy todir="target/docs/html/portal_manual/font">
 									<fileset dir="src/documentation/docbkx/font" />
 								</copy>
-								<copy todir="target/docs/html/baker_manual/js">
+								<copy todir="target/docs/html/portal_manual/js">
 									<fileset dir="src/documentation/docbkx/js" />
 								</copy>
 							</preProcess>
@@ -293,7 +293,7 @@
 								per page.False makes all in one page -->
 							<fop1Extensions>1</fop1Extensions>
 							<foCustomization>${project.basedir}/src/documentation/docbkx-stylesheet/html/docbook.xsl</foCustomization>
-							<includes> baker_manual.xml, test.xml</includes>
+							<includes> portal_manual.xml, test.xml</includes>
 						</configuration>
 
 					</plugin>
@@ -327,7 +327,7 @@
 								</httpConnector>
 								<scanIntervalSeconds>4</scanIntervalSeconds>
 								<webApp>
-									<contextPath>/baker</contextPath>
+									<contextPath>/portal</contextPath>
 								</webApp>
 							</configuration>
 							<executions>
@@ -376,7 +376,7 @@
 										<port>${test.server.port}</port>
 									</httpConnector>
 									<webApp>
-										<contextPath>/rsbaker-srvtest</contextPath>
+										<contextPath>/rsportal-srvtest</contextPath>
 									</webApp>
 									<stopPort>9999</stopPort>
 									<stopKey>STOP</stopKey>
@@ -409,7 +409,7 @@
 								</goals>
 								<configuration>
 									<systemPropertyVariables>
-										<service.url>http://localhost:${test.server.port}/rsbaker-srvtest</service.url>
+										<service.url>http://localhost:${test.server.port}/rsportal-srvtest</service.url>
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
@@ -446,7 +446,7 @@
 									</goals>
 									<configuration>
 										<port>13000</port>
-										<path>/baker</path>
+										<path>/portal</path>
 										<useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
 									</configuration>
 								</execution>
@@ -486,7 +486,7 @@
 								<phase>pre-integration-test</phase>
 								<configuration>
 									<port>${test.server.port}</port>
-									<path>/rsbaker-srvtest</path>
+									<path>/rsportal-srvtest</path>
 									<fork>true</fork>
 									<useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
 								</configuration>
@@ -498,7 +498,7 @@
 								</goals>
 								<phase>post-integration-test</phase>
 								<configuration>
-									<path>/rsbaker-srvtest</path>
+									<path>/rsportal-srvtest</path>
 								</configuration>
 							</execution>
 						</executions>
@@ -515,7 +515,7 @@
 								</goals>
 								<configuration>
 									<systemPropertyVariables>
-										<service.url>http://localhost:${test.server.port}/rsbaker-srvtest</service.url>
+										<service.url>http://localhost:${test.server.port}/rsportal-srvtest</service.url>
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
@@ -562,10 +562,10 @@
 							</configuration>
 							<deployables>
 								<deployable>
-									<location>../gr.upatras.ece.nam.baker-0.0.1-SNAPSHOT.war</location>
+									<location>../gr.upatras.ece.nam.portal-0.0.1-SNAPSHOT.war</location>
 									<type>war</type>
 									<properties>
-										<context>/baker</context>
+										<context>/portal</context>
 									</properties>
 								</deployable>
 							</deployables>

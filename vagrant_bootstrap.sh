@@ -12,7 +12,7 @@ echo 'deb http://get.docker.io/ubuntu docker main' >> /etc/apt/sources.list
 apt-get update
 
 apt-get -y --force-yes install \
-openjdk-7-jdk \
+default-jdk \
 git \
 lxc-docker \
 maven \

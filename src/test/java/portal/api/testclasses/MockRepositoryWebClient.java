@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker.testclasses;
+package portal.api.testclasses;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,7 +95,7 @@ public class MockRepositoryWebClient implements IRepositoryWebClient {
 			
 			File sourceFile = new File(res.getFile());
 
-			Path tempDir = Files.createTempDirectory("baker");
+			Path tempDir = Files.createTempDirectory("portal");
 			File destFile = new File(tempDir+"/"+uuid+"/bun.tar.gz" );
 			Files.createDirectory( Paths.get( tempDir+"/"+uuid ) );
 			Path targetPath = destFile.toPath();

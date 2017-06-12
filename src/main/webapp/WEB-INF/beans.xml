@@ -14,29 +14,29 @@
 	<bean
 		class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer" />
 
-	<bean id="bakerRepositoryBean" class="gr.upatras.ece.nam.baker.repo.BakerRepository">
-		<property name="bakerJpaController" ref="bakerJpaControllerRef" />
+	<bean id="portalRepositoryBean" class="gr.upatras.ece.nam.portal.repo.PortalRepository">
+		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
 
-	<bean id="repoWebClientBean" class="gr.upatras.ece.nam.baker.impl.RepositoryWebClient" />
+	<bean id="repoWebClientBean" class="gr.upatras.ece.nam.portal.impl.RepositoryWebClient" />
 
-	<bean id="bakerInstallationMgmtBean" class="gr.upatras.ece.nam.baker.impl.BakerInstallationMgmt">
+	<bean id="portalInstallationMgmtBean" class="gr.upatras.ece.nam.portal.impl.PortalInstallationMgmt">
 		<property name="repoWebClient" ref="repoWebClientBean" />
-		<property name="bakerJpaController" ref="bakerJpaControllerRef" />
+		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
 
 	<jaxrs:server id="services" address="/api/">
 		<jaxrs:serviceBeans>
 
-			<bean class="gr.upatras.ece.nam.baker.repo.BakerRepositoryAPIImpl" >
-				<property name="bakerRepositoryRef" ref="bakerRepositoryBean" />
+			<bean class="gr.upatras.ece.nam.portal.repo.PortalRepositoryAPIImpl" >
+				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 				<property name="oAuthClientManagerRef" ref="oAuthClientManagerBean" />
 				<!-- property name="fiwareService" ref="fiwareServiceClient"  -->
 
 			</bean>
 
-			<bean class="gr.upatras.ece.nam.baker.impl.BakerClientAPIImpl">
-				<property name="bakerInstallationMgmtRef" ref="bakerInstallationMgmtBean" />
+			<bean class="gr.upatras.ece.nam.portal.impl.PortalClientAPIImpl">
+				<property name="portalInstallationMgmtRef" ref="portalInstallationMgmtBean" />
 			</bean>
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
@@ -51,7 +51,7 @@
 
 	</jaxrs:server>
 
-	<bean id="headersOutInterceptor" class="gr.upatras.ece.nam.baker.util.HeadersOutInterceptor" />
+	<bean id="headersOutInterceptor" class="gr.upatras.ece.nam.portal.util.HeadersOutInterceptor" />
 
 	<!-- We are adding the interceptors to the bus as we will have only one  endpoint/service/bus. -->
 
@@ -66,14 +66,14 @@
 	<!-- Apapche Shiro -->
  	
 	<!-- 
-	<bean class="gr.upatras.ece.nam.baker.util.ShiroUTValidator" id="utValidator">
+	<bean class="gr.upatras.ece.nam.portal.util.ShiroUTValidator" id="utValidator">
  		<property name="securityManager" ref="securityManagerBean"/>
 	</bean>
-	<bean id="basicAuthValidator" class="gr.upatras.ece.nam.baker.util.ShiroBasicAuthInterceptor">
+	<bean id="basicAuthValidator" class="gr.upatras.ece.nam.portal.util.ShiroBasicAuthInterceptor">
 		<property name="validator" ref="utValidator" />
 	</bean>
 	 -->
-	<bean class="gr.upatras.ece.nam.baker.util.AjaxUserFilter" id="ajaxUserFilter">
+	<bean class="gr.upatras.ece.nam.portal.util.AjaxUserFilter" id="ajaxUserFilter">
 	</bean>
 	
 	<bean id="securityManagerBean" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
@@ -84,7 +84,7 @@
 	    <!-- <property name="sessionMode" value="native"/> -->
 	    <property name="sessionManager">
 		    <bean class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-		    <!-- <property name="sessionIdCookie" ref="cookieBAKERref"></property>  -->
+		    <!-- <property name="sessionIdCookie" ref="cookiePORTALref"></property>  -->
 		    </bean>
 		    
 		  </property>
@@ -93,13 +93,13 @@
 	
 	<!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
 	<!-- security datasource: -->
-	<bean id="myRealm" class="gr.upatras.ece.nam.baker.util.ShiroUTAuthorizingRealm">
-				<property name="bakerRepositoryRef" ref="bakerRepositoryBean" />
+	<bean id="myRealm" class="gr.upatras.ece.nam.portal.util.ShiroUTAuthorizingRealm">
+				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 	</bean>
 	
 	<!-- 
-	<bean id ="cookieBAKERref" class="org.apache.shiro.web.servlet.SimpleCookie">
-		<property name="name" value="BAKERCOOKIEMAN"></property>
+	<bean id ="cookiePORTALref" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<property name="name" value="PORTALCOOKIEMAN"></property>
 		<property name="path" value="/"></property>
 	</bean>
 	 -->
@@ -149,7 +149,7 @@
 
 	<!-- JPA Beans configuration -->
 
-	<bean name="bakerJpaControllerRef" class="gr.upatras.ece.nam.baker.impl.BakerJpaController">
+	<bean name="portalJpaControllerRef" class="gr.upatras.ece.nam.portal.impl.PortalJpaController">
 	</bean>
 
 <!-- 
@@ -157,7 +157,7 @@
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="org.h2.Driver" />
 		<property name="url"
-			value="jdbc:h2:~/.baker/db/bakerdb;CIPHER=AES;AUTO_SERVER=TRUE" />
+			value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE" />
 		<property name="username" value="bro4xipidb" />
 		<property name="password" value="filepwd bro4xipidb" />
 	</bean>
@@ -167,7 +167,7 @@
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
-		<property name="persistenceUnitName" value="bakerdb" />
+		<property name="persistenceUnitName" value="portaldb" />
 		<property name="jpaVendorAdapter" ref="jpaAdapter" />
 	</bean>
 
@@ -193,7 +193,7 @@
 
 
 
-	<!-- WebClient which baker uses to access fiware users' info -->
+	<!-- WebClient which portal uses to access fiware users' info -->
 	<bean id="fiwareServiceClient" class="org.apache.cxf.jaxrs.client.WebClient"
 		factory-method="create">
 		<constructor-arg type="java.lang.String"
@@ -213,7 +213,7 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-	<bean id="oAuthClientManagerBean" class="gr.upatras.ece.nam.baker.fiware.OAuthClientManager">
+	<bean id="oAuthClientManagerBean" class="gr.upatras.ece.nam.portal.fiware.OAuthClientManager">
 		<property name="authorizationURI"
 			value="http://account.lab.fiware.org/oauth2/authorize" />
 		<property name="accessTokenService" ref="atServiceClient" />

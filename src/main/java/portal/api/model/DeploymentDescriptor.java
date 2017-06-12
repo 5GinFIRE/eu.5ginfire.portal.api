@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -73,7 +73,7 @@ public class DeploymentDescriptor {
 	
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
-	private BakerUser owner = null;
+	private PortalUser owner = null;
 	
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
@@ -113,11 +113,11 @@ public class DeploymentDescriptor {
 		this.baseApplication = baseApplication;
 	}
 
-	public BakerUser getOwner() {
+	public PortalUser getOwner() {
 		return owner;
 	}
 
-	public void setOwner(BakerUser owner) {
+	public void setOwner(PortalUser owner) {
 		this.owner = owner;
 	}
 

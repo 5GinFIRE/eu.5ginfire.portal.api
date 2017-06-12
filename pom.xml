@@ -494,7 +494,7 @@
 									<contextHandler
 										implementation="org.eclipse.jetty.server.handler.ContextHandler">
 										<contextPath>/static</contextPath>
-										<resourceBase>/home/vagrant/.baker/metadata/</resourceBase>
+										<resourceBase>/home/ubuntu/.portal/metadata/</resourceBase>
 										<handler implementation="org.eclipse.jetty.server.handler.ResourceHandler">
 											<cacheControl>no-cache</cacheControl>
 											<directoriesListed>true</directoriesListed>
@@ -503,7 +503,7 @@
 									<contextHandler
 										implementation="org.eclipse.jetty.server.handler.ContextHandler">
 										<contextPath>/mp</contextPath>
-										<resourceBase>/home/vagrant/ws/eu.5ginfire.portal.web/src</resourceBase>
+										<resourceBase>/home/ubuntu/ws/eu.5ginfire.portal.web/src</resourceBase>
 										<handler implementation="org.eclipse.jetty.server.handler.ResourceHandler">
 											<cacheControl>no-cache</cacheControl>
 											<directoriesListed>true</directoriesListed>
@@ -513,7 +513,7 @@
 										implementation="org.eclipse.jetty.server.handler.ContextHandler">
 
 										<contextPath>/forgestore</contextPath>
-										<resourceBase>/home/vagrant/ws/gr.upatras.ece.nam.forgestoreweb/src</resourceBase>
+										<resourceBase>/home/ubuntu/ws/eu.5ginfire.portal.web/src</resourceBase>
 										<handler implementation="org.eclipse.jetty.server.handler.ResourceHandler">
 											<cacheControl>no-cache</cacheControl>
 											<directoriesListed>true</directoriesListed>
@@ -568,7 +568,7 @@
 										<port>${test.server.port}</port>
 									</httpConnector>
 									<webApp>
-										<contextPath>/rsbaker-srvtest</contextPath>
+										<contextPath>/rsportal-srvtest</contextPath>
 									</webApp>
 									<stopPort>9999</stopPort>
 									<stopKey>STOP</stopKey>
@@ -601,7 +601,7 @@
 								</goals>
 								<configuration>
 									<systemPropertyVariables>
-										<service.url>http://localhost:${test.server.port}/rsbaker-srvtest</service.url>
+										<service.url>http://localhost:${test.server.port}/rsportal-srvtest</service.url>
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
@@ -678,7 +678,7 @@
 								<phase>pre-integration-test</phase>
 								<configuration>
 									<port>${test.server.port}</port>
-									<path>/rsbaker-srvtest</path>
+									<path>/rsportal-srvtest</path>
 									<fork>true</fork>
 									<useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
 								</configuration>
@@ -690,7 +690,7 @@
 								</goals>
 								<phase>post-integration-test</phase>
 								<configuration>
-									<path>/rsbaker-srvtest</path>
+									<path>/rsportal-srvtest</path>
 								</configuration>
 							</execution>
 						</executions>
@@ -707,7 +707,7 @@
 								</goals>
 								<configuration>
 									<systemPropertyVariables>
-										<service.url>http://localhost:${test.server.port}/rsbaker-srvtest</service.url>
+										<service.url>http://localhost:${test.server.port}/rsportal-srvtest</service.url>
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
@@ -757,7 +757,7 @@
 									<location>../eu.5ginfire.portal.api-0.0.1-SNAPSHOT.war</location>
 									<type>war</type>
 									<properties>
-										<context>/baker</context>
+										<context>/portal</context>
 									</properties>
 								</deployable>
 							</deployables>

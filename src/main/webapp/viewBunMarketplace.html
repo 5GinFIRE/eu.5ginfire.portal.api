@@ -15,7 +15,7 @@
 
 	<div class="page-header">
 		<h1>Bun Marketplace <br>
-		<small>View Buns from the Baker marketplace, so that you can
+		<small>View Buns from the Portal marketplace, so that you can
 			install them into your resource</small>
 			</h1>
 	</div>
@@ -24,8 +24,8 @@
     
     <script>
     
-    var repoMarketplaceURL = 'http://www.forgebox.eu:443/baker/services/api/repo/buns';
-    var bakerURLatFORGEBoxInstall = 'http://localhost:13000';
+    var repoMarketplaceURL = 'http://www.forgebox.eu:443/portal/services/api/repo/buns';
+    var portalURLatFORGEBoxInstall = 'http://localhost:13000';
     
     $(document).ready(function() {
     	loadData();
@@ -103,7 +103,7 @@
     	
     	 
     	$.ajax({
-			  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/'+bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+bunUUID,
 			  type:"GET",
 			  dataType:"json",
 			  success: function(dataX){
@@ -248,7 +248,7 @@
     function getAndupdateLabelStatus(vid, bunUUID){
 		console.log('getAndupdateLabelStatus');
     	$.ajax({
-			  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/'+bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+bunUUID,
 			  type:"GET",
 			  dataType:"json",
 			  success: function(dataX){
@@ -293,7 +293,7 @@
 						};
 				// Send the data using post
 				$.ajax({
-				  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/',
+				  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/',
 				  type: 'POST',
 				  data:JSON.stringify(postData),
 				  contentType:"application/json; charset=utf-8",
@@ -306,7 +306,7 @@
 			console.log('Will STOP');
 			// Send the data using post
 			$.ajax({
-			  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/'+ bunUUID+'/stop',
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID+'/stop',
 			  type: 'PUT',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",
@@ -318,7 +318,7 @@
 			console.log('Will START');
 			// Send the data using post
 			$.ajax({
-			  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/'+ bunUUID+'/start',
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID+'/start',
 			  type: 'PUT',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",
@@ -330,7 +330,7 @@
 			console.log('Will UNINSTALL');
 			// Send the data using post
 			$.ajax({
-			  url: bakerURLatFORGEBoxInstall+'/baker/services/api/client/ibuns/'+ bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID,
 			  type: 'DELETE',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",

@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -32,9 +32,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import portal.api.util.EncryptionUtil;
 
-@Entity(name = "BakerUser")
+@Entity(name = "PortalUser")
 @JsonIgnoreProperties(value = { "products", "deployments", "subscribedResources" })
-public class BakerUser {
+public class PortalUser {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -175,7 +175,7 @@ public class BakerUser {
 
 	@Override
 	public String toString() {
-		return "BakerUser " + " [organization: " + getOrganization() + "]" + " [id: " + getId() + "]";
+		return "PortalUser " + " [organization: " + getOrganization() + "]" + " [id: " + getId() + "]";
 	}
 
 	public String getName() {

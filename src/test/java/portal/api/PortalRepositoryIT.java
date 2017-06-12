@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker;
+package portal.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import portal.api.model.BakerUser;
+import portal.api.model.PortalUser;
 import portal.api.model.UserSession;
 import portal.api.util.EncryptionUtil;
 
@@ -47,12 +47,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 //RUN a single Integration Test only, but runs all unit tests
-//mvn clean -Pjetty.integration -Dit.test=BakerRepositoryIT verify
+//mvn clean -Pjetty.integration -Dit.test=PortalRepositoryIT verify
 
-public class BakerRepositoryIT {
+public class PortalRepositoryIT {
 
 	private static String endpointUrl;
-	private static final transient Log logger = LogFactory.getLog(BakerRepositoryIT.class.getName());
+	private static final transient Log logger = LogFactory.getLog(PortalRepositoryIT.class.getName());
 	private NewCookie cookieJSESSIONID;
 
 	@BeforeClass
@@ -80,9 +80,9 @@ public class BakerRepositoryIT {
 
 	@Test
 	public void testManagementOfRepo() throws Exception {
-		List<BakerUser> busers = getUsers();
-		int initialBakerUserList = busers.size();
-		BakerUser bu = new BakerUser();
+		List<PortalUser> busers = getUsers();
+		int initialPortalUserList = busers.size();
+		PortalUser bu = new PortalUser();
 		bu.setName("ATESTUSER");
 		bu.setOrganization("ANORGANIZATION");
 		bu.setPasswordUnencrypted("APASS");
@@ -90,7 +90,7 @@ public class BakerRepositoryIT {
 		bu.setEmail("ANEMAIL");
 
 		// add a user...
-		BakerUser retBU = addUser(bu);
+		PortalUser retBU = addUser(bu);
 		assertNotNull(bu.getId());
 		assertEquals(bu.getName(), retBU.getName());
 		assertEquals(bu.getOrganization(), retBU.getOrganization());
@@ -98,23 +98,23 @@ public class BakerRepositoryIT {
 		assertEquals(bu.getUsername(), retBU.getUsername());
 
 		// should be one more user in the DB
-		assertEquals(initialBakerUserList + 1, getUsers().size());
+		assertEquals(initialPortalUserList + 1, getUsers().size());
 
 		// GET a user by Id
-		BakerUser retBUbyGET = getUserById(retBU.getId());
+		PortalUser retBUbyGET = getUserById(retBU.getId());
 		assertEquals(retBU.getName(), retBUbyGET.getName());
 		assertEquals(retBU.getOrganization(), retBUbyGET.getOrganization());
 		//assertEquals(EncryptionUtil.hash( bu.getPassword() ), retBUbyGET.getPassword());
 		assertEquals(retBU.getUsername(), retBUbyGET.getUsername());
 
 		// update user
-		bu = new BakerUser();
+		bu = new PortalUser();
 		bu.setName("ATESTUSERNEW");
 		bu.setOrganization("ANORGANIZATIONNEW");
 		bu.setPasswordUnencrypted("APASSNEW");
 		bu.setUsername("AUSERNAMENEW");
 		bu.setId(retBU.getId());
-		BakerUser retBUUpdated = updateUser(retBU.getId(), bu);
+		PortalUser retBUUpdated = updateUser(retBU.getId(), bu);
 		assertEquals(retBU.getId(), retBUUpdated.getId());
 		assertEquals(bu.getName(), retBUUpdated.getName());
 		assertEquals(bu.getOrganization(), retBUUpdated.getOrganization());
@@ -122,7 +122,7 @@ public class BakerRepositoryIT {
 		assertEquals(bu.getUsername(), retBUUpdated.getUsername());
 
 		// should be again the same user count in the DB
-		assertEquals(initialBakerUserList + 1, getUsers().size());
+		assertEquals(initialPortalUserList + 1, getUsers().size());
 
 		// GET the updated user by Id
 		retBUbyGET = getUserById(retBU.getId());
@@ -136,7 +136,7 @@ public class BakerRepositoryIT {
 		//delete our added user
 		deleteUserById(retBU.getId());
 
-		assertEquals(initialBakerUserList , getUsers().size());
+		assertEquals(initialPortalUserList , getUsers().size());
 		
 
 	}
@@ -152,7 +152,7 @@ public class BakerRepositoryIT {
 		
 	}
 
-	private BakerUser updateUser(int id, BakerUser bu) throws JsonParseException, IOException {
+	private PortalUser updateUser(int id, PortalUser bu) throws JsonParseException, IOException {
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
 
@@ -163,11 +163,11 @@ public class BakerRepositoryIT {
 
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-		BakerUser output = parser.readValueAs(BakerUser.class);
+		PortalUser output = parser.readValueAs(PortalUser.class);
 		return output;
 	}
 
-	private BakerUser getUserById(int id) throws JsonParseException, IOException {
+	private PortalUser getUserById(int id) throws JsonParseException, IOException {
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
 
@@ -178,11 +178,11 @@ public class BakerRepositoryIT {
 
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-		BakerUser output = parser.readValueAs(BakerUser.class);
+		PortalUser output = parser.readValueAs(PortalUser.class);
 		return output;
 	}
 
-	private BakerUser addUser(BakerUser bu) throws JsonParseException, IOException {
+	private PortalUser addUser(PortalUser bu) throws JsonParseException, IOException {
 
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
@@ -201,11 +201,11 @@ public class BakerRepositoryIT {
 		
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-		BakerUser output = parser.readValueAs(BakerUser.class);
+		PortalUser output = parser.readValueAs(PortalUser.class);
 		return output;
 	}
 
-	public List<BakerUser> getUsers() throws Exception {
+	public List<PortalUser> getUsers() throws Exception {
 
 		logger.info("Executing TEST = testGetUsers");
 
@@ -213,22 +213,22 @@ public class BakerRepositoryIT {
 		Response r = execGETonURL(endpointUrl + "/services/api/repo/admin/users", cookieJSESSIONID);
 		assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
 
-		String bakerAPIVersionListHeaders = (String) r.getHeaders().getFirst("X-Baker-API-Version");
-		assertEquals("1.0.0", bakerAPIVersionListHeaders);
+		String portalAPIVersionListHeaders = (String) r.getHeaders().getFirst("X-Portal-API-Version");
+		assertEquals("1.0.0", portalAPIVersionListHeaders);
 
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
 
 		JsonNode node = parser.readValueAsTree();
 		ObjectMapper mapper = new ObjectMapper();
-		TypeReference<List<BakerUser>> typeRef = new TypeReference<List<BakerUser>>() {
+		TypeReference<List<PortalUser>> typeRef = new TypeReference<List<PortalUser>>() {
 		};
-		List<BakerUser> bakerUsersList = mapper.readValue(node.traverse(), typeRef);
-		for (BakerUser f : bakerUsersList) {
+		List<PortalUser> portalUsersList = mapper.readValue(node.traverse(), typeRef);
+		for (PortalUser f : portalUsersList) {
 			logger.info("user = " + f.getName() + ", ID = " + f.getId());
 		}
 
-		return bakerUsersList;
+		return portalUsersList;
 	}
 
 	private Response execPOSTonURLForAPILogin(String url, String username, String passw) {
@@ -237,7 +237,7 @@ public class BakerRepositoryIT {
 
 		WebClient client = WebClient.create(url, providers, username, passw, null);
 
-		Cookie cookie = new Cookie("X-Baker-Key", "123456") ;
+		Cookie cookie = new Cookie("X-Portal-Key", "123456") ;
 		client.cookie(cookie );
 		
 		UserSession uses = new UserSession();
@@ -253,7 +253,7 @@ public class BakerRepositoryIT {
 
 		WebClient client = WebClient.create(url, providers);
 
-		Cookie cookie = new Cookie("X-Baker-Key", "123456") ;
+		Cookie cookie = new Cookie("X-Portal-Key", "123456") ;
 		client.cookie(cookie );
 		client.cookie(sessioncookie);
 		
@@ -266,7 +266,7 @@ public class BakerRepositoryIT {
 //		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
 //
 //		WebClient client = WebClient.create(url, providers);
-//		Cookie cookie = new Cookie("X-Baker-Key", "123456") ;
+//		Cookie cookie = new Cookie("X-Portal-Key", "123456") ;
 //		client.cookie(cookie );
 //		
 //		Response r = client.accept("application/json").type("application/json").get();

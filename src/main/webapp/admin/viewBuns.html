@@ -38,10 +38,10 @@
         return vars;
     }
     
-    var bunsUrl = '/baker/services/api/repo/buns';
+    var bunsUrl = '/portal/services/api/repo/buns';
     var userid = getUrlVars()["userid"];
     if (userid){
-    	bunsUrl = '/baker/services/api/repo/users/'+userid+'/buns';
+    	bunsUrl = '/portal/services/api/repo/users/'+userid+'/buns';
     }
     
 
@@ -108,7 +108,7 @@
 	            },
 	            "Yes": function () {
 					$.ajax({
-					  url:'/baker/services/api/repo/buns/'+bunId,
+					  url:'/portal/services/api/repo/buns/'+bunId,
 					  type:"DELETE",
 					  success: function(dataX){
 						  console.log("result= "+ dataX );

@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -22,7 +22,7 @@ public class UserSession {
 
 	private String username = null;
 	private String password = null;
-	private BakerUser bakerUser = null;
+	private PortalUser portalUser = null;
 	private FIWAREUser FIWAREUser = null;
 	
 	
@@ -42,11 +42,11 @@ public class UserSession {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public BakerUser getBakerUser() {
-		return bakerUser;
+	public PortalUser getPortalUser() {
+		return portalUser;
 	}
-	public void setBakerUser(BakerUser bakerUser) {
-		this.bakerUser = bakerUser;
+	public void setPortalUser(PortalUser portalUser) {
+		this.portalUser = portalUser;
 	}
 	public FIWAREUser getFIWAREUser() {
 		return FIWAREUser;

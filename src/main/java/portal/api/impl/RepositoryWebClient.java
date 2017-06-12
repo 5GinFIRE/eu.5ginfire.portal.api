@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -88,8 +88,8 @@ public class RepositoryWebClient implements IRepositoryWebClient {
 			
 
 			
-			//Path tempDir = Files.createTempDirectory("baker");
-			String tempDir = System.getProperty("user.home") + File.separator +".baker"+File.separator+"extractedbuns";
+			//Path tempDir = Files.createTempDirectory("portal");
+			String tempDir = System.getProperty("user.home") + File.separator +".portal"+File.separator+"extractedbuns";
 			File destFile = new File(tempDir+File.separator+uuid+File.separator+"bun.tar.gz" );
 			Files.createDirectories( Paths.get( tempDir+File.separator+uuid ) );
 			Path targetPath = destFile.toPath();

@@ -1,4 +1,4 @@
-var app = angular.module('bakerapp', [ 'ngResource', 'ngRoute' ]);
+var app = angular.module('portalapp', [ 'ngResource', 'ngRoute' ]);
 
 app.config(function($routeProvider) {
 	$routeProvider.when('/marketplace', {
@@ -6,7 +6,7 @@ app.config(function($routeProvider) {
 		controller : 'bunsCtrl'
 	}).when('/installed', {
 		templateUrl : 'viewInstalledBunsJS.html',
-		controller : 'bakerCtrl'
+		controller : 'portalCtrl'
 	}).when('/login', {
 		templateUrl : 'login.html',
 		controller : 'LoginCtrl'
@@ -18,17 +18,17 @@ app.config(function($routeProvider) {
 	});
 });
 
-app.controller('bakerCtrl', function($scope, BakerUser) {
-	$scope.bakerusers = BakerUser.query();
+app.controller('portalCtrl', function($scope, PortalUser) {
+	$scope.portalusers = PortalUser.query();
 });
 
 app.controller('bunsCtrl', function($scope, Buns) {
 	$scope.buns = Buns.query();
 });
 
-// BakerUser Resource
-app.factory('BakerUser', function($resource) {
-	return $resource("/baker/services/api/repo/users/:Id", {
+// PortalUser Resource
+app.factory('PortalUser', function($resource) {
+	return $resource("/portal/services/api/repo/users/:Id", {
 		Id : "@Id"
 	}, {
 		"update" : {
@@ -46,9 +46,9 @@ app.factory('BakerUser', function($resource) {
 });
 
 
-//BakerUser Resource
+//PortalUser Resource
 app.factory('Buns', function($resource) {
-	return $resource("/baker/services/api/repo/buns/:Id", {
+	return $resource("/portal/services/api/repo/buns/:Id", {
 		Id : "@Id"
 	}, {
 		"update" : {

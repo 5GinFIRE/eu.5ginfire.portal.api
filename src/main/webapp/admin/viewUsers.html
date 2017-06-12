@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Administer Baker Users</title>
+<title>Administer Portal Users</title>
 	
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
@@ -33,7 +33,7 @@
   	});
     
     function loadData(){
-		  $.getJSON('/baker/services/api/repo/users', function(data) {
+		  $.getJSON('/portal/services/api/repo/users', function(data) {
 		      var output="<table class='table table-bordered table-condensed table-hover table-striped' >"+ 
 		      		"<tr>" + 
 		   	  	   "<th>ID</th>" +
@@ -84,7 +84,7 @@
 	            },
 	            "Yes": function () {
 					$.ajax({
-					  url:'/baker/services/api/repo/users/'+checkID,
+					  url:'/portal/services/api/repo/users/'+checkID,
 					  type:"DELETE",
 					  success: function(dataX){
 						  console.log("result= "+ dataX );

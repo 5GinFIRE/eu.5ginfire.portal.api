@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -46,7 +46,7 @@ public class HeadersOutInterceptor extends AbstractOutDatabindingInterceptor {
 			
 			List<String> vl = new ArrayList<String>();
 			vl.add("1.0.0");
-			headers.put("X-Baker-API-Version", vl );
+			headers.put("X-Portal-API-Version", vl );
 //			vl = new ArrayList<String>();
 //			vl.add("*");
 //			headers.put("Access-Control-Allow-Origin", vl);			

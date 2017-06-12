@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -20,15 +20,15 @@ import portal.api.fiware.FIWAREUser;
 import portal.api.fiware.FIWAREUtils;
 import portal.api.fiware.OAuthClientManager;
 import portal.api.model.ApplicationMetadata;
-import portal.api.model.BakerProperty;
-import portal.api.model.BakerUser;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeployArtifact;
 import portal.api.model.DeployContainer;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
-import portal.api.model.IBakerRepositoryAPI;
+import portal.api.model.IPortalRepositoryAPI;
 import portal.api.model.InstalledBun;
 import portal.api.model.InstalledBunStatus;
 import portal.api.model.Product;
@@ -113,7 +113,7 @@ import com.woorea.openstack.nova.model.Servers;
 //        
 //)
 @Path("/repo")
-public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
+public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	@Context
 	UriInfo uri;
@@ -127,16 +127,16 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Context
 	protected SecurityContext securityContext;
 
-	private static final transient Log logger = LogFactory.getLog(BakerRepositoryAPIImpl.class.getName());
+	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
-	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".baker/metadata/";
+	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal/metadata/";
 
-	private BakerRepository bakerRepositoryRef;
+	private PortalRepository portalRepositoryRef;
 	private OAuthClientManager oAuthClientManagerRef;
 
 	public static final String KEYSTONE_AUTH_URL = "http://cloud.lab.fi-ware.org:4730/v2.0";
 
-	// BakerUser related API
+	// PortalUser related API
 
 	/*************** Users API *************************/
 
@@ -153,7 +153,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 		}
 
-		return Response.ok().entity(bakerRepositoryRef.getUserValues()).build();
+		return Response.ok().entity(portalRepositoryRef.getUserValues()).build();
 	}
 
 	@GET
@@ -161,13 +161,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getUserById(@PathParam("userid") int userid) {
 
-		BakerUser u = bakerRepositoryRef.getUserByID(userid);
+		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User with id=" + userid + " not found in baker registry");
+			builder.entity("User with id=" + userid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -176,7 +176,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/admin/users/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response addUser(BakerUser user) {
+	public Response addUser(PortalUser user) {
 
 		logger.info("Received POST for usergetUsername: " + user.getUsername());
 		// logger.info("Received POST for usergetPassword: " + user.getPassword());
@@ -189,17 +189,17 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		BakerUser u = bakerRepositoryRef.getUserByUsername(user.getUsername());
+		PortalUser u = portalRepositoryRef.getUserByUsername(user.getUsername());
 		if (u != null) {
 			return Response.status(Status.BAD_REQUEST).entity("Username exists").build();
 		}
 
-		u = bakerRepositoryRef.getUserByEmail(user.getEmail());
+		u = portalRepositoryRef.getUserByEmail(user.getEmail());
 		if (u != null) {
 			return Response.status(Status.BAD_REQUEST).entity("Email exists").build();
 		}
 
-		u = bakerRepositoryRef.addBakerUserToUsers(user);
+		u = portalRepositoryRef.addPortalUserToUsers(user);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -216,7 +216,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response addNewRegisterUser(List<Attachment> ats) {
 
-		BakerUser user = new BakerUser();
+		PortalUser user = new PortalUser();
 		user.setName(getAttachmentStringValue("name", ats));
 		user.setUsername(getAttachmentStringValue("username", ats));
 		user.setPassword(getAttachmentStringValue("userpassword", ats));
@@ -242,10 +242,10 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/admin/users/{userid}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateUserInfo(@PathParam("userid") int userid, BakerUser user) {
+	public Response updateUserInfo(@PathParam("userid") int userid, PortalUser user) {
 		logger.info("Received PUT for user: " + user.getUsername());
 
-		BakerUser previousUser = bakerRepositoryRef.getUserByID(userid);
+		PortalUser previousUser = portalRepositoryRef.getUserByID(userid);
 
 		List<Product> previousProducts = previousUser.getProducts();
 
@@ -253,7 +253,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			user.getProducts().addAll(previousProducts);
 		}
 
-		BakerUser u = bakerRepositoryRef.updateUserInfo(userid, user);
+		PortalUser u = portalRepositoryRef.updateUserInfo(userid, user);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -270,7 +270,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	public Response deleteUser(@PathParam("userid") int userid) {
 		logger.info("Received DELETE for userid: " + userid);
 
-		bakerRepositoryRef.deleteUser(userid);
+		portalRepositoryRef.deleteUser(userid);
 
 		return Response.ok().build();
 	}
@@ -280,7 +280,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllBunsofUser(@PathParam("userid") int userid) {
 		logger.info("getAllBunsofUser for userid: " + userid);
-		BakerUser u = bakerRepositoryRef.getUserByID(userid);
+		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			List<Product> prods = u.getProducts();
@@ -293,7 +293,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			return Response.ok().entity(buns).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User with id=" + userid + " not found in baker registry");
+			builder.entity("User with id=" + userid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -303,7 +303,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllAppsofUser(@PathParam("userid") int userid) {
 		logger.info("getAllAppsofUser for userid: " + userid);
-		BakerUser u = bakerRepositoryRef.getUserByID(userid);
+		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			List<Product> prods = u.getProducts();
@@ -316,7 +316,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			return Response.ok().entity(apps).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User with id=" + userid + " not found in baker registry");
+			builder.entity("User with id=" + userid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -326,14 +326,14 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getBunofUser(@PathParam("userid") int userid, @PathParam("bunid") int bunid) {
 		logger.info("getBunofUser for userid: " + userid + ", bunid=" + bunid);
-		BakerUser u = bakerRepositoryRef.getUserByID(userid);
+		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			BunMetadata bun = (BunMetadata) u.getProductById(bunid);
 			return Response.ok().entity(bun).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User with id=" + userid + " not found in baker registry");
+			builder.entity("User with id=" + userid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -343,14 +343,14 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAppofUser(@PathParam("userid") int userid, @PathParam("appid") int appid) {
 		logger.info("getAppofUser for userid: " + userid + ", appid=" + appid);
-		BakerUser u = bakerRepositoryRef.getUserByID(userid);
+		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			ApplicationMetadata appmeta = (ApplicationMetadata) u.getProductById(appid);
 			return Response.ok().entity(appmeta).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User with id=" + userid + " not found in baker registry");
+			builder.entity("User with id=" + userid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -372,7 +372,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 		// String[] catIDs = categories.split(",");
 		// for (String catid : catIDs) {
-		// Category category = bakerRepositoryRef.getCategoryByID( Integer.valueOf(catid) );
+		// Category category = portalRepositoryRef.getCategoryByID( Integer.valueOf(catid) );
 		// prod.addCategory(category);
 		// }
 
@@ -439,25 +439,25 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 		// we must replace given product categories with the ones from our DB
 		for (Category c : prod.getCategories()) {
-			Category catToUpdate = bakerRepositoryRef.getCategoryByID(c.getId());
+			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
 			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"  contains Products: "+ catToUpdate.getProducts().size() );
 			prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
 
 		}
 
 		// Save now bun for User
-		BakerUser bunOwner = bakerRepositoryRef.getUserByID(prod.getOwner().getId());
+		PortalUser bunOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
 		bunOwner.addProduct(prod);
 		prod.setOwner(bunOwner); // replace given owner with the one from our DB
 
-		BakerUser owner = bakerRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
-		Product registeredProd = bakerRepositoryRef.getProductByUUID(uuid);
+		PortalUser owner = portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
+		Product registeredProd = portalRepositoryRef.getProductByUUID(uuid);
 
 		// now fix category references
 		for (Category c : registeredProd.getCategories()) {
-			Category catToUpdate = bakerRepositoryRef.getCategoryByID(c.getId());
+			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
 			catToUpdate.addProduct(registeredProd);
-			bakerRepositoryRef.updateCategoryInfo(catToUpdate);
+			portalRepositoryRef.updateCategoryInfo(catToUpdate);
 		}
 
 		return registeredProd;
@@ -471,7 +471,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	public Response getAllBuns(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getBuns categoryid=" + categoryid);
 
-		List<BunMetadata> buns = bakerRepositoryRef.getBuns(categoryid);
+		List<BunMetadata> buns = portalRepositoryRef.getBuns(categoryid);
 		return Response.ok().entity(buns).build();
 
 	}
@@ -482,22 +482,22 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	public Response getBuns(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getBuns categoryid=" + categoryid);
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 			List<BunMetadata> buns;
 
 			if (u.getRole().equals("ROLE_BOSS")) {
-				buns = bakerRepositoryRef.getBuns(categoryid);
+				buns = portalRepositoryRef.getBuns(categoryid);
 			} else {
-				buns = bakerRepositoryRef.getBunsByUserID((long) u.getId());
+				buns = portalRepositoryRef.getBunsByUserID((long) u.getId());
 			}
 
 			return Response.ok().entity(buns).build();
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in");
+			builder.entity("User not found in portal registry or not logged in");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -508,11 +508,11 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response addBunMetadata(List<Attachment> ats) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in ");
+			builder.entity("User not found in portal registry or not logged in ");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -561,7 +561,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// BunMetadata sm = (BunMetadata) bakerRepositoryRef.getProductByID(bid);
+		// BunMetadata sm = (BunMetadata) portalRepositoryRef.getProductByID(bid);
 		bun = (BunMetadata) updateProductMetadata(bun, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
@@ -583,22 +583,22 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		logger.info("longDescription = " + prod.getLongDescription());
 
 		// get User
-		BakerUser bunOwner = bakerRepositoryRef.getUserByID(prod.getOwner().getId());
+		PortalUser bunOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
 		prod.setOwner(bunOwner); // replace given owner with the one from our DB
 
 		prod.setDateUpdated(new Date());
 
 		// first remove all references of the product from the previous categories
-		Product prodPreUpdate = (Product) bakerRepositoryRef.getProductByID(prod.getId());
+		Product prodPreUpdate = (Product) portalRepositoryRef.getProductByID(prod.getId());
 		for (Category c : prodPreUpdate.getCategories()) {
 			// logger.info("Will remove product "+prodPreUpdate.getName()+ ", from Previous Category "+c.getName() );
 			c.removeProduct(prodPreUpdate);
-			bakerRepositoryRef.updateCategoryInfo(c);
+			portalRepositoryRef.updateCategoryInfo(c);
 		}
 
 		// we must replace API given product categories with the ones from our DB
 		for (Category c : prod.getCategories()) {
-			Category catToUpdate = bakerRepositoryRef.getCategoryByID(c.getId());
+			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
 			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"  contains Products: "+ catToUpdate.getProducts().size() );
 			prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
 		}
@@ -656,18 +656,18 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		}
 
 		// save product
-		prod = bakerRepositoryRef.updateProductInfo(prod);
+		prod = portalRepositoryRef.updateProductInfo(prod);
 
 		// now fix category product references
 		for (Category catToUpdate : prod.getCategories()) {
-			Product p = bakerRepositoryRef.getProductByID(prod.getId());
+			Product p = portalRepositoryRef.getProductByID(prod.getId());
 			catToUpdate.addProduct(p);
-			bakerRepositoryRef.updateCategoryInfo(catToUpdate);
+			portalRepositoryRef.updateCategoryInfo(catToUpdate);
 		}
 
 		if (bunOwner.getProductById(prod.getId()) == null)
 			bunOwner.addProduct(prod);
-		bakerRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
+		portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
 		return prod;
 	}
 
@@ -711,7 +711,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@DELETE
 	@Path("/admin/buns/{bunid}")
 	public void deleteBun(@PathParam("bunid") int bunid) {
-		bakerRepositoryRef.deleteProduct(bunid);
+		portalRepositoryRef.deleteProduct(bunid);
 	}
 
 	@GET
@@ -719,13 +719,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getBunMetadataByID(@PathParam("bunid") int bunid) {
 		logger.info("getBunMetadataByID  bunid=" + bunid);
-		BunMetadata bun = (BunMetadata) bakerRepositoryRef.getProductByID(bunid);
+		BunMetadata bun = (BunMetadata) portalRepositoryRef.getProductByID(bunid);
 
 		if (bun != null) {
 			return Response.ok().entity(bun).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("bun with id=" + bunid + " not found in baker registry");
+			builder.entity("bun with id=" + bunid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -778,7 +778,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 			bun.setPackageLocation(endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplebunErrInstall.tar.gz");
 		} else {
-			bun = (BunMetadata) bakerRepositoryRef.getProductByUUID(uuid);
+			bun = (BunMetadata) portalRepositoryRef.getProductByUUID(uuid);
 		}
 
 		if (bun != null) {
@@ -791,12 +791,12 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 	}
 
-	public BakerRepository getBakerRepositoryRef() {
-		return bakerRepositoryRef;
+	public PortalRepository getPortalRepositoryRef() {
+		return portalRepositoryRef;
 	}
 
-	public void setBakerRepositoryRef(BakerRepository bakerRepositoryRef) {
-		this.bakerRepositoryRef = bakerRepositoryRef;
+	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
+		this.portalRepositoryRef = portalRepositoryRef;
 	}
 
 	public void setoAuthClientManagerRef(OAuthClientManager oAuthClientManagerRef) {
@@ -847,16 +847,16 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			AuthenticationToken token = new UsernamePasswordToken(userSession.getUsername(), userSession.getPassword());
 			try {
 				currentUser.login(token);
-				BakerUser bakerUser = bakerRepositoryRef.getUserByUsername(userSession.getUsername());
-				bakerUser.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
-				userSession.setBakerUser(bakerUser);
+				PortalUser portalUser = portalRepositoryRef.getUserByUsername(userSession.getUsername());
+				portalUser.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
+				userSession.setPortalUser(portalUser);
 				userSession.setPassword("");
 				;// so not tosend in response
 
 				logger.info(" currentUser = " + currentUser.toString());
 				logger.info("User [" + currentUser.getPrincipal() + "] logged in successfully.");
 
-				bakerRepositoryRef.updateUserInfo(bakerUser.getId(), bakerUser);
+				portalRepositoryRef.updateUserInfo(portalUser.getId(), portalUser);
 
 				return Response.ok().entity(userSession).build();
 			} catch (AuthenticationException ae) {
@@ -921,19 +921,19 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getSubscribedResources() {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 
 			if (u.getRole().equals("ROLE_BOSS")) {
-				return Response.ok().entity(bakerRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return all
+				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return all
 			} else
 				return Response.ok().entity(u.getSubscribedResources()).build();
 
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("User not found in baker registry or not logged in");
+		builder.entity("User not found in portal registry or not logged in");
 		throw new WebApplicationException(builder.build());
 
 	}
@@ -943,9 +943,9 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getSubscribedResourceById(@PathParam("smId") int smId) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
-		SubscribedResource sm = bakerRepositoryRef.getSubscribedResourceByID(smId);
+		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
 
 		if ((sm != null) && (u != null)) {
 
@@ -955,7 +955,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("SubscribedResource" + smId + " not found in baker registry");
+		builder.entity("SubscribedResource" + smId + " not found in portal registry");
 		throw new WebApplicationException(builder.build());
 
 	}
@@ -966,14 +966,14 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("application/json")
 	public Response addSubscribedResource(SubscribedResource sm) {
 
-		BakerUser u = sm.getOwner();
-		u = bakerRepositoryRef.getUserByID(sm.getOwner().getId());
+		PortalUser u = sm.getOwner();
+		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
 
 		if (u != null) {
 			sm.setOwner(u);
 
 			u.getSubscribedResources().add(sm);
-			u = bakerRepositoryRef.updateUserInfo(u.getId(), u);
+			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 
 			return Response.ok().entity(sm).build();
 		} else {
@@ -990,16 +990,16 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	public Response updateSubscribedResource(@PathParam("smId") int smId, SubscribedResource sm) {
 		logger.info("Received SubscribedResource for user: " + sm.getURL());
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
-		BakerUser reattachedUser = bakerRepositoryRef.getUserByID(sm.getOwner().getId());
+		PortalUser reattachedUser = portalRepositoryRef.getUserByID(sm.getOwner().getId());
 		sm.setOwner(reattachedUser);
 
 		if (u != null) {
 
 			if ((u.getRole().equals("ROLE_BOSS")) || (sm.getOwner().getId() == u.getId())) {
 
-				SubscribedResource sr = bakerRepositoryRef.updateSubscribedResourceInfo(smId, sm);
+				SubscribedResource sr = portalRepositoryRef.updateSubscribedResourceInfo(smId, sm);
 				return Response.ok().entity(u).build();
 			}
 
@@ -1017,13 +1017,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	public Response deleteSubscribedResource(@PathParam("smId") int smId) {
 		logger.info("Received SubscribedResource for userid: " + smId);
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
-		SubscribedResource sm = bakerRepositoryRef.getSubscribedResourceByID(smId);
+		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
 		if (u != null) {
 
 			if ((u.getRole().equals("ROLE_BOSS")) || (sm.getOwner().getId() == u.getId())) {
-				bakerRepositoryRef.deleteSubscribedResource(smId);
+				portalRepositoryRef.deleteSubscribedResource(smId);
 				return Response.ok().build();
 
 			}
@@ -1041,22 +1041,22 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getApps(@QueryParam("categoryid") Long categoryid) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 			List<ApplicationMetadata> apps;
 
 			if (u.getRole().equals("ROLE_BOSS")) {
-				apps = bakerRepositoryRef.getApps(categoryid);
+				apps = portalRepositoryRef.getApps(categoryid);
 			} else {
-				apps = bakerRepositoryRef.getAppsByUserID((long) u.getId());
+				apps = portalRepositoryRef.getAppsByUserID((long) u.getId());
 			}
 
 			return Response.ok().entity(apps).build();
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in");
+			builder.entity("User not found in portal registry or not logged in");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1067,7 +1067,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllApps(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getApps categoryid=" + categoryid);
-		List<ApplicationMetadata> buns = bakerRepositoryRef.getApps(categoryid);
+		List<ApplicationMetadata> buns = portalRepositoryRef.getApps(categoryid);
 		return Response.ok().entity(buns).build();
 	}
 
@@ -1076,13 +1076,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAppMetadataByID(@PathParam("appid") int appid) {
 		logger.info("getAppMetadataByID  appid=" + appid);
-		ApplicationMetadata app = (ApplicationMetadata) bakerRepositoryRef.getProductByID(appid);
+		ApplicationMetadata app = (ApplicationMetadata) portalRepositoryRef.getProductByID(appid);
 
 		if (app != null) {
 			return Response.ok().entity(app).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("App with id=" + appid + " not found in baker registry");
+			builder.entity("App with id=" + appid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1102,7 +1102,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		ApplicationMetadata app = null;
 
 		URI endpointUrl = uri.getBaseUri();
-		app = (ApplicationMetadata) bakerRepositoryRef.getProductByUUID(uuid);
+		app = (ApplicationMetadata) portalRepositoryRef.getProductByUUID(uuid);
 
 		if (app != null) {
 			return Response.ok().entity(app).build();
@@ -1119,11 +1119,11 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response addAppMetadata(List<Attachment> ats) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in ");
+			builder.entity("User not found in portal registry or not logged in ");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1173,7 +1173,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// ApplicationMetadata appmeta = (ApplicationMetadata) bakerRepositoryRef.getProductByID(aid);
+		// ApplicationMetadata appmeta = (ApplicationMetadata) portalRepositoryRef.getProductByID(aid);
 
 		appmeta = (ApplicationMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
@@ -1184,7 +1184,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@DELETE
 	@Path("/admin/apps/{appid}")
 	public void deleteApp(@PathParam("appid") int appid) {
-		bakerRepositoryRef.deleteProduct(appid);
+		portalRepositoryRef.deleteProduct(appid);
 
 	}
 
@@ -1193,14 +1193,14 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/categories/")
 	@Produces("application/json")
 	public Response getCategories() {
-		return Response.ok().entity(bakerRepositoryRef.getCategories()).build();
+		return Response.ok().entity(portalRepositoryRef.getCategories()).build();
 	}
 
 	@GET
 	@Path("/admin/categories/")
 	@Produces("application/json")
 	public Response getAdminCategories() {
-		return Response.ok().entity(bakerRepositoryRef.getCategories()).build();
+		return Response.ok().entity(portalRepositoryRef.getCategories()).build();
 	}
 
 	@POST
@@ -1208,7 +1208,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addCategory(Category c) {
-		Category u = bakerRepositoryRef.addCategory(c);
+		Category u = portalRepositoryRef.addCategory(c);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -1224,9 +1224,9 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateCategory(@PathParam("catid") int catid, Category c) {
-		Category previousCategory = bakerRepositoryRef.getCategoryByID(catid);
+		Category previousCategory = portalRepositoryRef.getCategoryByID(catid);
 
-		Category u = bakerRepositoryRef.updateCategoryInfo(c);
+		Category u = portalRepositoryRef.updateCategoryInfo(c);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -1241,13 +1241,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@DELETE
 	@Path("/admin/categories/{catid}")
 	public Response deleteCategory(@PathParam("catid") int catid) {
-		Category category = bakerRepositoryRef.getCategoryByID(catid);
+		Category category = portalRepositoryRef.getCategoryByID(catid);
 		if ((category.getProducts().size() > 0)) {
 			ResponseBuilder builder = Response.status(Status.METHOD_NOT_ALLOWED);
 			builder.entity("The category has assigned elements. You cannot delete it!");
 			throw new WebApplicationException(builder.build());
 		} else {
-			bakerRepositoryRef.deleteCategory(catid);
+			portalRepositoryRef.deleteCategory(catid);
 			return Response.ok().build();
 		}
 	}
@@ -1256,13 +1256,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/categories/{catid}")
 	@Produces("application/json")
 	public Response getCategoryById(@PathParam("catid") int catid) {
-		Category sm = bakerRepositoryRef.getCategoryByID(catid);
+		Category sm = portalRepositoryRef.getCategoryByID(catid);
 
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Category " + catid + " not found in baker registry");
+			builder.entity("Category " + catid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1383,7 +1383,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		logger.info("Requesting OAuth server accessTokenService to replace an authorized request token with an access token");
 		ClientAccessToken accessToken = oAuthClientManagerRef.getAccessToken(codeGrant);
 		if (accessToken == null) {
-			String msg = "NO_OAUTH_ACCESS_TOKEN, Problem replacing your authorization key for OAuth access token,  please report to baker admin";
+			String msg = "NO_OAUTH_ACCESS_TOKEN, Problem replacing your authorization key for OAuth access token,  please report to portal admin";
 			logger.info(msg);
 			return Response.status(Status.UNAUTHORIZED).entity(msg).build();
 		}
@@ -1404,12 +1404,12 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			fu.setTenantId(t.getId());
 			fu.setCloudToken(FIWARECloudAccess.getAccessModel(t, accessToken.getTokenKey()).getToken().getId());
 
-			// check if user exists in Baker database
-			BakerUser u = bakerRepositoryRef.getUserByUsername(fu.getNickName());
+			// check if user exists in Portal database
+			PortalUser u = portalRepositoryRef.getUserByUsername(fu.getNickName());
 
 			String roamPassword = UUID.randomUUID().toString(); // creating a temporary session password, to login
 			if (u == null) {
-				u = new BakerUser(); // create as new user
+				u = new PortalUser(); // create as new user
 				u.setEmail(fu.getEmail());
 				u.setUsername(fu.getNickName());
 				;
@@ -1418,18 +1418,18 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 				u.setRole("SERVICE_PLATFORM_PROVIDER");
 				u.setPassword(roamPassword);
 				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
-				bakerRepositoryRef.addBakerUserToUsers(u);
+				portalRepositoryRef.addPortalUserToUsers(u);
 			} else {
 				u.setEmail(fu.getEmail());
 				u.setName(fu.getDisplayName());
 				u.setPassword(roamPassword);
 				u.setOrganization("FI-WARE");
 				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
-				u = bakerRepositoryRef.updateUserInfo(u.getId(), u);
+				u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 			}
 
 			UserSession userSession = new UserSession();
-			userSession.setBakerUser(u);
+			userSession.setPortalUser(u);
 			userSession.setPassword(roamPassword);
 			userSession.setUsername(u.getUsername());
 			userSession.setFIWAREUser(fu);
@@ -1499,23 +1499,23 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/admin/properties/")
 	@Produces("application/json")
 	public Response getProperties() {
-		return Response.ok().entity(bakerRepositoryRef.getProperties()).build();
+		return Response.ok().entity(portalRepositoryRef.getProperties()).build();
 	}
 
 	@PUT
 	@Path("/admin/properties/{propid}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateProperty(@PathParam("catid") int propid, BakerProperty p) {
-		BakerProperty previousProperty = bakerRepositoryRef.getPropertyByID(propid);
+	public Response updateProperty(@PathParam("catid") int propid, PortalProperty p) {
+		PortalProperty previousProperty = portalRepositoryRef.getPropertyByID(propid);
 
-		BakerProperty u = bakerRepositoryRef.updateProperty(p);
+		PortalProperty u = portalRepositoryRef.updateProperty(p);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested BakerProperty with name=" + p.getName() + " cannot be updated");
+			builder.entity("Requested PortalProperty with name=" + p.getName() + " cannot be updated");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1525,13 +1525,13 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Path("/admin/properties/{propid}")
 	@Produces("application/json")
 	public Response getPropertyById(@PathParam("propid") int propid) {
-		BakerProperty sm = bakerRepositoryRef.getPropertyByID(propid);
+		PortalProperty sm = portalRepositoryRef.getPropertyByID(propid);
 
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("BakerProperty " + propid + " not found in baker registry");
+			builder.entity("PortalProperty " + propid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1541,14 +1541,14 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllDeploymentsofUser() {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
 			List<DeploymentDescriptor> deployments;
 
 			if (u.getRole().equals("ROLE_BOSS")) {
-				deployments = bakerRepositoryRef.getAllDeploymentDescriptors();
+				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 			} else {
 				deployments = u.getDeployments();
 			}
@@ -1556,7 +1556,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			return Response.ok().entity(deployments).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in");
+			builder.entity("User not found in portal registry or not logged in");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1568,7 +1568,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("application/json")
 	public Response addDeployment(DeploymentDescriptor deployment) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 			logger.info("addDeployment for userid: " + u.getId());
@@ -1580,23 +1580,23 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			deployment.setDateCreated(new Date());
 			deployment.setStatus(DeploymentDescriptorStatus.PENDING_ADMIN_AUTH);
 
-			u = bakerRepositoryRef.getUserByID(u.getId());
+			u = portalRepositoryRef.getUserByID(u.getId());
 			deployment.setOwner(u); // reattach from the DB model
 			u.getDeployments().add(deployment);
 
-			ApplicationMetadata baseApplication = (ApplicationMetadata) bakerRepositoryRef.getProductByID(deployment.getBaseApplication().getId());
+			ApplicationMetadata baseApplication = (ApplicationMetadata) portalRepositoryRef.getProductByID(deployment.getBaseApplication().getId());
 			deployment.setBaseApplication(baseApplication); // reattach from the DB model
 
 			for (DeployContainer dc : deployment.getDeployContainers()) {
 				dc.getTargetResource().setOwner(u);// reattach from the DB model, in case missing from the request
 			}
 
-			u = bakerRepositoryRef.updateUserInfo(u.getId(), u);
+			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 
 			return Response.ok().entity(deployment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("User not found in baker registry or not logged in. DeploymentDescriptor not added.");
+			builder.entity("User not found in portal registry or not logged in. DeploymentDescriptor not added.");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1606,18 +1606,18 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response deleteDeployment(@PathParam("id") int id) {
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
-		DeploymentDescriptor dep = bakerRepositoryRef.getDeploymentByID(id);
+		DeploymentDescriptor dep = portalRepositoryRef.getDeploymentByID(id);
 		if (u != null) {
 			if  (  u.getRole().equals("ROLE_BOSS") ||  u.getId() == dep.getOwner().getId())    {
-				bakerRepositoryRef.deleteDeployment(id);
+				portalRepositoryRef.deleteDeployment(id);
 				return Response.ok().build();
 			}
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("User not found in baker registry or not logged in");
+		builder.entity("User not found in portal registry or not logged in");
 		throw new WebApplicationException(builder.build());
 	}
 
@@ -1626,11 +1626,11 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Produces("application/json")
 	public Response getDeploymentById(@PathParam("id") int deploymentId) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
 			logger.info("getDeploymentById for id: " + deploymentId);
-			DeploymentDescriptor deployment = bakerRepositoryRef.getDeploymentByID(deploymentId);
+			DeploymentDescriptor deployment = portalRepositoryRef.getDeploymentByID(deploymentId);
 
 			if ((u.getRole().equals("ROLE_BOSS")) || (deployment.getOwner().getId() == u.getId())) {
 				return Response.ok().entity(deployment).build();
@@ -1639,7 +1639,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("User not found in baker registry or not logged in");
+		builder.entity("User not found in portal registry or not logged in");
 		throw new WebApplicationException(builder.build());
 
 	}
@@ -1650,7 +1650,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 	@Consumes("application/json")
 	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d, @QueryParam("action") String action) {
 
-		BakerUser u = bakerRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if ((u != null) ) { 
 
@@ -1661,10 +1661,10 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 			else if (action.equals("DENY") && (u.getRole().equals("ROLE_BOSS")) )
 				d.setStatus(DeploymentDescriptorStatus.DENIED);
 
-			BakerUser deploymentOwner = bakerRepositoryRef.getUserByID(d.getOwner().getId() );
+			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId() );
 			d.setOwner(deploymentOwner); // reattach from the DB model
 
-			ApplicationMetadata baseApplication = (ApplicationMetadata) bakerRepositoryRef.getProductByID(d.getBaseApplication().getId());
+			ApplicationMetadata baseApplication = (ApplicationMetadata) portalRepositoryRef.getProductByID(d.getBaseApplication().getId());
 			d.setBaseApplication(baseApplication); // reattach from the DB model
 
 			for (DeployContainer dc : d.getDeployContainers()) {
@@ -1672,7 +1672,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 				dc.getTargetResource().setOwner(deploymentOwner);// reattach from the DB model, in case missing from the request
 			}
 
-			DeploymentDescriptor deployment = bakerRepositoryRef.updateDeploymentDescriptor(d);
+			DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
 			logger.info("updateDeployment for id: " + d.getId());
 
@@ -1681,7 +1681,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		}
 
 		ResponseBuilder builder = Response.status(Status.FORBIDDEN);
-		builder.entity("User not found in baker registry or not logged in as admin");
+		builder.entity("User not found in portal registry or not logged in as admin");
 		throw new WebApplicationException(builder.build());
 
 	}
@@ -1694,23 +1694,23 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 		logger.info("Received SubscribedResource for client: " + sm.getUuid() + ", URLs:" + sm.getURL() + ", OwnerID:" + sm.getOwner().getId());
 
-		BakerUser u = sm.getOwner();
-		u = bakerRepositoryRef.getUserByID(sm.getOwner().getId());
+		PortalUser u = sm.getOwner();
+		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
 
 		if ((u != null) && (sm.getUuid() != null)) {
 
-			SubscribedResource checkSM = bakerRepositoryRef.getSubscribedResourceByUUID(sm.getUuid());
+			SubscribedResource checkSM = portalRepositoryRef.getSubscribedResourceByUUID(sm.getUuid());
 
 			if (checkSM == null) {
 				sm.setOwner(u);
 				sm.setActive(false);
 				u.getSubscribedResources().add(sm);
-				u = bakerRepositoryRef.updateUserInfo(u.getId(), u);
+				u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 				return Response.ok().entity(sm).build();
 			} else {
 				checkSM.setURL(sm.getURL());// update URL if changed
-				// u = bakerRepositoryRef.updateUserInfo( u.getId(), u);
-				checkSM = bakerRepositoryRef.updateSubscribedResourceInfo(checkSM.getId(), checkSM);
+				// u = portalRepositoryRef.updateUserInfo( u.getId(), u);
+				checkSM = portalRepositoryRef.updateSubscribedResourceInfo(checkSM.getId(), checkSM);
 				return Response.ok().entity(checkSM).build();
 			}
 
@@ -1731,7 +1731,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 		if (res!=null)
 			logger.info("Received req for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL() + ", OwnerID:" + res.getOwner().getId());
 
-		List<DeploymentDescriptor> deployments = bakerRepositoryRef.getAllDeploymentDescriptors();
+		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 		for (DeploymentDescriptor deploymentDescriptor : deployments) 
 			if ((deploymentDescriptor.getStatus()!= DeploymentDescriptorStatus.PENDING_ADMIN_AUTH )&&
 					(deploymentDescriptor.getStatus()!= DeploymentDescriptorStatus.DENIED )&&
@@ -1766,7 +1766,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 					+ ", OwnerID:"+ res.getOwner().getId()
 					+ ", installedBunUUID:"+ installedBunUUID);
 
-		List<DeploymentDescriptor> deployments = bakerRepositoryRef.getAllDeploymentDescriptors();
+		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 		for (DeploymentDescriptor deploymentDescriptor : deployments) {
 			List<DeployContainer> dcs = deploymentDescriptor.getDeployContainers();
 			for (DeployContainer dc : dcs) {
@@ -1779,7 +1779,7 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 						}
 
 					deploymentDescriptor.setStatus( resolveStatus(deploymentDescriptor) ); // we must write here code to properly find the status!
-					bakerRepositoryRef.updateDeploymentDescriptor(deploymentDescriptor);
+					portalRepositoryRef.updateDeploymentDescriptor(deploymentDescriptor);
 					
 					return Response.status(Status.OK).build();
 				}else{
@@ -1836,12 +1836,12 @@ public class BakerRepositoryAPIImpl implements IBakerRepositoryAPI {
 
 	private SubscribedResource updateLastSeenResource(String clientUUID) {
 
-		SubscribedResource res = bakerRepositoryRef.getSubscribedResourceByUUID(clientUUID);
+		SubscribedResource res = portalRepositoryRef.getSubscribedResourceByUUID(clientUUID);
 		if (res != null) {
-			res.setLastUpdate(new Date()); // each time Baker Client Polls marketplace, we update this Last seen of client
-			BakerUser reattachedUser = bakerRepositoryRef.getUserByID(res.getOwner().getId());
+			res.setLastUpdate(new Date()); // each time Portal Client Polls marketplace, we update this Last seen of client
+			PortalUser reattachedUser = portalRepositoryRef.getUserByID(res.getOwner().getId());
 			res.setOwner(reattachedUser);
-			bakerRepositoryRef.updateSubscribedResourceInfo(res.getId(), res);
+			portalRepositoryRef.updateSubscribedResourceInfo(res.getId(), res);
 		}
 
 		return res;

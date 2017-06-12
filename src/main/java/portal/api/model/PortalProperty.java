@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -21,8 +21,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity(name = "BakerProperty")
-public class BakerProperty {
+@Entity(name = "PortalProperty")
+public class PortalProperty {
 	
 
 	@Id
@@ -52,11 +52,11 @@ public class BakerProperty {
 		this.value = value;
 	}
 	
-	public BakerProperty() {
+	public PortalProperty() {
 
 	}
 	
-	public BakerProperty(String name, String value) {
+	public PortalProperty(String name, String value) {
 		this.name = name;
 		this.value = value;
 		

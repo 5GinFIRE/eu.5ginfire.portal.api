@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -15,9 +15,9 @@
 
 package portal.api.util;
 
-import portal.api.impl.BakerJpaController;
-import portal.api.repo.BakerRepository;
-import portal.api.repo.BakerRepositoryAPIImpl;
+import portal.api.impl.PortalJpaController;
+import portal.api.repo.PortalRepository;
+import portal.api.repo.PortalRepositoryAPIImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -47,15 +47,15 @@ public class EmailUtil {
 		// Session session = Session.getDefaultInstance(props, null);
 
 		props.setProperty("mail.transport.protocol", "smtp");
-		if ((BakerRepository.getPropertyByName("mailhost").getValue()!=null)&&(!BakerRepository.getPropertyByName("mailhost").getValue().isEmpty()))
-			props.setProperty("mail.host", BakerRepository.getPropertyByName("mailhost").getValue());
-		if ((BakerRepository.getPropertyByName("mailuser").getValue()!=null)&&(!BakerRepository.getPropertyByName("mailuser").getValue().isEmpty()))
-			props.setProperty("mail.user", BakerRepository.getPropertyByName("mailuser").getValue());
-		if ((BakerRepository.getPropertyByName("mailpassword").getValue()!=null)&&(!BakerRepository.getPropertyByName("mailpassword").getValue().isEmpty()))
-			props.setProperty("mail.password", BakerRepository.getPropertyByName("mailpassword").getValue());
+		if ((PortalRepository.getPropertyByName("mailhost").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailhost").getValue().isEmpty()))
+			props.setProperty("mail.host", PortalRepository.getPropertyByName("mailhost").getValue());
+		if ((PortalRepository.getPropertyByName("mailuser").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailuser").getValue().isEmpty()))
+			props.setProperty("mail.user", PortalRepository.getPropertyByName("mailuser").getValue());
+		if ((PortalRepository.getPropertyByName("mailpassword").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailpassword").getValue().isEmpty()))
+			props.setProperty("mail.password", PortalRepository.getPropertyByName("mailpassword").getValue());
 
-		String adminemail = BakerRepository.getPropertyByName("adminEmail").getValue();
-		String subj = BakerRepository.getPropertyByName("activationEmailSubject").getValue();
+		String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+		String subj = PortalRepository.getPropertyByName("activationEmailSubject").getValue();
 		logger.info("adminemail = " + adminemail);
 		logger.info("subj = " + subj);
 

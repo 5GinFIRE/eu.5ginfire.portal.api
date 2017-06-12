@@ -30,7 +30,7 @@
 	</div>
 
 	<form class="form-horizontal" role="form"
-		action="/baker/services/api/repo/users/"
+		action="/portal/services/api/repo/users/"
 		id="addUserForm">
 		<input type="hidden" name="userid" value=""  />
 		<div class="form-group">
@@ -91,7 +91,7 @@
     $(document).ready(function() {
     	if (userid){
     		document.getElementById("headerTitle").innerHTML = 'Edit user';
-    		 $.getJSON('/baker/services/api/repo/users/'+userid, function(data) {
+    		 $.getJSON('/portal/services/api/repo/users/'+userid, function(data) {
 
     			 $("#addUserForm input[name='userid']").val(data.id);
     			 $("#addUserForm input[name='name']").val(data.name);

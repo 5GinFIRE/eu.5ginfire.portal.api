@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -15,8 +15,8 @@
 
 package portal.api.util;
 
-import portal.api.model.BakerUser;
-import portal.api.repo.BakerRepository;
+import portal.api.model.PortalUser;
+import portal.api.repo.PortalRepository;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,7 +49,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 	private final List<String> requiredRoles = new ArrayList<String>();
 	private static final transient Log logger = LogFactory.getLog(ShiroUTAuthorizingRealm.class.getName());
 	
-	private BakerRepository bakerRepositoryRef;
+	private PortalRepository portalRepositoryRef;
 
 	
 	
@@ -59,7 +59,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 
 		SimpleAuthorizationInfo ai = new SimpleAuthorizationInfo();
 
-		BakerUser bu = bakerRepositoryRef.getUserByUsername( arg0.toString() );
+		PortalUser bu = portalRepositoryRef.getUserByUsername( arg0.toString() );
 		if (bu!=null){
 
 			String r = bu.getRole();
@@ -85,7 +85,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		//logger.info("tokengetPrincipal at=" + token.getPrincipal());
 		
 		
-		BakerUser bu = bakerRepositoryRef.getUserByUsername(token.getUsername());
+		PortalUser bu = portalRepositoryRef.getUserByUsername(token.getUsername());
 		if (bu == null ){
 			throw new AuthenticationException("Sorry! No login for you.");			
 		}
@@ -115,7 +115,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		SimpleAuthenticationInfo sa = new SimpleAuthenticationInfo();
 		sa.setCredentials(token.getCredentials());
 		SimplePrincipalCollection principals = new org.apache.shiro.subject.SimplePrincipalCollection();
-		principals.add(token.getPrincipal(), "bakerrealm");
+		principals.add(token.getPrincipal(), "portalrealm");
 		
 		
 		sa.setPrincipals(principals);
@@ -177,12 +177,12 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		return succeeded;
 	}
 
-	public BakerRepository getBakerRepositoryRef() {
-		return bakerRepositoryRef;
+	public PortalRepository getPortalRepositoryRef() {
+		return portalRepositoryRef;
 	}
 
-	public void setBakerRepositoryRef(BakerRepository bakerRepositoryRef) {
-		this.bakerRepositoryRef = bakerRepositoryRef;
+	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
+		this.portalRepositoryRef = portalRepositoryRef;
 	}
 
 }

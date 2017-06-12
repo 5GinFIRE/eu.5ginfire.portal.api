@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 
-public interface IBakerRepositoryAPI {
+public interface IPortalRepositoryAPI {
 
 	//utility
 
@@ -33,8 +33,8 @@ public interface IBakerRepositoryAPI {
 	//USER related methods 
 	Response getUsers(); 
 	Response getUserById(int userid);
-	Response addUser(BakerUser user);
-	Response updateUserInfo(int userid, BakerUser user);
+	Response addUser(PortalUser user);
+	Response updateUserInfo(int userid, PortalUser user);
 	Response deleteUser(int userid);
 	Response getAllBunsofUser(int userid);
 	Response getAllAppsofUser(int userid);

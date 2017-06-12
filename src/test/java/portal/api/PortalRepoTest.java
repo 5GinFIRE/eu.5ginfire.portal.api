@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker;
+package portal.api;
 
 import static org.junit.Assert.*;
 
 import java.util.UUID;
 
-import portal.api.impl.BakerJpaController;
+import portal.api.impl.PortalJpaController;
 import portal.api.model.ApplicationMetadata;
-import portal.api.model.BakerUser;
+import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
 import portal.api.model.Category;
 import portal.api.model.Container;
@@ -49,36 +49,36 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = { "classpath:contextTest.xml" })
 //@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
 //@Transactional
-public class BakerRepoTest {
+public class PortalRepoTest {
 
 	@Autowired
-	private  BakerJpaController bakerJpaControllerTest;
+	private  PortalJpaController portalJpaControllerTest;
 
-	// private static final transient Log logger = LogFactory.getLog(BakerRepoTest.class.getName());
+	// private static final transient Log logger = LogFactory.getLog(PortalRepoTest.class.getName());
 
 	@Before
 	public void deletePreviousobjectsDB() {
 
-		bakerJpaControllerTest.deleteAllUsers();
-		bakerJpaControllerTest.deleteAllProducts();
-		bakerJpaControllerTest.deleteAllSubscribedResources();
-		bakerJpaControllerTest.deleteAllCategories();
+		portalJpaControllerTest.deleteAllUsers();
+		portalJpaControllerTest.deleteAllProducts();
+		portalJpaControllerTest.deleteAllSubscribedResources();
+		portalJpaControllerTest.deleteAllCategories();
 
 	}
 
 	@Test
 	public void testWriteReadDB() {
 
-		bakerJpaControllerTest.getAllProductsPrinted();
+		portalJpaControllerTest.getAllProductsPrinted();
 		
-		BakerUser bu = new BakerUser();
+		PortalUser bu = new PortalUser();
 		bu.setOrganization("UoP");
 		bu.setName("aname");
 		bu.setUsername("ausername");
 		bu.setPassword("apassword");
 		bu.setEmail("e@e.com");
 
-		bakerJpaControllerTest.saveUser(bu);
+		portalJpaControllerTest.saveUser(bu);
 		
 		BunMetadata bmeta = new BunMetadata();
 		bmeta.setName("abun");
@@ -92,14 +92,14 @@ public class BakerRepoTest {
 		bmeta.addExtensionItem("aname1", "avalue1");
 		bu.addProduct(bmeta);
 
-		bakerJpaControllerTest.updateBakerUser(bu);
+		portalJpaControllerTest.updatePortalUser(bu);
 		
 		// change name and reSave
-		bmeta = (BunMetadata) bakerJpaControllerTest.readProductByUUID(uuid);
+		bmeta = (BunMetadata) portalJpaControllerTest.readProductByUUID(uuid);
 		bmeta.setName("NewBunName");
-		bakerJpaControllerTest.updateProduct(bmeta);		
+		portalJpaControllerTest.updateProduct(bmeta);		
 
-		bakerJpaControllerTest.getAllProductsPrinted();
+		portalJpaControllerTest.getAllProductsPrinted();
 		
 		bmeta = new BunMetadata();
 		String uuid2 = UUID.randomUUID().toString();
@@ -108,23 +108,23 @@ public class BakerRepoTest {
 		bmeta.setLongDescription("longDescription2");
 		bmeta.setShortDescription("shortDescription2");
 		bmeta.setPackageLocation("packageLocation2");
-		bu = bakerJpaControllerTest.readBakerUserByUsername("ausername");
+		bu = portalJpaControllerTest.readPortalUserByUsername("ausername");
 		bu.addProduct(bmeta);
 
-		bakerJpaControllerTest.updateBakerUser(bu);
+		portalJpaControllerTest.updatePortalUser(bu);
 
-		BakerUser testbu = bakerJpaControllerTest.readBakerUserByUsername("ausername");
+		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausername");
 		assertEquals("aname", testbu.getName());
 		assertEquals(EncryptionUtil.hash("apassword"), testbu.getPassword());
 		assertEquals("UoP", testbu.getOrganization());
 		assertEquals("e@e.com", testbu.getEmail());
 
 
-		bakerJpaControllerTest.getAllProductsPrinted();
+		portalJpaControllerTest.getAllProductsPrinted();
 		
 		assertEquals(2, testbu.getProducts().size());
 
-		BunMetadata testbm = (BunMetadata) bakerJpaControllerTest.readProductByUUID(uuid);
+		BunMetadata testbm = (BunMetadata) portalJpaControllerTest.readProductByUUID(uuid);
 		assertEquals("NewBunName", testbm.getName());
 		assertEquals(uuid, testbm.getUuid());
 		assertNotNull(testbm.getOwner());
@@ -133,15 +133,15 @@ public class BakerRepoTest {
 		assertEquals( "aname", testbm.getExtensions().get(0).getName() );
 		assertEquals( "aname1", testbm.getExtensions().get(1).getName() );
 
-		bu = new BakerUser();
+		bu = new PortalUser();
 		bu.setOrganization("UoP2");
 		bu.setName("aname2");
 		bu.setUsername("ausername2");
 		bu.setPassword("apassword2");
 
-		bakerJpaControllerTest.saveUser(bu);
-		bakerJpaControllerTest.getAllUsersPrinted();
-		assertEquals(2, bakerJpaControllerTest.countUsers());
+		portalJpaControllerTest.saveUser(bu);
+		portalJpaControllerTest.getAllUsersPrinted();
+		assertEquals(2, portalJpaControllerTest.countUsers());
 
 	}
 
@@ -152,21 +152,21 @@ public class BakerRepoTest {
 
 		assertEquals("testURL", sm.getURL());
 
-		bakerJpaControllerTest.saveSubscribedResource(sm);
+		portalJpaControllerTest.saveSubscribedResource(sm);
 
 		sm.setURL("testURL1");
-		bakerJpaControllerTest.updateSubscribedResource(sm);
+		portalJpaControllerTest.updateSubscribedResource(sm);
 
-		SubscribedResource testsm = bakerJpaControllerTest.readSubscribedResourceById(sm.getId());
+		SubscribedResource testsm = portalJpaControllerTest.readSubscribedResourceById(sm.getId());
 		assertEquals("testURL1", testsm.getURL());
 
 		sm = new SubscribedResource();
 		sm.setURL("anotherTestURL");
-		bakerJpaControllerTest.saveSubscribedResource(sm);
-		bakerJpaControllerTest.getAllSubscribedResourcesPrinted();
-		assertEquals(2, bakerJpaControllerTest.countSubscribedResources());
+		portalJpaControllerTest.saveSubscribedResource(sm);
+		portalJpaControllerTest.getAllSubscribedResourcesPrinted();
+		assertEquals(2, portalJpaControllerTest.countSubscribedResources());
 
-		bakerJpaControllerTest.deleteSubscribedResource(sm.getId());
+		portalJpaControllerTest.deleteSubscribedResource(sm.getId());
 
 	}
 	
@@ -179,7 +179,7 @@ public class BakerRepoTest {
 		Category c2 = new Category();
 		c2.setName("acat2");
 		
-		BakerUser bu = new BakerUser();
+		PortalUser bu = new PortalUser();
 		bu.setUsername("ausernameWRA");
 
 		ApplicationMetadata appmeta = new ApplicationMetadata();
@@ -200,11 +200,11 @@ public class BakerRepoTest {
 		appmeta.addExtensionItem(item2 );
 		bu.addProduct(appmeta);
 
-		bakerJpaControllerTest.saveUser(bu);
+		portalJpaControllerTest.saveUser(bu);
 
 		// change name and reSave
 		appmeta.setName("NewAppName");
-		bakerJpaControllerTest.updateProduct(appmeta);
+		portalJpaControllerTest.updateProduct(appmeta);
 		assertEquals(2, appmeta.getCategories().size() );
 		assertEquals(2, appmeta.getExtensions().size() );
 
@@ -216,18 +216,18 @@ public class BakerRepoTest {
 		appmeta2.getCategories().add(c);
 		bu.addProduct(appmeta2);
 
-		bakerJpaControllerTest.updateBakerUser(bu);
-		bakerJpaControllerTest.getAllUsersPrinted();
+		portalJpaControllerTest.updatePortalUser(bu);
+		portalJpaControllerTest.getAllUsersPrinted();
 
-		BakerUser testbu = bakerJpaControllerTest.readBakerUserByUsername("ausernameWRA");
+		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausernameWRA");
 		assertEquals(2, testbu.getProducts().size());
 
-		ApplicationMetadata testApp = (ApplicationMetadata) bakerJpaControllerTest.readProductByUUID(uuid);
+		ApplicationMetadata testApp = (ApplicationMetadata) portalJpaControllerTest.readProductByUUID(uuid);
 		assertEquals("NewAppName", testApp.getName());
 		assertEquals(uuid, testApp.getUuid());
 		assertNotNull(testApp.getOwner());
 		assertEquals("ausernameWRA", testApp.getOwner().getUsername());
-		bakerJpaControllerTest.getAllCategoriesPrinted();
+		portalJpaControllerTest.getAllCategoriesPrinted();
 		assertEquals("acat1", testApp.getCategories().get(0).getName());
 
 
@@ -237,7 +237,7 @@ public class BakerRepoTest {
 	public void testDeployDescriptorApplications() {
 		Category c = new Category();
 		c.setName("acat1");
-		BakerUser bu = new BakerUser();
+		PortalUser bu = new PortalUser();
 		bu.setUsername("ausername123");
 		
 		//add a couple of buns
@@ -292,10 +292,10 @@ public class BakerRepoTest {
 		dd.getDeployContainers().add(deplContainer);
 		bu.getDeployments().add(dd);//now add the deployment to the user
 
-		bakerJpaControllerTest.saveUser(bu);
+		portalJpaControllerTest.saveUser(bu);
 		
 
-		BakerUser testbu = bakerJpaControllerTest.readBakerUserByUsername("ausername123") ;		
+		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausername123") ;		
 
 		assertEquals(1, testbu.getDeployments().size()  );
 		assertEquals(1, testbu.getDeployments().get(0).getDeployContainers().size()  );

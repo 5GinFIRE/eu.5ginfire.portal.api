@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker;
+package portal.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import gr.upatras.ece.nam.baker.testclasses.MockRepositoryWebClient;
-import portal.api.impl.BakerInstallationMgmt;
-import portal.api.impl.BakerJpaController;
+import portal.api.impl.PortalInstallationMgmt;
+import portal.api.impl.PortalJpaController;
 import portal.api.model.BunMetadata;
 import portal.api.model.InstalledBun;
 import portal.api.model.InstalledBunStatus;
+import portal.api.testclasses.MockRepositoryWebClient;
 
 import java.util.UUID;
 
@@ -42,24 +42,24 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = { "classpath:contextTest.xml" })
 //@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
 //@Transactional
-public class BakerClientTest {
+public class PortalClientTest {
 
 	@Autowired
-	private BakerJpaController bakerJpaControllerTest;
+	private PortalJpaController portalJpaControllerTest;
 
-	private static final transient Log logger = LogFactory.getLog(BakerClientTest.class.getName());
+	private static final transient Log logger = LogFactory.getLog(PortalClientTest.class.getName());
 
 	@Test
 	public void testGetManagedServices() {
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		assertNotNull(bs.getManagedInstalledBuns());
-		logger.info("	 	>>>>	bakerJpaControllerTest = " + bakerJpaControllerTest);
+		logger.info("	 	>>>>	portalJpaControllerTest = " + portalJpaControllerTest);
 	}
 
 	@Test
 	public void testWriteReadDB() {
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 
 		String uuid = UUID.randomUUID().toString();
 		InstalledBun ibuntest = new InstalledBun(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
@@ -67,14 +67,14 @@ public class BakerClientTest {
 		ibuntest.setName("NONMAE");
 		ibuntest.setStatus(InstalledBunStatus.INSTALLING);
 
-		bakerJpaControllerTest.saveInstalledBun(ibuntest);
-		// bakerJpaControllerTest.getAll();
+		portalJpaControllerTest.saveInstalledBun(ibuntest);
+		// portalJpaControllerTest.getAll();
 
-		InstalledBun retIs = bakerJpaControllerTest.readInstalledBunByUUID(uuid);
+		InstalledBun retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
 		assertEquals(uuid, retIs.getUuid());
 		assertEquals(InstalledBunStatus.INSTALLING, retIs.getStatus());
 		assertEquals("NONMAE", retIs.getName());
-		assertEquals(1, bakerJpaControllerTest.countInstalledBuns());
+		assertEquals(1, portalJpaControllerTest.countInstalledBuns());
 
 		// second one with metadata
 		uuid = UUID.randomUUID().toString();
@@ -85,33 +85,33 @@ public class BakerClientTest {
 		ibuntest.setPackageLocalPath("packageLocalPath");
 		ibuntest.setPackageURL("packageURL");
 
-		bakerJpaControllerTest.saveInstalledBun(ibuntest);
-		// bakerJpaControllerTest.getAll();
-		retIs = bakerJpaControllerTest.readInstalledBunByUUID(uuid);
+		portalJpaControllerTest.saveInstalledBun(ibuntest);
+		// portalJpaControllerTest.getAll();
+		retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
 		assertEquals(uuid, retIs.getUuid());
 		assertEquals(InstalledBunStatus.STARTING, retIs.getStatus());
 		assertEquals("NONMAE2", retIs.getName());
 		assertEquals("packageLocalPath", retIs.getPackageLocalPath() );
 		assertEquals("packageURL", retIs.getPackageURL() );
-		assertEquals(2, bakerJpaControllerTest.countInstalledBuns());
+		assertEquals(2, portalJpaControllerTest.countInstalledBuns());
 
 		// update it
 		ibuntest.setStatus(InstalledBunStatus.STARTED);
-		bakerJpaControllerTest.updateInstalledBun(ibuntest);
-		retIs = bakerJpaControllerTest.readInstalledBunByUUID(uuid);
+		portalJpaControllerTest.updateInstalledBun(ibuntest);
+		retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
 		assertEquals(InstalledBunStatus.STARTED, retIs.getStatus());
-		// bakerJpaControllerTest.getAll();
-		assertEquals(2, bakerJpaControllerTest.countInstalledBuns());
+		// portalJpaControllerTest.getAll();
+		assertEquals(2, portalJpaControllerTest.countInstalledBuns());
 
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun. Baker should bring it to STARTED status
+	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status
 	 */
 	@Test
 	public void testReqInstall_toSTARTEDStatus() {
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
@@ -147,16 +147,16 @@ public class BakerClientTest {
 		assertEquals("1.0.0.test", istest.getInstalledVersion());
 		assertEquals(1, bs.getManagedInstalledBuns().size());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun. Baker should bring it to STARTED status and then request to STOP it and then UNINSTALL
+	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to STOP it and then UNINSTALL
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_STOPPED_UNINSTALL_Status() {
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
@@ -205,16 +205,16 @@ public class BakerClientTest {
 		istest = bs.getBun(uuid);
 		assertEquals(InstalledBunStatus.UNINSTALLED, istest.getStatus());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun. Baker should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
+	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_and_UNINSTALL_Status() {
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
@@ -246,16 +246,16 @@ public class BakerClientTest {
 		InstalledBun istest = bs.getBun(uuid);
 		assertEquals(InstalledBunStatus.UNINSTALLED, istest.getStatus());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun. Baker should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
+	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_CONFIGURE_and_RESTART() {
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
@@ -314,16 +314,16 @@ public class BakerClientTest {
 		InstalledBun istest = bs.getBun(uuid); // check also DB
 		assertEquals(InstalledBunStatus.STARTED, istest.getStatus());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun which contains an error on the onInstall recipe
+	 * This requests from Portal to INSTALL a Bun which contains an error on the onInstall recipe
 	 */
 	@Test
 	public void testReqInstall_ErrScript() {
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
@@ -358,18 +358,18 @@ public class BakerClientTest {
 		assertNull(istest.getInstalledVersion());
 		assertEquals(1, bs.getManagedInstalledBuns().size());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	/**
-	 * This requests from Baker to INSTALL a Bun. Baker should bring it to STARTED status. WE then destroy the baker service instance and create a new one. The
+	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status. WE then destroy the portal service instance and create a new one. The
 	 * Bun status should be there installed
 	 */
 	@Test
 	public void testReqInstall_AndPersistence() {
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
-		BakerInstallationMgmt bs = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
+		portalJpaControllerTest.deleteAllInstalledBuns();
+		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 
 		String uuid = UUID.randomUUID().toString();
 		// we don;t care about repo...we provide a local package hardcoded by MockRepositoryWebClient
@@ -377,9 +377,9 @@ public class BakerClientTest {
 		assertNotNull(is);
 		assertEquals(1, bs.getManagedInstalledBuns().size());
 		assertEquals(is.getStatus(), InstalledBunStatus.INIT);
-		assertEquals(1, bakerJpaControllerTest.countInstalledBuns());
+		assertEquals(1, portalJpaControllerTest.countInstalledBuns());
 
-		// bakerJpaControllerTest.getAll();
+		// portalJpaControllerTest.getAll();
 
 		int guard = 0;
 		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 40)) {
@@ -397,30 +397,30 @@ public class BakerClientTest {
 		assertEquals(uuid, istest.getUuid());
 		assertEquals(InstalledBunStatus.STARTED, istest.getStatus());
 		assertEquals(1, bs.getManagedInstalledBuns().size());
-		InstalledBun retIs = bakerJpaControllerTest.readInstalledBunByUUID(istest.getUuid());
+		InstalledBun retIs = portalJpaControllerTest.readInstalledBunByUUID(istest.getUuid());
 		assertEquals(InstalledBunStatus.STARTED, retIs.getStatus());
 
 		bs = null; // remove the old one
 
 		// create new one..It should persist any installed service
-		BakerInstallationMgmt bsNew = BakerServiceInit(new MockRepositoryWebClient("NORMAL"), bakerJpaControllerTest);
-		// bakerJpaControllerTest.getAll();
+		PortalInstallationMgmt bsNew = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
+		// portalJpaControllerTest.getAll();
 
 		assertEquals("Persistence not implemented yet?!?", 1, bsNew.getManagedInstalledBuns().size());// there should be one
 		InstalledBun istestNew = bsNew.getBun(uuid); // req the service with the previous uuid
 		assertEquals(uuid, istestNew.getUuid());
 		assertEquals(InstalledBunStatus.STARTED, istestNew.getStatus());
 
-		bakerJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledBuns();
 	}
 
 	// helper functions
 
-	public BakerInstallationMgmt BakerServiceInit(MockRepositoryWebClient mockRepositoryWebClient, BakerJpaController bakerJpaControllerTest2) {
+	public PortalInstallationMgmt PortalServiceInit(MockRepositoryWebClient mockRepositoryWebClient, PortalJpaController portalJpaControllerTest2) {
 
-		BakerInstallationMgmt bs = new BakerInstallationMgmt();
+		PortalInstallationMgmt bs = new PortalInstallationMgmt();
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
-		bs.setBakerJpaController(bakerJpaControllerTest);
+		bs.setPortalJpaController(portalJpaControllerTest);
 		return bs;
 	}
 }

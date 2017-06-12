@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -29,8 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import portal.api.model.ApplicationMetadata;
-import portal.api.model.BakerProperty;
-import portal.api.model.BakerUser;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
@@ -44,8 +44,8 @@ import portal.api.model.SubscribedResource;
  * @author ctranoris
  * 
  */
-public class BakerJpaController {
-	private static final transient Log logger = LogFactory.getLog(BakerJpaController.class.getName());
+public class PortalJpaController {
+	private static final transient Log logger = LogFactory.getLog(PortalJpaController.class.getName());
 
 
 	@PersistenceUnit
@@ -53,12 +53,12 @@ public class BakerJpaController {
 
 
 	public void initData() {
-		BakerUser admin = readBakerUserById(1);
+		PortalUser admin = readPortalUserById(1);
 		logger.info("======================== admin  = " + admin);
 		
 		if (admin==null){
-			BakerUser bu = new BakerUser();
-			bu.setName("Baker Administrator");
+			PortalUser bu = new PortalUser();
+			bu.setName("Portal Administrator");
 			bu.setUsername("admin");
 			bu.setPassword("changeme");
 			bu.setEmail("");
@@ -72,19 +72,19 @@ public class BakerJpaController {
 			saveCategory(c);
 			
 
-			BakerProperty p = new BakerProperty();
+			PortalProperty p = new PortalProperty();
 			p.setName("adminEmail");
 			p.setValue("info@example.org");
 			saveProperty(p);
-			p = new BakerProperty();
+			p = new PortalProperty();
 			p.setName("activationEmailSubject");
 			p.setValue("Activation Email Subject");
 			saveProperty(p);
-			p = new BakerProperty("mailhost", "example.org");
+			p = new PortalProperty("mailhost", "example.org");
 			saveProperty(p);
-			p = new BakerProperty("mailuser", "exampleusername");
+			p = new PortalProperty("mailuser", "exampleusername");
 			saveProperty(p);
-			p = new BakerProperty("mailpassword", "pass");
+			p = new PortalProperty("mailpassword", "pass");
 			saveProperty(p);
 			
 			
@@ -180,8 +180,8 @@ public class BakerJpaController {
 		logger.info("================= getAll() ==================END");
 	}
 
-	public BakerJpaController() {
-		logger.info(">>>>>>>>>>>>>> BakerJpaController constructor  <<<<<<<<<<<<<<<<<<");
+	public PortalJpaController() {
+		logger.info(">>>>>>>>>>>>>> PortalJpaController constructor  <<<<<<<<<<<<<<<<<<");
 		
 		
 		
@@ -230,7 +230,7 @@ public class BakerJpaController {
 
 		entityTransaction.begin();
 
-		Query q = entityManager.createQuery("DELETE FROM BakerUser ");
+		Query q = entityManager.createQuery("DELETE FROM PortalUser ");
 		q.executeUpdate();
 		entityManager.flush();
 
@@ -238,8 +238,8 @@ public class BakerJpaController {
 
 	}
 
-	public void saveUser(BakerUser bu) {
-		logger.info("Will save BakerUser = " + bu.getName());
+	public void saveUser(PortalUser bu) {
+		logger.info("Will save PortalUser = " + bu.getName());
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -256,56 +256,56 @@ public class BakerJpaController {
 	}
 	
 
-	public BakerUser readBakerUserByUsername(String username) {
+	public PortalUser readPortalUserByUsername(String username) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM BakerUser m WHERE m.username='" + username + "'");
-		return (q.getResultList().size()==0)?null:(BakerUser) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.username='" + username + "'");
+		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
 	}
 	
-	public BakerUser readBakerUserBySessionID(String id) {
+	public PortalUser readPortalUserBySessionID(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM BakerUser m WHERE m.currentSessionID='" + id + "'");
-		return (q.getResultList().size()==0)?null:(BakerUser) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.currentSessionID='" + id + "'");
+		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
 	}
 	
 
-	public BakerUser readBakerUserByEmail(String email) {
+	public PortalUser readPortalUserByEmail(String email) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM BakerUser m WHERE m.email='" + email + "'");
-		return (q.getResultList().size()==0)?null:(BakerUser) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.email='" + email + "'");
+		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
 	}
 
 	
-	public BakerUser readBakerUserById(int userid) {
+	public PortalUser readPortalUserById(int userid) {
 		
 		
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		return entityManager.find(BakerUser.class, userid);
+		return entityManager.find(PortalUser.class, userid);
 		
-//		Query q = entityManager.createQuery("SELECT m FROM BakerUser m WHERE m.id=" + userid );		
-//		return (q.getResultList().size()==0)?null:(BakerUser) q.getSingleResult();
+//		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.id=" + userid );		
+//		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
 		
 	}
 	
 	
 	
-	public BakerUser updateBakerUser(BakerUser bu) {
+	public PortalUser updatePortalUser(PortalUser bu) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		BakerUser resis = entityManager.merge(bu);
+		PortalUser resis = entityManager.merge(bu);
 		entityTransaction.commit();
 
 		return resis;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<BakerUser> readUsers(int firstResult, int maxResults) {
+	public List<PortalUser> readUsers(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM BakerUser m");
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -315,7 +315,7 @@ public class BakerJpaController {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT COUNT(s) FROM BakerUser s");
+		Query q = entityManager.createQuery("SELECT COUNT(s) FROM PortalUser s");
 		return (Long) q.getSingleResult();
 	}
 
@@ -324,10 +324,10 @@ public class BakerJpaController {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		List<BakerUser> lb = entityManager.createQuery("select p from BakerUser p").getResultList();
+		List<PortalUser> lb = entityManager.createQuery("select p from PortalUser p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
-			BakerUser bu = (BakerUser) iterator.next();
-			logger.info("	======> BakerUser found: " + bu.getName() + ", Id: " + bu.getId() + ", Id: " + bu.getOrganization() + ", username: " + bu.getUsername());
+			PortalUser bu = (PortalUser) iterator.next();
+			logger.info("	======> PortalUser found: " + bu.getName() + ", Id: " + bu.getId() + ", Id: " + bu.getOrganization() + ", username: " + bu.getUsername());
 
 			List<Product> products = bu.getProducts();
 			for (Product prod : products) {
@@ -449,7 +449,7 @@ public class BakerJpaController {
 
 	public void deleteUser(int userid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		BakerUser u = entityManager.find(BakerUser.class, userid);
+		PortalUser u = entityManager.find(PortalUser.class, userid);
 		
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
@@ -731,8 +731,8 @@ public class BakerJpaController {
 	
 	
 
-	public void saveProperty(BakerProperty p) {
-		logger.info("Will BakerProperty = " + p.getName());
+	public void saveProperty(PortalProperty p) {
+		logger.info("Will PortalProperty = " + p.getName());
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -748,7 +748,7 @@ public class BakerJpaController {
 	public void deleteProperty(int propid) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		BakerProperty c = entityManager.find(BakerProperty.class, propid);
+		PortalProperty c = entityManager.find(PortalProperty.class, propid);
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
@@ -757,39 +757,39 @@ public class BakerJpaController {
 		
 	}
 
-	public BakerProperty updateProperty(BakerProperty p) {
+	public PortalProperty updateProperty(PortalProperty p) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		BakerProperty  bp = entityManager.merge(p);
+		PortalProperty  bp = entityManager.merge(p);
 		entityTransaction.commit();
 
 		return bp;
 	}
 
-	public List<BakerProperty> readProperties(int firstResult, int maxResults) {
+	public List<PortalProperty> readProperties(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM BakerProperty m  ORDER BY m.id");
+		Query q = entityManager.createQuery("SELECT m FROM PortalProperty m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 
 	}
 
-	public BakerProperty readPropertyByName(String name) {
+	public PortalProperty readPropertyByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM BakerProperty m WHERE m.name='" + name + "'");
-		return (q.getResultList().size()==0)?null:(BakerProperty) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM PortalProperty m WHERE m.name='" + name + "'");
+		return (q.getResultList().size()==0)?null:(PortalProperty) q.getSingleResult();
 
 	}
 
-	public BakerProperty readPropertyByID(int propid) {
+	public PortalProperty readPropertyByID(int propid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		BakerProperty u = entityManager.find(BakerProperty.class, propid);
+		PortalProperty u = entityManager.find(PortalProperty.class, propid);
 		return u;
 
 	}

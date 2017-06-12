@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package gr.upatras.ece.nam.baker;
+package portal.api;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,21 +35,21 @@ import org.junit.Test;
 import portal.api.model.InstalledBun;
 import portal.api.model.InstalledBunStatus;
 
-public class BakerClientIT {
+public class PortalClientIT {
 
 	private static String endpointUrl;
-	private static final transient Log logger = LogFactory.getLog(BakerClientIT.class.getName());
+	private static final transient Log logger = LogFactory.getLog(PortalClientIT.class.getName());
 
 	@BeforeClass
 	public static void beforeClass() {
 		endpointUrl = System.getProperty("service.url");
-		// bakerJpaControllerTest.delete(message);
+		// portalJpaControllerTest.delete(message);
 	}
 
 	@Test
-	public void testBakerClientInstallServiceNotFoundAndFail() throws Exception {
+	public void testPortalClientInstallServiceNotFoundAndFail() throws Exception {
 
-		logger.info("Executing TEST = testBakerRSInstallServiceNotFound");
+		logger.info("Executing TEST = testPortalRSInstallServiceNotFound");
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
 		String uuid = UUID.fromString("55cab8b8-668b-4c75-99a9-39b24ed3d8be").toString();
@@ -60,8 +60,8 @@ public class BakerClientIT {
 		assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
 		
 
-		String bakerAPIVersionListHeaders = (String) r.getHeaders().getFirst("X-Baker-API-Version");
-		assertEquals("1.0.0", bakerAPIVersionListHeaders);
+		String portalAPIVersionListHeaders = (String) r.getHeaders().getFirst("X-Portal-API-Version");
+		assertEquals("1.0.0", portalAPIVersionListHeaders);
 
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
@@ -85,9 +85,9 @@ public class BakerClientIT {
 	}
 
 	@Test
-	public void testBakerClientInstallBunAndGetStatus() throws Exception {
+	public void testPortalClientInstallBunAndGetStatus() throws Exception {
 
-		logger.info("Executing TEST = testBakerRSInstallServiceAndGetStatus");
+		logger.info("Executing TEST = testPortalRSInstallServiceAndGetStatus");
 
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());

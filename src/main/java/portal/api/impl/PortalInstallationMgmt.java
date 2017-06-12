@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -25,15 +25,15 @@ import portal.api.model.IRepositoryWebClient;
 import portal.api.model.InstalledBun;
 import portal.api.model.InstalledBunStatus;
 
-public class BakerInstallationMgmt {
+public class PortalInstallationMgmt {
 
 	private ConcurrentHashMap<String, InstalledBun> managedInstalledBuns;
 	private IRepositoryWebClient repoWebClient;
-	private BakerJpaController bakerJpaController;
+	private PortalJpaController portalJpaController;
 
-	private static final transient Log logger = LogFactory.getLog(BakerInstallationMgmt.class.getName());
+	private static final transient Log logger = LogFactory.getLog(PortalInstallationMgmt.class.getName());
 
-	public BakerInstallationMgmt() {
+	public PortalInstallationMgmt() {
 		managedInstalledBuns = new ConcurrentHashMap<>();
 		// this.setRepoWebClient(new RepositoryWebClient());
 	}
@@ -58,7 +58,7 @@ public class BakerInstallationMgmt {
 
 //	private Boolean removeServiceFromManagedServices(InstalledBun s) {
 //		InstalledBun is = managedInstalledBuns.remove(s.getUuid());
-//		bakerJpaController.delete(s);
+//		portalJpaController.delete(s);
 //		return (is != null);
 //	}
 
@@ -90,7 +90,7 @@ public class BakerInstallationMgmt {
 		if (s == null) {
 			s = new InstalledBun(reqBunUUID, bunRepoURL);
 			addBunToManagedBuns(s);
-			bakerJpaController.saveInstalledBun(s);
+			portalJpaController.saveInstalledBun(s);
 		} else if ((s.getStatus() == InstalledBunStatus.FAILED) ||
 				(s.getStatus() == InstalledBunStatus.INIT) ||
 				(s.getStatus() == InstalledBunStatus.DOWNLOADING) ||
@@ -101,7 +101,7 @@ public class BakerInstallationMgmt {
 			s.setRepoUrl(bunRepoURL);
 		}
 
-		processBunLifecycleJob(s, this.bakerJpaController, InstalledBunStatus.STARTED);
+		processBunLifecycleJob(s, this.portalJpaController, InstalledBunStatus.STARTED);
 		return s;
 	}
 
@@ -111,7 +111,7 @@ public class BakerInstallationMgmt {
 	 * @param s
 	 *            InstalledBun object to manage the lifecycle
 	 */
-	private void processBunLifecycleJob(final InstalledBun s, final BakerJpaController jpsctr, final InstalledBunStatus targetStatus) {
+	private void processBunLifecycleJob(final InstalledBun s, final PortalJpaController jpsctr, final InstalledBunStatus targetStatus) {
 
 		logger.info("Creating new thread of " + s.getUuid() + " for target action = " + targetStatus);
 		Thread t1 = new Thread(new Runnable() {
@@ -142,14 +142,14 @@ public class BakerInstallationMgmt {
 		this.repoWebClient = repoWebClient;
 	}
 
-	public BakerJpaController getBakerJpaController() {
-		return bakerJpaController;
+	public PortalJpaController getPortalJpaController() {
+		return portalJpaController;
 	}
 
-	public void setBakerJpaController(BakerJpaController b) {
-		this.bakerJpaController = b;
+	public void setPortalJpaController(PortalJpaController b) {
+		this.portalJpaController = b;
 
-		this.bakerJpaController = b;
+		this.portalJpaController = b;
 		List<InstalledBun> ls = b.readInstalledBuns(0, 100000);
 
 		for (InstalledBun installedBun : ls) {
@@ -166,7 +166,7 @@ public class BakerInstallationMgmt {
 		logger.info("will stop service uuid= " + uuid);
 
 
-		processBunLifecycleJob(is, this.bakerJpaController, InstalledBunStatus.STOPPED);
+		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STOPPED);
 
 	}
 	
@@ -179,7 +179,7 @@ public class BakerInstallationMgmt {
 		logger.info("will start service uuid= " + uuid);
 
 
-		processBunLifecycleJob(is, this.bakerJpaController, InstalledBunStatus.STARTED);
+		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STARTED);
 
 	}
 
@@ -188,7 +188,7 @@ public class BakerInstallationMgmt {
 
 		logger.info("will uninstall bun uuid= " + uuid);
 
-		processBunLifecycleJob(is, this.bakerJpaController, InstalledBunStatus.UNINSTALLED);
+		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.UNINSTALLED);
 
 	}
 
@@ -197,7 +197,7 @@ public class BakerInstallationMgmt {
 
 		logger.info("will configure bun uuid= " + uuid);
 
-		processBunLifecycleJob(is, this.bakerJpaController, InstalledBunStatus.STARTED);
+		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STARTED);
 
 	}
 

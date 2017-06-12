@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -17,7 +17,7 @@ package portal.api.model;
 
 import javax.ws.rs.core.Response;
 
-public interface IBakerClientAPI {
+public interface IPortalClientAPI {
 
 	Response getInstalledBunInfoByUUID(String uuid);
 

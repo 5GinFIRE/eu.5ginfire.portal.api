@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -40,15 +40,15 @@ public class InstalledBunLifecycleMgmt {
 	InstalledBun installedBun;
 	IRepositoryWebClient repoWebClient;
 
-	BakerJpaController bakerJpaController;
+	PortalJpaController portalJpaController;
 	private InstalledBunStatus targetStatus;
 	private Boolean restartTriggered = false;
 	private BunMetadata bunMetadata = null;
 
-	public InstalledBunLifecycleMgmt(InstalledBun b, IRepositoryWebClient rwc, BakerJpaController jpactr, InstalledBunStatus ts) {
+	public InstalledBunLifecycleMgmt(InstalledBun b, IRepositoryWebClient rwc, PortalJpaController jpactr, InstalledBunStatus ts) {
 		installedBun = b;
 		repoWebClient = rwc;
-		bakerJpaController = jpactr;
+		portalJpaController = jpactr;
 		targetStatus = ts;
 
 		logger.info("ServiceLifecycleMgmt uuid:" + installedBun.getUuid() + " name:" + installedBun.getName());
@@ -147,7 +147,7 @@ public class InstalledBunLifecycleMgmt {
 			break;
 		}
 
-		bakerJpaController.updateInstalledBun(installedBun);
+		portalJpaController.updateInstalledBun(installedBun);
 
 		if ((targetStatus != installedBun.getStatus()) && (installedBun.getStatus() != InstalledBunStatus.FAILED))
 			processState();

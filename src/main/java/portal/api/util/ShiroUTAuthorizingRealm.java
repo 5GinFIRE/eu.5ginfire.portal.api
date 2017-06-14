@@ -64,7 +64,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 
 			String r = bu.getRole();
 			if ((r==null) || (r.isEmpty())){
-				r="ROLE_DEVELOPER"; //SERVICE_PLATFORM_PROVIDER
+				r="ROLE_EXPERIMENTER"; //SERVICE_PLATFORM_PROVIDER
 			}
 			logger.info("PrincipalCollection Role=" + r);
 			ai.addRole(r);

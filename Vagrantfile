@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.network :forwarded_port, guest: 80, host: 80, auto_correct:true
   #config.vm.network :forwarded_port, guest: 443, host: 443, auto_correct:true
   config.vm.network :forwarded_port, guest: 8443, host: 8443, auto_correct:true
-  #config.vm.network :forwarded_port, guest: 8080, host: 8080, auto_correct:true
+  config.vm.network :forwarded_port, guest: 80, host: 8080, auto_correct:true
   config.vm.network :forwarded_port, guest: 13000, host: 13000, auto_correct:true
   config.vm.network :forwarded_port, guest: 13001, host: 13001, auto_correct:true
 
@@ -57,6 +57,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder "./", "/home/ubuntu/portal", disabled: true
   config.vm.synced_folder "C:/Users/ctranoris/git/eu.5ginfire.portal.api", "/home/ubuntu/ws"
+  config.vm.synced_folder "C:/Users/ctranoris/git/eu.5ginfire.portal.web/src", "/home/ubuntu/web"
   config.vm.synced_folder "D:/programs/apache-cxf-3.0.0-src/apache-cxf-3.0.0-src/distribution/src/main/release/samples", "/home/ubuntu/cxfsamples"
 
 

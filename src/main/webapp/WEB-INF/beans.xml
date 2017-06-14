@@ -138,7 +138,7 @@
                 /services/api/repo/fiware/** = userfilter, rest
                 /services/api/** = userfilter, rest
                 /admin/logout = logout
-                /admin/viewUsers.html = authc, roles[ROLE_BOSS]         
+                /admin/viewUsers.html = authc, roles[ROLE_PORTALADMIN]         
                 /admin/** = authc
                 /** = authc
                 
@@ -171,18 +171,17 @@
 		<property name="jpaVendorAdapter" ref="jpaAdapter" />
 	</bean>
 
-	<!-- MySQL -->
-	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+	<!-- MySQL bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary" />
 		<property name="showSql" value="false" />
 		<property name="database" value="MYSQL" />
 		<property name="generateDdl" value="true" />
 	</bean>
-
-	<!-- H2 <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
+	-->
+	<!-- H2 --> <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" 
 		/> <property name="showSql" value="false" /> <property name="database" value="H2" 
-		/> <property name="generateDdl" value="true" /> </bean> -->
+		/> <property name="generateDdl" value="true" /> </bean> 
 
 	<!-- <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> 
 		<property name="entityManagerFactory" ref="entityManagerFactory" /> < property 

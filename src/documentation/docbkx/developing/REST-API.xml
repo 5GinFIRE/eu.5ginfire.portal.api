@@ -38,7 +38,7 @@ Response
 	        "email": "admin@gma",
 	        "username": "admin",
 	        "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	        "role": "ROLE_BOSS",
+	        "role": "ROLE_PORTALADMIN",
 	        "active": true,
 	        "currentSessionID": "de9d92dd-6cd0-4b60-8b43-6c1a1ce38df8"
 	    },
@@ -135,7 +135,7 @@ Response sample:
 	    "email": "admin@gma",
 	    "username": "admin",
 	    "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	    "role": "ROLE_BOSS",
+	    "role": "ROLE_PORTALADMIN",
 	    "active": true,
 	    "currentSessionID": "b9e382e4-f6e0-47da-94a2-58dcb9871010"
 	}, {
@@ -145,7 +145,7 @@ Response sample:
 	    "email": "admin@portal.org",
 	    "username": "fishadmin",
 	    "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	    "role": "ROLE_BOSS",
+	    "role": "ROLE_PORTALADMIN",
 	    "active": true,
 	    "currentSessionID": "68687786-e735-4698-96c0-34d51ec26758"
 	}, {
@@ -220,7 +220,7 @@ content/type "multipart/form-data"
 		-----------------------------28256268319500
 	Content-Disposition: form-data; name="bun"
 	
-	{"id":69,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_DEVELOPER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"uuid":"6f6067fa-7739-4d13-9ed1-18c7a769bf41","name":"devtestbun","iconsrc":"http://localhost:13000/portal/services/api/repo/images/6f6067fa-7739-4d13-9ed1-18c7a769bf41/iminds18.png","shortDescription":"devtestbun","longDescription":"test","version":null,"packageLocation":"http://localhost:13000/portal/services/api/repo/packages/6f6067fa-7739-4d13-9ed1-18c7a769bf41/unknown","dateCreated":1421658798000,"dateUpdated":1421658835000,"categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4}],"extensions":[{"id":140,"name":"param","value":"val"}],"screenshots":""}
+	{"id":69,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"uuid":"6f6067fa-7739-4d13-9ed1-18c7a769bf41","name":"devtestbun","iconsrc":"http://localhost:13000/portal/services/api/repo/images/6f6067fa-7739-4d13-9ed1-18c7a769bf41/iminds18.png","shortDescription":"devtestbun","longDescription":"test","version":null,"packageLocation":"http://localhost:13000/portal/services/api/repo/packages/6f6067fa-7739-4d13-9ed1-18c7a769bf41/unknown","dateCreated":1421658798000,"dateUpdated":1421658835000,"categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4}],"extensions":[{"id":140,"name":"param","value":"val"}],"screenshots":""}
 	-----------------------------28256268319500
 	Content-Disposition: form-data; name="prodIcon"
 	
@@ -241,7 +241,7 @@ Save a new bun (ony authorized users, role Developer)
 	-----------------------------9816548228756
 	Content-Disposition: form-data; name="bun"
 	
-	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_DEVELOPER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"extensions":[{"name":"param1","value":"val1"},{"name":"param2","value":"val2"}],"name":"ATestBun","version":"vers12","shortDescription":"a small descrip","longDescription":"A long desctip","categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4},{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0}]}
+	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"extensions":[{"name":"param1","value":"val1"},{"name":"param2","value":"val2"}],"name":"ATestBun","version":"vers12","shortDescription":"a small descrip","longDescription":"A long desctip","categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4},{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0}]}
 	-----------------------------9816548228756
 	Content-Disposition: form-data; name="prodIcon"; filename="_widgetIconEmpty.PNG"
 	Content-Type: image/png
@@ -274,7 +274,7 @@ Payload:
 	-----------------------------23719209031
 	Content-Disposition: form-data; name="application"
 	
-	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_DEVELOPER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"containers":[{"id":0,"name":"Container0","deployArtifacts":[{"id":null,"name":"Apache http server","uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"name":"ListenPort","value":"80"}]}]},{"id":null,"name":"Container1","deployArtifacts":[{"id":null,"name":"MySQL","uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"name":"PORT","value":"3306"},{"name":"DBUSER","value":"admin"},{"name":"DBPASSWD","value":"changeme"},{"name":"DBNAME","value":"mydatabase"},{"name":"DBHOST","value":"localhost"}]}]}],"name":"AtestApp","version":"1.2","shortDescription":"a small description","longDescription":"a long description","categories":[{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0},{"id":15,"name":"eLearning","appscount":0,"bunscount":0,"productsCount":0}]}
+	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"containers":[{"id":0,"name":"Container0","deployArtifacts":[{"id":null,"name":"Apache http server","uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"name":"ListenPort","value":"80"}]}]},{"id":null,"name":"Container1","deployArtifacts":[{"id":null,"name":"MySQL","uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"name":"PORT","value":"3306"},{"name":"DBUSER","value":"admin"},{"name":"DBPASSWD","value":"changeme"},{"name":"DBNAME","value":"mydatabase"},{"name":"DBHOST","value":"localhost"}]}]}],"name":"AtestApp","version":"1.2","shortDescription":"a small description","longDescription":"a long description","categories":[{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0},{"id":15,"name":"eLearning","appscount":0,"bunscount":0,"productsCount":0}]}
 	-----------------------------23719209031
 	Content-Disposition: form-data; name="prodIcon"; filename="_widgetIconEmpty.PNG"
 	Content-Type: image/png
@@ -293,7 +293,7 @@ Payload:
 	-----------------------------1377130454610
 	Content-Disposition: form-data; name="application"
 	
-	{"id":73,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_DEVELOPER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"uuid":"04307e99-8d24-4ca2-b75f-3e7df8558fc0","name":"AtestApp!","iconsrc":"http://localhost:13000/portal/services/api/repo/images/04307e99-8d24-4ca2-b75f-3e7df8558fc0/_widgetIconEmpty.PNG","shortDescription":"a small description","longDescription":"a long description","version":"1.2","packageLocation":null,"dateCreated":1421744477000,"dateUpdated":1421744477000,"categories":[{"id":12,"name":"eHealth","appscount":1,"bunscount":0,"productsCount":1},{"id":15,"name":"eLearning","appscount":1,"bunscount":0,"productsCount":1}],"extensions":[],"screenshots":"","containers":[{"id":26,"name":"Container0","deployArtifacts":[{"id":41,"uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","name":"Apache http server","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"id":158,"name":"ListenPort","value":"80"}]}]},{"id":27,"name":"Container1","deployArtifacts":[{"id":42,"uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","name":"MySQL","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"id":159,"name":"PORT","value":"3306"},{"id":160,"name":"DBUSER","value":"admin"},{"id":161,"name":"DBPASSWD","value":"changeme"},{"id":162,"name":"DBNAME","value":"mydatabase"},{"id":163,"name":"DBHOST","value":"localhost"}]}]}]}
+	{"id":73,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"uuid":"04307e99-8d24-4ca2-b75f-3e7df8558fc0","name":"AtestApp!","iconsrc":"http://localhost:13000/portal/services/api/repo/images/04307e99-8d24-4ca2-b75f-3e7df8558fc0/_widgetIconEmpty.PNG","shortDescription":"a small description","longDescription":"a long description","version":"1.2","packageLocation":null,"dateCreated":1421744477000,"dateUpdated":1421744477000,"categories":[{"id":12,"name":"eHealth","appscount":1,"bunscount":0,"productsCount":1},{"id":15,"name":"eLearning","appscount":1,"bunscount":0,"productsCount":1}],"extensions":[],"screenshots":"","containers":[{"id":26,"name":"Container0","deployArtifacts":[{"id":41,"uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","name":"Apache http server","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"id":158,"name":"ListenPort","value":"80"}]}]},{"id":27,"name":"Container1","deployArtifacts":[{"id":42,"uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","name":"MySQL","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"id":159,"name":"PORT","value":"3306"},{"id":160,"name":"DBUSER","value":"admin"},{"id":161,"name":"DBPASSWD","value":"changeme"},{"id":162,"name":"DBNAME","value":"mydatabase"},{"id":163,"name":"DBHOST","value":"localhost"}]}]}]}
 	-----------------------------1377130454610
 	Content-Disposition: form-data; name="prodIcon"
 	
@@ -330,7 +330,7 @@ Payload:
 		Add a resource
 			POST http://localhost:13000/portal/services/api/repo/admin/subscribedresources/
 		example payload:
-			{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_DEVELOPER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"url":"192.168.1.2"}
+			{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"url":"192.168.1.2"}
 		
 	
 	
@@ -368,7 +368,7 @@ Response
 	            "email": "admin@gma",
 	            "username": "admin",
 	            "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	            "role": "ROLE_BOSS",
+	            "role": "ROLE_PORTALADMIN",
 	            "active": true,
 	            "currentSessionID": "87845aae-042f-44ab-85cb-d85e410c732b"
 	        },
@@ -453,7 +453,7 @@ Response
 	        "email": "admin@gma",
 	        "username": "admin",
 	        "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	        "role": "ROLE_BOSS",
+	        "role": "ROLE_PORTALADMIN",
 	        "active": true,
 	        "currentSessionID": "87845aae-042f-44ab-85cb-d85e410c732b"
 	    },
@@ -509,7 +509,7 @@ Response
 	                "email": "admin@gma",
 	                "username": "admin",
 	                "password": "TLnIqASP0CKUR3/LGkEZGg==",
-	                "role": "ROLE_BOSS",
+	                "role": "ROLE_PORTALADMIN",
 	                "active": true,
 	                "currentSessionID": "87845aae-042f-44ab-85cb-d85e410c732b"
 	            },

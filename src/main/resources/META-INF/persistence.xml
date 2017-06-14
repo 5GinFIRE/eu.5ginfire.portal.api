@@ -53,6 +53,7 @@
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
 			<property name="openjpa.Log" value="none" />
+			<!--  property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" /  -->
 		</properties>
 
 	</persistence-unit>

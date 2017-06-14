@@ -19,7 +19,7 @@ import portal.api.fiware.FIWARECloudAccess;
 import portal.api.fiware.FIWAREUser;
 import portal.api.fiware.FIWAREUtils;
 import portal.api.fiware.OAuthClientManager;
-import portal.api.model.ApplicationMetadata;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
@@ -299,7 +299,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/apps")
+	@Path("/users/{userid}/experiments")
 	@Produces("application/json")
 	public Response getAllAppsofUser(@PathParam("userid") int userid) {
 		logger.info("getAllAppsofUser for userid: " + userid);
@@ -307,10 +307,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (u != null) {
 			List<Product> prods = u.getProducts();
-			List<ApplicationMetadata> apps = new ArrayList<ApplicationMetadata>();
+			List<ExperimentMetadata> apps = new ArrayList<ExperimentMetadata>();
 			for (Product p : prods) {
-				if (p instanceof ApplicationMetadata)
-					apps.add((ApplicationMetadata) p);
+				if (p instanceof ExperimentMetadata)
+					apps.add((ExperimentMetadata) p);
 			}
 
 			return Response.ok().entity(apps).build();
@@ -339,14 +339,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/apps/{appid}")
+	@Path("/users/{userid}/experiments/{appid}")
 	@Produces("application/json")
 	public Response getAppofUser(@PathParam("userid") int userid, @PathParam("appid") int appid) {
 		logger.info("getAppofUser for userid: " + userid + ", appid=" + appid);
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
-			ApplicationMetadata appmeta = (ApplicationMetadata) u.getProductById(appid);
+			ExperimentMetadata appmeta = (ExperimentMetadata) u.getProductById(appid);
 			return Response.ok().entity(appmeta).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1037,14 +1037,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// Applications related API
 
 	@GET
-	@Path("/admin/apps")
+	@Path("/admin/experiments")
 	@Produces("application/json")
 	public Response getApps(@QueryParam("categoryid") Long categoryid) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
-			List<ApplicationMetadata> apps;
+			List<ExperimentMetadata> apps;
 
 			if (u.getRole().equals("ROLE_PORTALADMIN")) {
 				apps = portalRepositoryRef.getApps(categoryid);
@@ -1063,20 +1063,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/apps")
+	@Path("/experiments")
 	@Produces("application/json")
 	public Response getAllApps(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getApps categoryid=" + categoryid);
-		List<ApplicationMetadata> buns = portalRepositoryRef.getApps(categoryid);
+		List<ExperimentMetadata> buns = portalRepositoryRef.getApps(categoryid);
 		return Response.ok().entity(buns).build();
 	}
 
 	@GET
-	@Path("/apps/{appid}")
+	@Path("/experiments/{appid}")
 	@Produces("application/json")
 	public Response getAppMetadataByID(@PathParam("appid") int appid) {
 		logger.info("getAppMetadataByID  appid=" + appid);
-		ApplicationMetadata app = (ApplicationMetadata) portalRepositoryRef.getProductByID(appid);
+		ExperimentMetadata app = (ExperimentMetadata) portalRepositoryRef.getProductByID(appid);
 
 		if (app != null) {
 			return Response.ok().entity(app).build();
@@ -1088,21 +1088,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/admin/apps/{appid}")
+	@Path("/admin/experiments/{appid}")
 	@Produces("application/json")
 	public Response getAdminAppMetadataByID(@PathParam("appid") int appid) {
 		return getAppMetadataByID(appid);
 	}
 
 	@GET
-	@Path("/apps/uuid/{uuid}")
+	@Path("/experiments/uuid/{uuid}")
 	@Produces("application/json")
 	public Response getAppMetadataByUUID(@PathParam("uuid") String uuid) {
 		logger.info("Received GET for app uuid: " + uuid);
-		ApplicationMetadata app = null;
+		ExperimentMetadata app = null;
 
 		URI endpointUrl = uri.getBaseUri();
-		app = (ApplicationMetadata) portalRepositoryRef.getProductByUUID(uuid);
+		app = (ExperimentMetadata) portalRepositoryRef.getProductByUUID(uuid);
 
 		if (app != null) {
 			return Response.ok().entity(app).build();
@@ -1115,7 +1115,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@POST
-	@Path("/admin/apps/")
+	@Path("/admin/experiments/")
 	@Consumes("multipart/form-data")
 	public Response addAppMetadata(List<Attachment> ats) {
 
@@ -1127,12 +1127,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		ApplicationMetadata app = new ApplicationMetadata();
+		ExperimentMetadata app = new ExperimentMetadata();
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("application", ats));
-			app = parser.readValueAs(ApplicationMetadata.class);
+			app = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for app : " + app.getName());
 			logger.info("Received @POST for app.containers : " + app.getContainers().size());
@@ -1144,8 +1144,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// ApplicationMetadata sm = new ApplicationMetadata();
-		app = (ApplicationMetadata) addNewProductData(app, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
+		// ExperimentMetadata sm = new ExperimentMetadata();
+		app = (ExperimentMetadata) addNewProductData(app, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(app).build();
@@ -1153,16 +1153,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@PUT
-	@Path("/admin/apps/{aid}")
+	@Path("/admin/experiments/{aid}")
 	@Consumes("multipart/form-data")
 	public Response updateAppMetadata(@PathParam("aid") int aid, List<Attachment> ats) {
 
-		ApplicationMetadata appmeta = new ApplicationMetadata();
+		ExperimentMetadata appmeta = new ExperimentMetadata();
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("application", ats));
-			appmeta = parser.readValueAs(ApplicationMetadata.class);
+			appmeta = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for app : " + appmeta.getName());
 			logger.info("Received @POST for app.containers : " + appmeta.getContainers().size());
@@ -1173,16 +1173,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// ApplicationMetadata appmeta = (ApplicationMetadata) portalRepositoryRef.getProductByID(aid);
+		// ExperimentMetadata appmeta = (ExperimentMetadata) portalRepositoryRef.getProductByID(aid);
 
-		appmeta = (ApplicationMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
+		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(appmeta).build();
 	}
 
 	@DELETE
-	@Path("/admin/apps/{appid}")
+	@Path("/admin/experiments/{appid}")
 	public void deleteApp(@PathParam("appid") int appid) {
 		portalRepositoryRef.deleteProduct(appid);
 
@@ -1584,7 +1584,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			deployment.setOwner(u); // reattach from the DB model
 			u.getDeployments().add(deployment);
 
-			ApplicationMetadata baseApplication = (ApplicationMetadata) portalRepositoryRef.getProductByID(deployment.getBaseApplication().getId());
+			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef.getProductByID(deployment.getBaseApplication().getId());
 			deployment.setBaseApplication(baseApplication); // reattach from the DB model
 
 			for (DeployContainer dc : deployment.getDeployContainers()) {
@@ -1664,7 +1664,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId() );
 			d.setOwner(deploymentOwner); // reattach from the DB model
 
-			ApplicationMetadata baseApplication = (ApplicationMetadata) portalRepositoryRef.getProductByID(d.getBaseApplication().getId());
+			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef.getProductByID(d.getBaseApplication().getId());
 			d.setBaseApplication(baseApplication); // reattach from the DB model
 
 			for (DeployContainer dc : d.getDeployContainers()) {

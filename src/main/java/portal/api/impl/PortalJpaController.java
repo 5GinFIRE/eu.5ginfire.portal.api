@@ -28,7 +28,7 @@ import javax.persistence.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.ApplicationMetadata;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
@@ -615,14 +615,14 @@ public class PortalJpaController {
 
 
 
-	public List<ApplicationMetadata> readAppsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<ExperimentMetadata> readAppsMetadata(Long categoryid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q;
 		
 		if ((categoryid!=null) && (categoryid>=0))
-			q = entityManager.createQuery("SELECT a FROM ApplicationMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
 		else
-			q = entityManager.createQuery("SELECT a FROM ApplicationMetadata a ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a ORDER BY a.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -630,15 +630,15 @@ public class PortalJpaController {
 	
 	
 	@SuppressWarnings("unchecked")
-	public List<ApplicationMetadata> readAppsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
+	public List<ExperimentMetadata> readAppsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		//Query q = entityManager.createQuery("SELECT m FROM BunMetadata m");
 		Query q;
 		
 		if ((ownerid!=null) && (ownerid>=0))
-			q = entityManager.createQuery("SELECT a FROM ApplicationMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
 		else
-			q = entityManager.createQuery("SELECT a FROM ApplicationMetadata a ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a ORDER BY a.id");
 
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);

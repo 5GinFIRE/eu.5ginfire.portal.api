@@ -16,7 +16,7 @@
 package portal.api.repo;
 
 import portal.api.impl.PortalJpaController;
-import portal.api.model.ApplicationMetadata;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
@@ -189,24 +189,24 @@ public class PortalRepository {
 	 * @param categoryid 
 	 * @return list of apps
 	 */
-	public List<ApplicationMetadata> getApps(Long categoryid) {
-		List<ApplicationMetadata> ls = portalJpaController.readAppsMetadata(categoryid, 0, 100000);		
+	public List<ExperimentMetadata> getApps(Long categoryid) {
+		List<ExperimentMetadata> ls = portalJpaController.readAppsMetadata(categoryid, 0, 100000);		
 		return ls;
 	}
 
 
-//	public ApplicationMetadata getApplicationMetadataByID(int appid) {
-//		return (ApplicationMetadata) portalJpaController.readProductByID(appid);
+//	public ExperimentMetadata getExperimentMetadataByID(int appid) {
+//		return (ExperimentMetadata) portalJpaController.readProductByID(appid);
 //	}
 //
 //
-//	public ApplicationMetadata getApplicationMetadataByUUID(String uuid) {
-//		return (ApplicationMetadata) portalJpaController.readProductByUUID(uuid);
+//	public ExperimentMetadata getExperimentMetadataByUUID(String uuid) {
+//		return (ExperimentMetadata) portalJpaController.readProductByUUID(uuid);
 //	}
 
 
-//	public ApplicationMetadata updateApplicationInfo(int appid, ApplicationMetadata sm) {
-//		ApplicationMetadata bmr = portalJpaController.updateApplicationMetadata(sm);
+//	public ExperimentMetadata updateApplicationInfo(int appid, ExperimentMetadata sm) {
+//		ExperimentMetadata bmr = portalJpaController.updateExperimentMetadata(sm);
 //		return bmr;
 //		
 //	}
@@ -282,8 +282,8 @@ public class PortalRepository {
 	}
 
 
-	public List<ApplicationMetadata> getAppsByUserID(Long ownerid) {
-		List<ApplicationMetadata> ls = portalJpaController.readAppsMetadataForOwnerID( ownerid, 0, 100000);	
+	public List<ExperimentMetadata> getAppsByUserID(Long ownerid) {
+		List<ExperimentMetadata> ls = portalJpaController.readAppsMetadataForOwnerID( ownerid, 0, 100000);	
 		return ls;
 	}
 

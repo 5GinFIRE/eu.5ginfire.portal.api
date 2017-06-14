@@ -252,25 +252,25 @@ public class PortalUser {
 		this.currentSessionID = currentSessionID;
 	}
 	
-//	public void addApplication(ApplicationMetadata app) {
+//	public void addApplication(ExperimentMetadata app) {
 //		if (!apps.contains(app)) {
 //			apps.add(app);
 //			app.setOwner(this);
 //		}
 //	}
 //
-//	public List<ApplicationMetadata> getApps() {
+//	public List<ExperimentMetadata> getApps() {
 //		return apps;
 //	}
 //
-//	public void setApps(List<ApplicationMetadata> apps) {
+//	public void setApps(List<ExperimentMetadata> apps) {
 //		this.apps = apps;
 //	}
 //
-//	public ApplicationMetadata getAppById(int appid) {
+//	public ExperimentMetadata getAppById(int appid) {
 //
 //		for (Iterator iterator = apps.iterator(); iterator.hasNext();) {
-//			ApplicationMetadata appMetadata = (ApplicationMetadata) iterator.next();
+//			ExperimentMetadata appMetadata = (ExperimentMetadata) iterator.next();
 //			if (appMetadata.getId() == appid)
 //				return appMetadata;
 //		}

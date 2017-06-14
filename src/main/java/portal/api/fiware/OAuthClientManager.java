@@ -64,7 +64,7 @@ public class OAuthClientManager {
 
 	}
 
-	// inject properties, register the client application...
+	// inject properties, register the client Experiment...
 
 	public URI getAuthorizationServiceURI(URI redirectUri,
 	/* state */String reservationRequestKey) {

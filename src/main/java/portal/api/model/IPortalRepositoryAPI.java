@@ -67,7 +67,7 @@ public interface IPortalRepositoryAPI {
 	Response updateSubscribedResource(int smId, SubscribedResource sm);
 	Response deleteSubscribedResource(int smId);
 	
-	//Apps Related API methods
+	//experiments Related API methods
 	Response getApps(Long categoryid);
 	Response getAppMetadataByID(int appid);
 	Response getAppMetadataByUUID(String uuid);		

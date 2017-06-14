@@ -23,7 +23,7 @@
 		<class>portal.api.model.Product</class>
 		<class>portal.api.model.ProductExtensionItem</class>
 		<class>portal.api.model.BunMetadata</class>
-		<class>portal.api.model.ApplicationMetadata</class>
+		<class>portal.api.model.ExperimentMetadata</class>
 		<class>portal.api.model.PortalProperty</class>
 		<class>portal.api.model.Container</class>
 		<class>portal.api.model.DeployArtifact</class>
@@ -67,7 +67,7 @@
 		<class>portal.api.model.BunMetadata</class>
 		<class>portal.api.model.PortalUser</class>
 		<class>portal.api.model.SubscribedResource</class>
-		<class>portal.api.model.ApplicationMetadata</class>
+		<class>portal.api.model.ExperimentMetadata</class>
 		<class>portal.api.model.Category</class>
 		<class>portal.api.model.Product</class>
 		<class>portal.api.model.ProductExtensionItem</class>

@@ -68,7 +68,7 @@ public class DeploymentDescriptor {
 
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
-	private ApplicationMetadata baseApplication = null;
+	private ExperimentMetadata baseApplication = null;
 	
 	
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
@@ -105,11 +105,11 @@ public class DeploymentDescriptor {
 	}
 
 	
-	public ApplicationMetadata getBaseApplication() {
+	public ExperimentMetadata getBaseApplication() {
 		return baseApplication;
 	}
 
-	public void setBaseApplication(ApplicationMetadata baseApplication) {
+	public void setBaseApplication(ExperimentMetadata baseApplication) {
 		this.baseApplication = baseApplication;
 	}
 

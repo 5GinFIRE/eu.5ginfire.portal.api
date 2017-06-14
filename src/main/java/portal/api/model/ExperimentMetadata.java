@@ -24,8 +24,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 
-@Entity(name = "ApplicationMetadata")
-public class ApplicationMetadata extends Product{
+@Entity(name = "ExperimentMetadata")
+public class ExperimentMetadata extends Product{
 
 
 	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })

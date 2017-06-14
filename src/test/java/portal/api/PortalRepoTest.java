@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import java.util.UUID;
 
 import portal.api.impl.PortalJpaController;
-import portal.api.model.ApplicationMetadata;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
 import portal.api.model.BunMetadata;
 import portal.api.model.Category;
@@ -182,7 +182,7 @@ public class PortalRepoTest {
 		PortalUser bu = new PortalUser();
 		bu.setUsername("ausernameWRA");
 
-		ApplicationMetadata appmeta = new ApplicationMetadata();
+		ExperimentMetadata appmeta = new ExperimentMetadata();
 		appmeta.setName("app");
 		String uuid = UUID.randomUUID().toString();
 		appmeta.setUuid(uuid);
@@ -208,7 +208,7 @@ public class PortalRepoTest {
 		assertEquals(2, appmeta.getCategories().size() );
 		assertEquals(2, appmeta.getExtensions().size() );
 
-		ApplicationMetadata appmeta2 = new ApplicationMetadata();
+		ExperimentMetadata appmeta2 = new ExperimentMetadata();
 		appmeta2.setName("app2");
 		appmeta2.setLongDescription("longDescription2");
 		appmeta2.setShortDescription("shortDescription2");
@@ -222,7 +222,7 @@ public class PortalRepoTest {
 		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausernameWRA");
 		assertEquals(2, testbu.getProducts().size());
 
-		ApplicationMetadata testApp = (ApplicationMetadata) portalJpaControllerTest.readProductByUUID(uuid);
+		ExperimentMetadata testApp = (ExperimentMetadata) portalJpaControllerTest.readProductByUUID(uuid);
 		assertEquals("NewAppName", testApp.getName());
 		assertEquals(uuid, testApp.getUuid());
 		assertNotNull(testApp.getOwner());
@@ -258,7 +258,7 @@ public class PortalRepoTest {
 		bu.addProduct(bmeta2);		
 		
 		//add an application description
-		ApplicationMetadata app = new ApplicationMetadata();
+		ExperimentMetadata app = new ExperimentMetadata();
 		app.setName("myapp");
 		uuid = UUID.randomUUID().toString();
 		app.setUuid(uuid);

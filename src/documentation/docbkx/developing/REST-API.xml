@@ -8,14 +8,14 @@
 
 	<para>
 	All API, 
-	Produces("application/json") and Consumes("application/json") except some POSTs that Consumes("multipart/form-data")
+	Produces("experiment/json") and Consumes("experiment/json") except some POSTs that Consumes("multipart/form-data")
 	All requests should be to the repo of the webservice. For example if you have the path /portal 
 	for the webservice then put the full path as /portal/repo/users/
 	
 	</para>
 	
 	<para>
-	<ns:application>Authenticate, Create Session</ns:application>
+	<ns:experiment>Authenticate, Create Session</ns:experiment>
 	</para>
 	
 	<para> 
@@ -24,7 +24,7 @@
 			
 	
 
-	curl -v -H "Content-Type: application/json" -X POST --data '{"username":"admin", "password":"changeme"}' http://localhost:13000/portal/services/api/repo/sessions
+	curl -v -H "Content-Type: experiment/json" -X POST --data '{"username":"admin", "password":"changeme"}' http://localhost:13000/portal/services/api/repo/sessions
 
 Response
 
@@ -53,7 +53,7 @@ In the following examples JSESSIONID cookie value is equal to the currentSession
 	</para>
 	
 	<para>
-	<ns:application>Categories</ns:application>
+	<ns:experiment>Categories</ns:experiment>
 	</para>
 	
 	<para> 
@@ -63,7 +63,7 @@ In the following examples JSESSIONID cookie value is equal to the currentSession
 
 GET all categories
 
-    curl -v -H "Content-Type: application/json" http://localhost:13000/portal/services/api/repo/categories
+    curl -v -H "Content-Type: experiment/json" http://localhost:13000/portal/services/api/repo/categories
     
 Response
 	[{
@@ -87,14 +87,14 @@ Response
 	
 GET all categories (only admin role user)
 	
-	curl -v -H "Content-Type: application/json" --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/categories
+	curl -v -H "Content-Type: experiment/json" --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/categories
 	
 JSESSIONID is the same value returned from sessionId
 		
 		
 Add a new category (if authorized, only admin role)
 
-    curl -v -H "Content-Type: application/json" -X POST --data '{"name":"NewCateg"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/categories
+    curl -v -H "Content-Type: experiment/json" -X POST --data '{"name":"NewCateg"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/categories
 
 Response
 	{
@@ -107,7 +107,7 @@ Response
 			
 Update a category(if authorized, only admin role)
 
-    curl -H "Content-Type: application/json" -X PUT --data '{"id":"10", "name":"NewCategNAMEX"}'  http://localhost:13000/portal/services/api/repo/admin/categories/10
+    curl -H "Content-Type: experiment/json" -X PUT --data '{"id":"10", "name":"NewCategNAMEX"}'  http://localhost:13000/portal/services/api/repo/admin/categories/10
 
 
 			</programlisting>
@@ -115,7 +115,7 @@ Update a category(if authorized, only admin role)
 	</para>
 	
 	<para>
-	<ns:application>Users</ns:application>
+	<ns:experiment>Users</ns:experiment>
 	</para>
 	
 	<para> 
@@ -124,7 +124,7 @@ Update a category(if authorized, only admin role)
 
 Getting all users (if authorized, only admin role)			
 			
-	curl -v -H "Content-Type: application/json" --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/			
+	curl -v -H "Content-Type: experiment/json" --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/			
 			
 Response sample:
 
@@ -155,17 +155,17 @@ Response sample:
 			
 Add a user (if authorized, only admin role)			
 			
-	curl -v -H "Content-Type: application/json" -X POST --data '{"name":"NewUser","username":"NewUser","email":"NewUser@org", "password":"somepass"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/			
+	curl -v -H "Content-Type: experiment/json" -X POST --data '{"name":"NewUser","username":"NewUser","email":"NewUser@org", "password":"somepass"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/			
 
 
 Update a user with id (if authorized, only admin role)			
 			
-	curl -v -H "Content-Type: application/json" -X PUT --data '{"id":"12","name":"NewUser","username":"NewUser","email":"NewUser@org", "password":"somepass"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/12			
+	curl -v -H "Content-Type: experiment/json" -X PUT --data '{"id":"12","name":"NewUser","username":"NewUser","email":"NewUser@org", "password":"somepass"}' --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/12			
 			
 			
 Delete a user wit id (if authorized, only admin role)			
 			
-	curl -v -H "Content-Type: application/json" -X DELETE --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/12			
+	curl -v -H "Content-Type: experiment/json" -X DELETE --cookie "JSESSIONID=b9e382e4-f6e0-47da-94a2-58dcb9871010"  http://localhost:13000/portal/services/api/repo/admin/users/12			
 			
 			
 		
@@ -175,7 +175,7 @@ Delete a user wit id (if authorized, only admin role)
 	</para>
 	
 	<para>
-	<ns:application>Buns/Apps</ns:application>
+	<ns:experiment>Buns/Experiments</ns:experiment>
 	</para>
 	
 	<para> 
@@ -248,7 +248,7 @@ Save a new bun (ony authorized users, role Developer)
 	
 	-----------------------------9816548228756
 	Content-Disposition: form-data; name="prodFile"; filename="examplebun.tar.gz"
-	Content-Type: application/x-gzip
+	Content-Type: experiment/x-gzip
 
 
 Delete a bun (only bun owner or admin auth)
@@ -258,21 +258,21 @@ Delete a bun (only bun owner or admin auth)
 	
 Get all Apps
 
-	GET http://localhost:13000/portal/services/api/repo/apps/
+	GET http://localhost:13000/portal/services/api/repo/experiments/
 
 GET Admin apps (only for authorized users)
 
-	GET http://localhost:13000/portal/services/api/repo/admin/apps/	
+	GET http://localhost:13000/portal/services/api/repo/admin/experiments/	
 	
 Add a new App
 
-	POST http://localhost:13000/portal/services/api/repo/admin/apps/
+	POST http://localhost:13000/portal/services/api/repo/admin/experiments/
 		
 Content type multipart/form-data
 Payload:
 
 	-----------------------------23719209031
-	Content-Disposition: form-data; name="application"
+	Content-Disposition: form-data; name="experiment"
 	
 	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"containers":[{"id":0,"name":"Container0","deployArtifacts":[{"id":null,"name":"Apache http server","uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"name":"ListenPort","value":"80"}]}]},{"id":null,"name":"Container1","deployArtifacts":[{"id":null,"name":"MySQL","uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"name":"PORT","value":"3306"},{"name":"DBUSER","value":"admin"},{"name":"DBPASSWD","value":"changeme"},{"name":"DBNAME","value":"mydatabase"},{"name":"DBHOST","value":"localhost"}]}]}],"name":"AtestApp","version":"1.2","shortDescription":"a small description","longDescription":"a long description","categories":[{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0},{"id":15,"name":"eLearning","appscount":0,"bunscount":0,"productsCount":0}]}
 	-----------------------------23719209031
@@ -283,15 +283,15 @@ Payload:
 
 
 
-Edit an Application
+Edit an Experiment
 
-	PUT http://localhost:13000/portal/services/api/repo/admin/apps/73
+	PUT http://localhost:13000/portal/services/api/repo/admin/experiments/73
 	
 Content type multipart/form-data
 Payload:
 	
 	-----------------------------1377130454610
-	Content-Disposition: form-data; name="application"
+	Content-Disposition: form-data; name="experiment"
 	
 	{"id":73,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"uuid":"04307e99-8d24-4ca2-b75f-3e7df8558fc0","name":"AtestApp!","iconsrc":"http://localhost:13000/portal/services/api/repo/images/04307e99-8d24-4ca2-b75f-3e7df8558fc0/_widgetIconEmpty.PNG","shortDescription":"a small description","longDescription":"a long description","version":"1.2","packageLocation":null,"dateCreated":1421744477000,"dateUpdated":1421744477000,"categories":[{"id":12,"name":"eHealth","appscount":1,"bunscount":0,"productsCount":1},{"id":15,"name":"eLearning","appscount":1,"bunscount":0,"productsCount":1}],"extensions":[],"screenshots":"","containers":[{"id":26,"name":"Container0","deployArtifacts":[{"id":41,"uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","name":"Apache http server","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"id":158,"name":"ListenPort","value":"80"}]}]},{"id":27,"name":"Container1","deployArtifacts":[{"id":42,"uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","name":"MySQL","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"id":159,"name":"PORT","value":"3306"},{"id":160,"name":"DBUSER","value":"admin"},{"id":161,"name":"DBPASSWD","value":"changeme"},{"id":162,"name":"DBNAME","value":"mydatabase"},{"id":163,"name":"DBHOST","value":"localhost"}]}]}]}
 	-----------------------------1377130454610
@@ -310,7 +310,7 @@ Payload:
 	
 	
 	<para>
-	<ns:application>Registered Resources</ns:application>
+	<ns:experiment>Registered Resources</ns:experiment>
 	</para>
 	
 	<para> 
@@ -318,7 +318,7 @@ Payload:
 			<programlisting language="bash">	
 			
 		Add a resource	for an owner (anauthorized call) example
-			curl -v -H "Content-Type: application/json" -X POST --data '{ "uuid": "99997468-7f92-4fff-9d9a-53a77eb4b25f",  "owner": {  "id": 34,  "username": "dev"  },  "url": "10.10.10.1" } '  http://localhost:13000/portal/services/api/repo/registerresource	
+			curl -v -H "Content-Type: experiment/json" -X POST --data '{ "uuid": "99997468-7f92-4fff-9d9a-53a77eb4b25f",  "owner": {  "id": 34,  "username": "dev"  },  "url": "10.10.10.1" } '  http://localhost:13000/portal/services/api/repo/registerresource	
 	
 	Admin resources:		
 		Get all resources (os auth owner user. Admin sees all resources)
@@ -340,7 +340,7 @@ Payload:
 	
 	
 	<para>
-	<ns:application>Deployments</ns:application>
+	<ns:experiment>Deployments</ns:experiment>
 	</para>
 	
 	<para> 
@@ -359,7 +359,7 @@ Response
 	    "name": "ApacheMysql Deployment",
 	    "status": "QUEUED",
 	    "dateCreated": 1421682762000,
-	    "baseApplication": {
+	    "baseExperiment": {
 	        "id": 68,
 	        "owner": {
 	            "id": 1,
@@ -376,7 +376,7 @@ Response
 	        "name": "ApacheMysql",
 	        "iconsrc": "http://localhost:13000/portal/services/api/repo/images/65d95d48-c30e-4a97-adde-aa3b3ede8791/lamp.png",
 	        "shortDescription": "Apache and Mysql installation",
-	        "longDescription": "Apache Mysql installation suitable for building dynamic web sites and web applications",
+	        "longDescription": "Apache Mysql installation suitable for building dynamic web sites and web experiments",
 	        "version": "1",
 	        "packageLocation": null,
 	        "dateCreated": 1421245904000,
@@ -525,8 +525,8 @@ Response
 	
 	
 	<para>
-	<ns:application>Client API</ns:application>
-	This API is for applications that want to communicate with a client
+	<ns:experiment>Client API</ns:experiment>
+	This API is for experiments that want to communicate with a client
 	installation of portal. The portal client communicates with a Portal
 	marketplace to download loccaly and install apps and buns to the local
 	resource where the portal client is installed.
@@ -540,11 +540,11 @@ Response
 			
 	GET local bun information by bun uuid
 	Path("/ibuns/{uuid}")
-	Produces("application/json")
+	Produces("experiment/json")
 		
 	GET all local installed buns
 	Path("/ibuns/")
-	Produces("application/json")
+	Produces("experiment/json")
 	
 	Response example:
 	[
@@ -592,7 +592,7 @@ Response
 		
 	POST install a bun locally, by fetching it from the remote marketplace
 	Path("/ibuns/")
-	Produces("application/json")	
+	Produces("experiment/json")	
 	Example request payload
 	{
 		"uuid":"511af54b-222e-43c2-ad8f-b618d43abdb8",
@@ -621,7 +621,7 @@ Response
 	
 	PUT, Stop a bun, put it to the Stopped state
 	Path("/ibuns/{uuid}/stop")
-	Produces("application/json")
+	Produces("experiment/json")
 	Response example, should poll the service to get the current STATUS, :
 	{
 	   "status":"STARTED",
@@ -639,13 +639,13 @@ Response
 	
 	PUT, Start a bun, put it to the Started phase by following all correct states and configuration
 	Path("/ibuns/{uuid}/start")
-	Produces("application/json")
+	Produces("experiment/json")
 	Response example:
 	
 	
 	PUT, reconfigure a bun. follows the bun lifecycle to restart the bun
 	Path("/ibuns/{uuid}/reconfigure")
-	Produces("application/json")
+	Produces("experiment/json")
 			</programlisting>
 		</informalexample>
 	</para>

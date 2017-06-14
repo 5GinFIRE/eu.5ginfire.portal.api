@@ -97,7 +97,7 @@ public class Category {
 	public int getAppscount() {
 		int c = 0;
 		for (int i = 0; i < this.products.size(); i++) {
-			if (this.products.get(i) instanceof ApplicationMetadata)
+			if (this.products.get(i) instanceof ExperimentMetadata)
 				c++;
 		}
 		return c;

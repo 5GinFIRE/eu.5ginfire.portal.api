@@ -24,7 +24,7 @@ public interface IRepositoryWebClient {
 	 * @param url
 	 * @return a ServiceMetada object containing info
 	 */
-	public BunMetadata fetchMetadata(String uuid, String url);
+	public VxFMetadata fetchMetadata(String uuid, String url);
 
 	
 	/**

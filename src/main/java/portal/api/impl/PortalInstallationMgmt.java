@@ -22,102 +22,102 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import portal.api.model.IRepositoryWebClient;
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 
 public class PortalInstallationMgmt {
 
-	private ConcurrentHashMap<String, InstalledBun> managedInstalledBuns;
+	private ConcurrentHashMap<String, InstalledVxF> managedInstalledVxFs;
 	private IRepositoryWebClient repoWebClient;
 	private PortalJpaController portalJpaController;
 
 	private static final transient Log logger = LogFactory.getLog(PortalInstallationMgmt.class.getName());
 
 	public PortalInstallationMgmt() {
-		managedInstalledBuns = new ConcurrentHashMap<>();
+		managedInstalledVxFs = new ConcurrentHashMap<>();
 		// this.setRepoWebClient(new RepositoryWebClient());
 	}
 
-	public ConcurrentHashMap<String, InstalledBun> getManagedInstalledBuns() {
-		return managedInstalledBuns;
+	public ConcurrentHashMap<String, InstalledVxF> getManagedInstalledVxFs() {
+		return managedInstalledVxFs;
 	}
 
 	/**
 	 * Add installed service object to ManagedServices list
 	 * 
 	 * @param s
-	 *            InstalledBun to add
+	 *            InstalledVxF to add
 	 * @return the same service
 	 */
-	private InstalledBun addBunToManagedBuns(InstalledBun s) {
-		managedInstalledBuns.put(s.getUuid(), s);
+	private InstalledVxF addVxFToManagedVxFs(InstalledVxF s) {
+		managedInstalledVxFs.put(s.getUuid(), s);
 
 
 		return s;
 	}
 
-//	private Boolean removeServiceFromManagedServices(InstalledBun s) {
-//		InstalledBun is = managedInstalledBuns.remove(s.getUuid());
+//	private Boolean removeServiceFromManagedServices(InstalledVxF s) {
+//		InstalledVxF is = managedInstalledVxFs.remove(s.getUuid());
 //		portalJpaController.delete(s);
 //		return (is != null);
 //	}
 
 	/**
-	 * Starts the installation of a bun. If found already in local registry (managedInstalledBun list) returns a ref to an existing instance if found. Otherwise
+	 * Starts the installation of a vxf. If found already in local registry (managedInstalledVxF list) returns a ref to an existing instance if found. Otherwise
 	 * starts a new installation.
 	 * 
-	 * @param reqBunUUID
-	 *            The uuid of the requested Bun
-	 * @param bunRepoURL
+	 * @param reqVxFUUID
+	 *            The uuid of the requested VxF
+	 * @param vxfRepoURL
 	 *            The endpoint of the repository
-	 * @return an InstalledBun object
+	 * @return an InstalledVxF object
 	 */
-	public InstalledBun installBunAndStart(String reqBunUUID, String bunRepoURL) {
+	public InstalledVxF installVxFAndStart(String reqVxFUUID, String vxfRepoURL) {
 
-		logger.info("reqBunUUID= " + reqBunUUID+", bunRepoURL= "+ bunRepoURL);
-		InstalledBun s = managedInstalledBuns.get(reqBunUUID); // return existing if
+		logger.info("reqVxFUUID= " + reqVxFUUID+", vxfRepoURL= "+ vxfRepoURL);
+		InstalledVxF s = managedInstalledVxFs.get(reqVxFUUID); // return existing if
 														// found
-		if ((s != null) && (s.getStatus() != InstalledBunStatus.FAILED)
-				 && (s.getStatus() != InstalledBunStatus.INIT)
-				  && (s.getStatus() != InstalledBunStatus.DOWNLOADING)
-				  && (s.getStatus() != InstalledBunStatus.DOWNLOADED)
-				  && (s.getStatus() != InstalledBunStatus.UNINSTALLED)) {
+		if ((s != null) && (s.getStatus() != InstalledVxFStatus.FAILED)
+				 && (s.getStatus() != InstalledVxFStatus.INIT)
+				  && (s.getStatus() != InstalledVxFStatus.DOWNLOADING)
+				  && (s.getStatus() != InstalledVxFStatus.DOWNLOADED)
+				  && (s.getStatus() != InstalledVxFStatus.UNINSTALLED)) {
 			return s;
 		}
 
 		logger.info("will start installation");
 
 		if (s == null) {
-			s = new InstalledBun(reqBunUUID, bunRepoURL);
-			addBunToManagedBuns(s);
-			portalJpaController.saveInstalledBun(s);
-		} else if ((s.getStatus() == InstalledBunStatus.FAILED) ||
-				(s.getStatus() == InstalledBunStatus.INIT) ||
-				(s.getStatus() == InstalledBunStatus.DOWNLOADING) ||
-				(s.getStatus() == InstalledBunStatus.DOWNLOADED) ||(s.getStatus() == InstalledBunStatus.UNINSTALLED)) {
+			s = new InstalledVxF(reqVxFUUID, vxfRepoURL);
+			addVxFToManagedVxFs(s);
+			portalJpaController.saveInstalledVxF(s);
+		} else if ((s.getStatus() == InstalledVxFStatus.FAILED) ||
+				(s.getStatus() == InstalledVxFStatus.INIT) ||
+				(s.getStatus() == InstalledVxFStatus.DOWNLOADING) ||
+				(s.getStatus() == InstalledVxFStatus.DOWNLOADED) ||(s.getStatus() == InstalledVxFStatus.UNINSTALLED)) {
 
 			logger.info("Will RESTART installation of existing " + s.getUuid() + ". HAD Status= " + s.getStatus());
-			s.setStatus(InstalledBunStatus.INIT); // restart installation
-			s.setRepoUrl(bunRepoURL);
+			s.setStatus(InstalledVxFStatus.INIT); // restart installation
+			s.setRepoUrl(vxfRepoURL);
 		}
 
-		processBunLifecycleJob(s, this.portalJpaController, InstalledBunStatus.STARTED);
+		processVxFLifecycleJob(s, this.portalJpaController, InstalledVxFStatus.STARTED);
 		return s;
 	}
 
 	/**
-	 * It executes the installation of the bun in a thread job, following the bun installation state resource
+	 * It executes the installation of the vxf in a thread job, following the vxf installation state resource
 	 * 
 	 * @param s
-	 *            InstalledBun object to manage the lifecycle
+	 *            InstalledVxF object to manage the lifecycle
 	 */
-	private void processBunLifecycleJob(final InstalledBun s, final PortalJpaController jpsctr, final InstalledBunStatus targetStatus) {
+	private void processVxFLifecycleJob(final InstalledVxF s, final PortalJpaController jpsctr, final InstalledVxFStatus targetStatus) {
 
 		logger.info("Creating new thread of " + s.getUuid() + " for target action = " + targetStatus);
 		Thread t1 = new Thread(new Runnable() {
 			public void run() {
 
-				new InstalledBunLifecycleMgmt(s, repoWebClient, jpsctr, targetStatus);
+				new InstalledVxFLifecycleMgmt(s, repoWebClient, jpsctr, targetStatus);
 
 			}
 		});
@@ -129,8 +129,8 @@ public class PortalInstallationMgmt {
 
 	}
 
-	public InstalledBun getBun(String uuid) {
-		InstalledBun is = managedInstalledBuns.get(uuid);
+	public InstalledVxF getVxF(String uuid) {
+		InstalledVxF is = managedInstalledVxFs.get(uuid);
 		return is;
 	}
 
@@ -150,54 +150,54 @@ public class PortalInstallationMgmt {
 		this.portalJpaController = b;
 
 		this.portalJpaController = b;
-		List<InstalledBun> ls = b.readInstalledBuns(0, 100000);
+		List<InstalledVxF> ls = b.readInstalledVxFs(0, 100000);
 
-		for (InstalledBun installedBun : ls) {
-			managedInstalledBuns.put(installedBun.getUuid(), installedBun);
+		for (InstalledVxF installedVxF : ls) {
+			managedInstalledVxFs.put(installedVxF.getUuid(), installedVxF);
 		}
 	}
 
-	public void stopBun(String uuid) {
-		InstalledBun is = managedInstalledBuns.get(uuid);
+	public void stopVxF(String uuid) {
+		InstalledVxF is = managedInstalledVxFs.get(uuid);
 
-		if (is.getStatus() != InstalledBunStatus.STARTED)
+		if (is.getStatus() != InstalledVxFStatus.STARTED)
 			return;
 
 		logger.info("will stop service uuid= " + uuid);
 
 
-		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STOPPED);
+		processVxFLifecycleJob(is, this.portalJpaController, InstalledVxFStatus.STOPPED);
 
 	}
 	
-	public void startBun(String uuid) {
-		InstalledBun is = managedInstalledBuns.get(uuid);
+	public void startVxF(String uuid) {
+		InstalledVxF is = managedInstalledVxFs.get(uuid);
 
-		if (is.getStatus() != InstalledBunStatus.STOPPED)
+		if (is.getStatus() != InstalledVxFStatus.STOPPED)
 			return;
 
 		logger.info("will start service uuid= " + uuid);
 
 
-		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STARTED);
+		processVxFLifecycleJob(is, this.portalJpaController, InstalledVxFStatus.STARTED);
 
 	}
 
-	public void uninstallBun(String uuid) {
-		InstalledBun is = managedInstalledBuns.get(uuid);
+	public void uninstallVxF(String uuid) {
+		InstalledVxF is = managedInstalledVxFs.get(uuid);
 
-		logger.info("will uninstall bun uuid= " + uuid);
+		logger.info("will uninstall vxf uuid= " + uuid);
 
-		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.UNINSTALLED);
+		processVxFLifecycleJob(is, this.portalJpaController, InstalledVxFStatus.UNINSTALLED);
 
 	}
 
-	public void configureBun(String uuid) {
-		InstalledBun is = managedInstalledBuns.get(uuid);
+	public void configureVxF(String uuid) {
+		InstalledVxF is = managedInstalledVxFs.get(uuid);
 
-		logger.info("will configure bun uuid= " + uuid);
+		logger.info("will configure vxf uuid= " + uuid);
 
-		processBunLifecycleJob(is, this.portalJpaController, InstalledBunStatus.STARTED);
+		processVxFLifecycleJob(is, this.portalJpaController, InstalledVxFStatus.STARTED);
 
 	}
 

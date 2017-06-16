@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Installed Buns</title>
+<title>Installed VxFs</title>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/themes/smoothness/jquery-ui.css" />
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js"></script>
@@ -13,8 +13,8 @@
 <body>
 
   	<div class="page-header">
-		<h1>Installed Buns <br>
-		<small>View status and manage installed Buns in your resource</small>
+		<h1>Installed VxFs <br>
+		<small>View status and manage installed VxFs in your resource</small>
 			</h1>
 	</div>
   
@@ -32,7 +32,7 @@
    
 
     function loadData(){
-	  $.getJSON(portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/', function(data) {
+	  $.getJSON(portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/', function(data) {
 	      var output="<table class='table table-bordered table-condensed ' >"+ 
 	      		"<tr>" + 
 	   	  	   "<th>ID</th>" +
@@ -52,11 +52,11 @@
 		            '<td>' + data[i].id + '</td> ' + 
 		            '<td><p>' + data[i].name + '</p>'+ '</td> ' +
 		            '<td>'+
-		            	'<p><span class="label label-default" id="bunStatusLabel'+ data[i].id+'">...</span></p>'+
+		            	'<p><span class="label label-default" id="vxfStatusLabel'+ data[i].id+'">...</span></p>'+
 		            	'<button type="button" id="uninstBtn'+data[i].id+'" style="display:none;" class=" btn btn-primary" NEXTACTION="UNINSTALL" onClick="execInstallButton('+ data[i].id+',\''+data[i].uuid +'\', true);" >Uninstall</button>'+
 	            	 	'</td> ' + 
 		            '<td>' + data[i].installedVersion + '</td> ' + 
-		            '<td><div id="bunaction'+data[i].id+'" bunuuid="'+data[i].uuid+'">'+
+		            '<td><div id="vxfaction'+data[i].id+'" vxfuuid="'+data[i].uuid+'">'+
 		            	'<button type="button" id="execBtn'+data[i].id+'" class="btn btn-primary" onClick="execInstallButton('+ data[i].id+',\''+data[i].uuid +'\');" >waiting action...</button>';
 		            	getAvailableAction( data[i].id, data[i].uuid)+
 		            	
@@ -72,13 +72,13 @@
 	  return false;
     }
 
-    function getAvailableAction(vid, bunUUID){
+    function getAvailableAction(vid, vxfUUID){
     	
-    	console.log("getAvailableAction for bunUUID="+bunUUID);
+    	console.log("getAvailableAction for vxfUUID="+vxfUUID);
     	
     	 
     	$.ajax({
-			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/'+vxfUUID,
 			  type:"GET",
 			  dataType:"json",
 			  success: function(dataX){
@@ -97,7 +97,7 @@
 			  },
 			  statusCode: {
 				  404: function() {
-					  console.log("statusCode result= 404 + "+ $("#bunaction"+vid).attr("bunuuid") );
+					  console.log("statusCode result= 404 + "+ $("#vxfaction"+vid).attr("vxfuuid") );
 						setLabelStatus(vid, 'UNINSTALLED');
 						setButtonText(vid, 'UNINSTALLED');
 				  }
@@ -175,56 +175,56 @@
 
 		
 		
-		$("#bunStatusLabel"+vid).text(vstatus);
-		$("#bunStatusLabel"+vid).removeClass().addClass('label');
+		$("#vxfStatusLabel"+vid).text(vstatus);
+		$("#vxfStatusLabel"+vid).removeClass().addClass('label');
 		
     	if (vstatus === 'INIT')
-    		$("#bunStatusLabel"+vid).addClass('label-warning');	
+    		$("#vxfStatusLabel"+vid).addClass('label-warning');	
     	else if (vstatus === 'DOWNLOADING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'DOWNLOADED')
-    		$("#bunStatusLabel"+vid).addClass('label-success');	
+    		$("#vxfStatusLabel"+vid).addClass('label-success');	
     	else if (vstatus === 'INSTALLING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'INSTALLED'){
-    		$("#bunStatusLabel"+vid).addClass('label-success');	
+    		$("#vxfStatusLabel"+vid).addClass('label-success');	
     	}
     	else if (vstatus === 'STARTING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'STARTED'){
-    		$("#bunStatusLabel"+vid).addClass('label-success');
+    		$("#vxfStatusLabel"+vid).addClass('label-success');
 			clearInterval(intervalIDTimerLabel);
 			setButtonText(vid, vstatus);	
     	}
     	else if (vstatus === 'CONFIGURING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'STOPPING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'STOPPED'){
-    		$("#bunStatusLabel"+vid).addClass('label-primary');	
+    		$("#vxfStatusLabel"+vid).addClass('label-primary');	
 			clearInterval(intervalIDTimerLabel);
 			setButtonText(vid, vstatus);	
     	}
     	else if (vstatus === 'UNINSTALLING')
-    		$("#bunStatusLabel"+vid).addClass('label-info');	
+    		$("#vxfStatusLabel"+vid).addClass('label-info');	
     	else if (vstatus === 'UNINSTALLED'){
-    		$("#bunStatusLabel"+vid).text('NOT INSTALLED');
-    		$("#bunStatusLabel"+vid).addClass('label-default');	
+    		$("#vxfStatusLabel"+vid).text('NOT INSTALLED');
+    		$("#vxfStatusLabel"+vid).addClass('label-default');	
 			clearInterval(intervalIDTimerLabel);
 			setButtonText(vid, vstatus);	
     	}
     	else if (vstatus === 'FAILED'){
-    		$("#bunStatusLabel"+vid).addClass('label-danger');	
+    		$("#vxfStatusLabel"+vid).addClass('label-danger');	
 			clearInterval(intervalIDTimerLabel);
 			setButtonText(vid, vstatus);	
     	}
     	
     };
     
-    function getAndupdateLabelStatus(vid, bunUUID){
+    function getAndupdateLabelStatus(vid, vxfUUID){
 		console.log('getAndupdateLabelStatus');
     	$.ajax({
-			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/'+vxfUUID,
 			  type:"GET",
 			  dataType:"json",
 			  success: function(dataX){
@@ -239,7 +239,7 @@
     
     var intervalIDTimerLabel;
     
-    function execInstallButton(vid, bunUUID, uninstall){
+    function execInstallButton(vid, vxfUUID, uninstall){
     	var btn = $("#execBtn"+vid);
     	btn.text("Wait...");
     	btn.prop('disabled', true);
@@ -252,24 +252,24 @@
 		var nextAction = btn.attr('NEXTACTION')
 
 		console.log("NEXT ACTION = "+ nextAction );
-		intervalIDTimerLabel = setInterval( function(){getAndupdateLabelStatus(vid, bunUUID)} , 1000 );
+		intervalIDTimerLabel = setInterval( function(){getAndupdateLabelStatus(vid, vxfUUID)} , 1000 );
     	
     	
 		
     	$("#uninstBtn"+vid).hide();
 		  
-		console.log("execInstallButto nvid = "+vid+", bunUUID="+bunUUID );
+		console.log("execInstallButto nvid = "+vid+", vxfUUID="+vxfUUID );
 		console.log( btn.attr("class") );
 		 
 		if (nextAction === 'INSTALL'){
 			console.log('Will INSTALL');
 			 var postData={
-						uuid : bunUUID,
-						repoUrl : repoMarketplaceURL+'/uuid/' + bunUUID
+						uuid : vxfUUID,
+						repoUrl : repoMarketplaceURL+'/uuid/' + vxfUUID
 						};
 				// Send the data using post
 				$.ajax({
-				  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/',
+				  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/',
 				  type: 'POST',
 				  data:JSON.stringify(postData),
 				  contentType:"application/json; charset=utf-8",
@@ -282,7 +282,7 @@
 			console.log('Will STOP');
 			// Send the data using post
 			$.ajax({
-			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID+'/stop',
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/'+ vxfUUID+'/stop',
 			  type: 'PUT',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",
@@ -294,7 +294,7 @@
 			console.log('Will START');
 			// Send the data using post
 			$.ajax({
-			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID+'/start',
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/'+ vxfUUID+'/start',
 			  type: 'PUT',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",
@@ -306,7 +306,7 @@
 			console.log('Will UNINSTALL');
 			// Send the data using post
 			$.ajax({
-			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ibuns/'+ bunUUID,
+			  url: portalURLatFORGEBoxInstall+'/portal/services/api/client/ivxfs/'+ vxfUUID,
 			  type: 'DELETE',
 			  contentType:"application/json; charset=utf-8",
 			  dataType:"json",

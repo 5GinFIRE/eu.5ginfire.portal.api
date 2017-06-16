@@ -55,13 +55,13 @@ public class DeployArtifact {
 	
 
 	@Basic() 
-	private InstalledBunStatus status = InstalledBunStatus.INIT;
+	private InstalledVxFStatus status = InstalledVxFStatus.INIT;
 
-	public InstalledBunStatus getStatus() {
+	public InstalledVxFStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(InstalledBunStatus status) {
+	public void setStatus(InstalledVxFStatus status) {
 		this.status = status;
 	}
 

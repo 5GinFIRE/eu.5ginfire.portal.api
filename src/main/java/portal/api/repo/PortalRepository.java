@@ -19,10 +19,10 @@ import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
-import portal.api.model.InstalledBun;
+import portal.api.model.InstalledVxF;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserSession;
@@ -64,8 +64,8 @@ public class PortalRepository {
 		return s;
 	}
 	
-//	public BunMetadata addBunMetadataToBuns(BunMetadata bm){
-//		portalJpaController.saveBunMetadata(bm);
+//	public VxFMetadata addVxFMetadataToVxFs(VxFMetadata bm){
+//		portalJpaController.saveVxFMetadata(bm);
 //		return bm;
 //	}
 //	
@@ -86,8 +86,8 @@ public class PortalRepository {
 		return bm;
 	}
 	
-//	public BunMetadata updateBunInfo(long l, BunMetadata bm) {
-//		BunMetadata bmr = portalJpaController.updateBunMetadata(bm);
+//	public VxFMetadata updateVxFInfo(long l, VxFMetadata bm) {
+//		VxFMetadata bmr = portalJpaController.updateVxFMetadata(bm);
 //		return bmr;
 //	}
 	
@@ -101,14 +101,14 @@ public class PortalRepository {
 		portalJpaController.deleteUser(userid);
 	}
 
-	public List<BunMetadata> getBuns(Long categoryid) {
-		List<BunMetadata> ls = portalJpaController.readBunsMetadata(categoryid,0, 100000);
+	public List<VxFMetadata> getVxFs(Long categoryid) {
+		List<VxFMetadata> ls = portalJpaController.readVxFsMetadata(categoryid,0, 100000);
 		
 		return ls;
 	}
 	
-	public void deleteProduct(int bunid) {
-		portalJpaController.deleteProduct(bunid);
+	public void deleteProduct(int vxfid) {
+		portalJpaController.deleteProduct(vxfid);
 		
 	}
 
@@ -132,8 +132,8 @@ public class PortalRepository {
 
 	
 
-	public Product getProductByID(long bunid) {
-		return (Product) portalJpaController.readProductByID(bunid);
+	public Product getProductByID(long vxfid) {
+		return (Product) portalJpaController.readProductByID(vxfid);
 	}
 	
 	public Product getProductByUUID(String uuid) {
@@ -274,9 +274,9 @@ public class PortalRepository {
 	}
 
 
-	public List<BunMetadata> getBunsByUserID(Long ownerid) {
+	public List<VxFMetadata> getVxFsByUserID(Long ownerid) {
 
-		List<BunMetadata> ls = portalJpaController.readBunsMetadataForOwnerID( ownerid, 0, 100000);	
+		List<VxFMetadata> ls = portalJpaController.readVxFsMetadataForOwnerID( ownerid, 0, 100000);	
 		return ls;
 		
 	}

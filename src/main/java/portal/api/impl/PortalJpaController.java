@@ -31,10 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
-import portal.api.model.InstalledBun;
+import portal.api.model.InstalledVxF;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 
@@ -93,28 +93,28 @@ public class PortalJpaController {
 		
 	}
 
-	public long countInstalledBuns() {
+	public long countInstalledVxFs() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT COUNT(s) FROM InstalledBun s");
+		Query q = entityManager.createQuery("SELECT COUNT(s) FROM InstalledVxF s");
 		return (Long) q.getSingleResult();
 	}
 
-	public InstalledBun updateInstalledBun(InstalledBun is) {
+	public InstalledVxF updateInstalledVxF(InstalledVxF is) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		InstalledBun resis = entityManager.merge(is);
+		InstalledVxF resis = entityManager.merge(is);
 		entityTransaction.commit();
 
 		return resis;
 	}
 
-	public void saveInstalledBun(InstalledBun is) {
-		logger.info("Will create InstalledBun = " + is.getUuid());
+	public void saveInstalledVxF(InstalledVxF is) {
+		logger.info("Will create InstalledVxF = " + is.getUuid());
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -127,31 +127,31 @@ public class PortalJpaController {
 		entityTransaction.commit();
 	}
 
-	public InstalledBun readInstalledBunByName(final String name) {
+	public InstalledVxF readInstalledVxFByName(final String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM InstalledBun m WHERE m.name='" + name + "'");
-		return (q.getResultList().size()==0)?null:(InstalledBun) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.name='" + name + "'");
+		return (q.getResultList().size()==0)?null:(InstalledVxF) q.getSingleResult();
 	}
 
-	public InstalledBun readInstalledBunByUUID(final String uuid) {
+	public InstalledVxF readInstalledVxFByUUID(final String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM InstalledBun m WHERE m.uuid='" + uuid + "'");
-		return (q.getResultList().size()==0)?null:(InstalledBun) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.uuid='" + uuid + "'");
+		return (q.getResultList().size()==0)?null:(InstalledVxF) q.getSingleResult();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<InstalledBun> readInstalledBuns(int firstResult, int maxResults) {
+	public List<InstalledVxF> readInstalledVxFs(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM InstalledBun m");
+		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
 
-	public void deleteInstalledBun(final InstalledBun message) {
+	public void deleteInstalledVxF(final InstalledVxF message) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
@@ -163,17 +163,17 @@ public class PortalJpaController {
 		entityTransaction.commit();
 	}
 
-	public void getAllInstalledBunPrinted() {
+	public void getAllInstalledVxFPrinted() {
 		logger.info("================= getAll() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		List<InstalledBun> lb = entityManager.createQuery("select p from InstalledBun p").getResultList();
+		List<InstalledVxF> lb = entityManager.createQuery("select p from InstalledVxF p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
-			InstalledBun iBun = (InstalledBun) iterator.next();
-			logger.info("=== InstalledBun found: " + iBun.getName() + ", Id: " + iBun.getId() + ", Uuid: " + iBun.getUuid() + ", RepoUrl: " + iBun.getRepoUrl()
-					+ ", InstalledVersion: " + iBun.getInstalledVersion() + ", PackageURL: " + iBun.getPackageURL() + ", PackageLocalPath: "
-					+ iBun.getPackageLocalPath() + ", Status: " + iBun.getStatus());
+			InstalledVxF iVxF = (InstalledVxF) iterator.next();
+			logger.info("=== InstalledVxF found: " + iVxF.getName() + ", Id: " + iVxF.getId() + ", Uuid: " + iVxF.getUuid() + ", RepoUrl: " + iVxF.getRepoUrl()
+					+ ", InstalledVersion: " + iVxF.getInstalledVersion() + ", PackageURL: " + iVxF.getPackageURL() + ", PackageLocalPath: "
+					+ iVxF.getPackageLocalPath() + ", Status: " + iVxF.getStatus());
 
 		}
 
@@ -192,14 +192,14 @@ public class PortalJpaController {
 
 	}
 
-	public void deleteAllInstalledBuns() {
+	public void deleteAllInstalledVxFs() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
 
-		Query q = entityManager.createQuery("DELETE FROM InstalledBun ");
+		Query q = entityManager.createQuery("DELETE FROM InstalledVxF ");
 		q.executeUpdate();
 		entityManager.flush();
 
@@ -331,7 +331,7 @@ public class PortalJpaController {
 
 			List<Product> products = bu.getProducts();
 			for (Product prod : products) {
-				logger.info("	======> bunMetadata found: " + prod.getName() + 
+				logger.info("	======> vxfMetadata found: " + prod.getName() + 
 						", Id: " + prod.getId() + ", getUuid: " + prod.getUuid()
 						+ ", getName: " + prod.getName());
 			}
@@ -370,8 +370,8 @@ public class PortalJpaController {
 	}
 
 	
-//	public BunMetadata updateBunMetadata(BunMetadata bm) {
-//		logger.info("================= updateBunMetadata ==================");
+//	public VxFMetadata updateVxFMetadata(VxFMetadata bm) {
+//		logger.info("================= updateVxFMetadata ==================");
 //		logger.info("bmgetId="+bm.getId());
 //		logger.info("bm getName= "+bm.getName());
 //		logger.info("bm getPackageLocation= "+bm.getPackageLocation());
@@ -380,22 +380,22 @@ public class PortalJpaController {
 //		EntityTransaction entityTransaction = entityManager.getTransaction();
 //
 //		entityTransaction.begin();
-//		BunMetadata resis = entityManager.merge(bm);
+//		VxFMetadata resis = entityManager.merge(bm);
 //		entityTransaction.commit();
 //
 //		return resis;
 //	}
 	
 	@SuppressWarnings("unchecked")
-	public List<BunMetadata> readBunsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<VxFMetadata> readVxFsMetadata(Long categoryid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM BunMetadata m");
+		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
 		
 		if ((categoryid!=null) && (categoryid>=0))
-			q = entityManager.createQuery("SELECT a FROM BunMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
 		else
-			q = entityManager.createQuery("SELECT a FROM BunMetadata a ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a ORDER BY a.id");
 
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -404,15 +404,15 @@ public class PortalJpaController {
 	
 
 	@SuppressWarnings("unchecked")
-	public List<BunMetadata> readBunsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
+	public List<VxFMetadata> readVxFsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM BunMetadata m");
+		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
 		
 		if ((ownerid!=null) && (ownerid>=0))
-			q = entityManager.createQuery("SELECT a FROM BunMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
 		else
-			q = entityManager.createQuery("SELECT a FROM BunMetadata a ORDER BY a.id");
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a ORDER BY a.id");
 
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -433,16 +433,16 @@ public class PortalJpaController {
 		return u;
 	}
 
-//	public BunMetadata readBunMetadataByUUID(String uuid) {
+//	public VxFMetadata readVxFMetadataByUUID(String uuid) {
 //		EntityManager entityManager = entityManagerFactory.createEntityManager();
 //
-//		Query q = entityManager.createQuery("SELECT m FROM BunMetadata m WHERE m.uuid='" + uuid + "'");
-//		return (q.getResultList().size()==0)?null:(BunMetadata) q.getSingleResult();
+//		Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m WHERE m.uuid='" + uuid + "'");
+//		return (q.getResultList().size()==0)?null:(VxFMetadata) q.getSingleResult();
 //	}
 //	
-//	public BunMetadata readBunMetadataByID(int bunid) {
+//	public VxFMetadata readVxFMetadataByID(int vxfid) {
 //		EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		BunMetadata u = entityManager.find(BunMetadata.class, bunid);
+//		VxFMetadata u = entityManager.find(VxFMetadata.class, vxfid);
 //		return u;
 //	}
 
@@ -632,7 +632,7 @@ public class PortalJpaController {
 	@SuppressWarnings("unchecked")
 	public List<ExperimentMetadata> readAppsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM BunMetadata m");
+		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
 		
 		if ((ownerid!=null) && (ownerid>=0))

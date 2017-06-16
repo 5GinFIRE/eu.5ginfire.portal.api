@@ -2,10 +2,10 @@ var app = angular.module('portalapp', [ 'ngResource', 'ngRoute' ]);
 
 app.config(function($routeProvider) {
 	$routeProvider.when('/marketplace', {
-		templateUrl : 'viewBunMarketplaceJS.html',
-		controller : 'bunsCtrl'
+		templateUrl : 'viewVxFMarketplaceJS.html',
+		controller : 'vxfsCtrl'
 	}).when('/installed', {
-		templateUrl : 'viewInstalledBunsJS.html',
+		templateUrl : 'viewInstalledVxFsJS.html',
 		controller : 'portalCtrl'
 	}).when('/login', {
 		templateUrl : 'login.html',
@@ -22,8 +22,8 @@ app.controller('portalCtrl', function($scope, PortalUser) {
 	$scope.portalusers = PortalUser.query();
 });
 
-app.controller('bunsCtrl', function($scope, Buns) {
-	$scope.buns = Buns.query();
+app.controller('vxfsCtrl', function($scope, VxFs) {
+	$scope.vxfs = VxFs.query();
 });
 
 // PortalUser Resource
@@ -47,8 +47,8 @@ app.factory('PortalUser', function($resource) {
 
 
 //PortalUser Resource
-app.factory('Buns', function($resource) {
-	return $resource("/portal/services/api/repo/buns/:Id", {
+app.factory('VxFs', function($resource) {
+	return $resource("/portal/services/api/repo/vxfs/:Id", {
 		Id : "@Id"
 	}, {
 		"update" : {
@@ -60,7 +60,7 @@ app.factory('Buns', function($resource) {
 
 /**
  * app.config(function($routeProvider) { $routeProvider.when('/', { templateUrl :
- * 'viewBunMarketplaceJS.html', controller : 'EventListCtrl' }).when('/login', {
+ * 'viewVxFMarketplaceJS.html', controller : 'EventListCtrl' }).when('/login', {
  * templateUrl : 'login.html', controller : 'LoginCtrl' }).when('/logout', {
  * templateUrl : 'login.html', controller : 'LogoutCtrl' }).otherwise({
  * redirectTo : '/' }); });

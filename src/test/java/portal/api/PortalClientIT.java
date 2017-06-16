@@ -32,8 +32,8 @@ import org.codehaus.jackson.map.MappingJsonFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 
 public class PortalClientIT {
 
@@ -53,9 +53,9 @@ public class PortalClientIT {
 		List<Object> providers = new ArrayList<Object>();
 		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
 		String uuid = UUID.fromString("55cab8b8-668b-4c75-99a9-39b24ed3d8be").toString();
-		InstalledBun is = prepareInstalledService(uuid);
+		InstalledVxF is = prepareInstalledService(uuid);
 
-		WebClient client = WebClient.create(endpointUrl + "/services/api/client/ibuns/", providers);
+		WebClient client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/", providers);
 		Response r = client.accept("application/json").type("application/json").post(is);
 		assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
 		
@@ -65,27 +65,27 @@ public class PortalClientIT {
 
 		MappingJsonFactory factory = new MappingJsonFactory();
 		JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-		InstalledBun output = parser.readValueAs(InstalledBun.class);
+		InstalledVxF output = parser.readValueAs(InstalledVxF.class);
 		logger.info("InstalledServiceoutput = " + output.getUuid() + ", status=" + output.getStatus());
-		assertEquals(InstalledBunStatus.INIT, output.getStatus());
+		assertEquals(InstalledVxFStatus.INIT, output.getStatus());
 
 		// wait for 2 seconds
 		Thread.sleep(2000);
 		// ask again about this task
-		client = WebClient.create(endpointUrl + "/services/api/client/ibuns/" + uuid);
+		client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/" + uuid);
 		r = client.accept("application/json").type("application/json").get();
 
 		factory = new MappingJsonFactory();
 		parser = factory.createJsonParser((InputStream) r.getEntity());
-		output = parser.readValueAs(InstalledBun.class);
+		output = parser.readValueAs(InstalledVxF.class);
 
 		assertEquals(uuid, output.getUuid());
-		assertEquals(InstalledBunStatus.FAILED, output.getStatus());
+		assertEquals(InstalledVxFStatus.FAILED, output.getStatus());
 		assertEquals("(pending)", output.getName());
 	}
 
 	@Test
-	public void testPortalClientInstallBunAndGetStatus() throws Exception {
+	public void testPortalClientInstallVxFAndGetStatus() throws Exception {
 
 		logger.info("Executing TEST = testPortalRSInstallServiceAndGetStatus");
 
@@ -95,72 +95,72 @@ public class PortalClientIT {
 
 		// first delete an existing installation if exists
 
-		WebClient client = WebClient.create(endpointUrl + "/services/api/client/ibuns/" + uuid, providers);
+		WebClient client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/" + uuid, providers);
 		Response r = client.accept("application/json").type("application/json").delete();
 		if (Response.Status.NOT_FOUND.getStatusCode() != r.getStatus()) {
 
 			assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
-			logger.info("Bun is already installed! We uninstall it first!");
+			logger.info("VxF is already installed! We uninstall it first!");
 			int guard = 0;
-			InstalledBun insbun = null;
+			InstalledVxF insvxf = null;
 			do {
 
 				// ask again about this task
-				client = WebClient.create(endpointUrl + "/services/api/client/ibuns/" + uuid);
+				client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/" + uuid);
 				r = client.accept("application/json").type("application/json").get();
 
 				MappingJsonFactory factory = new MappingJsonFactory();
 				JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-				insbun = parser.readValueAs(InstalledBun.class);
+				insvxf = parser.readValueAs(InstalledVxF.class);
 
-				logger.info("Waiting for UNINSTALLED for test bun UUID=" + uuid + " . Now is: " + insbun.getStatus());
+				logger.info("Waiting for UNINSTALLED for test vxf UUID=" + uuid + " . Now is: " + insvxf.getStatus());
 				Thread.sleep(2000);
 				guard++;
 
-			} while ((insbun != null) && (insbun.getStatus() != InstalledBunStatus.UNINSTALLED) && (insbun.getStatus() != InstalledBunStatus.FAILED)
+			} while ((insvxf != null) && (insvxf.getStatus() != InstalledVxFStatus.UNINSTALLED) && (insvxf.getStatus() != InstalledVxFStatus.FAILED)
 					&& (guard <= 30));
 
-			if (insbun.getStatus() != InstalledBunStatus.FAILED)
-				assertEquals(InstalledBunStatus.UNINSTALLED, insbun.getStatus());
+			if (insvxf.getStatus() != InstalledVxFStatus.FAILED)
+				assertEquals(InstalledVxFStatus.UNINSTALLED, insvxf.getStatus());
 
 		}
 
 		// now post a new installation
-		client = WebClient.create(endpointUrl + "/services/api/client/ibuns/", providers);
-		InstalledBun is = prepareInstalledService(uuid);
+		client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/", providers);
+		InstalledVxF is = prepareInstalledService(uuid);
 		r = client.accept("application/json").type("application/json").post(is);
 		assertEquals(Response.Status.OK.getStatusCode(), r.getStatus());
 
 		int guard = 0;
 
-		InstalledBun insbun = null;
+		InstalledVxF insvxf = null;
 		do {
 
 			// ask again about this task
-			client = WebClient.create(endpointUrl + "/services/api/client/ibuns/" + uuid);
+			client = WebClient.create(endpointUrl + "/services/api/client/ivxfs/" + uuid);
 			r = client.accept("application/json").type("application/json").get();
 
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser((InputStream) r.getEntity());
-			insbun = parser.readValueAs(InstalledBun.class);
+			insvxf = parser.readValueAs(InstalledVxF.class);
 
-			logger.info("Waiting for STARTED for test bun UUID=" + uuid + " . Now is: " + insbun.getStatus());
+			logger.info("Waiting for STARTED for test vxf UUID=" + uuid + " . Now is: " + insvxf.getStatus());
 			Thread.sleep(1000);
 			guard++;
 
-		} while ((insbun != null) && (insbun.getStatus() != InstalledBunStatus.STARTED) && (guard <= 30));
+		} while ((insvxf != null) && (insvxf.getStatus() != InstalledVxFStatus.STARTED) && (guard <= 30));
 
-		assertEquals(uuid, insbun.getUuid());
-		assertEquals(InstalledBunStatus.STARTED, insbun.getStatus());
-		assertEquals("IntegrTestLocal example service", insbun.getName());
+		assertEquals(uuid, insvxf.getUuid());
+		assertEquals(InstalledVxFStatus.STARTED, insvxf.getStatus());
+		assertEquals("IntegrTestLocal example service", insvxf.getName());
 
 	}
 
 	// helpers
-	private InstalledBun prepareInstalledService(String uuid) {
-		InstalledBun is = new InstalledBun();
+	private InstalledVxF prepareInstalledService(String uuid) {
+		InstalledVxF is = new InstalledVxF();
 		is.setUuid(uuid);
-		is.setRepoUrl(endpointUrl + "/services/api/repo/buns/uuid/" + uuid);
+		is.setRepoUrl(endpointUrl + "/services/api/repo/vxfs/uuid/" + uuid);
 		return is;
 	}
 }

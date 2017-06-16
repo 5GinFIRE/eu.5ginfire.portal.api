@@ -130,31 +130,31 @@
 
 		<para>
 			Portal is used currently to deploy services through the use of
-			buns
+			vxfs
 			recipes. Portal in general:
 		</para>
 		<orderedlist>
 			<listitem>
 				<ns:para>
-					will take care and install the most recent version of a bun
+					will take care and install the most recent version of a vxf
 				</ns:para>
 			</listitem>
 			<listitem>
 				<ns:para>
 					Will
-					match a bun version with installed version AND host OS
+					match a vxf version with installed version AND host OS
 					version
 				</ns:para>
 				<orderedlist>
 					<listitem>
 						<ns:para>
-							example Portal v1.1 on Ubuntu 12.04 should use ExampleBun1(v2.34,
-							ubuntu12.04)
+							example Portal v1.1 on Uvxftu 12.04 should use ExampleVxF1(v2.34,
+							uvxftu12.04)
 						</ns:para>
 					</listitem>
 					<listitem>
 						<ns:para>
-							example Portal v1.2 on Windows7 should use ExampleBunW2(v1.22, win7)
+							example Portal v1.2 on Windows7 should use ExampleVxFW2(v1.22, win7)
 						</ns:para>
 					</listitem>
 				</orderedlist>
@@ -164,7 +164,7 @@
 
 			<listitem>
 				<ns:para>
-					Report and manage dependencies between buns
+					Report and manage dependencies between vxfs
 				</ns:para>
 			</listitem>
 		</orderedlist>

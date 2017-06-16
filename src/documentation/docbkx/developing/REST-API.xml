@@ -69,19 +69,19 @@ Response
 	[{
         "id": 1,
         "name": "None",
-        "bunscount": 0,
+        "vxfscount": 0,
         "productsCount": 0,
         "appscount": 0
     }, {
         "id": 2,
         "name": "Multimedia",
-        "bunscount": 0,
+        "vxfscount": 0,
         "productsCount": 0,
         "appscount": 0
     }, {
         "id": 3,
         "name": "Remote access",
-        "bunscount": 0,	
+        "vxfscount": 0,	
 	
 	
 	
@@ -100,7 +100,7 @@ Response
 	{
 	    "id": 20,
 	    "name": "NewCateg",
-	    "bunscount": 0,
+	    "vxfscount": 0,
 	    "productsCount": 0,
 	    "appscount": 0
 	}			
@@ -175,7 +175,7 @@ Delete a user wit id (if authorized, only admin role)
 	</para>
 	
 	<para>
-	<ns:experiment>Buns/Experiments</ns:experiment>
+	<ns:experiment>VxFs/Experiments</ns:experiment>
 	</para>
 	
 	<para> 
@@ -184,43 +184,43 @@ Delete a user wit id (if authorized, only admin role)
 			
 			
 			
-Get all Buns (no need for authorization)
+Get all VxFs (no need for authorization)
 	
-	http://localhost:13000/portal/services/api/repo/buns
+	http://localhost:13000/portal/services/api/repo/vxfs
 	
-Get a bun by ID
+Get a vxf by ID
 
-	http://localhost:13000/portal/services/api/repo/buns/67
-
-
-Get a bun by UUID
-
-	http://localhost:13000/portal/services/api/repo/buns/uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14
-
-	
-
-Get all user buns (if authorized)
-
-	http://localhost:13000/portal/services/api/repo/admin/buns	
-
-returns all Buns of the logged in User.
-If Admin returns all buns of registered users
+	http://localhost:13000/portal/services/api/repo/vxfs/67
 
 
+Get a vxf by UUID
 
-Admin a bun
-	GET http://localhost:13000/portal/services/api/repo/admin/buns/69
+	http://localhost:13000/portal/services/api/repo/vxfs/uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14
+
 	
 
-Save an existing bun
+Get all user vxfs (if authorized)
+
+	http://localhost:13000/portal/services/api/repo/admin/vxfs	
+
+returns all VxFs of the logged in User.
+If Admin returns all vxfs of registered users
+
+
+
+Admin a vxf
+	GET http://localhost:13000/portal/services/api/repo/admin/vxfs/69
+	
+
+Save an existing vxf
 content/type "multipart/form-data"
 
-	PUT http://localhost:13000/portal/services/api/repo/admin/buns/69
+	PUT http://localhost:13000/portal/services/api/repo/admin/vxfs/69
 	
 		-----------------------------28256268319500
-	Content-Disposition: form-data; name="bun"
+	Content-Disposition: form-data; name="vxf"
 	
-	{"id":69,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"uuid":"6f6067fa-7739-4d13-9ed1-18c7a769bf41","name":"devtestbun","iconsrc":"http://localhost:13000/portal/services/api/repo/images/6f6067fa-7739-4d13-9ed1-18c7a769bf41/iminds18.png","shortDescription":"devtestbun","longDescription":"test","version":null,"packageLocation":"http://localhost:13000/portal/services/api/repo/packages/6f6067fa-7739-4d13-9ed1-18c7a769bf41/unknown","dateCreated":1421658798000,"dateUpdated":1421658835000,"categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4}],"extensions":[{"id":140,"name":"param","value":"val"}],"screenshots":""}
+	{"id":69,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"uuid":"6f6067fa-7739-4d13-9ed1-18c7a769bf41","name":"devtestvxf","iconsrc":"http://localhost:13000/portal/services/api/repo/images/6f6067fa-7739-4d13-9ed1-18c7a769bf41/iminds18.png","shortDescription":"devtestvxf","longDescription":"test","version":null,"packageLocation":"http://localhost:13000/portal/services/api/repo/packages/6f6067fa-7739-4d13-9ed1-18c7a769bf41/unknown","dateCreated":1421658798000,"dateUpdated":1421658835000,"categories":[{"id":11,"name":"Big Data","appscount":2,"vxfscount":2,"productsCount":4}],"extensions":[{"id":140,"name":"param","value":"val"}],"screenshots":""}
 	-----------------------------28256268319500
 	Content-Disposition: form-data; name="prodIcon"
 	
@@ -232,27 +232,27 @@ content/type "multipart/form-data"
 	-----------------------------28256268319500--
 	
 
-Save a new bun (ony authorized users, role Developer)
+Save a new vxf (ony authorized users, role Developer)
 	
-	POST http://localhost:13000/portal/services/api/repo/admin/buns/
+	POST http://localhost:13000/portal/services/api/repo/admin/vxfs/
 	
 	content/type "multipart/form-data"
 	
 	-----------------------------9816548228756
-	Content-Disposition: form-data; name="bun"
+	Content-Disposition: form-data; name="vxf"
 	
-	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"extensions":[{"name":"param1","value":"val1"},{"name":"param2","value":"val2"}],"name":"ATestBun","version":"vers12","shortDescription":"a small descrip","longDescription":"A long desctip","categories":[{"id":11,"name":"Big Data","appscount":2,"bunscount":2,"productsCount":4},{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0}]}
+	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"f97c2228-6a9e-47d5-abb0-f7c5590e7445"},"extensions":[{"name":"param1","value":"val1"},{"name":"param2","value":"val2"}],"name":"ATestVxF","version":"vers12","shortDescription":"a small descrip","longDescription":"A long desctip","categories":[{"id":11,"name":"Big Data","appscount":2,"vxfscount":2,"productsCount":4},{"id":12,"name":"eHealth","appscount":0,"vxfscount":0,"productsCount":0}]}
 	-----------------------------9816548228756
 	Content-Disposition: form-data; name="prodIcon"; filename="_widgetIconEmpty.PNG"
 	Content-Type: image/png
 	
 	-----------------------------9816548228756
-	Content-Disposition: form-data; name="prodFile"; filename="examplebun.tar.gz"
+	Content-Disposition: form-data; name="prodFile"; filename="examplevxf.tar.gz"
 	Content-Type: experiment/x-gzip
 
 
-Delete a bun (only bun owner or admin auth)
-	DELETE http://localhost:13000/portal/services/api/repo/admin/buns/72	
+Delete a vxf (only vxf owner or admin auth)
+	DELETE http://localhost:13000/portal/services/api/repo/admin/vxfs/72	
 	
 	
 	
@@ -274,7 +274,7 @@ Payload:
 	-----------------------------23719209031
 	Content-Disposition: form-data; name="experiment"
 	
-	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"containers":[{"id":0,"name":"Container0","deployArtifacts":[{"id":null,"name":"Apache http server","uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"name":"ListenPort","value":"80"}]}]},{"id":null,"name":"Container1","deployArtifacts":[{"id":null,"name":"MySQL","uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"name":"PORT","value":"3306"},{"name":"DBUSER","value":"admin"},{"name":"DBPASSWD","value":"changeme"},{"name":"DBNAME","value":"mydatabase"},{"name":"DBHOST","value":"localhost"}]}]}],"name":"AtestApp","version":"1.2","shortDescription":"a small description","longDescription":"a long description","categories":[{"id":12,"name":"eHealth","appscount":0,"bunscount":0,"productsCount":0},{"id":15,"name":"eLearning","appscount":0,"bunscount":0,"productsCount":0}]}
+	{"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"containers":[{"id":0,"name":"Container0","deployArtifacts":[{"id":null,"name":"Apache http server","uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"name":"ListenPort","value":"80"}]}]},{"id":null,"name":"Container1","deployArtifacts":[{"id":null,"name":"MySQL","uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"name":"PORT","value":"3306"},{"name":"DBUSER","value":"admin"},{"name":"DBPASSWD","value":"changeme"},{"name":"DBNAME","value":"mydatabase"},{"name":"DBHOST","value":"localhost"}]}]}],"name":"AtestApp","version":"1.2","shortDescription":"a small description","longDescription":"a long description","categories":[{"id":12,"name":"eHealth","appscount":0,"vxfscount":0,"productsCount":0},{"id":15,"name":"eLearning","appscount":0,"vxfscount":0,"productsCount":0}]}
 	-----------------------------23719209031
 	Content-Disposition: form-data; name="prodIcon"; filename="_widgetIconEmpty.PNG"
 	Content-Type: image/png
@@ -293,7 +293,7 @@ Payload:
 	-----------------------------1377130454610
 	Content-Disposition: form-data; name="experiment"
 	
-	{"id":73,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"uuid":"04307e99-8d24-4ca2-b75f-3e7df8558fc0","name":"AtestApp!","iconsrc":"http://localhost:13000/portal/services/api/repo/images/04307e99-8d24-4ca2-b75f-3e7df8558fc0/_widgetIconEmpty.PNG","shortDescription":"a small description","longDescription":"a long description","version":"1.2","packageLocation":null,"dateCreated":1421744477000,"dateUpdated":1421744477000,"categories":[{"id":12,"name":"eHealth","appscount":1,"bunscount":0,"productsCount":1},{"id":15,"name":"eLearning","appscount":1,"bunscount":0,"productsCount":1}],"extensions":[],"screenshots":"","containers":[{"id":26,"name":"Container0","deployArtifacts":[{"id":41,"uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","name":"Apache http server","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"id":158,"name":"ListenPort","value":"80"}]}]},{"id":27,"name":"Container1","deployArtifacts":[{"id":42,"uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","name":"MySQL","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"id":159,"name":"PORT","value":"3306"},{"id":160,"name":"DBUSER","value":"admin"},{"id":161,"name":"DBPASSWD","value":"changeme"},{"id":162,"name":"DBNAME","value":"mydatabase"},{"id":163,"name":"DBHOST","value":"localhost"}]}]}]}
+	{"id":73,"owner":{"id":34,"organization":"dev","name":"dev","email":"dev@dev.gr","username":"dev","password":"53mJ7SF1jngzGyDkd/xVgg==","role":"ROLE_EXPERIMENTER","active":false,"currentSessionID":"214f663c-de06-418f-8e75-156d53fe5d13"},"uuid":"04307e99-8d24-4ca2-b75f-3e7df8558fc0","name":"AtestApp!","iconsrc":"http://localhost:13000/portal/services/api/repo/images/04307e99-8d24-4ca2-b75f-3e7df8558fc0/_widgetIconEmpty.PNG","shortDescription":"a small description","longDescription":"a long description","version":"1.2","packageLocation":null,"dateCreated":1421744477000,"dateUpdated":1421744477000,"categories":[{"id":12,"name":"eHealth","appscount":1,"vxfscount":0,"productsCount":1},{"id":15,"name":"eLearning","appscount":1,"vxfscount":0,"productsCount":1}],"extensions":[],"screenshots":"","containers":[{"id":26,"name":"Container0","deployArtifacts":[{"id":41,"uuid":"906c15ee-22f9-43ab-817b-f6df41f0320c","name":"Apache http server","artifactURL":"uuid/906c15ee-22f9-43ab-817b-f6df41f0320c","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/906c15ee-22f9-43ab-817b-f6df41f0320c/unknown","extensions":[{"id":158,"name":"ListenPort","value":"80"}]}]},{"id":27,"name":"Container1","deployArtifacts":[{"id":42,"uuid":"4a16c8ec-edc3-40ca-9453-7822eacdaf14","name":"MySQL","artifactURL":"uuid/4a16c8ec-edc3-40ca-9453-7822eacdaf14","artifactPackageURL":"http://localhost:13000/portal/services/api/repo/packages/4a16c8ec-edc3-40ca-9453-7822eacdaf14/unknown","extensions":[{"id":159,"name":"PORT","value":"3306"},{"id":160,"name":"DBUSER","value":"admin"},{"id":161,"name":"DBPASSWD","value":"changeme"},{"id":162,"name":"DBNAME","value":"mydatabase"},{"id":163,"name":"DBHOST","value":"localhost"}]}]}]}
 	-----------------------------1377130454610
 	Content-Disposition: form-data; name="prodIcon"
 	
@@ -385,19 +385,19 @@ Response
 	            "id": 7,
 	            "name": "Future Internet",
 	            "appscount": 0,
-	            "bunscount": 0,
+	            "vxfscount": 0,
 	            "productsCount": 0
 	        }, {
 	            "id": 2,
 	            "name": "Multimedia",
 	            "appscount": 0,
-	            "bunscount": 0,
+	            "vxfscount": 0,
 	            "productsCount": 0
 	        }, {
 	            "id": 9,
 	            "name": "Service",
 	            "appscount": 0,
-	            "bunscount": 0,
+	            "vxfscount": 0,
 	            "productsCount": 0
 	        }],
 	        "extensions": [],
@@ -528,22 +528,22 @@ Response
 	<ns:experiment>Client API</ns:experiment>
 	This API is for experiments that want to communicate with a client
 	installation of portal. The portal client communicates with a Portal
-	marketplace to download loccaly and install apps and buns to the local
+	to download localy and install apps and vxfs to the local
 	resource where the portal client is installed.
 	</para>
 	
 	<para> 
 	<informalexample>
 			<programlisting language="bash">	
-	All requests should be to the /client url of the webservice for example http://localhost:13000/portal/client/ibuns
+	All requests should be to the /client url of the webservice for example http://localhost:13000/portal/client/ivxfs
 			
 			
-	GET local bun information by bun uuid
-	Path("/ibuns/{uuid}")
+	GET local vxf information by vxf uuid
+	Path("/ivxfs/{uuid}")
 	Produces("experiment/json")
 		
-	GET all local installed buns
-	Path("/ibuns/")
+	GET all local installed vxfs
+	Path("/ivxfs/")
 	Produces("experiment/json")
 	
 	Response example:
@@ -551,27 +551,27 @@ Response
 	   {
 	      "status":"STARTED",
 	      "uuid":"51164853-1ed7-4d51-a342-1dfdfe8523a1",
-	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/buns/uuid/51164853-1ed7-4d51-a342-1dfdfe8523a1",
+	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/vxfs/uuid/51164853-1ed7-4d51-a342-1dfdfe8523a1",
 	      "installedVersion":"1.0.2",
-	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/51164853-1ed7-4d51-a342-1dfdfe8523a1/_examplebun.tar.gz",
-	      "packageLocalPath":"/home/vagrant/.portal/extractedbuns/51164853-1ed7-4d51-a342-1dfdfe8523a1",
+	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/51164853-1ed7-4d51-a342-1dfdfe8523a1/_examplevxf.tar.gz",
+	      "packageLocalPath":"/home/vagrant/.portal/extractedvxfs/51164853-1ed7-4d51-a342-1dfdfe8523a1",
 	      "name":"ssh2web!",
 	      "id":3
 	   },
 	   {
 	      "status":"UNINSTALLED",
 	      "uuid":"40bf5bb4-9f9b-4380-a901-cd869ccd9964",
-	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/buns/uuid/40bf5bb4-9f9b-4380-a901-cd869ccd9964",
+	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/vxfs/uuid/40bf5bb4-9f9b-4380-a901-cd869ccd9964",
 	      "installedVersion":"6",
-	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/40bf5bb4-9f9b-4380-a901-cd869ccd9964/_examplebun.tar.gz",
-	      "packageLocalPath":"/home/vagrant/.portal/extractedbuns/40bf5bb4-9f9b-4380-a901-cd869ccd9964",
+	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/40bf5bb4-9f9b-4380-a901-cd869ccd9964/_examplevxf.tar.gz",
+	      "packageLocalPath":"/home/vagrant/.portal/extractedvxfs/40bf5bb4-9f9b-4380-a901-cd869ccd9964",
 	      "name":"OMFClient",
 	      "id":5
 	   },
 	   {
 	      "status":"FAILED",
 	      "uuid":"55cab8b8-668b-4c75-99a9-39b24ed3d8be",
-	      "repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/buns/uuid/55cab8b8-668b-4c75-99a9-39b24ed3d8be",
+	      "repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/vxfs/uuid/55cab8b8-668b-4c75-99a9-39b24ed3d8be",
 	      "installedVersion":null,
 	      "packageURL":"(pending url)",
 	      "packageLocalPath":null,
@@ -581,70 +581,70 @@ Response
 	   {
 	      "status":"STOPPED",
 	      "uuid":"511af54b-222e-43c2-ad8f-b618d43abdb8",
-	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/buns/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8",
+	      "repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/vxfs/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8",
 	      "installedVersion":"5.1",
-	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/511af54b-222e-43c2-ad8f-b618d43abdb8/_examplebun.tar.gz",
-	      "packageLocalPath":"/home/vagrant/.portal/extractedbuns/511af54b-222e-43c2-ad8f-b618d43abdb8",
+	      "packageURL":"http://localhost:13000/portal/services/api/repo/packages/511af54b-222e-43c2-ad8f-b618d43abdb8/_examplevxf.tar.gz",
+	      "packageLocalPath":"/home/vagrant/.portal/extractedvxfs/511af54b-222e-43c2-ad8f-b618d43abdb8",
 	      "name":"LabWiki",
 	      "id":4
 	   }
 	]	
 		
-	POST install a bun locally, by fetching it from the remote marketplace
-	Path("/ibuns/")
+	POST install a vxf locally, by fetching it from the remote portal
+	Path("/ivxfs/")
 	Produces("experiment/json")	
 	Example request payload
 	{
 		"uuid":"511af54b-222e-43c2-ad8f-b618d43abdb8",
-		"repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/buns/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8"
+		"repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/vxfs/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8"
 	}
 	
 	Example response:
 	{
 		"status":"INIT",
 		"uuid":"511af54b-222e-43c2-ad8f-b618d43abdb8",
-		"repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/buns/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8",
+		"repoUrl":"http://127.0.0.1:13000/portal/services/api/repo/vxfs/uuid/511af54b-222e-43c2-ad8f-b618d43abdb8",
 		"installedVersion":"5.1",
-		"packageURL":"http://localhost:13000/portal/services/api/repo/packages/511af54b-222e-43c2-ad8f-b618d43abdb8/_examplebun.tar.gz",
-		"packageLocalPath":"/home/vagrant/.portal/extractedbuns/511af54b-222e-43c2-ad8f-b618d43abdb8",
-		"name":"An Example Bun",
+		"packageURL":"http://localhost:13000/portal/services/api/repo/packages/511af54b-222e-43c2-ad8f-b618d43abdb8/_examplevxf.tar.gz",
+		"packageLocalPath":"/home/vagrant/.portal/extractedvxfs/511af54b-222e-43c2-ad8f-b618d43abdb8",
+		"name":"An Example VxF",
 		"id":4
 	}
 	
-	packageLocalPath, is the local path in the client that extracts the bun ad portal will execute the recipes
+	packageLocalPath, is the local path in the client that extracts the vxf ad portal will execute the recipes
 	
 	
 	
-	DELETE, uninstall a bun from the local resource. You can uninstall a Stoped bun otherwise will follow lifecycle
-	Path("/ibuns/{uuid}")		
+	DELETE, uninstall a vxf from the local resource. You can uninstall a Stoped vxf otherwise will follow lifecycle
+	Path("/ivxfs/{uuid}")		
 	
 	
-	PUT, Stop a bun, put it to the Stopped state
-	Path("/ibuns/{uuid}/stop")
+	PUT, Stop a vxf, put it to the Stopped state
+	Path("/ivxfs/{uuid}/stop")
 	Produces("experiment/json")
 	Response example, should poll the service to get the current STATUS, :
 	{
 	   "status":"STARTED",
 	   "uuid":"77777777-668b-4c75-99a9-39b24ed3d8be",
-	   "repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/buns/uuid/77777777-668b-4c75-99a9-39b24ed3d8be",
+	   "repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/vxfs/uuid/77777777-668b-4c75-99a9-39b24ed3d8be",
 	   "installedVersion":"1.0.0",
-	   "packageURL":"http://localhost:34908/rsportal-srvtest/services/api/repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplebun.tar.gz",
-	   "packageLocalPath":"/home/vagrant/.portal/extractedbuns/77777777-668b-4c75-99a9-39b24ed3d8be",
+	   "packageURL":"http://localhost:34908/rsportal-srvtest/services/api/repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz",
+	   "packageLocalPath":"/home/vagrant/.portal/extractedvxfs/77777777-668b-4c75-99a9-39b24ed3d8be",
 	   "name":"IntegrTestLocal example service",
 	   "id":2
 	}
-	For example after a few seconds will give on a GET http://localhost:13000/portal/services/api/client/ibuns/77777777-668b-4c75-99a9-39b24ed3d8be
-	{"status":"CONFIGURING","uuid":"77777777-668b-4c75-99a9-39b24ed3d8be","repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/buns/uuid/77777777-668b-4c75-99a9-39b24ed3d8be","installedVersion":"1.0.0","packageURL":"http://localhost:34908/rsportal-srvtest/services/api/repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplebun.tar.gz","packageLocalPath":"/home/vagrant/.portal/extractedbuns/77777777-668b-4c75-99a9-39b24ed3d8be","name":"IntegrTestLocal example service","id":2}
+	For example after a few seconds will give on a GET http://localhost:13000/portal/services/api/client/ivxfs/77777777-668b-4c75-99a9-39b24ed3d8be
+	{"status":"CONFIGURING","uuid":"77777777-668b-4c75-99a9-39b24ed3d8be","repoUrl":"http://localhost:34908/rsportal-srvtest/services/api/repo/vxfs/uuid/77777777-668b-4c75-99a9-39b24ed3d8be","installedVersion":"1.0.0","packageURL":"http://localhost:34908/rsportal-srvtest/services/api/repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz","packageLocalPath":"/home/vagrant/.portal/extractedvxfs/77777777-668b-4c75-99a9-39b24ed3d8be","name":"IntegrTestLocal example service","id":2}
 	
 	
-	PUT, Start a bun, put it to the Started phase by following all correct states and configuration
-	Path("/ibuns/{uuid}/start")
+	PUT, Start a vxf, put it to the Started phase by following all correct states and configuration
+	Path("/ivxfs/{uuid}/start")
 	Produces("experiment/json")
 	Response example:
 	
 	
-	PUT, reconfigure a bun. follows the bun lifecycle to restart the bun
-	Path("/ibuns/{uuid}/reconfigure")
+	PUT, reconfigure a vxf. follows the vxf lifecycle to restart the vxf
+	Path("/ivxfs/{uuid}/reconfigure")
 	Produces("experiment/json")
 			</programlisting>
 		</informalexample>

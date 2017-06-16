@@ -15,20 +15,26 @@
 
 package portal.api.model;
 
-public enum InstalledBunStatus {
+import java.util.Date;
 
-	INIT,
-	DOWNLOADING,
-	DOWNLOADED,
-	INSTALLING,
-	INSTALLED,
-	STARTING,
-	STARTED,
-	CONFIGURING,
-	STOPPING,
-	STOPPED,
-	UNINSTALLING,
-	UNINSTALLED,
-	FAILED
-	
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+
+@Entity(name = "VxFMetadata")
+public class VxFMetadata extends Product{
+
+
+
 }

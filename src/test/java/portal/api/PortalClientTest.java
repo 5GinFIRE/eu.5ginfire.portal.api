@@ -21,9 +21,9 @@ import static org.junit.Assert.assertNull;
 
 import portal.api.impl.PortalInstallationMgmt;
 import portal.api.impl.PortalJpaController;
-import portal.api.model.BunMetadata;
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.VxFMetadata;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 import portal.api.testclasses.MockRepositoryWebClient;
 
 import java.util.UUID;
@@ -52,79 +52,79 @@ public class PortalClientTest {
 	@Test
 	public void testGetManagedServices() {
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
-		assertNotNull(bs.getManagedInstalledBuns());
+		assertNotNull(bs.getManagedInstalledVxFs());
 		logger.info("	 	>>>>	portalJpaControllerTest = " + portalJpaControllerTest);
 	}
 
 	@Test
 	public void testWriteReadDB() {
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 
 		String uuid = UUID.randomUUID().toString();
-		InstalledBun ibuntest = new InstalledBun(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
-		ibuntest.setInstalledVersion("1.0.0v");
-		ibuntest.setName("NONMAE");
-		ibuntest.setStatus(InstalledBunStatus.INSTALLING);
+		InstalledVxF ivxftest = new InstalledVxF(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
+		ivxftest.setInstalledVersion("1.0.0v");
+		ivxftest.setName("NONMAE");
+		ivxftest.setStatus(InstalledVxFStatus.INSTALLING);
 
-		portalJpaControllerTest.saveInstalledBun(ibuntest);
+		portalJpaControllerTest.saveInstalledVxF(ivxftest);
 		// portalJpaControllerTest.getAll();
 
-		InstalledBun retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
+		InstalledVxF retIs = portalJpaControllerTest.readInstalledVxFByUUID(uuid);
 		assertEquals(uuid, retIs.getUuid());
-		assertEquals(InstalledBunStatus.INSTALLING, retIs.getStatus());
+		assertEquals(InstalledVxFStatus.INSTALLING, retIs.getStatus());
 		assertEquals("NONMAE", retIs.getName());
-		assertEquals(1, portalJpaControllerTest.countInstalledBuns());
+		assertEquals(1, portalJpaControllerTest.countInstalledVxFs());
 
 		// second one with metadata
 		uuid = UUID.randomUUID().toString();
-		ibuntest = new InstalledBun(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
-		ibuntest.setInstalledVersion("1.0.0v");
-		ibuntest.setName("NONMAE2");
-		ibuntest.setStatus(InstalledBunStatus.STARTING);
-		ibuntest.setPackageLocalPath("packageLocalPath");
-		ibuntest.setPackageURL("packageURL");
+		ivxftest = new InstalledVxF(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
+		ivxftest.setInstalledVersion("1.0.0v");
+		ivxftest.setName("NONMAE2");
+		ivxftest.setStatus(InstalledVxFStatus.STARTING);
+		ivxftest.setPackageLocalPath("packageLocalPath");
+		ivxftest.setPackageURL("packageURL");
 
-		portalJpaControllerTest.saveInstalledBun(ibuntest);
+		portalJpaControllerTest.saveInstalledVxF(ivxftest);
 		// portalJpaControllerTest.getAll();
-		retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
+		retIs = portalJpaControllerTest.readInstalledVxFByUUID(uuid);
 		assertEquals(uuid, retIs.getUuid());
-		assertEquals(InstalledBunStatus.STARTING, retIs.getStatus());
+		assertEquals(InstalledVxFStatus.STARTING, retIs.getStatus());
 		assertEquals("NONMAE2", retIs.getName());
 		assertEquals("packageLocalPath", retIs.getPackageLocalPath() );
 		assertEquals("packageURL", retIs.getPackageURL() );
-		assertEquals(2, portalJpaControllerTest.countInstalledBuns());
+		assertEquals(2, portalJpaControllerTest.countInstalledVxFs());
 
 		// update it
-		ibuntest.setStatus(InstalledBunStatus.STARTED);
-		portalJpaControllerTest.updateInstalledBun(ibuntest);
-		retIs = portalJpaControllerTest.readInstalledBunByUUID(uuid);
-		assertEquals(InstalledBunStatus.STARTED, retIs.getStatus());
+		ivxftest.setStatus(InstalledVxFStatus.STARTED);
+		portalJpaControllerTest.updateInstalledVxF(ivxftest);
+		retIs = portalJpaControllerTest.readInstalledVxFByUUID(uuid);
+		assertEquals(InstalledVxFStatus.STARTED, retIs.getStatus());
 		// portalJpaControllerTest.getAll();
-		assertEquals(2, portalJpaControllerTest.countInstalledBuns());
+		assertEquals(2, portalJpaControllerTest.countInstalledVxFs());
 
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status
+	 * This requests from Portal to INSTALL a VxF. Portal should bring it to STARTED status
 	 */
 	@Test
 	public void testReqInstall_toSTARTEDStatus() {
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
 		// we don;t care about repo...we provide a local package hardcoded by MockRepositoryWebClient
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
 		assertNotNull(is);
-		assertEquals(1, bs.getManagedInstalledBuns().size());
-		assertEquals(is.getStatus(), InstalledBunStatus.INIT);
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
+		assertEquals(is.getStatus(), InstalledVxFStatus.INIT);
 
 		logger.info(" test service UUID=" + uuid + " . Now is: " + is.getStatus());
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 30)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 30)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -136,34 +136,34 @@ public class PortalClientTest {
 			}
 		}
 
-		InstalledBun istest = bs.getBun(uuid);
+		InstalledVxF istest = bs.getVxF(uuid);
 		assertNotNull(istest);
 		assertEquals(uuid, istest.getUuid());
 		assertEquals(is.getUuid(), istest.getUuid());
-		assertEquals(InstalledBunStatus.STARTED, istest.getStatus());
-		assertEquals("www.repoexample.com/repo/EBUNID/" + uuid, istest.getRepoUrl());
-		assertEquals("/files/examplebun.tar.gz", istest.getPackageURL() );
+		assertEquals(InstalledVxFStatus.STARTED, istest.getStatus());
+		assertEquals("www.repoexample.com/repo/EVXFID/" + uuid, istest.getRepoUrl());
+		assertEquals("/files/examplevxf.tar.gz", istest.getPackageURL() );
 		assertEquals("TemporaryServiceFromMockClass", istest.getName());
 		assertEquals("1.0.0.test", istest.getInstalledVersion());
-		assertEquals(1, bs.getManagedInstalledBuns().size());
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to STOP it and then UNINSTALL
+	 * This requests from Portal to INSTALL a VxF. Portal should bring it to STARTED status and then request to STOP it and then UNINSTALL
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_STOPPED_UNINSTALL_Status() {
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 30)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 30)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -173,11 +173,11 @@ public class PortalClientTest {
 			}
 		}
 
-		assertEquals(InstalledBunStatus.STARTED, is.getStatus());
-		bs.stopBun(uuid);
+		assertEquals(InstalledVxFStatus.STARTED, is.getStatus());
+		bs.stopVxF(uuid);
 
 		guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STOPPED) && (guard <= 10)) {
+		while ((is.getStatus() != InstalledVxFStatus.STOPPED) && (guard <= 10)) {
 			logger.info("Waiting for STOPPED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -187,12 +187,12 @@ public class PortalClientTest {
 			}
 		}
 
-		InstalledBun istest = bs.getBun(uuid);
-		assertEquals(InstalledBunStatus.STOPPED, istest.getStatus());
+		InstalledVxF istest = bs.getVxF(uuid);
+		assertEquals(InstalledVxFStatus.STOPPED, istest.getStatus());
 
-		bs.uninstallBun(uuid);
+		bs.uninstallVxF(uuid);
 		guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.UNINSTALLED) && (guard <= 10)) {
+		while ((is.getStatus() != InstalledVxFStatus.UNINSTALLED) && (guard <= 10)) {
 			logger.info("Waiting for UNINSTALLED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -202,26 +202,26 @@ public class PortalClientTest {
 			}
 		}
 
-		istest = bs.getBun(uuid);
-		assertEquals(InstalledBunStatus.UNINSTALLED, istest.getStatus());
+		istest = bs.getVxF(uuid);
+		assertEquals(InstalledVxFStatus.UNINSTALLED, istest.getStatus());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
+	 * This requests from Portal to INSTALL a VxF. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_and_UNINSTALL_Status() {
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 30)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 30)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -231,9 +231,9 @@ public class PortalClientTest {
 			}
 		}
 
-		bs.uninstallBun(uuid);
+		bs.uninstallVxF(uuid);
 		guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.UNINSTALLED) && (guard <= 10)) {
+		while ((is.getStatus() != InstalledVxFStatus.UNINSTALLED) && (guard <= 10)) {
 			logger.info("Waiting for UNINSTALLED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -243,26 +243,26 @@ public class PortalClientTest {
 			}
 		}
 
-		InstalledBun istest = bs.getBun(uuid);
-		assertEquals(InstalledBunStatus.UNINSTALLED, istest.getStatus());
+		InstalledVxF istest = bs.getVxF(uuid);
+		assertEquals(InstalledVxFStatus.UNINSTALLED, istest.getStatus());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
+	 * This requests from Portal to INSTALL a VxF. Portal should bring it to STARTED status and then request to UNINSTALL it. STOP should happen by default
 	 */
 	@Test
 	public void testReqInstall_toSTARTED_CONFIGURE_and_RESTART() {
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 30)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 30)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -271,72 +271,72 @@ public class PortalClientTest {
 				e.printStackTrace();
 			}
 		}
-		assertEquals(InstalledBunStatus.STARTED, is.getStatus());
+		assertEquals(InstalledVxFStatus.STARTED, is.getStatus());
 		
 		logger.info("===========================================================================");
 		logger.info("Service STARTED UUID=" + uuid + " . Now will reconfigure and restart");
 
-		bs.configureBun(uuid);
+		bs.configureVxF(uuid);
 
 		try {
 
 			guard = 0;
-			while ((is.getStatus() != InstalledBunStatus.STOPPING) && (guard <= 50)) {
+			while ((is.getStatus() != InstalledVxFStatus.STOPPING) && (guard <= 50)) {
 				logger.info("Waiting for STOPPED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 				Thread.sleep(200);
 				guard++;
 			}
-			assertEquals(InstalledBunStatus.STOPPING, is.getStatus());
+			assertEquals(InstalledVxFStatus.STOPPING, is.getStatus());
 
 			guard = 0;
-			while ((is.getStatus() != InstalledBunStatus.CONFIGURING) && (guard <= 50)) {
+			while ((is.getStatus() != InstalledVxFStatus.CONFIGURING) && (guard <= 50)) {
 				logger.info("Waiting for CONFIGURING for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 
 				Thread.sleep(200);
 				guard++;
 			}
-			assertEquals(InstalledBunStatus.CONFIGURING, is.getStatus());
+			assertEquals(InstalledVxFStatus.CONFIGURING, is.getStatus());
 
 			guard = 0;
-			while ((is.getStatus() != InstalledBunStatus.STARTED) && (guard <= 20)) {
+			while ((is.getStatus() != InstalledVxFStatus.STARTED) && (guard <= 20)) {
 				logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 
 				Thread.sleep(1000);
 				guard++;
 			}
-			assertEquals(InstalledBunStatus.STARTED, is.getStatus());
+			assertEquals(InstalledVxFStatus.STARTED, is.getStatus());
 
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 
 		logger.info("Service CONFIGURED and reSTARTED UUID=" + uuid + ". ");
-		InstalledBun istest = bs.getBun(uuid); // check also DB
-		assertEquals(InstalledBunStatus.STARTED, istest.getStatus());
+		InstalledVxF istest = bs.getVxF(uuid); // check also DB
+		assertEquals(InstalledVxFStatus.STARTED, istest.getStatus());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun which contains an error on the onInstall recipe
+	 * This requests from Portal to INSTALL a VxF which contains an error on the onInstall recipe
 	 */
 	@Test
 	public void testReqInstall_ErrScript() {
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		bs.setRepoWebClient(new MockRepositoryWebClient("NORMAL"));
 
 		String uuid = UUID.randomUUID().toString();
 		// we don;t care about repo...we provide a local package hardcoded by MockRepositoryWebClient
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNERR/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFERR/" + uuid);
 		assertNotNull(is);
-		assertEquals(1, bs.getManagedInstalledBuns().size());
-		assertEquals(is.getStatus(), InstalledBunStatus.INIT);
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
+		assertEquals(is.getStatus(), InstalledVxFStatus.INIT);
 
 		logger.info(" test service UUID=" + uuid + " . Now is: " + is.getStatus());
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 30)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 30)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -347,42 +347,42 @@ public class PortalClientTest {
 			}
 		}
 
-		InstalledBun istest = bs.getBun(uuid);
+		InstalledVxF istest = bs.getVxF(uuid);
 		assertNotNull(istest);
 		assertEquals(uuid, istest.getUuid());
 		assertEquals(is.getUuid(), istest.getUuid());
-		assertEquals(InstalledBunStatus.FAILED, istest.getStatus());
-		assertEquals("www.repoexample.com/repo/EBUNERR/" + uuid, istest.getRepoUrl());
+		assertEquals(InstalledVxFStatus.FAILED, istest.getStatus());
+		assertEquals("www.repoexample.com/repo/EVXFERR/" + uuid, istest.getRepoUrl());
 		assertEquals("(pending url)", istest.getPackageURL() );
 		assertEquals("(pending)", istest.getName());
 		assertNull(istest.getInstalledVersion());
-		assertEquals(1, bs.getManagedInstalledBuns().size());
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	/**
-	 * This requests from Portal to INSTALL a Bun. Portal should bring it to STARTED status. WE then destroy the portal service instance and create a new one. The
-	 * Bun status should be there installed
+	 * This requests from Portal to INSTALL a VxF. Portal should bring it to STARTED status. WE then destroy the portal service instance and create a new one. The
+	 * VxF status should be there installed
 	 */
 	@Test
 	public void testReqInstall_AndPersistence() {
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 		PortalInstallationMgmt bs = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 
 		String uuid = UUID.randomUUID().toString();
 		// we don;t care about repo...we provide a local package hardcoded by MockRepositoryWebClient
-		InstalledBun is = bs.installBunAndStart(uuid, "www.repoexample.com/repo/EBUNID/" + uuid);
+		InstalledVxF is = bs.installVxFAndStart(uuid, "www.repoexample.com/repo/EVXFID/" + uuid);
 		assertNotNull(is);
-		assertEquals(1, bs.getManagedInstalledBuns().size());
-		assertEquals(is.getStatus(), InstalledBunStatus.INIT);
-		assertEquals(1, portalJpaControllerTest.countInstalledBuns());
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
+		assertEquals(is.getStatus(), InstalledVxFStatus.INIT);
+		assertEquals(1, portalJpaControllerTest.countInstalledVxFs());
 
 		// portalJpaControllerTest.getAll();
 
 		int guard = 0;
-		while ((is.getStatus() != InstalledBunStatus.STARTED) && (is.getStatus() != InstalledBunStatus.FAILED) && (guard <= 40)) {
+		while ((is.getStatus() != InstalledVxFStatus.STARTED) && (is.getStatus() != InstalledVxFStatus.FAILED) && (guard <= 40)) {
 			logger.info("Waiting for STARTED for test service UUID=" + uuid + " . Now is: " + is.getStatus());
 			try {
 				Thread.sleep(1000);
@@ -393,12 +393,12 @@ public class PortalClientTest {
 			}
 		}
 
-		InstalledBun istest = bs.getBun(uuid);
+		InstalledVxF istest = bs.getVxF(uuid);
 		assertEquals(uuid, istest.getUuid());
-		assertEquals(InstalledBunStatus.STARTED, istest.getStatus());
-		assertEquals(1, bs.getManagedInstalledBuns().size());
-		InstalledBun retIs = portalJpaControllerTest.readInstalledBunByUUID(istest.getUuid());
-		assertEquals(InstalledBunStatus.STARTED, retIs.getStatus());
+		assertEquals(InstalledVxFStatus.STARTED, istest.getStatus());
+		assertEquals(1, bs.getManagedInstalledVxFs().size());
+		InstalledVxF retIs = portalJpaControllerTest.readInstalledVxFByUUID(istest.getUuid());
+		assertEquals(InstalledVxFStatus.STARTED, retIs.getStatus());
 
 		bs = null; // remove the old one
 
@@ -406,12 +406,12 @@ public class PortalClientTest {
 		PortalInstallationMgmt bsNew = PortalServiceInit(new MockRepositoryWebClient("NORMAL"), portalJpaControllerTest);
 		// portalJpaControllerTest.getAll();
 
-		assertEquals("Persistence not implemented yet?!?", 1, bsNew.getManagedInstalledBuns().size());// there should be one
-		InstalledBun istestNew = bsNew.getBun(uuid); // req the service with the previous uuid
+		assertEquals("Persistence not implemented yet?!?", 1, bsNew.getManagedInstalledVxFs().size());// there should be one
+		InstalledVxF istestNew = bsNew.getVxF(uuid); // req the service with the previous uuid
 		assertEquals(uuid, istestNew.getUuid());
-		assertEquals(InstalledBunStatus.STARTED, istestNew.getStatus());
+		assertEquals(InstalledVxFStatus.STARTED, istestNew.getStatus());
 
-		portalJpaControllerTest.deleteAllInstalledBuns();
+		portalJpaControllerTest.deleteAllInstalledVxFs();
 	}
 
 	// helper functions

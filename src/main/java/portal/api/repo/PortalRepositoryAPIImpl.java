@@ -22,15 +22,15 @@ import portal.api.fiware.OAuthClientManager;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeployArtifact;
 import portal.api.model.DeployContainer;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.IPortalRepositoryAPI;
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 import portal.api.model.Product;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
@@ -276,21 +276,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/buns")
+	@Path("/users/{userid}/vxfs")
 	@Produces("application/json")
-	public Response getAllBunsofUser(@PathParam("userid") int userid) {
-		logger.info("getAllBunsofUser for userid: " + userid);
+	public Response getAllVxFsofUser(@PathParam("userid") int userid) {
+		logger.info("getAllVxFsofUser for userid: " + userid);
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
 			List<Product> prods = u.getProducts();
-			List<BunMetadata> buns = new ArrayList<BunMetadata>();
+			List<VxFMetadata> vxfs = new ArrayList<VxFMetadata>();
 			for (Product p : prods) {
-				if (p instanceof BunMetadata)
-					buns.add((BunMetadata) p);
+				if (p instanceof VxFMetadata)
+					vxfs.add((VxFMetadata) p);
 			}
 
-			return Response.ok().entity(buns).build();
+			return Response.ok().entity(vxfs).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("User with id=" + userid + " not found in portal registry");
@@ -322,15 +322,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/buns/{bunid}")
+	@Path("/users/{userid}/vxfs/{vxfid}")
 	@Produces("application/json")
-	public Response getBunofUser(@PathParam("userid") int userid, @PathParam("bunid") int bunid) {
-		logger.info("getBunofUser for userid: " + userid + ", bunid=" + bunid);
+	public Response getVxFofUser(@PathParam("userid") int userid, @PathParam("vxfid") int vxfid) {
+		logger.info("getVxFofUser for userid: " + userid + ", vxfid=" + vxfid);
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
-			BunMetadata bun = (BunMetadata) u.getProductById(bunid);
-			return Response.ok().entity(bun).build();
+			VxFMetadata vxf = (VxFMetadata) u.getProductById(vxfid);
+			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("User with id=" + userid + " not found in portal registry");
@@ -355,9 +355,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 
-	// BUNS API
+	// VxFS API
 
-	private Product addNewProductData(Product prod, Attachment image, Attachment bunFile, List<Attachment> screenshots) {
+	private Product addNewProductData(Product prod, Attachment image, Attachment vxfFile, List<Attachment> screenshots) {
 
 		String uuid = UUID.randomUUID().toString();
 
@@ -402,13 +402,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 			}
 
-			if (bunFile != null) {
-				String bunFileNamePosted = getFileName(bunFile.getHeaders());
-				logger.info("bunFile = " + bunFileNamePosted);
-				if (!bunFileNamePosted.equals("")) {
-					String bunfilepath = saveFile(bunFile, tempDir + bunFileNamePosted);
-					logger.info("bunfilepath saved to = " + bunfilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + File.separator + bunFileNamePosted);
+			if (vxfFile != null) {
+				String vxfFileNamePosted = getFileName(vxfFile.getHeaders());
+				logger.info("vxfFile = " + vxfFileNamePosted);
+				if (!vxfFileNamePosted.equals("")) {
+					String vxffilepath = saveFile(vxfFile, tempDir + vxfFileNamePosted);
+					logger.info("vxffilepath saved to = " + vxffilepath);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + File.separator + vxfFileNamePosted);
 				}
 			}
 
@@ -445,12 +445,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		}
 
-		// Save now bun for User
-		PortalUser bunOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
-		bunOwner.addProduct(prod);
-		prod.setOwner(bunOwner); // replace given owner with the one from our DB
+		// Save now vxf for User
+		PortalUser vxfOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
+		vxfOwner.addProduct(prod);
+		prod.setOwner(vxfOwner); // replace given owner with the one from our DB
 
-		PortalUser owner = portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
+		PortalUser owner = portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), vxfOwner);
 		Product registeredProd = portalRepositoryRef.getProductByUUID(uuid);
 
 		// now fix category references
@@ -463,37 +463,37 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return registeredProd;
 	}
 
-	/******************* Buns API ***********************/
+	/******************* VxFs API ***********************/
 
 	@GET
-	@Path("/buns")
+	@Path("/vxfs")
 	@Produces("application/json")
-	public Response getAllBuns(@QueryParam("categoryid") Long categoryid) {
-		logger.info("getBuns categoryid=" + categoryid);
+	public Response getAllVxFs(@QueryParam("categoryid") Long categoryid) {
+		logger.info("getVxFs categoryid=" + categoryid);
 
-		List<BunMetadata> buns = portalRepositoryRef.getBuns(categoryid);
-		return Response.ok().entity(buns).build();
+		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs(categoryid);
+		return Response.ok().entity(vxfs).build();
 
 	}
 
 	@GET
-	@Path("/admin/buns")
+	@Path("/admin/vxfs")
 	@Produces("application/json")
-	public Response getBuns(@QueryParam("categoryid") Long categoryid) {
-		logger.info("getBuns categoryid=" + categoryid);
+	public Response getVxFs(@QueryParam("categoryid") Long categoryid) {
+		logger.info("getVxFs categoryid=" + categoryid);
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if (u != null) {
-			List<BunMetadata> buns;
+			List<VxFMetadata> vxfs;
 
 			if (u.getRole().equals("ROLE_PORTALADMIN")) {
-				buns = portalRepositoryRef.getBuns(categoryid);
+				vxfs = portalRepositoryRef.getVxFs(categoryid);
 			} else {
-				buns = portalRepositoryRef.getBunsByUserID((long) u.getId());
+				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
 			}
 
-			return Response.ok().entity(buns).build();
+			return Response.ok().entity(vxfs).build();
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -504,9 +504,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@POST
-	@Path("/admin/buns/")
+	@Path("/admin/vxfs/")
 	@Consumes("multipart/form-data")
-	public Response addBunMetadata(List<Attachment> ats) {
+	public Response addVxFMetadata(List<Attachment> ats) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
@@ -516,15 +516,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		BunMetadata bun = new BunMetadata();
+		VxFMetadata vxf = new VxFMetadata();
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("bun", ats));
-			bun = parser.readValueAs(BunMetadata.class);
+			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("vxf", ats));
+			vxf = parser.readValueAs(VxFMetadata.class);
 
-			logger.info("Received @POST for bun : " + bun.getName());
-			logger.info("Received @POST for bun.extensions : " + bun.getExtensions());
+			logger.info("Received @POST for vxf : " + vxf.getName());
+			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -532,28 +532,28 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		bun = (BunMetadata) addNewProductData(bun,
+		vxf = (VxFMetadata) addNewProductData(vxf,
 
 		getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
-		return Response.ok().entity(bun).build();
+		return Response.ok().entity(vxf).build();
 
 	}
 
 	@PUT
-	@Path("/admin/buns/{bid}")
+	@Path("/admin/vxfs/{bid}")
 	@Consumes("multipart/form-data")
-	public Response updateBunMetadata(@PathParam("bid") int bid, List<Attachment> ats) {
+	public Response updateVxFMetadata(@PathParam("bid") int bid, List<Attachment> ats) {
 
-		BunMetadata bun = new BunMetadata();
+		VxFMetadata vxf = new VxFMetadata();
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("bun", ats));
-			bun = parser.readValueAs(BunMetadata.class);
+			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("vxf", ats));
+			vxf = parser.readValueAs(VxFMetadata.class);
 
-			logger.info("Received @POST for bun : " + bun.getName());
-			logger.info("Received @POST for bun.extensions : " + bun.getExtensions());
+			logger.info("Received @POST for vxf : " + vxf.getName());
+			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -561,30 +561,30 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// BunMetadata sm = (BunMetadata) portalRepositoryRef.getProductByID(bid);
-		bun = (BunMetadata) updateProductMetadata(bun, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
+		// VxFMetadata sm = (VxFMetadata) portalRepositoryRef.getProductByID(bid);
+		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
-		return Response.ok().entity(bun).build();
+		return Response.ok().entity(vxf).build();
 
 	}
 
-	// Buns related API
+	// VxFs related API
 
 	private Product updateProductMetadata(Product prod, Attachment image, Attachment prodFile, List<Attachment> screenshots) {
 
 		logger.info("userid = " + prod.getOwner().getId());
-		logger.info("bunname = " + prod.getName());
-		logger.info("bunid = " + prod.getId());
+		logger.info("vxfname = " + prod.getName());
+		logger.info("vxfid = " + prod.getId());
 
-		logger.info("bunuuid = " + prod.getUuid());
+		logger.info("vxfuuid = " + prod.getUuid());
 		logger.info("version = " + prod.getVersion());
 		logger.info("shortDescription = " + prod.getShortDescription());
 		logger.info("longDescription = " + prod.getLongDescription());
 
 		// get User
-		PortalUser bunOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
-		prod.setOwner(bunOwner); // replace given owner with the one from our DB
+		PortalUser vxfOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
+		prod.setOwner(vxfOwner); // replace given owner with the one from our DB
 
 		prod.setDateUpdated(new Date());
 
@@ -620,12 +620,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 
 			if (prodFile != null) {
-				String bunFileNamePosted = getFileName(prodFile.getHeaders());
-				logger.info("bunFile = " + bunFileNamePosted);
-				if (!bunFileNamePosted.equals("unknown")) {
-					String bunfilepath = saveFile(prodFile, tempDir + bunFileNamePosted);
-					logger.info("bunfilepath saved to = " + bunfilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + File.separator + bunFileNamePosted);
+				String vxfFileNamePosted = getFileName(prodFile.getHeaders());
+				logger.info("vxfFile = " + vxfFileNamePosted);
+				if (!vxfFileNamePosted.equals("unknown")) {
+					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
+					logger.info("vxffilepath saved to = " + vxffilepath);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + File.separator + vxfFileNamePosted);
 				}
 			}
 
@@ -665,9 +665,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			portalRepositoryRef.updateCategoryInfo(catToUpdate);
 		}
 
-		if (bunOwner.getProductById(prod.getId()) == null)
-			bunOwner.addProduct(prod);
-		portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), bunOwner);
+		if (vxfOwner.getProductById(prod.getId()) == null)
+			vxfOwner.addProduct(prod);
+		portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), vxfOwner);
 		return prod;
 	}
 
@@ -686,19 +686,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/packages/{uuid}/{bunfile}")
+	@Path("/packages/{uuid}/{vxffile}")
 	@Produces("application/gzip")
-	public Response downloadBunPackage(@PathParam("uuid") String uuid, @PathParam("bunfile") String bunfile) {
+	public Response downloadVxFPackage(@PathParam("uuid") String uuid, @PathParam("vxffile") String vxffile) {
 
-		logger.info("bunfile: " + bunfile);
+		logger.info("vxffile: " + vxffile);
 		logger.info("uuid: " + uuid);
 
-		String bunAbsfile = METADATADIR + uuid + File.separator + bunfile;
-		logger.info("Bun RESOURCE FILE: " + bunAbsfile);
-		File file = new File(bunAbsfile);
+		String vxfAbsfile = METADATADIR + uuid + File.separator + vxffile;
+		logger.info("VxF RESOURCE FILE: " + vxfAbsfile);
+		File file = new File(vxfAbsfile);
 
 		if ((uuid.equals("77777777-668b-4c75-99a9-39b24ed3d8be")) || (uuid.equals("22cab8b8-668b-4c75-99a9-39b24ed3d8be"))) {
-			URL res = getClass().getResource("/files/" + bunfile);
+			URL res = getClass().getResource("/files/" + vxffile);
 			logger.info("TEST LOCAL RESOURCE FILE: " + res);
 			file = new File(res.getFile());
 		}
@@ -709,83 +709,83 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@DELETE
-	@Path("/admin/buns/{bunid}")
-	public void deleteBun(@PathParam("bunid") int bunid) {
-		portalRepositoryRef.deleteProduct(bunid);
+	@Path("/admin/vxfs/{vxfid}")
+	public void deleteVxF(@PathParam("vxfid") int vxfid) {
+		portalRepositoryRef.deleteProduct(vxfid);
 	}
 
 	@GET
-	@Path("/buns/{bunid}")
+	@Path("/vxfs/{vxfid}")
 	@Produces("application/json")
-	public Response getBunMetadataByID(@PathParam("bunid") int bunid) {
-		logger.info("getBunMetadataByID  bunid=" + bunid);
-		BunMetadata bun = (BunMetadata) portalRepositoryRef.getProductByID(bunid);
+	public Response getVxFMetadataByID(@PathParam("vxfid") int vxfid) {
+		logger.info("getVxFMetadataByID  vxfid=" + vxfid);
+		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
 
-		if (bun != null) {
-			return Response.ok().entity(bun).build();
+		if (vxf != null) {
+			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("bun with id=" + bunid + " not found in portal registry");
+			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
 
 	@GET
-	@Path("/admin/buns/{bunid}")
+	@Path("/admin/vxfs/{vxfid}")
 	@Produces("application/json")
-	public Response getAdminBunMetadataByID(@PathParam("bunid") int bunid) {
+	public Response getAdminVxFMetadataByID(@PathParam("vxfid") int vxfid) {
 
-		return getBunMetadataByID(bunid);
+		return getVxFMetadataByID(vxfid);
 	}
 
 	@GET
-	@Path("/buns/uuid/{uuid}")
+	@Path("/vxfs/uuid/{uuid}")
 	@Produces("application/json")
-	public Response getBunMetadataByUUID(@PathParam("uuid") String uuid) {
+	public Response getVxFMetadataByUUID(@PathParam("uuid") String uuid) {
 
-		logger.info("Received GET for bun uuid: " + uuid);
-		BunMetadata bun = null;
+		logger.info("Received GET for vxf uuid: " + uuid);
+		VxFMetadata vxf = null;
 
 		URI endpointUrl = uri.getBaseUri();
 		if (uuid.equals("77777777-668b-4c75-99a9-39b24ed3d8be")) {
-			bun = new BunMetadata();
-			bun.setUuid(uuid);
-			bun.setName("IntegrTestLocal example service");
-			bun.setShortDescription("An example local service");
-			bun.setVersion("1.0.0");
-			bun.setIconsrc("");
-			bun.setLongDescription("");
+			vxf = new VxFMetadata();
+			vxf.setUuid(uuid);
+			vxf.setName("IntegrTestLocal example service");
+			vxf.setShortDescription("An example local service");
+			vxf.setVersion("1.0.0");
+			vxf.setIconsrc("");
+			vxf.setLongDescription("");
 
-			bun.setPackageLocation(endpointUrl + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplebun.tar.gz");
+			vxf.setPackageLocation(endpointUrl + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 			// }else if (uuid.equals("12cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
-			// bun = new BunMetadata(uuid, "AN example service");
-			// bun.setShortDescription("An example local service");
-			// bun.setVersion("1.0.0rc1");
-			// bun.setIconsrc("");
-			// bun.setLongDescription("");
+			// vxf = new VxFMetadata(uuid, "AN example service");
+			// vxf.setShortDescription("An example local service");
+			// vxf.setVersion("1.0.0rc1");
+			// vxf.setIconsrc("");
+			// vxf.setLongDescription("");
 			// //URI endpointUrl = uri.getBaseUri();
 			//
-			// bun.setPackageLocation( endpointUrl +"repo/packages/12cab8b8-668b-4c75-99a9-39b24ed3d8be/examplebun.tar.gz");
+			// vxf.setPackageLocation( endpointUrl +"repo/packages/12cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 		} else if (uuid.equals("22cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
-			bun = new BunMetadata();
-			bun.setUuid(uuid);
-			bun.setName("IntegrTestLocal example ErrInstall service");
-			bun.setShortDescription("An example ErrInstall local service");
-			bun.setVersion("1.0.0");
-			bun.setIconsrc("");
-			bun.setLongDescription("");
+			vxf = new VxFMetadata();
+			vxf.setUuid(uuid);
+			vxf.setName("IntegrTestLocal example ErrInstall service");
+			vxf.setShortDescription("An example ErrInstall local service");
+			vxf.setVersion("1.0.0");
+			vxf.setIconsrc("");
+			vxf.setLongDescription("");
 			// URI endpointUrl = uri.getBaseUri();
 
-			bun.setPackageLocation(endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplebunErrInstall.tar.gz");
+			vxf.setPackageLocation(endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
 		} else {
-			bun = (BunMetadata) portalRepositoryRef.getProductByUUID(uuid);
+			vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID(uuid);
 		}
 
-		if (bun != null) {
-			return Response.ok().entity(bun).build();
+		if (vxf != null) {
+			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in local registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in local registry");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1067,8 +1067,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllApps(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getApps categoryid=" + categoryid);
-		List<ExperimentMetadata> buns = portalRepositoryRef.getApps(categoryid);
-		return Response.ok().entity(buns).build();
+		List<ExperimentMetadata> vxfs = portalRepositoryRef.getApps(categoryid);
+		return Response.ok().entity(vxfs).build();
 	}
 
 	@GET
@@ -1415,7 +1415,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				;
 				u.setName(fu.getDisplayName());
 				u.setOrganization("FI-WARE");
-				u.setRole("SERVICE_PLATFORM_PROVIDER");
+				u.setRole("TESTBED_PROVIDER");
 				u.setPassword(roamPassword);
 				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
 				portalRepositoryRef.addPortalUserToUsers(u);
@@ -1751,20 +1751,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	}
 
-	// /registerresource/deployments/target/uuid/"+ clientUUID+"/installedbunuuid/"+installedBunUUID+"/status/"+status"
+	// /registerresource/deployments/target/uuid/"+ clientUUID+"/installedvxfuuid/"+installedVxFUUID+"/status/"+status"
 
 	@PUT
-	@Path("/registerresource/deployments/target/uuid/{clientUUID}/installedbunuuid/{installedBunUUID}/status/{status}/deployContainerid/{cid}")
+	@Path("/registerresource/deployments/target/uuid/{clientUUID}/installedvxfuuid/{installedVxFUUID}/status/{status}/deployContainerid/{cid}")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response updateDeployContainerTargetResourceStatus(@PathParam("clientUUID") String clientUUID,
-			@PathParam("installedBunUUID") String installedBunUUID, @PathParam("status") String status,@PathParam("cid") Long deployContainerId) {
+			@PathParam("installedVxFUUID") String installedVxFUUID, @PathParam("status") String status,@PathParam("cid") Long deployContainerId) {
 
 		SubscribedResource res = updateLastSeenResource(clientUUID);
 		if (res!=null)
 			logger.info("Received ResourceStatus: " + status + ", for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL() 
 					+ ", OwnerID:"+ res.getOwner().getId()
-					+ ", installedBunUUID:"+ installedBunUUID);
+					+ ", installedVxFUUID:"+ installedVxFUUID);
 
 		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 		for (DeploymentDescriptor deploymentDescriptor : deployments) {
@@ -1773,8 +1773,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if ((deployContainerId == dc.getId()) && (dc.getTargetResource()!=null) && dc.getTargetResource().getUuid().equals(clientUUID)) {
 					List<DeployArtifact> artifacts = dc.getDeployArtifacts();
 					for (DeployArtifact deployArtifact : artifacts)
-						if (deployArtifact.getUuid().equals(installedBunUUID)) {
-							deployArtifact.setStatus(InstalledBunStatus.valueOf(status));
+						if (deployArtifact.getUuid().equals(installedVxFUUID)) {
+							deployArtifact.setStatus(InstalledVxFStatus.valueOf(status));
 							
 						}
 
@@ -1806,21 +1806,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		for (DeployContainer deployContainer : containers) {
 			List<DeployArtifact> artifacts = deployContainer.getDeployArtifacts();
 			for (DeployArtifact deployArtifact : artifacts) {
-				if (deployArtifact.getStatus()!=InstalledBunStatus.STARTED)
+				if (deployArtifact.getStatus()!=InstalledVxFStatus.STARTED)
 					allInstalled= false;
-				if (deployArtifact.getStatus()!=InstalledBunStatus.UNINSTALLED)
+				if (deployArtifact.getStatus()!=InstalledVxFStatus.UNINSTALLED)
 					allUnInstalled= false;
 
-				if ((deployArtifact.getStatus()==InstalledBunStatus.FAILED))
+				if ((deployArtifact.getStatus()==InstalledVxFStatus.FAILED))
 					return DeploymentDescriptorStatus.FAILED;
-				if ((deployArtifact.getStatus()==InstalledBunStatus.UNINSTALLING))
+				if ((deployArtifact.getStatus()==InstalledVxFStatus.UNINSTALLING))
 					return DeploymentDescriptorStatus.UNINSTALLING;
-				if ((deployArtifact.getStatus()==InstalledBunStatus.CONFIGURING)|| 
-						(deployArtifact.getStatus()==InstalledBunStatus.DOWNLOADING)|| 
-						(deployArtifact.getStatus()==InstalledBunStatus.DOWNLOADED)|| 
-						(deployArtifact.getStatus()==InstalledBunStatus.INSTALLING)|| 
-						(deployArtifact.getStatus()==InstalledBunStatus.INSTALLED)|| 
-						(deployArtifact.getStatus()==InstalledBunStatus.STARTING)
+				if ((deployArtifact.getStatus()==InstalledVxFStatus.CONFIGURING)|| 
+						(deployArtifact.getStatus()==InstalledVxFStatus.DOWNLOADING)|| 
+						(deployArtifact.getStatus()==InstalledVxFStatus.DOWNLOADED)|| 
+						(deployArtifact.getStatus()==InstalledVxFStatus.INSTALLING)|| 
+						(deployArtifact.getStatus()==InstalledVxFStatus.INSTALLED)|| 
+						(deployArtifact.getStatus()==InstalledVxFStatus.STARTING)
 						)
 					return DeploymentDescriptorStatus.INSTALLING;
 			}
@@ -1838,7 +1838,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		SubscribedResource res = portalRepositoryRef.getSubscribedResourceByUUID(clientUUID);
 		if (res != null) {
-			res.setLastUpdate(new Date()); // each time Portal Client Polls marketplace, we update this Last seen of client
+			res.setLastUpdate(new Date()); // each time Portal Client Polls api, we update this Last seen of client
 			PortalUser reattachedUser = portalRepositoryRef.getUserByID(res.getOwner().getId());
 			res.setOwner(reattachedUser);
 			portalRepositoryRef.updateSubscribedResourceInfo(res.getId(), res);

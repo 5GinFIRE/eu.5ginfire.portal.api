@@ -18,7 +18,7 @@
 	</div>
  <div style="padding-left: 30px;padding-bottom: 10px;">
  <a href="index.html">Main</a> |
- <a href="viewBuns.html">View Buns</a>  |
+ <a href="viewVxFs.html">View VxFs</a>  |
  <a href="viewUsers.html">View Users</a> | 
  <a href="addUser.html">Add User</a> | 
  <a href="logout">Logout</a>
@@ -42,7 +42,7 @@
 		    	   "<th>username</th>" +
 		    	   "<th>password</th>" +
 		    	   "<th>email</th>" +
-		    	   "<th>Buns</th>" +
+		    	   "<th>VxFs</th>" +
 		    	   "<th>Actions</th>" +
 		    	 	"</tr>";
 		        for (var i in data) {
@@ -53,8 +53,8 @@
 		            "<td>" + data[i].username + "</td> " + 
 		            "<td>" + data[i].password + "</td> " + 
 		            "<td>" + data[i].email + "</td> " +  
-		            "<td><a href='viewBuns.html?userid=" + data[i].id + "'>Buns</a></td> " + 
-		            "<td><a href='addBun.html?userid=" + data[i].id + "'>New Bun</a> | "+
+		            "<td><a href='viewVxFs.html?userid=" + data[i].id + "'>VxFs</a></td> " + 
+		            "<td><a href='addVxF.html?userid=" + data[i].id + "'>New VxF</a> | "+
 		            "<a href='addUser.html?userid=" + data[i].id + "'>Edit</a> | "+
 		            "<a href='#' onClick='removeItem(" + data[i].id + ")'>Delete</a></td> " + 
 		            

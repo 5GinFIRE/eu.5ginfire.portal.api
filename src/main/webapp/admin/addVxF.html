@@ -12,33 +12,33 @@
 </head>
 <body>
   	<div class="page-header">
-		<h1>Add Bun<br><small>Add/Upload a new Bun </small></h1>
+		<h1>Add VxF<br><small>Add/Upload a new VxF </small></h1>
 	</div>
  <div style="padding-left: 30px;padding-bottom: 10px;">
  <a href="index.html">Main</a> |
- <a href="viewBuns.html">View Buns</a>  |
+ <a href="viewVxFs.html">View VxFs</a>  |
  <a href="viewUsers.html">View Users</a> | 
  <a href="addUser.html">Add User</a> | 
  <a href="logout">Logout</a>
   </div>
 
 	<div style="padding-left: 100px; ">
-		<h1 id="headerTitle">Bun Upload Form</h1>
-		<h3 id="headerBunIDTitle"></h3>
+		<h1 id="headerTitle">VxF Upload Form</h1>
+		<h3 id="headerVxFIDTitle"></h3>
 		<div id="result"></div>
 	</div>
 
 
-	<form class="form-horizontal" role="form" id="bunForm"
+	<form class="form-horizontal" role="form" id="vxfForm"
 		action="/portal/services/api/repo/users/"  >
 			
 			
-		<input type="hidden" name="bunid" value=""  />
-		<input type="hidden" name="bunuuid" value=""  />
+		<input type="hidden" name="vxfid" value=""  />
+		<input type="hidden" name="vxfuuid" value=""  />
 		<div class="form-group">
-			<label for="bunname" class="col-sm-2 control-label">Bun name</label>
+			<label for="vxfname" class="col-sm-2 control-label">VxF name</label>
 			<div class="col-sm-10">
-		   		<input type="text" name="bunname" value=""/>
+		   		<input type="text" name="vxfname" value=""/>
 			</div>
 		</div>
 		<div class="form-group">
@@ -56,7 +56,7 @@
 		<div class="form-group">
 			<label for="shortDescription" class="col-sm-2 control-label"></label>
 			<div class="col-sm-10">
-				<input type="text" name="shortDescription"  placeholder="A shortDescription for this bun"/>
+				<input type="text" name="shortDescription"  placeholder="A shortDescription for this vxf"/>
 			</div>
 		
 		</div>
@@ -68,9 +68,9 @@
 		
 		</div>
 		<div class="form-group">
-				<label for="uploadedBunIcon" class="col-sm-2 control-label">Icon File</label>
+				<label for="uploadedVxFIcon" class="col-sm-2 control-label">Icon File</label>
 			<div class="col-sm-10">
-				<input type="file" name="uploadedBunIcon" size="50" />
+				<input type="file" name="uploadedVxFIcon" size="50" />
 				<p class="help-block">Select logo image</p>
 			</div>
 		
@@ -78,10 +78,10 @@
 
 		
 		<div class="form-group">
-			<label for="uploadedBunFile" class="col-sm-2 control-label">Bun File</label>
+			<label for="uploadedVxFFile" class="col-sm-2 control-label">VxF File</label>
 			<div class="col-sm-10">
-				<input type="file" name="uploadedBunFile" size="50" />
-				<p class="help-block">Select bun file in tar.gz format</p>
+				<input type="file" name="uploadedVxFFile" size="50" />
+				<p class="help-block">Select vxf file in tar.gz format</p>
 			</div>
 		
 		</div>
@@ -104,41 +104,41 @@
     }
 
     var userid = getUrlVars()["userid"];
-    var bunid = getUrlVars()["bunid"];
+    var vxfid = getUrlVars()["vxfid"];
 	
     $(document).ready(function() {
     	
-		 $("#bunForm input[name='userid']").val(userid);
-    	if (bunid){
-    		 $.getJSON('/portal/services/api/repo/buns/'+bunid, function(data) {
+		 $("#vxfForm input[name='userid']").val(userid);
+    	if (vxfid){
+    		 $.getJSON('/portal/services/api/repo/vxfs/'+vxfid, function(data) {
 
-    			 document.getElementById("headerTitle").innerHTML = 'Edit Bun Form';
-    			 document.getElementById("headerBunIDTitle").innerHTML = data.uuid;
+    			 document.getElementById("headerTitle").innerHTML = 'Edit VxF Form';
+    			 document.getElementById("headerVxFIDTitle").innerHTML = data.uuid;
 
-    			 $("#bunForm input[name='bunid']").val(data.id);
-    			 $("#bunForm input[name='bunid']").val(data.id);
-    			 $("#bunForm input[name='bunuuid']").val(data.uuid);
-    			 $("#bunForm input[name='bunname']").val(data.name);
-    			 $("#bunForm input[name='version']").val(data.version);
-    			 $("#bunForm input[name='shortDescription']").val(data.shortDescription);
-    			 $("#bunForm textarea[name='longDescription']").val(data.longDescription);
+    			 $("#vxfForm input[name='vxfid']").val(data.id);
+    			 $("#vxfForm input[name='vxfid']").val(data.id);
+    			 $("#vxfForm input[name='vxfuuid']").val(data.uuid);
+    			 $("#vxfForm input[name='vxfname']").val(data.name);
+    			 $("#vxfForm input[name='version']").val(data.version);
+    			 $("#vxfForm input[name='shortDescription']").val(data.shortDescription);
+    			 $("#vxfForm textarea[name='longDescription']").val(data.longDescription);
     		 });
     	}
   	});
     
 
 	// Attach a submit handler to the form
-	$("#bunForm").submit(
+	$("#vxfForm").submit(
 			function(event) {
 				// Stop form from submitting normally
 				event.preventDefault();
 				// Get some values from elements on the page:
 				
-					var url = '/portal/services/api/repo/users/'+userid+'/buns/';	
+					var url = '/portal/services/api/repo/users/'+userid+'/vxfs/';	
 					var action = 'POST';
 					
-					if (bunid){
-						url = '/portal/services/api/repo/buns/'+bunid;	
+					if (vxfid){
+						url = '/portal/services/api/repo/vxfs/'+vxfid;	
 				    	action = 'PUT';
 					}
 					
@@ -151,7 +151,7 @@
 				  processData: false,
 			      contentType: false,
 				  success: function(){
-						$("#result").empty().append("Bun saved!");
+						$("#result").empty().append("VxF saved!");
 				  }
 				});
 				

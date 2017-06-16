@@ -28,41 +28,41 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.IRepositoryWebClient;
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 
-public class InstalledBunLifecycleMgmt {
+public class InstalledVxFLifecycleMgmt {
 
-	private static final transient Log logger = LogFactory.getLog(InstalledBunLifecycleMgmt.class.getName());
+	private static final transient Log logger = LogFactory.getLog(InstalledVxFLifecycleMgmt.class.getName());
 
-	InstalledBun installedBun;
+	InstalledVxF installedVxF;
 	IRepositoryWebClient repoWebClient;
 
 	PortalJpaController portalJpaController;
-	private InstalledBunStatus targetStatus;
+	private InstalledVxFStatus targetStatus;
 	private Boolean restartTriggered = false;
-	private BunMetadata bunMetadata = null;
+	private VxFMetadata vxfMetadata = null;
 
-	public InstalledBunLifecycleMgmt(InstalledBun b, IRepositoryWebClient rwc, PortalJpaController jpactr, InstalledBunStatus ts) {
-		installedBun = b;
+	public InstalledVxFLifecycleMgmt(InstalledVxF b, IRepositoryWebClient rwc, PortalJpaController jpactr, InstalledVxFStatus ts) {
+		installedVxF = b;
 		repoWebClient = rwc;
 		portalJpaController = jpactr;
 		targetStatus = ts;
 
-		logger.info("ServiceLifecycleMgmt uuid:" + installedBun.getUuid() + " name:" + installedBun.getName());
+		logger.info("ServiceLifecycleMgmt uuid:" + installedVxF.getUuid() + " name:" + installedVxF.getName());
 		processState();
 	}
 
 	public void processState() {
 
-		logger.info("Task for uuid:" + installedBun.getUuid() + " is:" + installedBun.getStatus());
-		InstalledBunStatus entryState = installedBun.getStatus();
+		logger.info("Task for uuid:" + installedVxF.getUuid() + " is:" + installedVxF.getStatus());
+		InstalledVxFStatus entryState = installedVxF.getStatus();
 		
 		//this is used to restart the service. usefull if reconfiguring.
-		if ((targetStatus == InstalledBunStatus.STARTED) &&
-				(entryState == InstalledBunStatus.STARTED ) &&
+		if ((targetStatus == InstalledVxFStatus.STARTED) &&
+				(entryState == InstalledVxFStatus.STARTED ) &&
 				(!restartTriggered) ){
 			logger.info("Entry and Target state are STARTED. A restart will be triggered, with confguration applied.");
 			restartTriggered = true;
@@ -76,20 +76,20 @@ public class InstalledBunLifecycleMgmt {
 			break;
 
 		case DOWNLOADING:
-			if (targetStatus == InstalledBunStatus.STOPPED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
-			} else if (targetStatus == InstalledBunStatus.UNINSTALLED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
+			if (targetStatus == InstalledVxFStatus.STOPPED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
+			} else if (targetStatus == InstalledVxFStatus.UNINSTALLED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
 			}else{
 				startPackageDownloading();
 			}
 			break;
 
 		case DOWNLOADED:
-			if (targetStatus == InstalledBunStatus.STOPPED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
-			} else if (targetStatus == InstalledBunStatus.UNINSTALLED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
+			if (targetStatus == InstalledVxFStatus.STOPPED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
+			} else if (targetStatus == InstalledVxFStatus.UNINSTALLED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
 			}else{
 				startPackageInstallation();
 					
@@ -111,12 +111,12 @@ public class InstalledBunLifecycleMgmt {
 			execStartingPhase();
 			break;
 		case STARTED:
-			if (targetStatus == InstalledBunStatus.STOPPED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
-			} else if (targetStatus == InstalledBunStatus.UNINSTALLED) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
-			} else if ( (targetStatus == InstalledBunStatus.STARTED) && restartTriggered) {
-				installedBun.setStatus(InstalledBunStatus.STOPPING);
+			if (targetStatus == InstalledVxFStatus.STOPPED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
+			} else if (targetStatus == InstalledVxFStatus.UNINSTALLED) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
+			} else if ( (targetStatus == InstalledVxFStatus.STARTED) && restartTriggered) {
+				installedVxF.setStatus(InstalledVxFStatus.STOPPING);
 			}
 
 			break;
@@ -126,10 +126,10 @@ public class InstalledBunLifecycleMgmt {
 			break;
 
 		case STOPPED:
-			if (targetStatus == InstalledBunStatus.UNINSTALLED) {
-				installedBun.setStatus(InstalledBunStatus.UNINSTALLING);
-			} else if (targetStatus == InstalledBunStatus.STARTED) {
-				installedBun.setStatus(InstalledBunStatus.CONFIGURING);
+			if (targetStatus == InstalledVxFStatus.UNINSTALLED) {
+				installedVxF.setStatus(InstalledVxFStatus.UNINSTALLING);
+			} else if (targetStatus == InstalledVxFStatus.STARTED) {
+				installedVxF.setStatus(InstalledVxFStatus.CONFIGURING);
 			}
 			break;
 
@@ -147,9 +147,9 @@ public class InstalledBunLifecycleMgmt {
 			break;
 		}
 
-		portalJpaController.updateInstalledBun(installedBun);
+		portalJpaController.updateInstalledVxF(installedVxF);
 
-		if ((targetStatus != installedBun.getStatus()) && (installedBun.getStatus() != InstalledBunStatus.FAILED))
+		if ((targetStatus != installedVxF.getStatus()) && (installedVxF.getStatus() != InstalledVxFStatus.FAILED))
 			processState();
 
 	}
@@ -158,33 +158,33 @@ public class InstalledBunLifecycleMgmt {
 		
 		logger.info("Downloading metadata info...");
 		
-		bunMetadata = null;
+		vxfMetadata = null;
 		if (repoWebClient != null)
-			bunMetadata = repoWebClient.fetchMetadata(installedBun.getUuid(), installedBun.getRepoUrl());
+			vxfMetadata = repoWebClient.fetchMetadata(installedVxF.getUuid(), installedVxF.getRepoUrl());
 		else
 			logger.info("repoWebClient == null...FAILED PLEASE CHECK");
 
-		if (bunMetadata != null) {
-			installedBun.setStatus(InstalledBunStatus.DOWNLOADING);
+		if (vxfMetadata != null) {
+			installedVxF.setStatus(InstalledVxFStatus.DOWNLOADING);
 		} else {
 			logger.info("smetadata == null...FAILED");
-			installedBun.setStatus(InstalledBunStatus.FAILED);
+			installedVxF.setStatus(InstalledVxFStatus.FAILED);
 		}
 
 	}
 
 	private void startPackageDownloading() {
-		logger.info("Downloading installation package: " + bunMetadata.getPackageLocation() );
+		logger.info("Downloading installation package: " + vxfMetadata.getPackageLocation() );
 
-		Path destFile = repoWebClient.fetchPackageFromLocation(installedBun.getUuid(), bunMetadata.getPackageLocation());
+		Path destFile = repoWebClient.fetchPackageFromLocation(installedVxF.getUuid(), vxfMetadata.getPackageLocation());
 
 		if ((destFile != null) && (extractPackage(destFile) == 0)) {
-			installedBun.setStatus(InstalledBunStatus.DOWNLOADED);
+			installedVxF.setStatus(InstalledVxFStatus.DOWNLOADED);
 			Path packageLocalPath = destFile.getParent();
-			installedBun.setPackageLocalPath(packageLocalPath.toString());
+			installedVxF.setPackageLocalPath(packageLocalPath.toString());
 		} else {
-			logger.info("FAILED Downloading installation package from: " + bunMetadata.getPackageLocation());
-			installedBun.setStatus(InstalledBunStatus.FAILED);
+			logger.info("FAILED Downloading installation package from: " + vxfMetadata.getPackageLocation());
+			installedVxF.setStatus(InstalledVxFStatus.FAILED);
 		}
 
 	}
@@ -196,85 +196,85 @@ public class InstalledBunLifecycleMgmt {
 
 	private void startPackageInstallation() {
 
-		installedBun.setStatus(InstalledBunStatus.INSTALLING);
+		installedVxF.setStatus(InstalledVxFStatus.INSTALLING);
 		logger.info("Installing...");
 
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onInstall";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onInstall";
 		logger.info("Will execute recipe 'onInstall' of:" + cmdStr);
 
 		if (executeSystemCommand(cmdStr) == 0) {
 
-			installedBun.setStatus(InstalledBunStatus.INSTALLED);
+			installedVxF.setStatus(InstalledVxFStatus.INSTALLED);
 		} else
-			installedBun.setStatus(InstalledBunStatus.FAILED);
+			installedVxF.setStatus(InstalledVxFStatus.FAILED);
 
 	}
 
 	private void execInstalledPhase() {
 		logger.info("execInstalledPhase...");
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onInstallFinish";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onInstallFinish";
 		logger.info("Will execute recipe 'onInstallFinish' of:" + cmdStr);
 
 		
 		executeSystemCommand(cmdStr); // we don't care for the exit code
 		if (executeSystemCommand(cmdStr) == 0) {
-			installedBun.setStatus(InstalledBunStatus.CONFIGURING);
-			installedBun.setName(bunMetadata.getName());
-			installedBun.setPackageURL(bunMetadata.getPackageLocation() );
-			installedBun.setInstalledVersion(bunMetadata.getVersion());			
+			installedVxF.setStatus(InstalledVxFStatus.CONFIGURING);
+			installedVxF.setName(vxfMetadata.getName());
+			installedVxF.setPackageURL(vxfMetadata.getPackageLocation() );
+			installedVxF.setInstalledVersion(vxfMetadata.getVersion());			
 		} else
-			installedBun.setStatus(InstalledBunStatus.FAILED);
+			installedVxF.setStatus(InstalledVxFStatus.FAILED);
 
 	}
 
 	private void execConfiguringPhase() {
 		logger.info("execInstalledPhase...");
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onApplyConf";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onApplyConf";
 		logger.info("Will execute recipe 'onApplyConf' of:" + cmdStr);
 
 		executeSystemCommand(cmdStr); // we don't care for the exit code
 		if (executeSystemCommand(cmdStr) == 0) {
-			installedBun.setStatus(InstalledBunStatus.STARTING);
+			installedVxF.setStatus(InstalledVxFStatus.STARTING);
 		} else
-			installedBun.setStatus(InstalledBunStatus.FAILED);
+			installedVxF.setStatus(InstalledVxFStatus.FAILED);
 
 	}
 
 	private void execStartingPhase() {
 		logger.info("execStartingPhase...");
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onStart";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onStart";
 		logger.info("Will execute recipe 'onStart' of:" + cmdStr);
 
 		if (executeSystemCommand(cmdStr) == 0) {
-			installedBun.setStatus(InstalledBunStatus.STARTED);
+			installedVxF.setStatus(InstalledVxFStatus.STARTED);
 		} else
-			installedBun.setStatus(InstalledBunStatus.STOPPED);
+			installedVxF.setStatus(InstalledVxFStatus.STOPPED);
 
 	}
 
 	private void execStoppingPhase() {
 
 		logger.info("execStoppingPhase...");
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onStop";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onStop";
 		logger.info("Will execute recipe 'onStop' of:" + cmdStr);
 
 		// if (executeSystemCommand(cmdStr) == 0) {
 		// whatever is the return value...it will go to stopped
 		executeSystemCommand(cmdStr);
-		installedBun.setStatus(InstalledBunStatus.STOPPED);
+		installedVxF.setStatus(InstalledVxFStatus.STOPPED);
 
 	}
 
 	private void execUninstallingPhase() {
 
 		logger.info("execUninstallingPhase...");
-		String cmdStr = installedBun.getPackageLocalPath() + "/recipes/onUninstall";
+		String cmdStr = installedVxF.getPackageLocalPath() + "/recipes/onUninstall";
 		logger.info("Will execute recipe 'onUninstall' of:" + cmdStr);
 
 		// if (executeSystemCommand(cmdStr) == 0) {
 		// whatever is the return value...it will go to stopped
 		executeSystemCommand(cmdStr);
-		installedBun.setStatus(InstalledBunStatus.UNINSTALLED);
+		installedVxF.setStatus(InstalledVxFStatus.UNINSTALLED);
 
 	}
 

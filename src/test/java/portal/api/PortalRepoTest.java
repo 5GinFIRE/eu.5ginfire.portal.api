@@ -22,7 +22,7 @@ import java.util.UUID;
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.Container;
 import portal.api.model.DeployArtifact;
@@ -80,8 +80,8 @@ public class PortalRepoTest {
 
 		portalJpaControllerTest.saveUser(bu);
 		
-		BunMetadata bmeta = new BunMetadata();
-		bmeta.setName("abun");
+		VxFMetadata bmeta = new VxFMetadata();
+		bmeta.setName("avxf");
 		String uuid = UUID.randomUUID().toString();
 		bmeta.setUuid(uuid);
 		bmeta.setLongDescription("longDescription");
@@ -95,16 +95,16 @@ public class PortalRepoTest {
 		portalJpaControllerTest.updatePortalUser(bu);
 		
 		// change name and reSave
-		bmeta = (BunMetadata) portalJpaControllerTest.readProductByUUID(uuid);
-		bmeta.setName("NewBunName");
+		bmeta = (VxFMetadata) portalJpaControllerTest.readProductByUUID(uuid);
+		bmeta.setName("NewVxFName");
 		portalJpaControllerTest.updateProduct(bmeta);		
 
 		portalJpaControllerTest.getAllProductsPrinted();
 		
-		bmeta = new BunMetadata();
+		bmeta = new VxFMetadata();
 		String uuid2 = UUID.randomUUID().toString();
 		bmeta.setUuid(uuid2);
-		bmeta.setName("abun2");
+		bmeta.setName("avxf2");
 		bmeta.setLongDescription("longDescription2");
 		bmeta.setShortDescription("shortDescription2");
 		bmeta.setPackageLocation("packageLocation2");
@@ -124,8 +124,8 @@ public class PortalRepoTest {
 		
 		assertEquals(2, testbu.getProducts().size());
 
-		BunMetadata testbm = (BunMetadata) portalJpaControllerTest.readProductByUUID(uuid);
-		assertEquals("NewBunName", testbm.getName());
+		VxFMetadata testbm = (VxFMetadata) portalJpaControllerTest.readProductByUUID(uuid);
+		assertEquals("NewVxFName", testbm.getName());
 		assertEquals(uuid, testbm.getUuid());
 		assertNotNull(testbm.getOwner());
 		assertEquals("ausername", testbm.getOwner().getUsername());
@@ -240,17 +240,17 @@ public class PortalRepoTest {
 		PortalUser bu = new PortalUser();
 		bu.setUsername("ausername123");
 		
-		//add a couple of buns
-		BunMetadata bmeta = new BunMetadata();
-		bmeta.setName("bun1");
+		//add a couple of vxfs
+		VxFMetadata bmeta = new VxFMetadata();
+		bmeta.setName("vxf1");
 		String uuid = UUID.randomUUID().toString();
 		bmeta.setUuid(uuid);
 		bmeta.addExtensionItem("aname1", "avalue1");
 		bmeta.addExtensionItem("aname2", "avalue2");
 		bu.addProduct(bmeta);
 		
-		BunMetadata bmeta2 = new BunMetadata();
-		bmeta2.setName("bun2");
+		VxFMetadata bmeta2 = new VxFMetadata();
+		bmeta2.setName("vxf2");
 		uuid = UUID.randomUUID().toString();
 		bmeta2.setUuid(uuid);
 		bmeta2.addExtensionItem("aname11", "avalue11");

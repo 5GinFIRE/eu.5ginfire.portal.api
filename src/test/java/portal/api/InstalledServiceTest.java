@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
-import portal.api.model.InstalledBun;
-import portal.api.model.InstalledBunStatus;
+import portal.api.model.InstalledVxF;
+import portal.api.model.InstalledVxFStatus;
 
 public class InstalledServiceTest {
 
@@ -33,13 +33,13 @@ public class InstalledServiceTest {
 	
 	@Test
 	public void testGetUuid() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		assertNotNull(is.getUuid());				
 	}
 
 	@Test
 	public void testSetUuid() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		UUID uuid = UUID.randomUUID();
 		is.setUuid(uuid.toString());
 		assertEquals(uuid.toString(), is.getUuid());
@@ -48,14 +48,14 @@ public class InstalledServiceTest {
 
 	@Test
 	public void testGetRepoUrl() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		assertNotNull(is.getRepoUrl());		
 				
 	}
 
 	@Test
 	public void testSetRepoUrl() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		String url= "testurl";
 		is.setRepoUrl(url);
 		assertEquals(url, is.getRepoUrl());
@@ -63,13 +63,13 @@ public class InstalledServiceTest {
 
 	@Test
 	public void testGetInstalledVersion() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		assertNotNull(is.getInstalledVersion());		
 	}
 
 	@Test
 	public void testSetInstalledVersion() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		String version= "2.2vv2";
 		is.setInstalledVersion(version);
 		assertEquals(version, is.getInstalledVersion());
@@ -77,18 +77,18 @@ public class InstalledServiceTest {
 	
 	@Test
 	public void testSetStatus() {
-		InstalledBun is = installedServiceInit();
+		InstalledVxF is = installedServiceInit();
 		
-		is.setStatus( InstalledBunStatus.INSTALLING ); 
-		assertEquals(InstalledBunStatus.INSTALLING, is.getStatus());
+		is.setStatus( InstalledVxFStatus.INSTALLING ); 
+		assertEquals(InstalledVxFStatus.INSTALLING, is.getStatus());
 	}
 	
 	
 	//helpers
-	private InstalledBun installedServiceInit(){
+	private InstalledVxF installedServiceInit(){
 		UUID uuid =  UUID.randomUUID();		
 		String repoUrl="repourl";
-		InstalledBun is = new InstalledBun(uuid.toString() , repoUrl);
+		InstalledVxF is = new InstalledVxF(uuid.toString() , repoUrl);
 		is.setInstalledVersion("1.1v");
 		return is;
 	}

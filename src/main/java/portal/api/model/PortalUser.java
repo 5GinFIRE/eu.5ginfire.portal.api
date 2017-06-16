@@ -138,31 +138,31 @@ public class PortalUser {
 		organization = newOrganization;
 	}
 
-//	public List<BunMetadata> getBuns() {
-//		return buns;
+//	public List<VxFMetadata> getVxFs() {
+//		return vxfs;
 //	}
 
-//	public void addBun(BunMetadata bunsValue) {
-//		if (!buns.contains(bunsValue)) {
-//			buns.add(bunsValue);
-//			bunsValue.setOwner(this);
+//	public void addVxF(VxFMetadata vxfsValue) {
+//		if (!vxfs.contains(vxfsValue)) {
+//			vxfs.add(vxfsValue);
+//			vxfsValue.setOwner(this);
 //		}
 //	}
 //
-//	public void removeFromBuns(BunMetadata bunsValue) {
-//		if (buns.contains(bunsValue)) {
-//			buns.remove(bunsValue);
+//	public void removeFromVxFs(VxFMetadata vxfsValue) {
+//		if (vxfs.contains(vxfsValue)) {
+//			vxfs.remove(vxfsValue);
 //		}
 //	}
 //
-//	public void clearBuns() {
-//		while (!buns.isEmpty()) {
-//			removeFromBuns(buns.iterator().next());
+//	public void clearVxFs() {
+//		while (!vxfs.isEmpty()) {
+//			removeFromVxFs(vxfs.iterator().next());
 //		}
 //	}
 //
-//	public void setBuns(List<BunMetadata> newBuns) {
-//		buns = newBuns;
+//	public void setVxFs(List<VxFMetadata> newVxFs) {
+//		vxfs = newVxFs;
 //	}
 
 	public int getId() {
@@ -210,12 +210,12 @@ public class PortalUser {
 		this.password = password;
 	}
 
-//	public BunMetadata getBunById(int bunid) {
+//	public VxFMetadata getVxFById(int vxfid) {
 //
-//		for (Iterator iterator = buns.iterator(); iterator.hasNext();) {
-//			BunMetadata bunMetadata = (BunMetadata) iterator.next();
-//			if (bunMetadata.getId() == bunid)
-//				return bunMetadata;
+//		for (Iterator iterator = vxfs.iterator(); iterator.hasNext();) {
+//			VxFMetadata vxfMetadata = (VxFMetadata) iterator.next();
+//			if (vxfMetadata.getId() == vxfid)
+//				return vxfMetadata;
 //		}
 //		return null;
 //	}

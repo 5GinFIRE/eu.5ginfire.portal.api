@@ -36,7 +36,7 @@ public interface IPortalRepositoryAPI {
 	Response addUser(PortalUser user);
 	Response updateUserInfo(int userid, PortalUser user);
 	Response deleteUser(int userid);
-	Response getAllBunsofUser(int userid);
+	Response getAllVxFsofUser(int userid);
 	Response getAllAppsofUser(int userid);
 
 	//Sessions
@@ -50,15 +50,15 @@ public interface IPortalRepositoryAPI {
 	Response updateCategory(int catId, Category c);
 	Response deleteCategory(int catId);
 	
-	//BUNs related API methods
-	Response getBuns(Long categoryid);
-	Response getBunMetadataByID(int bunid);
-	Response getBunMetadataByUUID(String uuid);		
-	Response getBunofUser( int userid, int bunid);
-	Response downloadBunPackage(String uuid, String bunfile);	
-	Response updateBunMetadata(int bid, List<Attachment> attachements);
-	Response addBunMetadata(List<Attachment> attachements);
-	void deleteBun( int bunid);
+	//VxFs related API methods
+	Response getVxFs(Long categoryid);
+	Response getVxFMetadataByID(int vxfid);
+	Response getVxFMetadataByUUID(String uuid);		
+	Response getVxFofUser( int userid, int vxfid);
+	Response downloadVxFPackage(String uuid, String vxffile);	
+	Response updateVxFMetadata(int bid, List<Attachment> attachements);
+	Response addVxFMetadata(List<Attachment> attachements);
+	void deleteVxF( int vxfid);
 	
 	//Subscribed resources
 	Response getSubscribedResources();

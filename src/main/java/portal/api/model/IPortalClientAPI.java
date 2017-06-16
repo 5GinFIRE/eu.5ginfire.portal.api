@@ -19,18 +19,18 @@ import javax.ws.rs.core.Response;
 
 public interface IPortalClientAPI {
 
-	Response getInstalledBunInfoByUUID(String uuid);
+	Response getInstalledVxFInfoByUUID(String uuid);
 
-	Response getInstalledBuns();
+	Response getInstalledVxFs();
 
-	Response installBun(InstalledBun reqInstallBun);
+	Response installVxF(InstalledVxF reqInstallVxF);
 
-	Response stopBun(String uuid);
+	Response stopVxF(String uuid);
 
-	Response startBun(String uuid);
+	Response startVxF(String uuid);
 
-	Response uninstallBun(String uuid);
+	Response uninstallVxF(String uuid);
 
-	Response reConfigureBun(String uuid);
+	Response reConfigureVxF(String uuid);
 
 }

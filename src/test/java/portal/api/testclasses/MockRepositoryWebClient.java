@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.IRepositoryWebClient;
 
 /**
@@ -52,7 +52,7 @@ public class MockRepositoryWebClient implements IRepositoryWebClient {
 	}
 
 	@Override
-	public BunMetadata fetchMetadata(String uuid, String url) {
+	public VxFMetadata fetchMetadata(String uuid, String url) {
 		logger.info("TEST fetchMetadata from: " + url + " , for uuid=" + uuid);
 
 		try {
@@ -61,15 +61,15 @@ public class MockRepositoryWebClient implements IRepositoryWebClient {
 			e.printStackTrace();
 		}
 
-		BunMetadata sm = null;
+		VxFMetadata sm = null;
 		if (mockRepositoryBehavior != MockRepositoryBehavior.RETURN_NULLMETADATA) {
-			sm = new BunMetadata();
+			sm = new VxFMetadata();
 			sm.setUuid(uuid);
 			sm.setName("TemporaryServiceFromMockClass");
-			if (url.contains("EBUNID") )
-				sm.setPackageLocation("/files/examplebun.tar.gz");
-			else if (url.contains("EBUNERR"))
-				sm.setPackageLocation("/files/examplebunErrInstall.tar.gz");
+			if (url.contains("EVXFID") )
+				sm.setPackageLocation("/files/examplevxf.tar.gz");
+			else if (url.contains("EVXFERR"))
+				sm.setPackageLocation("/files/examplevxfErrInstall.tar.gz");
 			
 			sm.setVersion("1.0.0.test");
 		}
@@ -96,7 +96,7 @@ public class MockRepositoryWebClient implements IRepositoryWebClient {
 			File sourceFile = new File(res.getFile());
 
 			Path tempDir = Files.createTempDirectory("portal");
-			File destFile = new File(tempDir+"/"+uuid+"/bun.tar.gz" );
+			File destFile = new File(tempDir+"/"+uuid+"/vxf.tar.gz" );
 			Files.createDirectory( Paths.get( tempDir+"/"+uuid ) );
 			Path targetPath = destFile.toPath();
 

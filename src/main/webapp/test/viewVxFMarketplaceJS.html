@@ -1,0 +1,46 @@
+<div class="page-header">
+	<h1>
+		VxF Marketplace <br> <small>View VxFs from the Portal
+			marketplace, so that you can install them into your resource</small>
+	</h1>
+</div>
+
+<div>
+
+	<table class='table table-bordered table-condensed '>
+		<colgroup span="9"></colgroup>
+		<tbody>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Status</th>
+				<th nowrap>Version <br> (Installed Version)
+				</th>
+				<th>shortDescription</th>
+				<th>longDescription</th>
+				<th>Image</th>
+				<th>owner</th>
+				<th>action</th>
+			</tr>
+			<tr ng-repeat="vxf in vxfs">
+			
+				<td>{{ vxf.id }}</td>
+				<td>{{ vxf.name }}</td>
+				<td><p><span class="label label-default" id="{{'vxfStatusLabel'+ vxf.id }}">...</span></p>
+	            	<button type="button" 
+	            		id="{{ 'uninstBtn'+vxf.id }}" 
+	            		style="display:none;" 
+	            		class=" btn btn-primary" 
+	            		NEXTACTION="UNINSTALL" 
+	            		onClick="execInstallButton({{ vxf.id}}, '{{vxf.uuid}}', true);" >Uninstall</button>
+            	 	</td>
+            	<td nowrap>{{ vxf.version }}<br><div id="installedVersion{{vxf.id}}"></div></td> 
+	            <td>{{vxf.shortDescription }}</td> 
+	            <td>{{vxf.longDescription }}</td>
+	            <td><img width="80px" src="{{vxf.iconsrc}}"></td>
+	            <td nowrap >{{ vxf.owner.username }}<br>({{vxf.owner.organization}}</td> 
+			</tr>
+		</tbody>
+	</table>
+
+</div>

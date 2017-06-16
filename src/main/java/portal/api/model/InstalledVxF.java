@@ -30,8 +30,8 @@ import org.apache.openjpa.persistence.Factory;
 import org.apache.openjpa.persistence.Type;
 
 
-@Entity(name = "InstalledBun")
-public class InstalledBun {
+@Entity(name = "InstalledVxF")
+public class InstalledVxF {
 	
 
 
@@ -48,17 +48,17 @@ public class InstalledBun {
 	@Basic()
 	private String name;
 	@Basic()
-	private InstalledBunStatus status = InstalledBunStatus.INIT;
+	private InstalledVxFStatus status = InstalledVxFStatus.INIT;
 	@Basic()
 	private String packageLocalPath;
 	@Basic()
 	private String packageURL;
 	
-	public InstalledBun() {
+	public InstalledVxF() {
 		super();
 	}
 	
-	public InstalledBun(String uuid, String repoUrl) {
+	public InstalledVxF(String uuid, String repoUrl) {
 		super();
 		this.uuid = uuid;
 		this.repoUrl = repoUrl;
@@ -94,11 +94,11 @@ public class InstalledBun {
 		this.name = name;
 	}
 
-	public InstalledBunStatus getStatus() {
+	public InstalledVxFStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(InstalledBunStatus status) {
+	public void setStatus(InstalledVxFStatus status) {
 		this.status = status;
 	}
 

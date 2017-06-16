@@ -103,10 +103,10 @@ public class Category {
 		return c;
 	}
 	
-	public int getBunscount() {
+	public int getVxFscount() {
 		int c = 0;
 		for (int i = 0; i < this.products.size(); i++) {
-			if (this.products.get(i) instanceof BunMetadata)
+			if (this.products.get(i) instanceof VxFMetadata)
 				c++;
 		}
 		return c;

@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import portal.api.model.IPortalClientAPI;
-import portal.api.model.InstalledBun;
+import portal.api.model.InstalledVxF;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -71,9 +71,9 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 
 	// just to get an example json!
 	@GET
-	@Path("/ibuns/example")
+	@Path("/ivxfs/example")
 	@Produces("application/json")
-	public Response getJsonInstalledBunExample(@Context HttpHeaders headers, @Context  HttpServletRequest request) {
+	public Response getJsonInstalledVxFExample(@Context HttpHeaders headers, @Context  HttpServletRequest request) {
 		
 		
 		String userAgent = headers.getRequestHeader("user-agent").get(0);
@@ -91,11 +91,11 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 
 		URI endpointUrl = uri.getBaseUri();
 
-		InstalledBun installedBun = new InstalledBun(("12cab8b8-668b-4c75-99a9-39b24ed3d8be"), endpointUrl
-				+ "repo/ibuns/12cab8b8-668b-4c75-99a9-39b24ed3d8be");
-		installedBun.setName("ServiceName");
+		InstalledVxF installedVxF = new InstalledVxF(("12cab8b8-668b-4c75-99a9-39b24ed3d8be"), endpointUrl
+				+ "repo/ivxfs/12cab8b8-668b-4c75-99a9-39b24ed3d8be");
+		installedVxF.setName("ServiceName");
 
-		ResponseBuilder response = Response.ok(installedBun);
+		ResponseBuilder response = Response.ok(installedVxF);
 		
 		CacheControl cacheControl = new CacheControl();
 		cacheControl.setNoCache(true);
@@ -105,51 +105,51 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	}
 
 	@GET
-	@Path("/ibuns/{uuid}")
+	@Path("/ivxfs/{uuid}")
 	@Produces("application/json")
-	public Response getInstalledBunInfoByUUID(@PathParam("uuid") String uuid) {
+	public Response getInstalledVxFInfoByUUID(@PathParam("uuid") String uuid) {
 
 		logger.info("Received GET for uuid: " + uuid);
 
-		InstalledBun installedBun = portalInstallationMgmtRef.getBun(uuid);
+		InstalledVxF installedVxF = portalInstallationMgmtRef.getVxF(uuid);
 
-		if (installedBun != null) {
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in portal client registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in portal client registry");
 			throw new WebApplicationException(builder.build());
 		}
 
 	}
 
 	@GET
-	@Path("/ibuns/")
+	@Path("/ivxfs/")
 	@Produces("application/json")
-	public Response getInstalledBuns() {
+	public Response getInstalledVxFs() {
 
 		// for (int i = 0; i < 20; i++) { //add 20 more random
 		// portalServiceRef.installService( UUID.randomUUID() ,
 		// "www.repoexample.comRANDOM", "1.1.1RANDOM"+i);
 		// }
-		return Response.ok().entity(portalInstallationMgmtRef.getManagedInstalledBuns().values()).build();
+		return Response.ok().entity(portalInstallationMgmtRef.getManagedInstalledVxFs().values()).build();
 
 	}
 
 	@POST
-	@Path("/ibuns/")
+	@Path("/ivxfs/")
 	@Produces("application/json")
-	public Response installBun(InstalledBun reqInstallBun) {
+	public Response installVxF(InstalledVxF reqInstallVxF) {
 
-		logger.info("Received POST for uuid: " + reqInstallBun.getUuid());
+		logger.info("Received POST for uuid: " + reqInstallVxF.getUuid());
 
-		InstalledBun installedBun = portalInstallationMgmtRef.installBunAndStart(reqInstallBun.getUuid(), reqInstallBun.getRepoUrl());
+		InstalledVxF installedVxF = portalInstallationMgmtRef.installVxFAndStart(reqInstallVxF.getUuid(), reqInstallVxF.getRepoUrl());
 
-		if (installedBun != null) {
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Bun with uuid=" + reqInstallBun.getUuid() + " cannot be installed");
+			builder.entity("Requested VxF with uuid=" + reqInstallVxF.getUuid() + " cannot be installed");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -158,77 +158,77 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	
 
 	@DELETE
-	@Path("/ibuns/{uuid}")
+	@Path("/ivxfs/{uuid}")
 	@Produces("application/json")
-	public Response uninstallBun(@PathParam("uuid") String uuid) {
+	public Response uninstallVxF(@PathParam("uuid") String uuid) {
 
 		logger.info("Received @DELETE for uuid: " + uuid);
 
-		InstalledBun installedBun = portalInstallationMgmtRef.getBun(uuid);
+		InstalledVxF installedVxF = portalInstallationMgmtRef.getVxF(uuid);
 
-		if (installedBun != null) {
-			portalInstallationMgmtRef.uninstallBun(uuid);
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			portalInstallationMgmtRef.uninstallVxF(uuid);
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in portal client registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in portal client registry");
 			throw new WebApplicationException(builder.build());
 		}
 
 	}
 
 	@PUT
-	@Path("/ibuns/{uuid}/stop")
+	@Path("/ivxfs/{uuid}/stop")
 	@Produces("application/json")
-	public Response stopBun(@PathParam("uuid") String uuid) {
+	public Response stopVxF(@PathParam("uuid") String uuid) {
 
 		logger.info("Received @PUT (stop) for uuid: " + uuid);
 
-		InstalledBun installedBun = portalInstallationMgmtRef.getBun(uuid);
+		InstalledVxF installedVxF = portalInstallationMgmtRef.getVxF(uuid);
 
-		if (installedBun != null) {
-			portalInstallationMgmtRef.stopBun(uuid);
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			portalInstallationMgmtRef.stopVxF(uuid);
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in portal client registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in portal client registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
 
 	@PUT
-	@Path("/ibuns/{uuid}/start")
+	@Path("/ivxfs/{uuid}/start")
 	@Produces("application/json")
-	public Response startBun(@PathParam("uuid") String uuid) {
+	public Response startVxF(@PathParam("uuid") String uuid) {
 
 		logger.info("Received  @PUT (start) for uuid: " + uuid);
 
-		InstalledBun installedBun = portalInstallationMgmtRef.getBun(uuid);
+		InstalledVxF installedVxF = portalInstallationMgmtRef.getVxF(uuid);
 
-		if (installedBun != null) {
-			portalInstallationMgmtRef.startBun(uuid);
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			portalInstallationMgmtRef.startVxF(uuid);
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in portal client registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in portal client registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
 
 	@PUT
-	@Path("/ibuns/{uuid}/reconfigure")
+	@Path("/ivxfs/{uuid}/reconfigure")
 	@Produces("application/json")
-	public Response reConfigureBun(String uuid) {
+	public Response reConfigureVxF(String uuid) {
 		logger.info("Received  @PUT (reconfigure) for uuid: " + uuid);
 
-		InstalledBun installedBun = portalInstallationMgmtRef.getBun(uuid);
+		InstalledVxF installedVxF = portalInstallationMgmtRef.getVxF(uuid);
 
-		if (installedBun != null) {
-			portalInstallationMgmtRef.configureBun(uuid);
-			return Response.ok().entity(installedBun).build();
+		if (installedVxF != null) {
+			portalInstallationMgmtRef.configureVxF(uuid);
+			return Response.ok().entity(installedVxF).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Installed bun with uuid=" + uuid + " not found in portal client registry");
+			builder.entity("Installed vxf with uuid=" + uuid + " not found in portal client registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -242,7 +242,7 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	@Produces("application/json")
 	public Response getInstalledFIREAdapters() {
 
-		return getInstalledBuns();
+		return getInstalledVxFs();
 
 	}
 	
@@ -250,7 +250,7 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	@Path("/fireadapters/{uuid}")
 	@Produces("application/json")
 	public Response getInstalledFIREAdapterInfoByUUID(@PathParam("uuid") String uuid) {
-		return getInstalledBunInfoByUUID(uuid);
+		return getInstalledVxFInfoByUUID(uuid);
 	}
 
 	
@@ -258,8 +258,8 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	@POST
 	@Path("/fireadapters/")
 	@Produces("application/json")
-	public Response installfireadapter(InstalledBun reqInstallBun) {
-		return installBun(reqInstallBun);
+	public Response installfireadapter(InstalledVxF reqInstallVxF) {
+		return installVxF(reqInstallVxF);
 	}
 	
 	
@@ -269,21 +269,21 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	@Produces("application/json")
 	public Response uninstallFireadapter(@PathParam("uuid") String uuid) {
 		
-		return uninstallBun(uuid);
+		return uninstallVxF(uuid);
 	}
 
 	@PUT
 	@Path("/fireadapters/{uuid}/stop")
 	@Produces("application/json")
 	public Response stopfireadapter(@PathParam("uuid") String uuid) {
-		return stopBun(uuid);
+		return stopVxF(uuid);
 	}
 
 	@PUT
 	@Path("/fireadapters/{uuid}/start")
 	@Produces("application/json")
 	public Response startFireadapter(@PathParam("uuid") String uuid) {
-		return startBun(uuid);
+		return startVxF(uuid);
 	
 	}
 
@@ -291,7 +291,7 @@ public class PortalClientAPIImpl implements IPortalClientAPI {
 	@Path("/fireadapters/{uuid}/reconfigure")
 	@Produces("application/json")
 	public Response reConfigureFireadapter(String uuid) {
-		return reConfigureBun(uuid);
+		return reConfigureVxF(uuid);
 	}
 
 

@@ -38,7 +38,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
 
-import portal.api.model.BunMetadata;
+import portal.api.model.VxFMetadata;
 import portal.api.model.IRepositoryWebClient;
 
 public class RepositoryWebClient implements IRepositoryWebClient {
@@ -47,7 +47,7 @@ public class RepositoryWebClient implements IRepositoryWebClient {
 			.getLog(RepositoryWebClient.class.getName());
 
 	@Override
-	public BunMetadata fetchMetadata(String uuid, String url) {
+	public VxFMetadata fetchMetadata(String uuid, String url) {
 		logger.info("fetchMetadata from: " + url + " , for uuid=" + uuid);
 
 		try {
@@ -58,7 +58,7 @@ public class RepositoryWebClient implements IRepositoryWebClient {
 			if ( r.getStatus() == Response.Status.OK.getStatusCode() ){
 				MappingJsonFactory factory = new MappingJsonFactory();
 				JsonParser parser  = factory.createJsonParser((InputStream) r.getEntity());
-				BunMetadata output = parser.readValueAs(BunMetadata.class);
+				VxFMetadata output = parser.readValueAs(VxFMetadata.class);
 				return output;
 			}
 			
@@ -89,8 +89,8 @@ public class RepositoryWebClient implements IRepositoryWebClient {
 
 			
 			//Path tempDir = Files.createTempDirectory("portal");
-			String tempDir = System.getProperty("user.home") + File.separator +".portal"+File.separator+"extractedbuns";
-			File destFile = new File(tempDir+File.separator+uuid+File.separator+"bun.tar.gz" );
+			String tempDir = System.getProperty("user.home") + File.separator +".portal"+File.separator+"extractedvxfs";
+			File destFile = new File(tempDir+File.separator+uuid+File.separator+"vxf.tar.gz" );
 			Files.createDirectories( Paths.get( tempDir+File.separator+uuid ) );
 			Path targetPath = destFile.toPath();
             OutputStream output = new FileOutputStream(targetPath.toFile());			

@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ctranoris/eu.5ginfire.portal.api.svg?branch=master)](https://travis-ci.org/ctranoris/eu.5ginfire.portal.api)
 [[![Documentation Status](https://readthedocs.org/projects/eu5ginfireportalapi/badge/?version=latest)](http://eu5ginfireportalapi.readthedocs.io/en/latest/?badge=latest)
-[![Coverage Status](https://coveralls.io/repos/ctranoris/eu.5ginfire.portal.api/badge.png)](https://coveralls.io/r/ctranoris/eu.5ginfire.portal.api)
+[![Coverage Status](https://coveralls.io/repos/github/ctranoris/eu.5ginfire.portal.api/badge.svg?branch=master)](https://coveralls.io/github/ctranoris/eu.5ginfire.portal.api?branch=master)
 
 eu.5ginfire.portal.api
 ==========

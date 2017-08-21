@@ -17,5 +17,6 @@ Contact
 
 For further information on collaboration, support or alternative licensing, please contact:
 
-* Website: http://nam.ece.upatras.gr
-* Email: tranoris@ece.upatras.gr
+* Website: https://5ginfire.eu/ 
+* Email: contact@5GinFIRE.eu
+

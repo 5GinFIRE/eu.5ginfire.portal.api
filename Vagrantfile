@@ -23,7 +23,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.network :forwarded_port, guest: 80, host: 80, auto_correct:true
   #config.vm.network :forwarded_port, guest: 443, host: 443, auto_correct:true
   config.vm.network :forwarded_port, guest: 8443, host: 8443, auto_correct:true
-  config.vm.network :forwarded_port, guest: 80, host: 8080, auto_correct:true
+  config.vm.network :forwarded_port, guest: 80, host: 13080, auto_correct:true
   config.vm.network :forwarded_port, guest: 13000, host: 13000, auto_correct:true
   config.vm.network :forwarded_port, guest: 13001, host: 13001, auto_correct:true
 

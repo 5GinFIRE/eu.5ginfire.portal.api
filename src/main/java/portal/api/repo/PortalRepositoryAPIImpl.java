@@ -1398,7 +1398,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("accessToken getExpiresIn= " + accessToken.getExpiresIn());
 
 			Tenant t = FIWARECloudAccess.getFirstTenant(accessToken.getTokenKey());
-			FIWAREUser fu = FIWAREUtils.getFIWAREUser(authHeader, accessToken);
+			FIWAREUser fu = FIWAREUtils.getFIWAREUser(authHeader, accessToken); //get user information since we are authorized via oauth
 			fu.setxOAuth2Token(accessToken.getTokenKey());
 			fu.setTenantName(t.getName());
 			fu.setTenantId(t.getId());

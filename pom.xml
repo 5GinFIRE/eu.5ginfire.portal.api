@@ -13,7 +13,7 @@
 		<jackson.version>1.9.4</jackson.version>
 		<maven-license-plugin.version>1.2.5</maven-license-plugin.version>
 		<cxf.version>3.0.0</cxf.version>
-
+		<httpclient.version>4.2.1</httpclient.version>
 
 		<!-- repositories for distribution -->
 		<!-- snapshots -->
@@ -49,8 +49,18 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-client</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
 			<version>${cxf.version}</version>
 		</dependency>
 		<dependency>
@@ -177,7 +187,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.33</version>
 		</dependency>
-		
+
 		<!-- FI-WARE cloud access related -->
 		<dependency>
 			<groupId>com.woorea</groupId>
@@ -203,9 +213,9 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>2.6</version>
-			</dependency>
-					
-			<dependency>
+		</dependency>
+
+		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
 			<version>2.6</version>
@@ -217,6 +227,11 @@
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
 			<version>1.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.5ginFIRE.riftioyangschema2java</groupId>
+			<artifactId>eu.5ginFIRE.riftioyangschema2java</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -481,7 +496,7 @@
 							<configuration>
 								<!-- Uncomment this to run it with jetty:run and secure port 8443 
 									<jettyXml>${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml</jettyXml> -->
-	
+
 								<httpConnector>
 									<port>13000</port>
 								</httpConnector>

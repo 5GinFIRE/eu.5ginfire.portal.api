@@ -27,8 +27,7 @@ http://localhost:13000/5ginfireportal/services/api/repo/vxfs
 or 
 http://localhost:13000/5ginfireportal/services/api/repo/admin/users (needs authentication first to http://localhost:13000/5ginfireportal)
 
-to access the web project go to 
-The admin user has admin/changeme.
+The admin user is admin, password = changeme.
 
 Jetty can also serve the web project under http://localhost:13000/mp to do this, edit the pom.xml and
 edit the line

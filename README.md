@@ -32,6 +32,7 @@ The admin user is admin, password = changeme.
 Jetty can also serve the web project under http://localhost:13000/mp . See the pom.xml at the line
 `<resourceBase>${project.basedir}/../eu.5ginfire.portal.web/src</resourceBase>`
 
+login to web with same credentials. When logged in you can add some categories and the some test artefacts (e.g. users, VxF etc)
 
 Licenses
 --------

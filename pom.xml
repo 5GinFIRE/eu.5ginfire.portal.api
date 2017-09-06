@@ -526,16 +526,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 											<directoriesListed>true</directoriesListed>
 										</handler>
 									</contextHandler>
-									<contextHandler
-										implementation="org.eclipse.jetty.server.handler.ContextHandler">
-
-										<contextPath>/forgestore</contextPath>
-										<resourceBase>/home/ubuntu/ws/eu.5ginfire.portal.web/src</resourceBase>
-										<handler implementation="org.eclipse.jetty.server.handler.ResourceHandler">
-											<cacheControl>no-cache</cacheControl>
-											<directoriesListed>true</directoriesListed>
-										</handler>
-									</contextHandler>
+									
 								</contextHandlers>
 
 							</configuration>

@@ -23,6 +23,7 @@ import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
+import portal.api.osm.client.OSMClient;
 import portal.api.model.Category;
 import portal.api.model.DeployArtifact;
 import portal.api.model.DeployContainer;
@@ -36,6 +37,7 @@ import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserSession;
 import portal.api.util.EmailUtil;
+import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -723,6 +725,24 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (vxf != null) {
 			return Response.ok().entity(vxf).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
+	@GET
+	@Path("/osmvnfds/{vxfid}")
+	@Produces("application/json")
+	public Response getOSMVNFMetadataByID(@PathParam("vxfid") String vxfid) {
+		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
+		
+		Vnfd vnfd = OSMClient.getVNFDbyID( vxfid ) ; 
+
+		if (vnfd != null) {
+			return Response.ok().entity(vnfd).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("vxf with id=" + vxfid + " not found in portal registry");

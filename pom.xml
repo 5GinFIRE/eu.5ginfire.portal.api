@@ -7,7 +7,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>eu.5ginfire.portal.api</name>
-	<description>eu.5ginfire.portal.api is a simple CXF JAX-RS webapp service using spring configuration</description>
+	<description>eu.5ginfire.portal.api is a simple CXF JAX-RS webapp service using spring configuration
+To properly run it make sure that in your environment the artifact eu.5ginFIRE.riftioyangschema2java is already installed with </description>
 
 	<properties>
 		<jackson.version>1.9.4</jackson.version>
@@ -485,6 +486,7 @@
 				and access to http://127.0.0.1:13000/jaxrs-srvtest/hello/echo/SierraTangoNevadaxx 
 				For jetty integration test: mvn clean -Pjetty.integration verify -->
 			<id>jetty.integration</id>
+
 			<build>
 				<pluginManagement>
 					<plugins>

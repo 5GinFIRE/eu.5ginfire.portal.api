@@ -56,7 +56,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder "./", "/home/ubuntu/portal", disabled: true
-  config.vm.synced_folder "C:/Users/ctranoris/git/eu.5ginfire.portal.api", "/home/ubuntu/ws"
+  config.vm.synced_folder "C:/Users/ctranoris/git", "/home/ubuntu/ws"
   config.vm.synced_folder "C:/Users/ctranoris/git/eu.5ginfire.portal.web/src", "/home/ubuntu/web"
   config.vm.synced_folder "D:/programs/apache-cxf-3.0.0-src/apache-cxf-3.0.0-src/distribution/src/main/release/samples", "/home/ubuntu/cxfsamples"
 

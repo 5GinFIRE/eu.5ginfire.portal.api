@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>portal.api</artifactId>
+	<artifactId>gr.upatras.ece.nam.portal</artifactId>
 	<packaging>war</packaging>
 	<name>Portal</name>
 	<description>Portal is a simple CXF JAX-RS webapp service using spring configuration</description>
 
 	<parent>
-		<groupId>portal.api</groupId>
-		<artifactId>portal.api.project</artifactId>
+		<groupId>gr.upatras.ece.nam.portal</groupId>
+		<artifactId>gr.upatras.ece.nam.portal.project</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../portal.api.project/pom.xml</relativePath>
+		<relativePath>../gr.upatras.ece.nam.portal.project/pom.xml</relativePath>
 	</parent>
 
 
@@ -181,8 +181,8 @@
 				<artifactId>openjpa-maven-plugin</artifactId>
 				<version>${openjpa.version}</version>
 				<configuration>
-					<includes>portal.api.model</includes>
-					<excludes>**/portal.api/*.class</excludes>
+					<includes>gr.upatras.ece.nam.portal.model</includes>
+					<excludes>**/gr.upatras.ece.nam.portal/*.class</excludes>
 					<addDefaultConstructor>true</addDefaultConstructor>
 					<enforcePropertyRestrictions>true</enforcePropertyRestrictions>
 
@@ -562,7 +562,7 @@
 							</configuration>
 							<deployables>
 								<deployable>
-									<location>../eu.5ginfire.portal.api-0.0.1-SNAPSHOT.war</location>
+									<location>../gr.upatras.ece.nam.portal-0.0.1-SNAPSHOT.war</location>
 									<type>war</type>
 									<properties>
 										<context>/portal</context>

@@ -29,10 +29,9 @@ http://localhost:13000/5ginfireportal/services/api/repo/admin/users (needs authe
 
 The admin user is admin, password = changeme.
 
-Jetty can also serve the web project under http://localhost:13000/mp to do this, edit the pom.xml and
-edit the line
-`<resourceBase>/home/ubuntu/ws/eu.5ginfire.portal.web/src</resourceBase>`
-the run again the api project to serve also the web
+Jetty can also serve the web project under http://localhost:13000/mp . See the pom.xml at the line
+`<resourceBase>${project.basedir}/../eu.5ginfire.portal.web/src</resourceBase>`
+
 
 Licenses
 --------

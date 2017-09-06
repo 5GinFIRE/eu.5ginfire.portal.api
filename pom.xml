@@ -520,7 +520,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 									<contextHandler
 										implementation="org.eclipse.jetty.server.handler.ContextHandler">
 										<contextPath>/mp</contextPath>
-										<resourceBase>/home/ubuntu/ws/eu.5ginfire.portal.web/src</resourceBase>
+										<resourceBase>${project.basedir}/../eu.5ginfire.portal.web/src</resourceBase>
 										<handler implementation="org.eclipse.jetty.server.handler.ResourceHandler">
 											<cacheControl>no-cache</cacheControl>
 											<directoriesListed>true</directoriesListed>

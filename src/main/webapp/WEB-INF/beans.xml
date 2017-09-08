@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:cxf="http://cxf.apache.org/core"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:cxf="http://cxf.apache.org/core" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd ">
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
@@ -25,13 +23,21 @@
 		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
 
+	<!-- CXF Swagger2Feature -->
+	<bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
+		<!-- customize some of the properties -->
+		<property name="basePath" value="/api/swaggerSpec" />
+		<property name="contact" value="tranoris@ece.upatras.gr" />
+		<property name="scanAllResources" value="true" />		
+	</bean>
+
 	<jaxrs:server id="services" address="/api/">
 		<jaxrs:serviceBeans>
 
-			<bean class="portal.api.repo.PortalRepositoryAPIImpl" >
+			<bean class="portal.api.repo.PortalRepositoryAPIImpl">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 				<property name="oAuthClientManagerRef" ref="oAuthClientManagerBean" />
-				<!-- property name="fiwareService" ref="fiwareServiceClient"  -->
+				<!-- property name="fiwareService" ref="fiwareServiceClient" -->
 
 			</bean>
 
@@ -47,121 +53,114 @@
 		<jaxrs:inInterceptors>
 			<!-- <ref bean="basicAuthValidator"/> -->
 		</jaxrs:inInterceptors>
-
+		<jaxrs:features>
+			<ref bean="swagger2Feature" />
+		</jaxrs:features>
 
 	</jaxrs:server>
 
 	<bean id="headersOutInterceptor" class="portal.api.util.HeadersOutInterceptor" />
 
-	<!-- We are adding the interceptors to the bus as we will have only one  endpoint/service/bus. -->
+	<!-- We are adding the interceptors to the bus as we will have only one 
+		endpoint/service/bus. -->
 
 	<cxf:bus>
 		<cxf:outInterceptors>
 			<ref bean="headersOutInterceptor" />
 		</cxf:outInterceptors>
-		
+
 	</cxf:bus>
-	
-	
+
+
 	<!-- Apapche Shiro -->
- 	
-	<!-- 
-	<bean class="portal.api.util.ShiroUTValidator" id="utValidator">
- 		<property name="securityManager" ref="securityManagerBean"/>
-	</bean>
-	<bean id="basicAuthValidator" class="portal.api.util.ShiroBasicAuthInterceptor">
-		<property name="validator" ref="utValidator" />
-	</bean>
-	 -->
+
+	<!-- <bean class="portal.api.util.ShiroUTValidator" id="utValidator"> <property 
+		name="securityManager" ref="securityManagerBean"/> </bean> <bean id="basicAuthValidator" 
+		class="portal.api.util.ShiroBasicAuthInterceptor"> <property name="validator" 
+		ref="utValidator" /> </bean> -->
 	<bean class="portal.api.util.AjaxUserFilter" id="ajaxUserFilter">
 	</bean>
-	
+
 	<bean id="securityManagerBean" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-	    <!-- Single realm app.  If you have multiple realms, use the 'realms' property instead. -->
-	    <property name="realm" ref="myRealm"/>
-	    <!-- By default the servlet container sessions will be used.  Uncomment this line
-	         to use shiro's native sessions (see the JavaDoc for more): -->
-	    <!-- <property name="sessionMode" value="native"/> -->
-	    <property name="sessionManager">
-		    <bean class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
-		    <!-- <property name="sessionIdCookie" ref="cookiePORTALref"></property>  -->
-		    </bean>
-		    
-		  </property>
+		<!-- Single realm app. If you have multiple realms, use the 'realms' property 
+			instead. -->
+		<property name="realm" ref="myRealm" />
+		<!-- By default the servlet container sessions will be used. Uncomment 
+			this line to use shiro's native sessions (see the JavaDoc for more): -->
+		<!-- <property name="sessionMode" value="native"/> -->
+		<property name="sessionManager">
+			<bean class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+				<!-- <property name="sessionIdCookie" ref="cookiePORTALref"></property> -->
+			</bean>
+
+		</property>
 	</bean>
-	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
-	
-	<!-- Define the Shiro Realm implementation you want to use to connect to your back-end -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- Define the Shiro Realm implementation you want to use to connect to 
+		your back-end -->
 	<!-- security datasource: -->
 	<bean id="myRealm" class="portal.api.util.ShiroUTAuthorizingRealm">
-				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
+		<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 	</bean>
-	
-	<!-- 
-	<bean id ="cookiePORTALref" class="org.apache.shiro.web.servlet.SimpleCookie">
-		<property name="name" value="PORTALCOOKIEMAN"></property>
-		<property name="path" value="/"></property>
-	</bean>
-	 -->
-	 
+
+	<!-- <bean id ="cookiePORTALref" class="org.apache.shiro.web.servlet.SimpleCookie"> 
+		<property name="name" value="PORTALCOOKIEMAN"></property> <property name="path" 
+		value="/"></property> </bean> -->
+
 	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
-        <property name="securityManager" ref="securityManagerBean"/>
-        <property name="loginUrl" value="/login.jsp"/>
-        <property name="successUrl" value="/index.html"/>
-        <property name="unauthorizedUrl" value=""/>
-        <!-- The 'filters' property is not necessary since any declared javax.servlet.Filter bean
-             defined will be automatically acquired and available via its beanName in chain
-             definitions, but you can perform overrides or parent/child consolidated configuration
-             here if you like: -->
-       <property name="filters">
-        <map>
-            <entry key="userfilter" value-ref="ajaxUserFilter" />
-        </map>
-    	</property>
-        <property name="filterChainDefinitions">
-            <value>
-                # everything else requires authentication:
-                /index.html = anon
-                /mpui/** = anon
-                /viewVxFMarketplace.html = anon
-                /viewInstalledVxFs.html = anon
-                /services/api/client/** = anon, rest
-                /services/api/repo/vxfs/** = anon, rest
-                /services/api/repo/packages/** = anon, rest
-                /services/api/repo/images/** = anon, rest
-                /services/api/repo/sessions/** = anon, rest
-                /services/api/repo/oauth2/** = anon, rest
-                /services/api/repo/categories/** = anon, rest
-                /services/api/repo/experiments/** = anon, rest
-                /services/api/repo/register/** = anon, rest
-                /services/api/repo/registerresource/** = anon, rest                
-                /services/api/repo/fiware/** = userfilter, rest
-                /services/api/** = userfilter, rest
-                /admin/logout = logout
-                /admin/viewUsers.html = authc, roles[ROLE_PORTALADMIN]         
-                /admin/** = authc
-                /** = authc
-                
-            </value>
-        </property>
-    </bean>
-	
+		<property name="securityManager" ref="securityManagerBean" />
+		<property name="loginUrl" value="/login.jsp" />
+		<property name="successUrl" value="/index.html" />
+		<property name="unauthorizedUrl" value="" />
+		<!-- The 'filters' property is not necessary since any declared javax.servlet.Filter 
+			bean defined will be automatically acquired and available via its beanName 
+			in chain definitions, but you can perform overrides or parent/child consolidated 
+			configuration here if you like: -->
+		<property name="filters">
+			<map>
+				<entry key="userfilter" value-ref="ajaxUserFilter" />
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				# everything else requires authentication:
+				/index.html = anon
+				/mpui/** = anon
+				/viewVxFMarketplace.html = anon
+				/viewInstalledVxFs.html = anon
+				/services/api/client/** = anon, rest
+				/services/api/repo/vxfs/** = anon, rest
+				/services/api/repo/packages/** = anon, rest
+				/services/api/repo/images/** = anon, rest
+				/services/api/repo/sessions/** = anon, rest
+				/services/api/repo/oauth2/** = anon, rest
+				/services/api/repo/categories/** = anon, rest
+				/services/api/repo/experiments/** = anon, rest
+				/services/api/repo/register/** = anon, rest
+				/services/api/repo/registerresource/** = anon, rest
+				/services/api/repo/fiware/** = userfilter, rest
+				/services/api/** = userfilter, rest
+				/admin/logout = logout
+				/admin/viewUsers.html = authc, roles[ROLE_PORTALADMIN]
+				/admin/** = authc
+				/** = authc
+
+			</value>
+		</property>
+	</bean>
+
 
 	<!-- JPA Beans configuration -->
 
 	<bean name="portalJpaControllerRef" class="portal.api.impl.PortalJpaController">
 	</bean>
 
-<!-- 
-	<bean id="data_source_h2"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="org.h2.Driver" />
-		<property name="url"
-			value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE" />
-		<property name="username" value="bro4xipidb" />
-		<property name="password" value="filepwd bro4xipidb" />
-	</bean>
- -->
+	<!-- <bean id="data_source_h2" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="org.h2.Driver" /> <property name="url" 
+		value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE" /> <property 
+		name="username" value="bro4xipidb" /> <property name="password" value="filepwd 
+		bro4xipidb" /> </bean> -->
 
 
 
@@ -171,17 +170,17 @@
 		<property name="jpaVendorAdapter" ref="jpaAdapter" />
 	</bean>
 
-	<!-- MySQL bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
-		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary" />
+	<!-- MySQL bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
+		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary" 
+		/> <property name="showSql" value="false" /> <property name="database" value="MYSQL" 
+		/> <property name="generateDdl" value="true" /> </bean> -->
+	<!-- H2 -->
+	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
 		<property name="showSql" value="false" />
-		<property name="database" value="MYSQL" />
+		<property name="database" value="H2" />
 		<property name="generateDdl" value="true" />
 	</bean>
-	-->
-	<!-- H2 --> <bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
-		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" 
-		/> <property name="showSql" value="false" /> <property name="database" value="H2" 
-		/> <property name="generateDdl" value="true" /> </bean> 
 
 	<!-- <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> 
 		<property name="entityManagerFactory" ref="entityManagerFactory" /> < property 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-package portal.api.fiware;
+package portal.api.cloudOAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Servers;
 
-import portal.api.fiware.cloud.osconnector.JaxRs20Connector;
+import portal.api.cloudOAuth.cloud.osconnector.JaxRs20Connector;
 
 public class KeystoneCloudAccess {
 

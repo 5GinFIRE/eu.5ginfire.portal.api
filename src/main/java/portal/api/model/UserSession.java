@@ -15,7 +15,7 @@
 
 package portal.api.model;
 
-import portal.api.fiware.OAuthUser;
+import portal.api.cloudOAuth.OAuthUser;
 
 public class UserSession {
 

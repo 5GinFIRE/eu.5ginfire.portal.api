@@ -15,15 +15,15 @@
 
 package portal.api.repo;
 
-import portal.api.fiware.KeystoneCloudAccess;
-import portal.api.fiware.OAuthUser;
-import portal.api.fiware.OAuthUtils;
-import portal.api.fiware.OAuthClientManager;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
 import portal.api.osm.client.OSMClient;
+import portal.api.cloudOAuth.KeystoneCloudAccess;
+import portal.api.cloudOAuth.OAuthClientManager;
+import portal.api.cloudOAuth.OAuthUser;
+import portal.api.cloudOAuth.OAuthUtils;
 import portal.api.model.Category;
 import portal.api.model.DeployArtifact;
 import portal.api.model.DeployContainer;

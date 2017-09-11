@@ -342,6 +342,13 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 				</configuration>
 				<executions>
 					<execution>
+						<id>format-classes</id>
+						<goals>						
+							<goal>format</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>check-classes</id>
 						<goals>
 							<goal>check</goal>
 						</goals>

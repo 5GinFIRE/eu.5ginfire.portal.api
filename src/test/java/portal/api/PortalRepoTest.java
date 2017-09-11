@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.MANOplatform;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
@@ -63,6 +64,7 @@ public class PortalRepoTest {
 		portalJpaControllerTest.deleteAllProducts();
 		portalJpaControllerTest.deleteAllSubscribedResources();
 		portalJpaControllerTest.deleteAllCategories();
+		portalJpaControllerTest.deleteAllMANOplatforms();
 
 	}
 
@@ -143,6 +145,13 @@ public class PortalRepoTest {
 		portalJpaControllerTest.getAllUsersPrinted();
 		assertEquals(2, portalJpaControllerTest.countUsers());
 
+		MANOplatform mp = new MANOplatform();
+		mp.setName("OSM");		
+		portalJpaControllerTest.saveMANOplatform(mp);
+		assertEquals( 1, portalJpaControllerTest.countMANOplatforms());
+		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName( "OSM" );
+		assertEquals("OSM", mp1.getName());
+		
 	}
 
 	@Test

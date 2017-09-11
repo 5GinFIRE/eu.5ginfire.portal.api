@@ -211,7 +211,7 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-	<bean id="oAuthClientManagerBean" class="portal.api.cloud.OAuthClientManager">
+	<bean id="oAuthClientManagerBean" class="portal.api.cloudOAuth.OAuthClientManager">
 		<property name="authorizationURI"
 			value="http://account.lab.cloud.org/oauth2/authorize" />
 		<property name="accessTokenService" ref="atServiceClient" />

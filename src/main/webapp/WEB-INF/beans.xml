@@ -37,7 +37,7 @@
 			<bean class="portal.api.repo.PortalRepositoryAPIImpl">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 				<property name="oAuthClientManagerRef" ref="oAuthClientManagerBean" />
-				<!-- property name="fiwareService" ref="fiwareServiceClient" -->
+				<!-- property name="cloudService" ref="cloudServiceClient" -->
 
 			</bean>
 
@@ -139,7 +139,7 @@
 				/services/api/repo/experiments/** = anon, rest
 				/services/api/repo/register/** = anon, rest
 				/services/api/repo/registerresource/** = anon, rest
-				/services/api/repo/fiware/** = userfilter, rest
+				/services/api/repo/cloud/** = userfilter, rest
 				/services/api/** = userfilter, rest
 				/admin/logout = logout
 				/admin/viewUsers.html = authc, roles[ROLE_PORTALADMIN]
@@ -191,17 +191,17 @@
 
 
 
-	<!-- WebClient which portal uses to access fiware users' info -->
-	<bean id="fiwareServiceClient" class="org.apache.cxf.jaxrs.client.WebClient"
+	<!-- WebClient which portal uses to access cloud users' info -->
+	<bean id="cloudServiceClient" class="org.apache.cxf.jaxrs.client.WebClient"
 		factory-method="create">
 		<constructor-arg type="java.lang.String"
-			value="http://account.lab.fiware.org/user" />
+			value="http://account.lab.cloud.org/user" />
 	</bean>
 
 
 
 	<bean id="atServiceClientFactory" class="org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean">
-		<property name="address" value="https://account.lab.fiware.org/oauth2/token" />
+		<property name="address" value="https://account.lab.cloud.org/oauth2/token" />
 		<property name="headers">
 			<map>
 				<entry key="Accept" value="application/x-www-form-urlencoded" />
@@ -211,9 +211,9 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-	<bean id="oAuthClientManagerBean" class="portal.api.fiware.OAuthClientManager">
+	<bean id="oAuthClientManagerBean" class="portal.api.cloud.OAuthClientManager">
 		<property name="authorizationURI"
-			value="http://account.lab.fiware.org/oauth2/authorize" />
+			value="http://account.lab.cloud.org/oauth2/authorize" />
 		<property name="accessTokenService" ref="atServiceClient" />
 	</bean>
 

@@ -1376,7 +1376,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return null;
 	}
 
-	/***************************************** OAUTH2 FIWARE Related API *********************************************/
+	/***************************************** OAUTH2 cloud Related API *********************************************/
 
 	@GET
 	@Path("/oauth2/")
@@ -1396,7 +1396,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// @Produces("application/json")
 	public Response oauth2login(@QueryParam("code") String code) {
 
-		// This one is the callback URL, which is called by the FIWARE OAUTH2 service
+		// This one is the callback URL, which is called by the cloud OAUTH2 service
 		logger.info("Received authorized request token code: " + code + ". Preparing AuthorizationCodeGrant header.");
 
 		AuthorizationCodeGrant codeGrant = new AuthorizationCodeGrant(code, getCallbackURI());
@@ -1452,7 +1452,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			userSession.setPortalUser(u);
 			userSession.setPassword(roamPassword);
 			userSession.setUsername(u.getUsername());
-			userSession.setFIWAREUser(fu);
+			userSession.setCLOUDUser(fu);
 
 			Subject currentUser = SecurityUtils.getSubject();
 			if (currentUser != null) {
@@ -1495,9 +1495,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/fiware/computeendpoints")
+	@Path("/cloud/computeendpoints")
 	@Produces("application/json")
-	public Response getFIWAREServiceCatalogComputeEndpoints(@QueryParam("xauthtoken") String xauthtoken) {
+	public Response getCLOUDServiceCatalogComputeEndpoints(@QueryParam("xauthtoken") String xauthtoken) {
 
 		List<Endpoint> scatalog = KeystoneCloudAccess.getServiceCatalogEndpointsOnlyCompute(xauthtoken);
 
@@ -1505,9 +1505,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/fiware/servers")
+	@Path("/cloud/servers")
 	@Produces("application/json")
-	public Response getFIWAREServiceComputeServers(@QueryParam("endPointPublicURL") String endPointPublicURL,
+	public Response getCLOUDServiceComputeServers(@QueryParam("endPointPublicURL") String endPointPublicURL,
 			@QueryParam("cloudAccessToken") String cloudAccessToken) {
 
 		ArrayList<Server> servers = KeystoneCloudAccess.getServers(endPointPublicURL, cloudAccessToken);

@@ -23,7 +23,7 @@ public class UserSession {
 	private String username = null;
 	private String password = null;
 	private PortalUser portalUser = null;
-	private OAuthUser FIWAREUser = null;
+	private OAuthUser CLOUDUser = null;
 	
 	
 	
@@ -48,10 +48,10 @@ public class UserSession {
 	public void setPortalUser(PortalUser portalUser) {
 		this.portalUser = portalUser;
 	}
-	public OAuthUser getFIWAREUser() {
-		return FIWAREUser;
+	public OAuthUser getCLOUDUser() {
+		return CLOUDUser;
 	}
-	public void setFIWAREUser(OAuthUser fIWAREUser) {
-		FIWAREUser = fIWAREUser;
+	public void setCLOUDUser(OAuthUser cloudUser) {
+		CLOUDUser = cloudUser;
 	}
 }

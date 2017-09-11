@@ -42,7 +42,7 @@ Response
 	        "active": true,
 	        "currentSessionID": "de9d92dd-6cd0-4b60-8b43-6c1a1ce38df8"
 	    },
-	    "fiwareuser": null
+	    "clouduser": null
 	}  		
 				
 In the following examples JSESSIONID cookie value is equal to the currentSessionID (and JSESSIONID given from server). Must be present for authenticated requests

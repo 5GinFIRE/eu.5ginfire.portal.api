@@ -37,11 +37,11 @@ public class OAuthUtils {
 		// get fi-ware user info
 
 		try {
-			WebClient fiwareService = WebClient.create("https://account.lab.fiware.org/user");
-			fiwareService.replaceHeader("Authorization", authHeader);
-			fiwareService.replaceQueryParam("auth_token", accessToken.getTokenKey());
+			WebClient cloudService = WebClient.create("https://account.lab.cloud.org/user");
+			cloudService.replaceHeader("Authorization", authHeader);
+			cloudService.replaceQueryParam("auth_token", accessToken.getTokenKey());
 
-			Response r = fiwareService.accept("application/json").type("application/json").get();
+			Response r = cloudService.accept("application/json").type("application/json").get();
 			// InputStream i = (InputStream)r.getEntity();
 			// String s = IOUtils.toString(i);
 			// logger.info("===  USER response: "+ s );

@@ -29,11 +29,11 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
 
-public class FIWAREUtils {
+public class OAuthUtils {
 
-	private static final transient Log logger = LogFactory.getLog(FIWAREUtils.class.getName());
+	private static final transient Log logger = LogFactory.getLog(OAuthUtils.class.getName());
 
-	public static FIWAREUser getFIWAREUser(String authHeader, ClientAccessToken accessToken) {
+	public static OAuthUser getOAuthUser(String authHeader, ClientAccessToken accessToken) {
 		// get fi-ware user info
 
 		try {
@@ -44,13 +44,13 @@ public class FIWAREUtils {
 			Response r = fiwareService.accept("application/json").type("application/json").get();
 			// InputStream i = (InputStream)r.getEntity();
 			// String s = IOUtils.toString(i);
-			// logger.info("=== FIWARE USER response: "+ s );
+			// logger.info("===  USER response: "+ s );
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser;
 			parser = factory.createJsonParser((InputStream) r.getEntity());
-			FIWAREUser fu = parser.readValueAs(FIWAREUser.class);
+			OAuthUser fu = parser.readValueAs(OAuthUser.class);
 
-			logger.info("=== FIWARE USER response: " + fu.toString());
+			logger.info("=== USER response: " + fu.toString());
 
 			return fu;
 
@@ -66,19 +66,19 @@ public class FIWAREUtils {
 
 	}
 	
-	public static String getFIWAREUserExtendend(String FIWAREUSerNickName,  String authHeader, ClientAccessToken accessToken) {
+	public static String getOAuthUserExtendend(String CloudUSerNickName,  String authHeader, ClientAccessToken accessToken) {
 		try {
 			
 			MappingJsonFactory factory = new MappingJsonFactory();
 			
-			WebClient fiwareService = WebClient.create("https://account.lab.fiware.org/users/" + FIWAREUSerNickName + ".json");
-			fiwareService.replaceHeader("Authorization", authHeader);
-			fiwareService.replaceQueryParam("auth_token", accessToken.getTokenKey());
+			WebClient cloudService = WebClient.create("https://account.lab.org/users/" + CloudUSerNickName + ".json");
+			cloudService.replaceHeader("Authorization", authHeader);
+			cloudService.replaceQueryParam("auth_token", accessToken.getTokenKey());
 
-			Response r = fiwareService.get();
+			Response r = cloudService.get();
 			InputStream i2 = (InputStream) r.getEntity();
 			String s2 = IOUtils.toString(i2);
-			logger.info("=== FIWARE USER users response: " + s2);
+			logger.info("===  USER users response: " + s2);
 
 			return s2;
 

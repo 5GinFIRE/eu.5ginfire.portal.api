@@ -36,11 +36,11 @@ import com.woorea.openstack.nova.model.Servers;
 
 import portal.api.fiware.cloud.osconnector.JaxRs20Connector;
 
-public class FIWARECloudAccess {
+public class KeystoneCloudAccess {
 
-	private static final transient Log logger = LogFactory.getLog(FIWARECloudAccess.class.getName());
+	private static final transient Log logger = LogFactory.getLog(KeystoneCloudAccess.class.getName());
 	
-	private static String KEYSTONE_AUTHURL = "http://cloud.lab.fiware.org:4731/v2.0";
+	private static String KEYSTONE_AUTHURL = "http://cloud.lab.org:4731/v2.0";
 	
 	
 	public static JaxRs20Connector getConnector(){
@@ -97,7 +97,7 @@ public class FIWARECloudAccess {
 	 * @param xAuthToken as given from OAUTH2 authentication session
 	 * @return
 	 */
-	public static String getFIWARENOVACloudAccessToken(String xAuthToken){
+	public static String getNOVACloudAccessToken(String xAuthToken){
 		
 		Access a = getAccessModel(xAuthToken);		
 		return a.getToken().getId();
@@ -157,7 +157,7 @@ public class FIWARECloudAccess {
 
 		JaxRs20Connector connector = new JaxRs20Connector();
 		Keystone keysclient = new Keystone( KEYSTONE_AUTHURL , connector);
-		// Keystone keysclient = new Keystone( "https://cloud.lab.fiware.org/keystone/v2.0/");
+		// Keystone keysclient = new Keystone( "https://cloud.lab.org/keystone/v2.0/");
 
 		keysclient.token(token);
 

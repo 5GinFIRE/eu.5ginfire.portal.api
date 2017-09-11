@@ -44,13 +44,6 @@ public class OAuthClientManager {
 	private String authorizationServiceURI;
 	private Consumer consumer = new Consumer(DEFAULT_CLIENT_ID, DEFAULT_CLIENT_SECRET);
 
-	// public static String getFIWAREOAUTH2URL(String redirectURI){
-	// return "/oauth2/authorize?response_type=code&"+
-	// "client_id="+DEFAULT_CLIENT_ID+"&"+
-	// "state=xyz&"+
-	// "redirect_uri="+redirectURI;
-	//
-	// }
 
 	public OAuthClientManager() {
 

@@ -17,7 +17,7 @@ package portal.api.fiware;
 
 import java.util.ArrayList;
 
-public class FIWAREUser {
+public class OAuthUser {
 	
 	private String id;
 	private String actorId;

@@ -15,9 +15,9 @@
 
 package portal.api.repo;
 
-import portal.api.fiware.FIWARECloudAccess;
-import portal.api.fiware.FIWAREUser;
-import portal.api.fiware.FIWAREUtils;
+import portal.api.fiware.KeystoneCloudAccess;
+import portal.api.fiware.OAuthUser;
+import portal.api.fiware.OAuthUtils;
 import portal.api.fiware.OAuthClientManager;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
@@ -1417,12 +1417,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("accessToken getRefreshToken= " + accessToken.getRefreshToken());
 			logger.info("accessToken getExpiresIn= " + accessToken.getExpiresIn());
 
-			Tenant t = FIWARECloudAccess.getFirstTenant(accessToken.getTokenKey());
-			FIWAREUser fu = FIWAREUtils.getFIWAREUser(authHeader, accessToken); //get user information since we are authorized via oauth
+			Tenant t = KeystoneCloudAccess.getFirstTenant(accessToken.getTokenKey());
+			OAuthUser fu = OAuthUtils.getOAuthUser(authHeader, accessToken); //get user information since we are authorized via oauth
 			fu.setxOAuth2Token(accessToken.getTokenKey());
 			fu.setTenantName(t.getName());
 			fu.setTenantId(t.getId());
-			fu.setCloudToken(FIWARECloudAccess.getAccessModel(t, accessToken.getTokenKey()).getToken().getId());
+			fu.setCloudToken(KeystoneCloudAccess.getAccessModel(t, accessToken.getTokenKey()).getToken().getId());
 
 			// check if user exists in Portal database
 			PortalUser u = portalRepositoryRef.getUserByUsername(fu.getNickName());
@@ -1499,7 +1499,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getFIWAREServiceCatalogComputeEndpoints(@QueryParam("xauthtoken") String xauthtoken) {
 
-		List<Endpoint> scatalog = FIWARECloudAccess.getServiceCatalogEndpointsOnlyCompute(xauthtoken);
+		List<Endpoint> scatalog = KeystoneCloudAccess.getServiceCatalogEndpointsOnlyCompute(xauthtoken);
 
 		return Response.ok(scatalog).build();
 	}
@@ -1510,7 +1510,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getFIWAREServiceComputeServers(@QueryParam("endPointPublicURL") String endPointPublicURL,
 			@QueryParam("cloudAccessToken") String cloudAccessToken) {
 
-		ArrayList<Server> servers = FIWARECloudAccess.getServers(endPointPublicURL, cloudAccessToken);
+		ArrayList<Server> servers = KeystoneCloudAccess.getServers(endPointPublicURL, cloudAccessToken);
 
 		return Response.ok(servers).build();
 	}

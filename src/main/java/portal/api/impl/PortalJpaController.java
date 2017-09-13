@@ -32,6 +32,7 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
@@ -848,6 +849,49 @@ public class PortalJpaController {
 
 		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (MANOplatform) q.getSingleResult();
+	}
+
+	public void saveMANOprovider(MANOprovider mprovider) {
+		logger.info("Will save MANOprovider = " + mprovider.getName());
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public long countMANOproviders() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT COUNT(s) FROM MANOprovider s");
+		return (Long) q.getSingleResult();
+	}
+	
+	public MANOprovider readMANOproviderByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (MANOprovider) q.getSingleResult();
+	}
+	
+	public void deleteAllMANOproviders() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+
+		Query q = entityManager.createQuery("DELETE FROM MANOprovider");
+		q.executeUpdate();
+		entityManager.flush();
+
+		entityTransaction.commit();
+
 	}
 
 }

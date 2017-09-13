@@ -41,7 +41,18 @@ public class VxFMetadata extends Product{
 	@JoinTable()
 	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
 	
-	
+
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@JoinTable()
+	private List<MANOprovider> supportedMANOProviders = new ArrayList<MANOprovider>();
+
+	public List<MANOprovider> getSupportedMANOProviders() {
+		return supportedMANOProviders;
+	}
+
+	public void setSupportedMANOProviders(List<MANOprovider> supportedMANOProviders) {
+		this.supportedMANOProviders = supportedMANOProviders;
+	}
 
 	public boolean isPublished() {
 		return published;

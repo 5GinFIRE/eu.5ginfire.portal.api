@@ -22,6 +22,7 @@ import java.util.UUID;
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
 import portal.api.model.PackagingFormat;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
@@ -66,6 +67,7 @@ public class PortalRepoTest {
 		portalJpaControllerTest.deleteAllSubscribedResources();
 		portalJpaControllerTest.deleteAllCategories();
 		portalJpaControllerTest.deleteAllMANOplatforms();
+		portalJpaControllerTest.deleteAllMANOproviders();
 
 	}
 
@@ -78,6 +80,13 @@ public class PortalRepoTest {
 		assertEquals( 1, portalJpaControllerTest.countMANOplatforms());
 		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName( "OSM" );
 		assertEquals("OSM", mp1.getName());
+		
+		MANOprovider mprovider = new MANOprovider();
+		mprovider.setName("OSMAPIENDPOINT");		
+		portalJpaControllerTest.saveMANOprovider(mprovider);
+		assertEquals( 1, portalJpaControllerTest.countMANOproviders());
+		MANOprovider mprovider1 = portalJpaControllerTest.readMANOproviderByName( "OSMAPIENDPOINT" );
+		assertEquals("OSMAPIENDPOINT", mprovider1.getName());
 
 		portalJpaControllerTest.getAllProductsPrinted();
 		
@@ -106,7 +115,7 @@ public class PortalRepoTest {
 		bmeta.setCertifiedBy("ACERT");
 		bmeta.setPackagingFormat(PackagingFormat.TOSCA);
 		bmeta.getSupportedMANOPlatforms().add(mp1);
-		
+		bmeta.getSupportedMANOProviders().add(mprovider1);
 
 		portalJpaControllerTest.updatePortalUser(bu);
 		
@@ -153,6 +162,7 @@ public class PortalRepoTest {
 		assertEquals( "ACERT", testbm.getCertifiedBy() );
 		assertEquals( PackagingFormat.TOSCA, testbm.getPackagingFormat() );
 		assertEquals( 1, testbm.getSupportedMANOPlatforms().size() );
+		assertEquals( 1, testbm.getSupportedMANOProviders().size() );
 		
 
 		bu = new PortalUser();

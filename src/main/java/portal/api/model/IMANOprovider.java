@@ -15,8 +15,21 @@
 
 package portal.api.model;
 
-public enum PackagingFormat {
+/**
+ * @author ctranoris
+ * 
+ * Describes a MANO provider that can be accessed via an API
+ *
+ */
+public interface IMANOprovider {
 
-	OSMvTWO,
-	TOSCA
+	public String getName();
+	
+	public String getDescription();
+	
+	public MANOplatform getSupportedMANOplatform();
+	
+	public String getApiEndpoint();
+	
+	
 }

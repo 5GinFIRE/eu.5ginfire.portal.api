@@ -897,7 +897,7 @@ public class PortalJpaController {
 	public List<MANOplatform> readMANOplatforms(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM M m  ORDER BY m.id");
+		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -925,6 +925,47 @@ public class PortalJpaController {
 		entityManager.remove(c);
 		entityTransaction.commit();
 		
+	}
+	
+	
+	
+	public List<MANOprovider> readMANOproviders(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public MANOprovider updateMANOprovider(MANOprovider c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		MANOprovider resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteMANOprovider(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		MANOprovider c = entityManager.find(MANOprovider.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public MANOprovider readMANOproviderById(int i) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(MANOprovider.class, i);
 	}
 
 }

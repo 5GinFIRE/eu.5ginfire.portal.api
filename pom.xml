@@ -39,7 +39,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 		<project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
 
-		<openjpa.version>2.3.0</openjpa.version>
+		<openjpa.version>2.4.2</openjpa.version>
 		<spring.version>4.0.5.RELEASE</spring.version>
 
 		<shiro.version>1.2.3</shiro.version>

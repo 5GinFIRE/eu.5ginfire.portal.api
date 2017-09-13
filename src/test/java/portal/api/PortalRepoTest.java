@@ -22,6 +22,7 @@ import java.util.UUID;
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.MANOplatform;
+import portal.api.model.PackagingFormat;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
@@ -70,6 +71,13 @@ public class PortalRepoTest {
 
 	@Test
 	public void testWriteReadDB() {
+		
+		MANOplatform mp = new MANOplatform();
+		mp.setName("OSM");		
+		portalJpaControllerTest.saveMANOplatform(mp);
+		assertEquals( 1, portalJpaControllerTest.countMANOplatforms());
+		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName( "OSM" );
+		assertEquals("OSM", mp1.getName());
 
 		portalJpaControllerTest.getAllProductsPrinted();
 		
@@ -93,6 +101,12 @@ public class PortalRepoTest {
 		bmeta.addExtensionItem("aname", "avalue");
 		bmeta.addExtensionItem("aname1", "avalue1");
 		bu.addProduct(bmeta);
+		bmeta.setPublished(true);
+		bmeta.setCertified(true);
+		bmeta.setCertifiedBy("ACERT");
+		bmeta.setPackagingFormat(PackagingFormat.TOSCA);
+		bmeta.getSupportedMANOPlatforms().add(mp1);
+		
 
 		portalJpaControllerTest.updatePortalUser(bu);
 		
@@ -134,6 +148,12 @@ public class PortalRepoTest {
 		assertEquals( 2, testbm.getExtensions().size() );
 		assertEquals( "aname", testbm.getExtensions().get(0).getName() );
 		assertEquals( "aname1", testbm.getExtensions().get(1).getName() );
+		assertEquals( true,
+				testbm.isCertified() );
+		assertEquals( "ACERT", testbm.getCertifiedBy() );
+		assertEquals( PackagingFormat.TOSCA, testbm.getPackagingFormat() );
+		assertEquals( 1, testbm.getSupportedMANOPlatforms().size() );
+		
 
 		bu = new PortalUser();
 		bu.setOrganization("UoP2");
@@ -145,12 +165,10 @@ public class PortalRepoTest {
 		portalJpaControllerTest.getAllUsersPrinted();
 		assertEquals(2, portalJpaControllerTest.countUsers());
 
-		MANOplatform mp = new MANOplatform();
-		mp.setName("OSM");		
-		portalJpaControllerTest.saveMANOplatform(mp);
-		assertEquals( 1, portalJpaControllerTest.countMANOplatforms());
-		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName( "OSM" );
-		assertEquals("OSM", mp1.getName());
+		
+		
+		
+		
 		
 	}
 

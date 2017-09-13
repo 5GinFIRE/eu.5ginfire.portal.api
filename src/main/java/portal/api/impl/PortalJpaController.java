@@ -21,23 +21,22 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.PortalProperty;
-import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
+import portal.api.model.VxFMetadata;
 
 /**
  * This class maintains the entity manager and get a broker element from DB

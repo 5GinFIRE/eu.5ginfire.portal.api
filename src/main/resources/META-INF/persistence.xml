@@ -15,8 +15,6 @@
 	<persistence-unit name="portaldb" transaction-type="RESOURCE_LOCAL">
 		<provider>org.apache.openjpa.persistence.PersistenceProviderImpl
 		</provider>
-
-		<class>portal.api.model.InstalledVxF</class>
 		<class>portal.api.model.PortalUser</class>
 		<class>portal.api.model.SubscribedResource</class>
 		<class>portal.api.model.Category</class>
@@ -25,10 +23,7 @@
 		<class>portal.api.model.VxFMetadata</class>
 		<class>portal.api.model.ExperimentMetadata</class>
 		<class>portal.api.model.PortalProperty</class>
-		<class>portal.api.model.Container</class>
-		<class>portal.api.model.DeployArtifact</class>
 		<class>portal.api.model.DeploymentDescriptor</class>
-		<class>portal.api.model.DeployContainer</class>
 		<class>portal.api.model.MANOplatform</class>
 		
 
@@ -100,6 +95,7 @@
 			<property name="openjpa.ConnectionPassword" value="filepwd portaldb_testuserpwd" />
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
+			<property name="openjpa.DynamicEnhancementAgent" value="true"/>
 			<property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" />
 
 		</properties>

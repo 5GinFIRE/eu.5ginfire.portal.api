@@ -15,12 +15,74 @@
 
 package portal.api.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 
 
 @Entity(name = "VxFMetadata")
 public class VxFMetadata extends Product{
 
 
+	private boolean published;	
 
+	private boolean certified;
+	
+	private String certifiedBy;	
+
+	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
+	
+	
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@JoinTable()
+	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
+	
+	
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+
+	public boolean isCertified() {
+		return certified;
+	}
+
+	public void setCertified(boolean certified) {
+		this.certified = certified;
+	}
+
+	public String getCertifiedBy() {
+		return certifiedBy;
+	}
+
+	public void setCertifiedBy(String certifiedBy) {
+		this.certifiedBy = certifiedBy;
+	}
+
+	public PackagingFormat getPackagingFormat() {
+		return packagingFormat;
+	}
+
+	public void setPackagingFormat(PackagingFormat packagingFormat) {
+		this.packagingFormat = packagingFormat;
+	}
+
+	public List<MANOplatform> getSupportedMANOPlatforms() {
+		return supportedMANOPlatforms;
+	}
+
+	public void setSupportedMANOPlatforms(List<MANOplatform> supportedMANOPlatforms) {
+		this.supportedMANOPlatforms = supportedMANOPlatforms;
+	}
+
+	
+	
 }

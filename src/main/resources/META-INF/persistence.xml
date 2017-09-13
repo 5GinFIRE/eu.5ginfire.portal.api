@@ -15,6 +15,7 @@
 	<persistence-unit name="portaldb" transaction-type="RESOURCE_LOCAL">
 		<provider>org.apache.openjpa.persistence.PersistenceProviderImpl
 		</provider>
+		<class>portal.api.model.InstalledVxF</class>
 		<class>portal.api.model.PortalUser</class>
 		<class>portal.api.model.SubscribedResource</class>
 		<class>portal.api.model.Category</class>
@@ -26,6 +27,7 @@
 		<class>portal.api.model.DeploymentDescriptor</class>
 		<class>portal.api.model.MANOplatform</class>
 		<class>portal.api.model.MANOprovider</class>
+		<class>portal.api.model.VxFOnBoardedDescriptor</class>
 		
 
 
@@ -75,6 +77,7 @@
 		<class>portal.api.model.DeployContainer</class>
 		<class>portal.api.model.MANOplatform</class>
 		<class>portal.api.model.MANOprovider</class>
+		<class>portal.api.model.VxFOnBoardedDescriptor</class>
 
 
 

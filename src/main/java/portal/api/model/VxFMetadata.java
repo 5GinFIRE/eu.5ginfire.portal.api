@@ -40,19 +40,20 @@ public class VxFMetadata extends Product{
 	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable()
 	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
-	
 
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
-	private List<MANOprovider> supportedMANOProviders = new ArrayList<MANOprovider>();
-
-	public List<MANOprovider> getSupportedMANOProviders() {
-		return supportedMANOProviders;
+	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
+	
+	
+	public List<VxFOnBoardedDescriptor> getVxfOnBoardedDescriptors() {
+		return vxfOnBoardedDescriptors;
 	}
 
-	public void setSupportedMANOProviders(List<MANOprovider> supportedMANOProviders) {
-		this.supportedMANOProviders = supportedMANOProviders;
+	public void setVxfOnBoardedDescriptors(List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors) {
+		this.vxfOnBoardedDescriptors = vxfOnBoardedDescriptors;
 	}
+
 
 	public boolean isPublished() {
 		return published;

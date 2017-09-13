@@ -894,4 +894,37 @@ public class PortalJpaController {
 
 	}
 
+	public List<MANOplatform> readMANOplatforms(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM M m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public MANOplatform updateMANOplatform(MANOplatform c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		MANOplatform resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteMANOplatform(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		MANOplatform c = entityManager.find(MANOplatform.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
 }

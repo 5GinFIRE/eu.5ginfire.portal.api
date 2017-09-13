@@ -136,6 +136,7 @@
 				/services/api/repo/sessions/** = anon, rest
 				/services/api/repo/oauth2/** = anon, rest
 				/services/api/repo/categories/** = anon, rest
+				/services/api/repo/manoplatforms/** = anon, rest
 				/services/api/repo/experiments/** = anon, rest
 				/services/api/repo/register/** = anon, rest
 				/services/api/repo/registerresource/** = anon, rest

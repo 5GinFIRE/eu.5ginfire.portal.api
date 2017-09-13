@@ -95,10 +95,12 @@
 				value="jdbc:h2:~/.portal/db/portaldb_test;CIPHER=AES;AUTO_SERVER=TRUE" />
 			<property name="openjpa.ConnectionUserName" value="portaldb_testuser" />
 			<property name="openjpa.ConnectionPassword" value="filepwd portaldb_testuserpwd" />
-			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
+        	<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
+        	<property name="openjpa.InitializeEagerly" value="true"/>
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
 			<property name="openjpa.DynamicEnhancementAgent" value="true"/>
-			<property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" />
+			<property name="openjpa.Log" value="DefaultLevel=TRACE, Runtime=TRACE, Tool=TRACE, SQL=Trace" />
+			
 
 		</properties>
 		

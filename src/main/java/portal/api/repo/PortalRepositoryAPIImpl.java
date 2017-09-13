@@ -32,6 +32,7 @@ import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.IPortalRepositoryAPI;
 import portal.api.model.InstalledVxF;
 import portal.api.model.InstalledVxFStatus;
+import portal.api.model.MANOplatform;
 import portal.api.model.Product;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
@@ -1866,5 +1867,91 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return res;
 	}
+	
+	
+	//admin MANO platforms
+	
+	
+	// categories API
+		@GET
+		@Path("/manoplatforms/")
+		@Produces("application/json")
+		public Response getMANOplatforms() {
+			return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
+		}
+
+		@GET
+		@Path("/admin/manoplatforms/")
+		@Produces("application/json")
+		public Response getAdminMANOplatforms() {
+			return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
+		}
+
+		@POST
+		@Path("/admin/manoplatforms/")
+		@Produces("application/json")
+		@Consumes("application/json")
+		public Response addMANOplatform(MANOplatform c) {
+			MANOplatform u = portalRepositoryRef.addMANOplatform(c);
+
+			if (u != null) {
+				return Response.ok().entity(u).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+				builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be installed");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+
+		@PUT
+		@Path("/admin/manoplatforms/{mpid}")
+		@Produces("application/json")
+		@Consumes("application/json")
+		public Response updateMANOplatform(@PathParam("mpid") int mpid, MANOplatform c) {
+			MANOplatform previousMP = portalRepositoryRef.getMANOplatformByID(mpid);
+
+			MANOplatform u = portalRepositoryRef.updateMANOplatformInfo(c);
+
+			if (u != null) {
+				return Response.ok().entity(u).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+				builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be updated");
+				throw new WebApplicationException(builder.build());
+			}
+
+		}
+
+		@DELETE
+		@Path("/admin/manoplatforms/{mpid}")
+		public Response deleteMANOplatform(@PathParam("mpid") int mpid) {
+			MANOplatform category = portalRepositoryRef.getMANOplatformByID(mpid);
+			
+				portalRepositoryRef.deleteMANOplatform(mpid);
+				return Response.ok().build();
+			
+		}
+
+		@GET
+		@Path("/manoplatforms/{mpid}")
+		@Produces("application/json")
+		public Response getMANOplatformById(@PathParam("mpid") int mpid) {
+			MANOplatform sm = portalRepositoryRef.getMANOplatformByID(mpid);
+
+			if (sm != null) {
+				return Response.ok().entity(sm).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("MANOplatform " + mpid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+
+		@GET
+		@Path("/admin/manoplatforms/{mpid}")
+		@Produces("application/json")
+		public Response getAdminMANOplatformById(@PathParam("mpid") int mpid) {
+			return getCategoryById(mpid);
+		}
 
 }

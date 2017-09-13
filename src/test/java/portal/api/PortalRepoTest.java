@@ -87,6 +87,7 @@ public class PortalRepoTest {
 		assertEquals( 1, portalJpaControllerTest.countMANOproviders());
 		MANOprovider mprovider1 = portalJpaControllerTest.readMANOproviderByName( "OSMAPIENDPOINT" );
 		assertEquals("OSMAPIENDPOINT", mprovider1.getName());
+		//assertEquals( 1, mprovider1.getId() );
 
 		portalJpaControllerTest.getAllProductsPrinted();
 		

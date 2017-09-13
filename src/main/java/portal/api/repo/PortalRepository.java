@@ -23,6 +23,7 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.InstalledVxF;
+import portal.api.model.MANOplatform;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserSession;
@@ -313,6 +314,36 @@ public class PortalRepository {
 
 	public SubscribedResource getSubscribedResourceByUUID(String uuid) {
 		return portalJpaController.readSubscribedResourceByuuid(uuid);
+	}
+
+
+	public Object getMANOplatforms() {
+
+		List<MANOplatform> ls = portalJpaController.readMANOplatforms(0, 100000);
+		return ls;	
+	}
+
+
+	public MANOplatform addMANOplatform(MANOplatform c) {
+		portalJpaController.saveMANOplatform(c);
+		return c;
+	}
+
+
+	public MANOplatform getMANOplatformByID(int catid) {
+		return portalJpaController.readMANOplatformById(catid);
+	}
+
+
+	public MANOplatform updateMANOplatformInfo(MANOplatform c) {
+		MANOplatform bmr = portalJpaController.updateMANOplatform(c);
+		return bmr;
+	}
+
+
+	public void deleteMANOplatform(int mpid) {
+		portalJpaController.deleteMANOplatform(mpid);
+		
 	}
 
 

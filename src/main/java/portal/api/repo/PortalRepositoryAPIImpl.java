@@ -15,31 +15,6 @@
 
 package portal.api.repo;
 
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.PortalProperty;
-import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
-import portal.api.osm.client.OSMClient;
-import portal.api.cloudOAuth.KeystoneCloudAccess;
-import portal.api.cloudOAuth.OAuthClientManager;
-import portal.api.cloudOAuth.OAuthUser;
-import portal.api.cloudOAuth.OAuthUtils;
-import portal.api.model.Category;
-import portal.api.model.DeployArtifact;
-import portal.api.model.DeployContainer;
-import portal.api.model.DeploymentDescriptor;
-import portal.api.model.DeploymentDescriptorStatus;
-import portal.api.model.IPortalRepositoryAPI;
-import portal.api.model.InstalledVxF;
-import portal.api.model.InstalledVxFStatus;
-import portal.api.model.MANOplatform;
-import portal.api.model.Product;
-import portal.api.model.ProductExtensionItem;
-import portal.api.model.SubscribedResource;
-import portal.api.model.UserSession;
-import portal.api.util.EmailUtil;
-import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,14 +27,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -67,7 +40,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -79,15 +51,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
-import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
-import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
-import org.apache.cxf.rs.security.cors.LocalPreflight;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.shiro.SecurityUtils;
@@ -100,12 +65,33 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.woorea.openstack.keystone.model.Access;
 import com.woorea.openstack.keystone.model.Access.Service.Endpoint;
 import com.woorea.openstack.keystone.model.Tenant;
-import com.woorea.openstack.keystone.model.Access.Service;
 import com.woorea.openstack.nova.model.Server;
-import com.woorea.openstack.nova.model.Servers;
+
+import portal.api.cloudOAuth.KeystoneCloudAccess;
+import portal.api.cloudOAuth.OAuthClientManager;
+import portal.api.cloudOAuth.OAuthUser;
+import portal.api.cloudOAuth.OAuthUtils;
+import portal.api.model.Category;
+import portal.api.model.DeployArtifact;
+import portal.api.model.DeployContainer;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.IPortalRepositoryAPI;
+import portal.api.model.InstalledVxFStatus;
+import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
+import portal.api.model.Product;
+import portal.api.model.SubscribedResource;
+import portal.api.model.UserSession;
+import portal.api.model.VxFMetadata;
+import portal.api.osm.client.OSMClient;
+import portal.api.util.EmailUtil;
+import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 //CORS support
 //@CrossOriginResourceSharing(
@@ -152,7 +138,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (securityContext != null) {
 			if (securityContext.getUserPrincipal() != null)
-				logger.info(" securityContext.getUserPrincipal().toString() >" + securityContext.getUserPrincipal().getName() + "<");
+				logger.info(" securityContext.getUserPrincipal().toString() >"
+						+ securityContext.getUserPrincipal().getName() + "<");
 
 		}
 
@@ -182,10 +169,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response addUser(PortalUser user) {
 
 		logger.info("Received POST for usergetUsername: " + user.getUsername());
-		// logger.info("Received POST for usergetPassword: " + user.getPassword());
-		// logger.info("Received POST for usergetOrganization: " + user.getOrganization());
+		// logger.info("Received POST for usergetPassword: " +
+		// user.getPassword());
+		// logger.info("Received POST for usergetOrganization: " +
+		// user.getOrganization());
 
-		if ((user.getUsername() == null) || (user.getUsername().equals("") || (user.getEmail() == null) || (user.getEmail().equals("")))) {
+		if ((user.getUsername() == null)
+				|| (user.getUsername().equals("") || (user.getEmail() == null) || (user.getEmail().equals("")))) {
 			ResponseBuilder builder = Response.status(Status.BAD_REQUEST);
 			builder.entity("New user with username=" + user.getUsername() + " cannot be registered");
 			logger.info("New user with username=" + user.getUsername() + " cannot be registered BAD_REQUEST.");
@@ -223,10 +213,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		user.setName(getAttachmentStringValue("name", ats));
 		user.setUsername(getAttachmentStringValue("username", ats));
 		user.setPassword(getAttachmentStringValue("userpassword", ats));
-		user.setOrganization(getAttachmentStringValue("userorganization", ats) + "^^" + getAttachmentStringValue("randomregid", ats));
+		user.setOrganization(getAttachmentStringValue("userorganization", ats) + "^^"
+				+ getAttachmentStringValue("randomregid", ats));
 		user.setEmail(getAttachmentStringValue("useremail", ats));
 		user.setActive(false);// in any case the user should be not active
-		user.setRole("ROLE_EXPERIMENTER"); // otherwise in post he can choose ROLE_PORTALADMIN, and the immediately register :-)
+		user.setRole("ROLE_EXPERIMENTER"); // otherwise in post he can choose
+											// ROLE_PORTALADMIN, and the
+											// immediately register :-)
 
 		String msg = getAttachmentStringValue("emailmessage", ats);
 		logger.info("Received register for usergetUsername: " + user.getUsername());
@@ -360,7 +353,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	// VxFS API
 
-	private Product addNewProductData(Product prod, Attachment image, Attachment vxfFile, List<Attachment> screenshots) {
+	private Product addNewProductData(Product prod, Attachment image, Attachment vxfFile,
+			List<Attachment> screenshots) {
 
 		String uuid = UUID.randomUUID().toString();
 
@@ -375,7 +369,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// String[] catIDs = categories.split(",");
 		// for (String catid : catIDs) {
-		// Category category = portalRepositoryRef.getCategoryByID( Integer.valueOf(catid) );
+		// Category category = portalRepositoryRef.getCategoryByID(
+		// Integer.valueOf(catid) );
 		// prod.addCategory(category);
 		// }
 
@@ -443,7 +438,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// we must replace given product categories with the ones from our DB
 		for (Category c : prod.getCategories()) {
 			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
-			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"  contains Products: "+ catToUpdate.getProducts().size() );
+			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"
+			// contains Products: "+ catToUpdate.getProducts().size() );
 			prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
 
 		}
@@ -537,7 +533,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		vxf = (VxFMetadata) addNewProductData(vxf,
 
-		getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+				getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
+				getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(vxf).build();
 
@@ -564,9 +561,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// VxFMetadata sm = (VxFMetadata) portalRepositoryRef.getProductByID(bid);
-		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
-				getListOfAttachmentsByName("screenshots", ats));
+		// VxFMetadata sm = (VxFMetadata)
+		// portalRepositoryRef.getProductByID(bid);
+		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
+				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(vxf).build();
 
@@ -574,7 +572,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	// VxFs related API
 
-	private Product updateProductMetadata(Product prod, Attachment image, Attachment prodFile, List<Attachment> screenshots) {
+	private Product updateProductMetadata(Product prod, Attachment image, Attachment prodFile,
+			List<Attachment> screenshots) {
 
 		logger.info("userid = " + prod.getOwner().getId());
 		logger.info("vxfname = " + prod.getName());
@@ -591,18 +590,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		prod.setDateUpdated(new Date());
 
-		// first remove all references of the product from the previous categories
+		// first remove all references of the product from the previous
+		// categories
 		Product prodPreUpdate = (Product) portalRepositoryRef.getProductByID(prod.getId());
 		for (Category c : prodPreUpdate.getCategories()) {
-			// logger.info("Will remove product "+prodPreUpdate.getName()+ ", from Previous Category "+c.getName() );
+			// logger.info("Will remove product "+prodPreUpdate.getName()+ ",
+			// from Previous Category "+c.getName() );
 			c.removeProduct(prodPreUpdate);
 			portalRepositoryRef.updateCategoryInfo(c);
 		}
 
-		// we must replace API given product categories with the ones from our DB
+		// we must replace API given product categories with the ones from our
+		// DB
 		for (Category c : prod.getCategories()) {
 			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
-			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"  contains Products: "+ catToUpdate.getProducts().size() );
+			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"
+			// contains Products: "+ catToUpdate.getProducts().size() );
 			prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
 		}
 
@@ -618,7 +621,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("unknown")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + File.separator + imageFileNamePosted);
+					prod.setIconsrc(
+							endpointUrl + "repo/images/" + prod.getUuid() + File.separator + imageFileNamePosted);
 				}
 			}
 
@@ -628,7 +632,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("unknown")) {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + File.separator + vxfFileNamePosted);
+					prod.setPackageLocation(
+							endpointUrl + "repo/packages/" + prod.getUuid() + File.separator + vxfFileNamePosted);
 				}
 			}
 
@@ -700,7 +705,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		logger.info("VxF RESOURCE FILE: " + vxfAbsfile);
 		File file = new File(vxfAbsfile);
 
-		if ((uuid.equals("77777777-668b-4c75-99a9-39b24ed3d8be")) || (uuid.equals("22cab8b8-668b-4c75-99a9-39b24ed3d8be"))) {
+		if ((uuid.equals("77777777-668b-4c75-99a9-39b24ed3d8be"))
+				|| (uuid.equals("22cab8b8-668b-4c75-99a9-39b24ed3d8be"))) {
 			URL res = getClass().getResource("/files/" + vxffile);
 			logger.info("TEST LOCAL RESOURCE FILE: " + res);
 			file = new File(res.getFile());
@@ -732,15 +738,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
 	@GET
 	@Path("/osmvnfds/{vxfid}")
 	@Produces("application/json")
 	public Response getOSMVNFMetadataByID(@PathParam("vxfid") String vxfid) {
 		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
-		
-		Vnfd vnfd = OSMClient.getVNFDbyID( vxfid ) ; 
+
+		Vnfd vnfd = OSMClient.getVNFDbyID(vxfid);
 
 		if (vnfd != null) {
 			return Response.ok().entity(vnfd).build();
@@ -777,7 +782,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf.setIconsrc("");
 			vxf.setLongDescription("");
 
-			vxf.setPackageLocation(endpointUrl + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
+			vxf.setPackageLocation(
+					endpointUrl + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 			// }else if (uuid.equals("12cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
 			// vxf = new VxFMetadata(uuid, "AN example service");
 			// vxf.setShortDescription("An example local service");
@@ -786,7 +792,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// vxf.setLongDescription("");
 			// //URI endpointUrl = uri.getBaseUri();
 			//
-			// vxf.setPackageLocation( endpointUrl +"repo/packages/12cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
+			// vxf.setPackageLocation( endpointUrl
+			// +"repo/packages/12cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 		} else if (uuid.equals("22cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
 			vxf = new VxFMetadata();
 			vxf.setUuid(uuid);
@@ -797,7 +804,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf.setLongDescription("");
 			// URI endpointUrl = uri.getBaseUri();
 
-			vxf.setPackageLocation(endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
+			vxf.setPackageLocation(
+					endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
 		} else {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID(uuid);
 		}
@@ -834,13 +842,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// public Response addUserSessionOption(){
 	//
 	//
-	// logger.info("Received OPTIONS  addUserSessionOption ");
+	// logger.info("Received OPTIONS addUserSessionOption ");
 	// String origin = headers.getRequestHeader("Origin").get(0);
 	// if (origin != null) {
 	// return Response.ok()
-	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, "GET POST DELETE PUT HEAD OPTIONS")
+	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, "GET POST DELETE PUT
+	// HEAD OPTIONS")
 	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, "true")
-	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, "Origin, X-Requested-With, Content-Type, Accept")
+	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, "Origin,
+	// X-Requested-With, Content-Type, Accept")
 	// .header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, origin)
 	// .build();
 	// } else {
@@ -855,11 +865,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response addUserSession(UserSession userSession) {
 
 		logger.info("Received POST addUserSession usergetUsername: " + userSession.getUsername());
-		// logger.info("DANGER, REMOVE Received POST addUserSession password: " + userSession.getPassword());
+		// logger.info("DANGER, REMOVE Received POST addUserSession password: "
+		// + userSession.getPassword());
 
 		if (securityContext != null) {
 			if (securityContext.getUserPrincipal() != null)
-				logger.info(" securityContext.getUserPrincipal().toString() >" + securityContext.getUserPrincipal().toString() + "<");
+				logger.info(" securityContext.getUserPrincipal().toString() >"
+						+ securityContext.getUserPrincipal().toString() + "<");
 
 		}
 
@@ -898,7 +910,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (securityContext != null) {
 			if (securityContext.getUserPrincipal() != null)
-				logger.info(" securityContext.getUserPrincipal().toString() >" + securityContext.getUserPrincipal().toString() + "<");
+				logger.info(" securityContext.getUserPrincipal().toString() >"
+						+ securityContext.getUserPrincipal().toString() + "<");
 
 			SecurityUtils.getSubject().logout();
 		}
@@ -917,7 +930,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (securityContext != null) {
 			if (securityContext.getUserPrincipal() != null)
-				logger.info(" securityContext.getUserPrincipal().toString() >" + securityContext.getUserPrincipal().toString() + "<");
+				logger.info(" securityContext.getUserPrincipal().toString() >"
+						+ securityContext.getUserPrincipal().toString() + "<");
 
 		}
 
@@ -925,9 +939,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ((currentUser != null) && (currentUser.getPrincipal() != null)) {
 
 			// logger.info(" currentUser = " + currentUser.toString() );
-			// logger.info( "User [" + currentUser.getPrincipal() + "] logged in successfully." );
-			// logger.info(" currentUser  employee  = " + currentUser.hasRole("employee") );
-			// logger.info(" currentUser  boss  = " + currentUser.hasRole("boss") );
+			// logger.info( "User [" + currentUser.getPrincipal() + "] logged in
+			// successfully." );
+			// logger.info(" currentUser employee = " +
+			// currentUser.hasRole("employee") );
+			// logger.info(" currentUser boss = " + currentUser.hasRole("boss")
+			// );
 
 			return Response.ok().build();
 		}
@@ -947,7 +964,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 
 			if (u.getRole().equals("ROLE_PORTALADMIN")) {
-				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return all
+				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return
+																												// all
 			} else
 				return Response.ok().entity(u.getSubscribedResources()).build();
 
@@ -999,7 +1017,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested SubscribedResource with rls=" + sm.getURL() + " cannot be registered under not found user");
+			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
+					+ " cannot be registered under not found user");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1166,8 +1185,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		// ExperimentMetadata sm = new ExperimentMetadata();
-		app = (ExperimentMetadata) addNewProductData(app, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
-				getListOfAttachmentsByName("screenshots", ats));
+		app = (ExperimentMetadata) addNewProductData(app, getAttachmentByName("prodIcon", ats),
+				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(app).build();
 
@@ -1194,10 +1213,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			e.printStackTrace();
 		}
 
-		// ExperimentMetadata appmeta = (ExperimentMetadata) portalRepositoryRef.getProductByID(aid);
+		// ExperimentMetadata appmeta = (ExperimentMetadata)
+		// portalRepositoryRef.getProductByID(aid);
 
-		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
-				getListOfAttachmentsByName("screenshots", ats));
+		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
+				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
 		return Response.ok().entity(appmeta).build();
 	}
@@ -1377,18 +1397,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return null;
 	}
 
-	/***************************************** OAUTH2 cloud Related API *********************************************/
+	/*****************************************
+	 * OAUTH2 cloud Related API
+	 *********************************************/
 
 	@GET
 	@Path("/oauth2/")
 	@Produces("application/json")
-	public Response oauth2Sessions(@QueryParam("oath2serverurl") String oath2serverurl, @QueryParam("oath2requestkey") String oath2requestkey) {
+	public Response oauth2Sessions(@QueryParam("oath2serverurl") String oath2serverurl,
+			@QueryParam("oath2requestkey") String oath2requestkey) {
 
 		// the params
 		logger.info("Received GET oath2serverurl: " + oath2serverurl);
 		logger.info("Received GET oath2requestkey: " + oath2requestkey);
 
-		return Response.seeOther(oAuthClientManagerRef.getAuthorizationServiceURI(getCallbackURI(), oath2requestkey)).build();
+		return Response.seeOther(oAuthClientManagerRef.getAuthorizationServiceURI(getCallbackURI(), oath2requestkey))
+				.build();
 	}
 
 	@GET
@@ -1397,11 +1421,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// @Produces("application/json")
 	public Response oauth2login(@QueryParam("code") String code) {
 
-		// This one is the callback URL, which is called by the cloud OAUTH2 service
+		// This one is the callback URL, which is called by the cloud OAUTH2
+		// service
 		logger.info("Received authorized request token code: " + code + ". Preparing AuthorizationCodeGrant header.");
 
 		AuthorizationCodeGrant codeGrant = new AuthorizationCodeGrant(code, getCallbackURI());
-		logger.info("Requesting OAuth server accessTokenService to replace an authorized request token with an access token");
+		logger.info(
+				"Requesting OAuth server accessTokenService to replace an authorized request token with an access token");
 		ClientAccessToken accessToken = oAuthClientManagerRef.getAccessToken(codeGrant);
 		if (accessToken == null) {
 			String msg = "NO_OAUTH_ACCESS_TOKEN, Problem replacing your authorization key for OAuth access token,  please report to portal admin";
@@ -1419,7 +1445,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("accessToken getExpiresIn= " + accessToken.getExpiresIn());
 
 			Tenant t = KeystoneCloudAccess.getFirstTenant(accessToken.getTokenKey());
-			OAuthUser fu = OAuthUtils.getOAuthUser(authHeader, accessToken); //get user information since we are authorized via oauth
+			OAuthUser fu = OAuthUtils.getOAuthUser(authHeader, accessToken); // get
+																				// user
+																				// information
+																				// since
+																				// we
+																				// are
+																				// authorized
+																				// via
+																				// oauth
 			fu.setxOAuth2Token(accessToken.getTokenKey());
 			fu.setTenantName(t.getName());
 			fu.setTenantId(t.getId());
@@ -1428,7 +1462,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// check if user exists in Portal database
 			PortalUser u = portalRepositoryRef.getUserByUsername(fu.getNickName());
 
-			String roamPassword = UUID.randomUUID().toString(); // creating a temporary session password, to login
+			String roamPassword = UUID.randomUUID().toString(); // creating a
+																// temporary
+																// session
+																// password, to
+																// login
 			if (u == null) {
 				u = new PortalUser(); // create as new user
 				u.setEmail(fu.getEmail());
@@ -1457,7 +1495,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			Subject currentUser = SecurityUtils.getSubject();
 			if (currentUser != null) {
-				AuthenticationToken token = new UsernamePasswordToken(userSession.getUsername(), userSession.getPassword());
+				AuthenticationToken token = new UsernamePasswordToken(userSession.getUsername(),
+						userSession.getPassword());
 				try {
 					currentUser.login(token);
 
@@ -1470,11 +1509,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			userSession.setPassword("");// trick so not to send in response
 			ObjectMapper mapper = new ObjectMapper();
 
-			// see https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage
-			// there are CORS issues so to do this trich the popup window communicates with the parent window ia this script
-			String comScript = "<script type='text/javascript'>function receiveMessage(event){" + "event.source.postMessage('"
-					+ mapper.writeValueAsString(userSession) + "', event.origin);" + "}" + "window.addEventListener('message', receiveMessage, false);"
-					+ "</script>";
+			// see
+			// https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage
+			// there are CORS issues so to do this trich the popup window
+			// communicates with the parent window ia this script
+			String comScript = "<script type='text/javascript'>function receiveMessage(event){"
+					+ "event.source.postMessage('" + mapper.writeValueAsString(userSession) + "', event.origin);" + "}"
+					+ "window.addEventListener('message', receiveMessage, false);" + "</script>";
 
 			return Response.ok("<html><body><p>Succesful Login</p>" + comScript + "</body></html>"
 
@@ -1605,11 +1646,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			deployment.setOwner(u); // reattach from the DB model
 			u.getDeployments().add(deployment);
 
-			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef.getProductByID(deployment.getBaseApplication().getId());
-			deployment.setBaseApplication(baseApplication); // reattach from the DB model
+			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
+					.getProductByID(deployment.getBaseApplication().getId());
+			deployment.setBaseApplication(baseApplication); // reattach from the
+															// DB model
 
 			for (DeployContainer dc : deployment.getDeployContainers()) {
-				dc.getTargetResource().setOwner(u);// reattach from the DB model, in case missing from the request
+				dc.getTargetResource().setOwner(u);// reattach from the DB
+													// model, in case missing
+													// from the request
 			}
 
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
@@ -1631,7 +1676,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		DeploymentDescriptor dep = portalRepositoryRef.getDeploymentByID(id);
 		if (u != null) {
-			if  (  u.getRole().equals("ROLE_PORTALADMIN") ||  u.getId() == dep.getOwner().getId())    {
+			if (u.getRole().equals("ROLE_PORTALADMIN") || u.getId() == dep.getOwner().getId()) {
 				portalRepositoryRef.deleteDeployment(id);
 				return Response.ok().build();
 			}
@@ -1669,28 +1714,42 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/deployments/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d, @QueryParam("action") String action) {
+	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d,
+			@QueryParam("action") String action) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
-		if ((u != null) ) { 
+		if ((u != null)) {
 
-			if (action.equals("AUTH") && (u.getRole().equals("ROLE_PORTALADMIN")) ) // only admin can alter a deployment
+			if (action.equals("AUTH") && (u.getRole().equals("ROLE_PORTALADMIN"))) // only
+																					// admin
+																					// can
+																					// alter
+																					// a
+																					// deployment
 				d.setStatus(DeploymentDescriptorStatus.QUEUED);
-			else if (action.equals("UNINSTALL")  &&  (u.getRole().equals("ROLE_PORTALADMIN") ||  u.getId() == d.getOwner().getId())  )
+			else if (action.equals("UNINSTALL")
+					&& (u.getRole().equals("ROLE_PORTALADMIN") || u.getId() == d.getOwner().getId()))
 				d.setStatus(DeploymentDescriptorStatus.UNINSTALLING);
-			else if (action.equals("DENY") && (u.getRole().equals("ROLE_PORTALADMIN")) )
+			else if (action.equals("DENY") && (u.getRole().equals("ROLE_PORTALADMIN")))
 				d.setStatus(DeploymentDescriptorStatus.DENIED);
 
-			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId() );
+			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
 			d.setOwner(deploymentOwner); // reattach from the DB model
 
-			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef.getProductByID(d.getBaseApplication().getId());
+			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
+					.getProductByID(d.getBaseApplication().getId());
 			d.setBaseApplication(baseApplication); // reattach from the DB model
 
 			for (DeployContainer dc : d.getDeployContainers()) {
-				
-				dc.getTargetResource().setOwner(deploymentOwner);// reattach from the DB model, in case missing from the request
+
+				dc.getTargetResource().setOwner(deploymentOwner);// reattach
+																	// from the
+																	// DB model,
+																	// in case
+																	// missing
+																	// from the
+																	// request
 			}
 
 			DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
@@ -1713,7 +1772,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response addANewAnauthSubscribedResource(SubscribedResource sm) {
 
-		logger.info("Received SubscribedResource for client: " + sm.getUuid() + ", URLs:" + sm.getURL() + ", OwnerID:" + sm.getOwner().getId());
+		logger.info("Received SubscribedResource for client: " + sm.getUuid() + ", URLs:" + sm.getURL() + ", OwnerID:"
+				+ sm.getOwner().getId());
 
 		PortalUser u = sm.getOwner();
 		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
@@ -1737,7 +1797,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested SubscribedResource with rls=" + sm.getURL() + " cannot be registered under not found user");
+			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
+					+ " cannot be registered under not found user");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1749,18 +1810,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getDeployContainerByTargetResourceUUID(@PathParam("uuid") String uuid) {
 
 		SubscribedResource res = updateLastSeenResource(uuid);
-		if (res!=null)
-			logger.info("Received req for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL() + ", OwnerID:" + res.getOwner().getId());
+		if (res != null)
+			logger.info("Received req for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL()
+					+ ", OwnerID:" + res.getOwner().getId());
 
 		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
-		for (DeploymentDescriptor deploymentDescriptor : deployments) 
-			if ((deploymentDescriptor.getStatus()!= DeploymentDescriptorStatus.PENDING_ADMIN_AUTH )&&
-					(deploymentDescriptor.getStatus()!= DeploymentDescriptorStatus.DENIED )&&
-					(deploymentDescriptor.getStatus()!= DeploymentDescriptorStatus.UNINSTALLED )){
+		for (DeploymentDescriptor deploymentDescriptor : deployments)
+			if ((deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.PENDING_ADMIN_AUTH)
+					&& (deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.DENIED)
+					&& (deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.UNINSTALLED)) {
 				List<DeployContainer> dcs = deploymentDescriptor.getDeployContainers();
 				for (DeployContainer dc : dcs) {
-					if ((dc.getTargetResource()!=null) && (dc.getTargetResource().getUuid().equals(uuid))) {						
-						dc.setMasterDeploymentStatus( deploymentDescriptor.getStatus() );
+					if ((dc.getTargetResource() != null) && (dc.getTargetResource().getUuid().equals(uuid))) {
+						dc.setMasterDeploymentStatus(deploymentDescriptor.getStatus());
 						return Response.ok().entity(dc).build();
 					}
 				}
@@ -1772,38 +1834,49 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	}
 
-	// /registerresource/deployments/target/uuid/"+ clientUUID+"/installedvxfuuid/"+installedVxFUUID+"/status/"+status"
+	// /registerresource/deployments/target/uuid/"+
+	// clientUUID+"/installedvxfuuid/"+installedVxFUUID+"/status/"+status"
 
 	@PUT
 	@Path("/registerresource/deployments/target/uuid/{clientUUID}/installedvxfuuid/{installedVxFUUID}/status/{status}/deployContainerid/{cid}")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public Response updateDeployContainerTargetResourceStatus(@PathParam("clientUUID") String clientUUID,
-			@PathParam("installedVxFUUID") String installedVxFUUID, @PathParam("status") String status,@PathParam("cid") Long deployContainerId) {
+			@PathParam("installedVxFUUID") String installedVxFUUID, @PathParam("status") String status,
+			@PathParam("cid") Long deployContainerId) {
 
 		SubscribedResource res = updateLastSeenResource(clientUUID);
-		if (res!=null)
-			logger.info("Received ResourceStatus: " + status + ", for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL() 
-					+ ", OwnerID:"+ res.getOwner().getId()
-					+ ", installedVxFUUID:"+ installedVxFUUID);
+		if (res != null)
+			logger.info("Received ResourceStatus: " + status + ", for Deployent by client: " + res.getUuid() + ", URLs:"
+					+ res.getURL() + ", OwnerID:" + res.getOwner().getId() + ", installedVxFUUID:" + installedVxFUUID);
 
 		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 		for (DeploymentDescriptor deploymentDescriptor : deployments) {
 			List<DeployContainer> dcs = deploymentDescriptor.getDeployContainers();
 			for (DeployContainer dc : dcs) {
-				if ((deployContainerId == dc.getId()) && (dc.getTargetResource()!=null) && dc.getTargetResource().getUuid().equals(clientUUID)) {
+				if ((deployContainerId == dc.getId()) && (dc.getTargetResource() != null)
+						&& dc.getTargetResource().getUuid().equals(clientUUID)) {
 					List<DeployArtifact> artifacts = dc.getDeployArtifacts();
 					for (DeployArtifact deployArtifact : artifacts)
 						if (deployArtifact.getUuid().equals(installedVxFUUID)) {
 							deployArtifact.setStatus(InstalledVxFStatus.valueOf(status));
-							
+
 						}
 
-					deploymentDescriptor.setStatus( resolveStatus(deploymentDescriptor) ); // we must write here code to properly find the status!
+					deploymentDescriptor.setStatus(resolveStatus(deploymentDescriptor)); // we
+																							// must
+																							// write
+																							// here
+																							// code
+																							// to
+																							// properly
+																							// find
+																							// the
+																							// status!
 					portalRepositoryRef.updateDeploymentDescriptor(deploymentDescriptor);
-					
+
 					return Response.status(Status.OK).build();
-				}else{
+				} else {
 					logger.info(" dc.getTargetResource()==null !! PROBLEM");
 				}
 			}
@@ -1821,35 +1894,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		Boolean allInstalled = true;
 		Boolean allUnInstalled = true;
-		DeploymentDescriptorStatus status= deploymentDescriptor.getStatus();
+		DeploymentDescriptorStatus status = deploymentDescriptor.getStatus();
 
 		List<DeployContainer> containers = deploymentDescriptor.getDeployContainers();
 		for (DeployContainer deployContainer : containers) {
 			List<DeployArtifact> artifacts = deployContainer.getDeployArtifacts();
 			for (DeployArtifact deployArtifact : artifacts) {
-				if (deployArtifact.getStatus()!=InstalledVxFStatus.STARTED)
-					allInstalled= false;
-				if (deployArtifact.getStatus()!=InstalledVxFStatus.UNINSTALLED)
-					allUnInstalled= false;
+				if (deployArtifact.getStatus() != InstalledVxFStatus.STARTED)
+					allInstalled = false;
+				if (deployArtifact.getStatus() != InstalledVxFStatus.UNINSTALLED)
+					allUnInstalled = false;
 
-				if ((deployArtifact.getStatus()==InstalledVxFStatus.FAILED))
+				if ((deployArtifact.getStatus() == InstalledVxFStatus.FAILED))
 					return DeploymentDescriptorStatus.FAILED;
-				if ((deployArtifact.getStatus()==InstalledVxFStatus.UNINSTALLING))
+				if ((deployArtifact.getStatus() == InstalledVxFStatus.UNINSTALLING))
 					return DeploymentDescriptorStatus.UNINSTALLING;
-				if ((deployArtifact.getStatus()==InstalledVxFStatus.CONFIGURING)|| 
-						(deployArtifact.getStatus()==InstalledVxFStatus.DOWNLOADING)|| 
-						(deployArtifact.getStatus()==InstalledVxFStatus.DOWNLOADED)|| 
-						(deployArtifact.getStatus()==InstalledVxFStatus.INSTALLING)|| 
-						(deployArtifact.getStatus()==InstalledVxFStatus.INSTALLED)|| 
-						(deployArtifact.getStatus()==InstalledVxFStatus.STARTING)
-						)
+				if ((deployArtifact.getStatus() == InstalledVxFStatus.CONFIGURING)
+						|| (deployArtifact.getStatus() == InstalledVxFStatus.DOWNLOADING)
+						|| (deployArtifact.getStatus() == InstalledVxFStatus.DOWNLOADED)
+						|| (deployArtifact.getStatus() == InstalledVxFStatus.INSTALLING)
+						|| (deployArtifact.getStatus() == InstalledVxFStatus.INSTALLED)
+						|| (deployArtifact.getStatus() == InstalledVxFStatus.STARTING))
 					return DeploymentDescriptorStatus.INSTALLING;
 			}
 		}
-		
-		if (allInstalled) 
+
+		if (allInstalled)
 			return DeploymentDescriptorStatus.INSTALLED;
-		else if (allUnInstalled) 
+		else if (allUnInstalled)
 			return DeploymentDescriptorStatus.UNINSTALLED;
 		else
 			return status;
@@ -1859,7 +1931,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		SubscribedResource res = portalRepositoryRef.getSubscribedResourceByUUID(clientUUID);
 		if (res != null) {
-			res.setLastUpdate(new Date()); // each time Portal Client Polls api, we update this Last seen of client
+			res.setLastUpdate(new Date()); // each time Portal Client Polls api,
+											// we update this Last seen of
+											// client
 			PortalUser reattachedUser = portalRepositoryRef.getUserByID(res.getOwner().getId());
 			res.setOwner(reattachedUser);
 			portalRepositoryRef.updateSubscribedResourceInfo(res.getId(), res);
@@ -1867,91 +1941,156 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return res;
 	}
+
+	// admin MANO platforms
+	@GET
+	@Path("/manoplatforms/")
+	@Produces("application/json")
+	public Response getMANOplatforms() {
+		return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
+	}
+
+	@GET
+	@Path("/admin/manoplatforms/")
+	@Produces("application/json")
+	public Response getAdminMANOplatforms() {
+		return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
+	}
+
+	@POST
+	@Path("/admin/manoplatforms/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addMANOplatform(MANOplatform c) {
+		MANOplatform u = portalRepositoryRef.addMANOplatform(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@PUT
+	@Path("/admin/manoplatforms/{mpid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateMANOplatform(@PathParam("mpid") int mpid, MANOplatform c) {
+		MANOplatform previousMP = portalRepositoryRef.getMANOplatformByID(mpid);
+
+		MANOplatform u = portalRepositoryRef.updateMANOplatformInfo(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+
+	@DELETE
+	@Path("/admin/manoplatforms/{mpid}")
+	public Response deleteMANOplatform(@PathParam("mpid") int mpid) {
+		MANOplatform category = portalRepositoryRef.getMANOplatformByID(mpid);
+
+		portalRepositoryRef.deleteMANOplatform(mpid);
+		return Response.ok().build();
+
+	}
+
+	@GET
+	@Path("/manoplatforms/{mpid}")
+	@Produces("application/json")
+	public Response getMANOplatformById(@PathParam("mpid") int mpid) {
+		MANOplatform sm = portalRepositoryRef.getMANOplatformByID(mpid);
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("MANOplatform " + mpid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@GET
+	@Path("/admin/manoplatforms/{mpid}")
+	@Produces("application/json")
+	public Response getAdminMANOplatformById(@PathParam("mpid") int mpid) {
+		return getMANOplatformById(mpid);
+	}
+
+	// admin MANO providers
+
 	
+	@GET
+	@Path("/admin/manoproviders/")
+	@Produces("application/json")
+	public Response getAdminMANOproviders() {
+		return Response.ok().entity(portalRepositoryRef.getMANOproviders()).build();
+	}
+
+	@POST
+	@Path("/admin/manoproviders/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addMANOprovider(MANOprovider c) {
+		MANOprovider u = portalRepositoryRef.addMANOprovider(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested MANOprovider with name=" + c.getName() + " cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@PUT
+	@Path("/admin/manoproviders/{mpid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateMANOprovider(@PathParam("mpid") int mpid, MANOprovider c) {
+
+		MANOprovider u = portalRepositoryRef.updateMANOproviderInfo(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested MANOprovider with name=" + c.getName() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+
+	@DELETE
+	@Path("/admin/manoproviders/{mpid}")
+	public Response deleteMANOprovider(@PathParam("mpid") int mpid) {
+
+		portalRepositoryRef.deleteMANOprovider(mpid);
+		return Response.ok().build();
+
+	}
 	
-	//admin MANO platforms
-	
-	
-	// categories API
-		@GET
-		@Path("/manoplatforms/")
-		@Produces("application/json")
-		public Response getMANOplatforms() {
-			return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
+
+	@GET
+	@Path("/admin/manoproviders/{mpid}")
+	@Produces("application/json")
+	public Response getAdminMANOproviderById(@PathParam("mpid") int mpid) {
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(mpid);
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("MANOprovider " + mpid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
 		}
-
-		@GET
-		@Path("/admin/manoplatforms/")
-		@Produces("application/json")
-		public Response getAdminMANOplatforms() {
-			return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
-		}
-
-		@POST
-		@Path("/admin/manoplatforms/")
-		@Produces("application/json")
-		@Consumes("application/json")
-		public Response addMANOplatform(MANOplatform c) {
-			MANOplatform u = portalRepositoryRef.addMANOplatform(c);
-
-			if (u != null) {
-				return Response.ok().entity(u).build();
-			} else {
-				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-				builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be installed");
-				throw new WebApplicationException(builder.build());
-			}
-		}
-
-		@PUT
-		@Path("/admin/manoplatforms/{mpid}")
-		@Produces("application/json")
-		@Consumes("application/json")
-		public Response updateMANOplatform(@PathParam("mpid") int mpid, MANOplatform c) {
-			MANOplatform previousMP = portalRepositoryRef.getMANOplatformByID(mpid);
-
-			MANOplatform u = portalRepositoryRef.updateMANOplatformInfo(c);
-
-			if (u != null) {
-				return Response.ok().entity(u).build();
-			} else {
-				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-				builder.entity("Requested MANOplatform with name=" + c.getName() + " cannot be updated");
-				throw new WebApplicationException(builder.build());
-			}
-
-		}
-
-		@DELETE
-		@Path("/admin/manoplatforms/{mpid}")
-		public Response deleteMANOplatform(@PathParam("mpid") int mpid) {
-			MANOplatform category = portalRepositoryRef.getMANOplatformByID(mpid);
-			
-				portalRepositoryRef.deleteMANOplatform(mpid);
-				return Response.ok().build();
-			
-		}
-
-		@GET
-		@Path("/manoplatforms/{mpid}")
-		@Produces("application/json")
-		public Response getMANOplatformById(@PathParam("mpid") int mpid) {
-			MANOplatform sm = portalRepositoryRef.getMANOplatformByID(mpid);
-
-			if (sm != null) {
-				return Response.ok().entity(sm).build();
-			} else {
-				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-				builder.entity("MANOplatform " + mpid + " not found in portal registry");
-				throw new WebApplicationException(builder.build());
-			}
-		}
-
-		@GET
-		@Path("/admin/manoplatforms/{mpid}")
-		@Produces("application/json")
-		public Response getAdminMANOplatformById(@PathParam("mpid") int mpid) {
-			return getCategoryById(mpid);
-		}
+	}
 
 }

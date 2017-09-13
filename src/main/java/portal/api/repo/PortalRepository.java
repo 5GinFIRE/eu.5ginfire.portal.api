@@ -24,6 +24,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserSession;
@@ -343,6 +344,38 @@ public class PortalRepository {
 
 	public void deleteMANOplatform(int mpid) {
 		portalJpaController.deleteMANOplatform(mpid);
+		
+	}
+
+	
+
+
+	public Object getMANOproviders() {
+
+		List<MANOprovider> ls = portalJpaController.readMANOproviders(0, 100000);
+		return ls;	
+	}
+
+
+	public MANOprovider addMANOprovider(MANOprovider c) {
+		portalJpaController.saveMANOprovider(c);
+		return c;
+	}
+
+
+	public MANOprovider getMANOproviderByID(int catid) {
+		return portalJpaController.readMANOproviderById(catid);
+	}
+
+
+	public MANOprovider updateMANOproviderInfo(MANOprovider c) {
+		MANOprovider bmr = portalJpaController.updateMANOprovider(c);
+		return bmr;
+	}
+
+
+	public void deleteMANOprovider(int mpid) {
+		portalJpaController.deleteMANOprovider(mpid);
 		
 	}
 

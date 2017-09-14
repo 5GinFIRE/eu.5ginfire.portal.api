@@ -17,15 +17,18 @@ package portal.api;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
 import java.util.UUID;
 
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
+import portal.api.model.OnBoardingStatus;
 import portal.api.model.PackagingFormat;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.model.Category;
 import portal.api.model.Container;
 import portal.api.model.DeployArtifact;
@@ -50,14 +53,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:contextTest.xml" })
-//@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
-//@Transactional
+// @TransactionConfiguration(transactionManager = "transactionManager",
+// defaultRollback = false)
+// @Transactional
 public class PortalRepoTest {
 
 	@Autowired
-	private  PortalJpaController portalJpaControllerTest;
+	private PortalJpaController portalJpaControllerTest;
 
-	// private static final transient Log logger = LogFactory.getLog(PortalRepoTest.class.getName());
+	// private static final transient Log logger =
+	// LogFactory.getLog(PortalRepoTest.class.getName());
 
 	@Before
 	public void deletePreviousobjectsDB() {
@@ -73,24 +78,24 @@ public class PortalRepoTest {
 
 	@Test
 	public void testWriteReadDB() {
-		
+
 		MANOplatform mp = new MANOplatform();
-		mp.setName("OSM");		
+		mp.setName("OSM");
 		portalJpaControllerTest.saveMANOplatform(mp);
-		assertEquals( 1, portalJpaControllerTest.countMANOplatforms());
-		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName( "OSM" );
+		assertEquals(1, portalJpaControllerTest.countMANOplatforms());
+		MANOplatform mp1 = portalJpaControllerTest.readMANOplatformByName("OSM");
 		assertEquals("OSM", mp1.getName());
-		
+
 		MANOprovider mprovider = new MANOprovider();
-		mprovider.setName("OSMAPIENDPOINT");		
+		mprovider.setName("OSMAPIENDPOINT");
 		portalJpaControllerTest.saveMANOprovider(mprovider);
-		assertEquals( 1, portalJpaControllerTest.countMANOproviders());
-		MANOprovider mprovider1 = portalJpaControllerTest.readMANOproviderByName( "OSMAPIENDPOINT" );
+		assertEquals(1, portalJpaControllerTest.countMANOproviders());
+		MANOprovider mprovider1 = portalJpaControllerTest.readMANOproviderByName("OSMAPIENDPOINT");
 		assertEquals("OSMAPIENDPOINT", mprovider1.getName());
-		//assertEquals( 1, mprovider1.getId() );
+		// assertEquals( 1, mprovider1.getId() );
 
 		portalJpaControllerTest.getAllProductsPrinted();
-		
+
 		PortalUser bu = new PortalUser();
 		bu.setOrganization("UoP");
 		bu.setName("aname");
@@ -99,7 +104,7 @@ public class PortalRepoTest {
 		bu.setEmail("e@e.com");
 
 		portalJpaControllerTest.saveUser(bu);
-		
+
 		VxFMetadata bmeta = new VxFMetadata();
 		bmeta.setName("avxf");
 		String uuid = UUID.randomUUID().toString();
@@ -116,17 +121,22 @@ public class PortalRepoTest {
 		bmeta.setCertifiedBy("ACERT");
 		bmeta.setPackagingFormat(PackagingFormat.TOSCA);
 		bmeta.getSupportedMANOPlatforms().add(mp1);
-		bmeta.getSupportedMANOProviders().add(mprovider1);
+
+		VxFOnBoardedDescriptor vobd = new VxFOnBoardedDescriptor(bmeta);
+		vobd.setLastOnboarding(new Date());
+		vobd.setObMANOprovider(mprovider1);
+		vobd.setOnBoardingStatus(OnBoardingStatus.SUCCESS);
+		bmeta.getVxfOnBoardedDescriptors().add(vobd);
 
 		portalJpaControllerTest.updatePortalUser(bu);
-		
+
 		// change name and reSave
 		bmeta = (VxFMetadata) portalJpaControllerTest.readProductByUUID(uuid);
 		bmeta.setName("NewVxFName");
-		portalJpaControllerTest.updateProduct(bmeta);		
+		portalJpaControllerTest.updateProduct(bmeta);
 
 		portalJpaControllerTest.getAllProductsPrinted();
-		
+
 		bmeta = new VxFMetadata();
 		String uuid2 = UUID.randomUUID().toString();
 		bmeta.setUuid(uuid2);
@@ -145,9 +155,8 @@ public class PortalRepoTest {
 		assertEquals("UoP", testbu.getOrganization());
 		assertEquals("e@e.com", testbu.getEmail());
 
-
 		portalJpaControllerTest.getAllProductsPrinted();
-		
+
 		assertEquals(2, testbu.getProducts().size());
 
 		VxFMetadata testbm = (VxFMetadata) portalJpaControllerTest.readProductByUUID(uuid);
@@ -155,17 +164,16 @@ public class PortalRepoTest {
 		assertEquals(uuid, testbm.getUuid());
 		assertNotNull(testbm.getOwner());
 		assertEquals("ausername", testbm.getOwner().getUsername());
-		assertEquals( 2, testbm.getExtensions().size() );
-		assertEquals( "aname", testbm.getExtensions().get(0).getName() );
-		assertEquals( "aname1", testbm.getExtensions().get(1).getName() );
-		assertEquals( true,
-				testbm.isCertified() );
-		assertEquals( "ACERT", testbm.getCertifiedBy() );
-		assertEquals( PackagingFormat.TOSCA, testbm.getPackagingFormat() );
-		assertEquals( 1, testbm.getSupportedMANOPlatforms().size() );
-		assertEquals( 1, testbm.getSupportedMANOProviders().size() );
-		
-
+		assertEquals(2, testbm.getExtensions().size());
+		assertEquals("aname", testbm.getExtensions().get(0).getName());
+		assertEquals("aname1", testbm.getExtensions().get(1).getName());
+		assertEquals(true, testbm.isCertified());
+		assertEquals("ACERT", testbm.getCertifiedBy());
+		assertEquals(PackagingFormat.TOSCA, testbm.getPackagingFormat());
+		assertEquals(1, testbm.getSupportedMANOPlatforms().size());
+		assertEquals(1, testbm.getVxfOnBoardedDescriptors().size()  );
+		assertEquals("OSMAPIENDPOINT", testbm.getVxfOnBoardedDescriptors().get(0).getObMANOprovider().getName()  );
+				
 		bu = new PortalUser();
 		bu.setOrganization("UoP2");
 		bu.setName("aname2");
@@ -176,11 +184,6 @@ public class PortalRepoTest {
 		portalJpaControllerTest.getAllUsersPrinted();
 		assertEquals(2, portalJpaControllerTest.countUsers());
 
-		
-		
-		
-		
-		
 	}
 
 	@Test
@@ -207,16 +210,16 @@ public class PortalRepoTest {
 		portalJpaControllerTest.deleteSubscribedResource(sm.getId());
 
 	}
-	
+
 	@Test
 	public void testWriteReadApplications() {
-		
+
 		Category c = new Category();
 		c.setName("acat1");
 		assertEquals("acat1", c.getName());
 		Category c2 = new Category();
 		c2.setName("acat2");
-		
+
 		PortalUser bu = new PortalUser();
 		bu.setUsername("ausernameWRA");
 
@@ -231,11 +234,11 @@ public class PortalRepoTest {
 		ProductExtensionItem item = new ProductExtensionItem();
 		item.setName("param1");
 		item.setValue("value1");
-		appmeta.addExtensionItem(item );
+		appmeta.addExtensionItem(item);
 		ProductExtensionItem item2 = new ProductExtensionItem();
 		item.setName("param2");
 		item.setValue("value2");
-		appmeta.addExtensionItem(item2 );
+		appmeta.addExtensionItem(item2);
 		bu.addProduct(appmeta);
 
 		portalJpaControllerTest.saveUser(bu);
@@ -243,8 +246,8 @@ public class PortalRepoTest {
 		// change name and reSave
 		appmeta.setName("NewAppName");
 		portalJpaControllerTest.updateProduct(appmeta);
-		assertEquals(2, appmeta.getCategories().size() );
-		assertEquals(2, appmeta.getExtensions().size() );
+		assertEquals(2, appmeta.getCategories().size());
+		assertEquals(2, appmeta.getExtensions().size());
 
 		ExperimentMetadata appmeta2 = new ExperimentMetadata();
 		appmeta2.setName("app2");
@@ -268,17 +271,16 @@ public class PortalRepoTest {
 		portalJpaControllerTest.getAllCategoriesPrinted();
 		assertEquals("acat1", testApp.getCategories().get(0).getName());
 
-
 	}
-	
+
 	@Test
 	public void testDeployDescriptorApplications() {
 		Category c = new Category();
 		c.setName("acat1");
 		PortalUser bu = new PortalUser();
 		bu.setUsername("ausername123");
-		
-		//add a couple of vxfs
+
+		// add a couple of vxfs
 		VxFMetadata bmeta = new VxFMetadata();
 		bmeta.setName("vxf1");
 		String uuid = UUID.randomUUID().toString();
@@ -286,16 +288,16 @@ public class PortalRepoTest {
 		bmeta.addExtensionItem("aname1", "avalue1");
 		bmeta.addExtensionItem("aname2", "avalue2");
 		bu.addProduct(bmeta);
-		
+
 		VxFMetadata bmeta2 = new VxFMetadata();
 		bmeta2.setName("vxf2");
 		uuid = UUID.randomUUID().toString();
 		bmeta2.setUuid(uuid);
 		bmeta2.addExtensionItem("aname11", "avalue11");
 		bmeta2.addExtensionItem("aname21", "avalue21");
-		bu.addProduct(bmeta2);		
-		
-		//add an application description
+		bu.addProduct(bmeta2);
+
+		// add an application description
 		ExperimentMetadata app = new ExperimentMetadata();
 		app.setName("myapp");
 		uuid = UUID.randomUUID().toString();
@@ -303,43 +305,45 @@ public class PortalRepoTest {
 		app.setLongDescription("longDescription");
 		app.setShortDescription("shortDescription");
 		app.getCategories().add(c);
-		Container container = new Container(); //add a container
-		container.setName("Container0");		
+		Container container = new Container(); // add a container
+		container.setName("Container0");
 		DeployArtifact deployArtifact = new DeployArtifact();
-		deployArtifact.setName(bmeta2.getName() );
+		deployArtifact.setName(bmeta2.getName());
 		deployArtifact.setUuid(bmeta2.getUuid());
 		container.getDeployArtifacts().add(deployArtifact);
-		app.getContainers().add(container );		
+		app.getContainers().add(container);
 		bu.addProduct(app);
-		
-		//now create a dployment
+
+		// now create a dployment
 		DeploymentDescriptor dd = new DeploymentDescriptor();
 		dd.setBaseApplication(app);
 		dd.setName("a test DeployDescriptor");
 		dd.setOwner(bu);
-		dd.setStatus( DeploymentDescriptorStatus.PENDING_ADMIN_AUTH );
+		dd.setStatus(DeploymentDescriptorStatus.PENDING_ADMIN_AUTH);
 		DeployContainer deplContainer = new DeployContainer();
 		deplContainer.setName("deploy1");
 		DeployArtifact deployArtifactInst = new DeployArtifact();
-		deployArtifactInst.setName( dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getName() );
-		deployArtifactInst.setUuid( dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getUuid() );		
+		deployArtifactInst
+				.setName(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getName());
+		deployArtifactInst
+				.setUuid(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getUuid());
 		deplContainer.getDeployArtifacts().add(deployArtifactInst);
 		SubscribedResource targetResource = new SubscribedResource();
 		targetResource.setURL("targetIP");
-		deplContainer.setTargetResource(targetResource );
+		deplContainer.setTargetResource(targetResource);
 		dd.getDeployContainers().add(deplContainer);
-		bu.getDeployments().add(dd);//now add the deployment to the user
+		bu.getDeployments().add(dd);// now add the deployment to the user
 
 		portalJpaControllerTest.saveUser(bu);
-		
 
-		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausername123") ;		
+		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausername123");
 
-		assertEquals(1, testbu.getDeployments().size()  );
-		assertEquals(1, testbu.getDeployments().get(0).getDeployContainers().size()  );
-		assertEquals("myapp", testbu.getDeployments().get(0).getBaseApplication().getName() );
-		assertEquals("targetIP", testbu.getDeployments().get(0).getDeployContainers().get(0).getTargetResource().getURL()  );
-		
+		assertEquals(1, testbu.getDeployments().size());
+		assertEquals(1, testbu.getDeployments().get(0).getDeployContainers().size());
+		assertEquals("myapp", testbu.getDeployments().get(0).getBaseApplication().getName());
+		assertEquals("targetIP",
+				testbu.getDeployments().get(0).getDeployContainers().get(0).getTargetResource().getURL());
+
 	}
 
 }

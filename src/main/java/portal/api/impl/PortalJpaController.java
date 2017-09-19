@@ -37,6 +37,7 @@ import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
+import portal.api.model.UserRoleType;
 import portal.api.model.VxFMetadata;
 
 /**
@@ -62,7 +63,7 @@ public class PortalJpaController {
 			bu.setPassword("changeme");
 			bu.setEmail("");
 			bu.setOrganization("");
-			bu.setRole("ROLE_PORTALADMIN");
+			bu.addRole( UserRoleType.ROLE_PORTALADMIN );
 			bu.setActive(true);
 			saveUser(bu);
 

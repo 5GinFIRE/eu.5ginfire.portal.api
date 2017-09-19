@@ -16,6 +16,7 @@
 package portal.api.util;
 
 import portal.api.model.PortalUser;
+import portal.api.model.UserRoleType;
 import portal.api.repo.PortalRepository;
 
 import java.util.ArrayList;
@@ -62,12 +63,16 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		PortalUser bu = portalRepositoryRef.getUserByUsername( arg0.toString() );
 		if (bu!=null){
 
-			String r = bu.getRole();
-			if ((r==null) || (r.isEmpty())){
-				r="ROLE_EXPERIMENTER"; //SERVICE_PLATFORM_PROVIDER
+			
+			//String r = bu.getRole();
+			if ( bu.getRoles().isEmpty()  ){
+				bu.addRole( UserRoleType.ROLE_EXPERIMENTER );
 			}
-			logger.info("PrincipalCollection Role=" + r);
-			ai.addRole(r);
+			for (UserRoleType role : bu.getRoles()) {
+				logger.info("PrincipalCollection Role=" + role.toString());
+				ai.addRole( role.toString() );
+				
+			}
 		}
 		
 		

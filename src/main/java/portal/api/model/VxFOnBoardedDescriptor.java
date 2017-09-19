@@ -42,6 +42,9 @@ public class VxFOnBoardedDescriptor {
 	
 	private String deployId = UUID.randomUUID().toString()+"(temporary)";
 
+	public VxFOnBoardedDescriptor() {		
+	}
+	
 	public VxFOnBoardedDescriptor(VxFMetadata v) {
 		this.vxf = v;
 	}

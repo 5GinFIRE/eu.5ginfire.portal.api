@@ -22,6 +22,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -50,13 +52,18 @@ public class PortalUser {
 	private String username = null;
 	@Basic()
 	private String password = null;
-	@Basic()
-	private String role = null;
+//	@Basic()
+//	private String role = null;
 	@Basic()	
 	private Boolean active = false;
 	@Basic()
 	private String currentSessionID = null;
 	
+	/**
+	 * 
+	 */
+	@Enumerated(EnumType.ORDINAL)
+	private List<UserRoleType> roles = new ArrayList<UserRoleType>();
 	
 	/**
 	 * 
@@ -65,6 +72,10 @@ public class PortalUser {
 	@JoinTable()
 	private List<Product> products = new ArrayList<Product>();
 	
+
+	public List<UserRoleType> getRoles() {
+		return roles;
+	}
 
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
@@ -228,14 +239,6 @@ public class PortalUser {
 		this.email = email;
 	}
 
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
 	public Boolean getActive() {
 		return active;
 	}
@@ -250,6 +253,14 @@ public class PortalUser {
 
 	public void setCurrentSessionID(String currentSessionID) {
 		this.currentSessionID = currentSessionID;
+	}
+
+	public void addRole(UserRoleType role ) {
+		this.roles.add(role);		
+	}
+	
+	public void removeRole(UserRoleType role ) {
+		this.roles.remove(role);		
 	}
 	
 //	public void addApplication(ExperimentMetadata app) {

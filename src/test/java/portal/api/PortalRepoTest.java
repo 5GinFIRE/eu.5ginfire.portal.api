@@ -37,6 +37,7 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
+import portal.api.model.UserRoleType;
 import portal.api.util.EncryptionUtil;
 
 import org.apache.commons.logging.Log;
@@ -102,6 +103,7 @@ public class PortalRepoTest {
 		bu.setUsername("ausername");
 		bu.setPassword("apassword");
 		bu.setEmail("e@e.com");
+		bu.addRole(UserRoleType.ROLE_PORTALADMIN);
 
 		portalJpaControllerTest.saveUser(bu);
 
@@ -154,6 +156,8 @@ public class PortalRepoTest {
 		assertEquals(EncryptionUtil.hash("apassword"), testbu.getPassword());
 		assertEquals("UoP", testbu.getOrganization());
 		assertEquals("e@e.com", testbu.getEmail());
+		assertEquals(UserRoleType.ROLE_PORTALADMIN, testbu.getRoles().get(0) );
+		
 
 		portalJpaControllerTest.getAllProductsPrinted();
 

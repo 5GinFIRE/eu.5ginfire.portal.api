@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -62,6 +63,7 @@ public class PortalUser {
 	/**
 	 * 
 	 */
+	@ElementCollection(targetClass=UserRoleType.class)
 	@Enumerated(EnumType.ORDINAL)
 	private List<UserRoleType> roles = new ArrayList<UserRoleType>();
 	

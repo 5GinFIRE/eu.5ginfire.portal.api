@@ -218,8 +218,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				+ getAttachmentStringValue("randomregid", ats));
 		user.setEmail(getAttachmentStringValue("useremail", ats));
 		user.setActive(false);// in any case the user should be not active
-		user.addRole(UserRoleType.ROLE_EXPERIMENTER); // otherwise in post he can choose
-											// ROLE_PORTALADMIN, and the
+		user.addRole(UserRoleType.EXPERIMENTER); // otherwise in post he can choose
+											// PORTALADMIN, and the
 											// immediately register :-)
 
 		String msg = getAttachmentStringValue("emailmessage", ats);
@@ -489,7 +489,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			
 			
-			if ( u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN) ) {
+			if ( u.getRoles().contains(UserRoleType.PORTALADMIN) ) {
 				vxfs = portalRepositoryRef.getVxFs(categoryid);
 			} else {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
@@ -966,7 +966,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (u != null) {
 
-			if ( u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN) ) {
+			if ( u.getRoles().contains(UserRoleType.PORTALADMIN) ) {
 				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return
 																												// all
 			} else
@@ -991,7 +991,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((sm != null) && (u != null)) {
 
-			if (( u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN) ) || (sm.getOwner().getId() == u.getId()))
+			if (( u.getRoles().contains(UserRoleType.PORTALADMIN) ) || (sm.getOwner().getId() == u.getId()))
 				return Response.ok().entity(sm).build();
 
 		}
@@ -1040,7 +1040,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (u != null) {
 
-			if ((u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
 
 				SubscribedResource sr = portalRepositoryRef.updateSubscribedResourceInfo(smId, sm);
 				return Response.ok().entity(u).build();
@@ -1065,7 +1065,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
 		if (u != null) {
 
-			if ((u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
 				portalRepositoryRef.deleteSubscribedResource(smId);
 				return Response.ok().build();
 
@@ -1089,7 +1089,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			List<ExperimentMetadata> apps;
 
-			if (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
 				apps = portalRepositoryRef.getApps(categoryid);
 			} else {
 				apps = portalRepositoryRef.getAppsByUserID((long) u.getId());
@@ -1477,7 +1477,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				;
 				u.setName(fu.getDisplayName());
 				u.setOrganization("FI-WARE");
-				u.addRole(UserRoleType.ROLE_TESTBEDPROVIDER);
+				u.addRole(UserRoleType.TESTBED_PROVIDER);
 				u.setPassword(roamPassword);
 				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
 				portalRepositoryRef.addPortalUserToUsers(u);
@@ -1612,7 +1612,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
 			List<DeploymentDescriptor> deployments;
 
-			if (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 			} else {
 				deployments = u.getDeployments();
@@ -1679,7 +1679,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		DeploymentDescriptor dep = portalRepositoryRef.getDeploymentByID(id);
 		if (u != null) {
-			if (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN) || u.getId() == dep.getOwner().getId()) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getId() == dep.getOwner().getId()) {
 				portalRepositoryRef.deleteDeployment(id);
 				return Response.ok().build();
 			}
@@ -1701,7 +1701,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("getDeploymentById for id: " + deploymentId);
 			DeploymentDescriptor deployment = portalRepositoryRef.getDeploymentByID(deploymentId);
 
-			if ((u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)) || (deployment.getOwner().getId() == u.getId())) {
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (deployment.getOwner().getId() == u.getId())) {
 				return Response.ok().entity(deployment).build();
 			}
 
@@ -1724,7 +1724,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((u != null)) {
 
-			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN))) // only
+			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only
 																					// admin
 																					// can
 																					// alter
@@ -1732,9 +1732,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 																					// deployment
 				d.setStatus(DeploymentDescriptorStatus.QUEUED);
 			else if (action.equals("UNINSTALL")
-					&& (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN) || u.getId() == d.getOwner().getId()))
+					&& (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getId() == d.getOwner().getId()))
 				d.setStatus(DeploymentDescriptorStatus.UNINSTALLING);
-			else if (action.equals("DENY") && (u.getRoles().contains(UserRoleType.ROLE_PORTALADMIN)))
+			else if (action.equals("DENY") && (u.getRoles().contains(UserRoleType.PORTALADMIN)))
 				d.setStatus(DeploymentDescriptorStatus.DENIED);
 
 			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());

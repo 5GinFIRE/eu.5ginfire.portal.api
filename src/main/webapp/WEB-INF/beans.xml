@@ -143,7 +143,7 @@
 				/services/api/repo/cloud/** = userfilter, rest
 				/services/api/** = userfilter, rest
 				/admin/logout = logout
-				/admin/viewUsers.html = authc, roles[ROLE_PORTALADMIN]
+				/admin/viewUsers.html = authc, roles[PORTALADMIN]
 				/admin/** = authc
 				/** = authc
 

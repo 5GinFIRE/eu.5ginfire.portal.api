@@ -63,7 +63,7 @@ public class PortalJpaController {
 			bu.setPassword("changeme");
 			bu.setEmail("");
 			bu.setOrganization("");
-			bu.addRole( UserRoleType.ROLE_PORTALADMIN );
+			bu.addRole( UserRoleType.PORTALADMIN );
 			bu.setActive(true);
 			saveUser(bu);
 

@@ -66,7 +66,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 			
 			//String r = bu.getRole();
 			if ( bu.getRoles().isEmpty()  ){
-				bu.addRole( UserRoleType.ROLE_EXPERIMENTER );
+				bu.addRole( UserRoleType.EXPERIMENTER );
 			}
 			for (UserRoleType role : bu.getRoles()) {
 				logger.info("PrincipalCollection Role=" + role.toString());

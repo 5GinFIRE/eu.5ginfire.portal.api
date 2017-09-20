@@ -24,8 +24,8 @@ import javax.persistence.Entity;
 @Entity(name = "UserRoleType")
 public enum UserRoleType {
 
-	ROLE_PORTALADMIN,
-	ROLE_EXPERIMENTER,
-	ROLE_VXF_DEVELOPER,
-	ROLE_TESTBEDPROVIDER
+	PORTALADMIN,
+	EXPERIMENTER,
+	VXF_DEVELOPER,
+	TESTBED_PROVIDER
 }

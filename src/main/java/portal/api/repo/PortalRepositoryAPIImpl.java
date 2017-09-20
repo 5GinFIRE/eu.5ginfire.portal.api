@@ -119,7 +119,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
-	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal/metadata/";
+	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal" + File.separator + "metadata" + File.separator ;
 
 	private PortalRepository portalRepositoryRef;
 	private OAuthClientManager oAuthClientManagerRef;
@@ -397,7 +397,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl + "repo/images/" + uuid + File.separator + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
 				}
 			}
 
@@ -407,7 +407,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("")) {
 					String vxffilepath = saveFile(vxfFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + File.separator + vxfFileNamePosted);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/"  + vxfFileNamePosted);
 				}
 			}
 
@@ -422,7 +422,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + uuid + File.separator + shotFileNamePosted;
+					shotfilepath = endpointUrl + "repo/images/" + uuid + "/"  + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -625,7 +625,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
 					prod.setIconsrc(
-							endpointUrl + "repo/images/" + prod.getUuid() + File.separator + imageFileNamePosted);
+							endpointUrl + "repo/images/" + prod.getUuid() + "/"  + imageFileNamePosted);
 				}
 			}
 
@@ -636,7 +636,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
 					prod.setPackageLocation(
-							endpointUrl + "repo/packages/" + prod.getUuid() + File.separator + vxfFileNamePosted);
+							endpointUrl + "repo/packages/" + prod.getUuid() + "/"  + vxfFileNamePosted);
 				}
 			}
 
@@ -651,7 +651,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + prod.getUuid() + File.separator + shotFileNamePosted;
+					shotfilepath = endpointUrl + "repo/images/" + prod.getUuid() + "/"  + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -684,16 +684,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	@GET
 	@Path("/images/{uuid}/{imgfile}")
-	@Produces("image/*")
+	@Produces({"image/jpeg,image/png"})
 	public Response getEntityImage(@PathParam("uuid") String uuid, @PathParam("imgfile") String imgfile) {
 		logger.info("getEntityImage of uuid: " + uuid);
 		String imgAbsfile = METADATADIR + uuid + File.separator + imgfile;
 		logger.info("Image RESOURCE FILE: " + imgAbsfile);
 		File file = new File(imgAbsfile);
-		ResponseBuilder response = Response.ok((Object) file);
-		response.header("Content-Disposition", "attachment; filename=" + file.getName());
-		return response.build();
 
+//		ResponseBuilder response = Response.ok((Object) file );
+//		logger.info( "attachment; filename=" + file.getName() );
+//		response.header("Content-Disposition", "attachment; filename=" + file.getName());
+//		return response.build();
+		//String mediaType = SomeContentTypeMapHere(file)
+		return Response.ok(file).build();
 	}
 
 	@GET

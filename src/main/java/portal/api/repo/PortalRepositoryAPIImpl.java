@@ -567,6 +567,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// VxFMetadata sm = (VxFMetadata)
 		// portalRepositoryRef.getProductByID(bid);
+		
+		for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors() ) {
+			vxFOnBoardedDescriptor.setVxf ( vxf );
+		}
+		
 		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
@@ -664,6 +669,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			e.printStackTrace();
 		}
+		
+		
 
 		// save product
 		prod = portalRepositoryRef.updateProductInfo(prod);

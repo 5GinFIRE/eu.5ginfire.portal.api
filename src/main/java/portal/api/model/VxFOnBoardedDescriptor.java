@@ -28,12 +28,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 /**
  * @author ctranoris
  * maintains information and status of a VNF on which MANO providers is on-boarded
  * see https://github.com/5GinFIRE/eu.5ginfire.portal.api/issues/10 
  */
 @Entity(name = "VxFOnBoardedDescriptor")
+@JsonIgnoreProperties(value = { "vxf" })
+
 public class VxFOnBoardedDescriptor {
 
 	@Id
@@ -48,6 +52,8 @@ public class VxFOnBoardedDescriptor {
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
 	private VxFMetadata vxf;
+	
+	private long vxfid;
 	
 	private  OnBoardingStatus onBoardingStatus = OnBoardingStatus.UNKNOWN;
 	
@@ -109,6 +115,13 @@ public class VxFOnBoardedDescriptor {
 	public void setDeployId(String deployId) {
 		this.deployId = deployId;
 	}
-	
+		
+	public long getVxfid() {
+		return vxf.getId();
+	}
+
+	public void setVxfid(long vxfid) {
+		
+	}
 	
 }

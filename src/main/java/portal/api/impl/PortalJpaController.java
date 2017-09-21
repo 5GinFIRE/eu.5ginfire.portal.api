@@ -39,6 +39,7 @@ import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserRoleType;
 import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 
 /**
  * This class maintains the entity manager and get a broker element from DB
@@ -967,6 +968,58 @@ public class PortalJpaController {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(MANOprovider.class, i);
+	}
+
+	
+	public List<VxFOnBoardedDescriptor> readVxFOnBoardedDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM VxFOnBoardedDescriptor m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveVxFOnBoardedDescriptor(VxFOnBoardedDescriptor mprovider) {
+		logger.info("Will save VxFOnBoardedDescriptor = " + mprovider.getDeployId() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public VxFOnBoardedDescriptor updateVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		VxFOnBoardedDescriptor resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteVxFOnBoardedDescriptor(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		VxFOnBoardedDescriptor c = entityManager.find( VxFOnBoardedDescriptor.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public VxFOnBoardedDescriptor readVxFOnBoardedDescriptorById(int i) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(VxFOnBoardedDescriptor.class, i);
 	}
 
 }

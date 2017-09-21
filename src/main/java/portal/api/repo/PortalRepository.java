@@ -20,6 +20,7 @@ import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.InstalledVxF;
@@ -377,6 +378,37 @@ public class PortalRepository {
 	public void deleteMANOprovider(int mpid) {
 		portalJpaController.deleteMANOprovider(mpid);
 		
+	}
+
+	
+
+	public Object getVxFOnBoardedDescriptors() {
+
+		List<VxFOnBoardedDescriptor> ls = portalJpaController.readVxFOnBoardedDescriptors(0, 100000);
+		return ls;	
+	}
+
+
+	public VxFOnBoardedDescriptor addVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		portalJpaController.saveVxFOnBoardedDescriptor(c);
+		return c;
+	}
+
+
+	public VxFOnBoardedDescriptor updateVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		VxFOnBoardedDescriptor bmr = portalJpaController.updateVxFOnBoardedDescriptor(c);
+		return bmr;
+	}
+
+
+	public void deleteVxFOnBoardedDescriptor(int mpid) {
+		portalJpaController.deleteVxFOnBoardedDescriptor(mpid);
+		
+	}
+
+
+	public VxFOnBoardedDescriptor getVxFOnBoardedDescriptorByID(int mpid) {
+		return portalJpaController.readVxFOnBoardedDescriptorById( mpid );
 	}
 
 

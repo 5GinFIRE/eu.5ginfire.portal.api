@@ -90,6 +90,7 @@ import portal.api.model.SubscribedResource;
 import portal.api.model.UserRoleType;
 import portal.api.model.UserSession;
 import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.util.EmailUtil;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
@@ -119,7 +120,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
-	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal" + File.separator + "metadata" + File.separator ;
+	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal"
+			+ File.separator + "metadata" + File.separator;
 
 	private PortalRepository portalRepositoryRef;
 	private OAuthClientManager oAuthClientManagerRef;
@@ -219,8 +221,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		user.setEmail(getAttachmentStringValue("useremail", ats));
 		user.setActive(false);// in any case the user should be not active
 		user.addRole(UserRoleType.EXPERIMENTER); // otherwise in post he can choose
-											// PORTALADMIN, and the
-											// immediately register :-)
+		// PORTALADMIN, and the
+		// immediately register :-)
 
 		String msg = getAttachmentStringValue("emailmessage", ats);
 		logger.info("Received register for usergetUsername: " + user.getUsername());
@@ -407,7 +409,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("")) {
 					String vxffilepath = saveFile(vxfFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/"  + vxfFileNamePosted);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/" + vxfFileNamePosted);
 				}
 			}
 
@@ -422,7 +424,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + uuid + "/"  + shotFileNamePosted;
+					shotfilepath = endpointUrl + "repo/images/" + uuid + "/" + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -487,9 +489,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			List<VxFMetadata> vxfs;
 
-			
-			
-			if ( u.getRoles().contains(UserRoleType.PORTALADMIN) ) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
 				vxfs = portalRepositoryRef.getVxFs(categoryid);
 			} else {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
@@ -624,8 +624,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("unknown")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(
-							endpointUrl + "repo/images/" + prod.getUuid() + "/"  + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
 				}
 			}
 
@@ -635,8 +634,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("unknown")) {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(
-							endpointUrl + "repo/packages/" + prod.getUuid() + "/"  + vxfFileNamePosted);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
 				}
 			}
 
@@ -651,7 +649,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + prod.getUuid() + "/"  + shotFileNamePosted;
+					shotfilepath = endpointUrl + "repo/images/" + prod.getUuid() + "/" + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -684,18 +682,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	@GET
 	@Path("/images/{uuid}/{imgfile}")
-	@Produces({"image/jpeg,image/png"})
+	@Produces({ "image/jpeg,image/png" })
 	public Response getEntityImage(@PathParam("uuid") String uuid, @PathParam("imgfile") String imgfile) {
 		logger.info("getEntityImage of uuid: " + uuid);
 		String imgAbsfile = METADATADIR + uuid + File.separator + imgfile;
 		logger.info("Image RESOURCE FILE: " + imgAbsfile);
 		File file = new File(imgAbsfile);
 
-//		ResponseBuilder response = Response.ok((Object) file );
-//		logger.info( "attachment; filename=" + file.getName() );
-//		response.header("Content-Disposition", "attachment; filename=" + file.getName());
-//		return response.build();
-		//String mediaType = SomeContentTypeMapHere(file)
+		// ResponseBuilder response = Response.ok((Object) file );
+		// logger.info( "attachment; filename=" + file.getName() );
+		// response.header("Content-Disposition", "attachment; filename=" +
+		// file.getName());
+		// return response.build();
+		// String mediaType = SomeContentTypeMapHere(file)
 		return Response.ok(file).build();
 	}
 
@@ -969,7 +968,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (u != null) {
 
-			if ( u.getRoles().contains(UserRoleType.PORTALADMIN) ) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
 				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return
 																												// all
 			} else
@@ -994,7 +993,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((sm != null) && (u != null)) {
 
-			if (( u.getRoles().contains(UserRoleType.PORTALADMIN) ) || (sm.getOwner().getId() == u.getId()))
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId()))
 				return Response.ok().entity(sm).build();
 
 		}
@@ -1728,11 +1727,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ((u != null)) {
 
 			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only
-																					// admin
-																					// can
-																					// alter
-																					// a
-																					// deployment
+				// admin
+				// can
+				// alter
+				// a
+				// deployment
 				d.setStatus(DeploymentDescriptorStatus.QUEUED);
 			else if (action.equals("UNINSTALL")
 					&& (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getId() == d.getOwner().getId()))
@@ -1948,7 +1947,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return res;
 	}
 
-	// admin MANO platforms
+	/********************************************************************************
+	 * 
+	 * admin MANO platforms
+	 * 
+	 ********************************************************************************/
+
 	@GET
 	@Path("/manoplatforms/")
 	@Produces("application/json")
@@ -2030,9 +2034,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return getMANOplatformById(mpid);
 	}
 
-	// admin MANO providers
+	/********************************************************************************
+	 * 
+	 * admin MANO providers
+	 * 
+	 ********************************************************************************/
 
-	
+	/**
+	 * @return
+	 */
 	@GET
 	@Path("/admin/manoproviders/")
 	@Produces("application/json")
@@ -2082,7 +2092,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return Response.ok().build();
 
 	}
-	
 
 	@GET
 	@Path("/admin/manoproviders/{mpid}")
@@ -2095,6 +2104,77 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("MANOprovider " + mpid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	/********************************************************************************
+	 * 
+	 * admin VxFOnBoardedDescriptors
+	 * 
+	 ********************************************************************************/
+
+	@GET
+	@Path("/admin/vxfobds/")
+	@Produces("application/json")
+	public Response getVxFOnBoardedDescriptors() {
+		return Response.ok().entity(portalRepositoryRef.getVxFOnBoardedDescriptors()).build();
+	}
+
+	@POST
+	@Path("/admin/vxfobds/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		VxFOnBoardedDescriptor u = portalRepositoryRef.addVxFOnBoardedDescriptor(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested VxFOnBoardedDescriptor with name=" + c.getId() + " cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@PUT
+	@Path("/admin/vxfobds/{mpid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateVxFOnBoardedDescriptor(@PathParam("mpid") int mpid, VxFOnBoardedDescriptor c) {
+
+		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested VxFOnBoardedDescriptor with name=" + c.getId()+ " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+
+	@DELETE
+	@Path("/admin/vxfobds/{mpid}")
+	public Response deleteVxFOnBoardedDescriptor(@PathParam("mpid") int mpid) {
+
+		portalRepositoryRef.deleteVxFOnBoardedDescriptor(mpid);
+		return Response.ok().build();
+
+	}
+
+	@GET
+	@Path("/admin/vxfobds/{mpid}")
+	@Produces("application/json")
+	public Response getVxFOnBoardedDescriptorById(@PathParam("mpid") int mpid) {
+		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
 	}

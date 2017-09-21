@@ -83,6 +83,7 @@ import portal.api.model.IPortalRepositoryAPI;
 import portal.api.model.InstalledVxFStatus;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
+import portal.api.model.OnBoardingStatus;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
@@ -2179,5 +2180,44 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			//throw new WebApplicationException(builder.build());
 		}
 	}
+	
+	
+	@PUT
+	@Path("/admin/vxfobds/{mpid}/onboard")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response onBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
+		
+		c.setOnBoardingStatus( OnBoardingStatus.FAILED );		
+		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId()+ " cannot be onboarded");
+			return builder.build();
+		}
+
+	}
+
+	
+	@PUT
+	@Path("/admin/vxfobds/{mpid}/offboard")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
+		
+		c.setOnBoardingStatus( OnBoardingStatus.OFFBOARDED );		
+		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId()+ " cannot be onboarded");
+			return builder.build();
+		}
+
+	}
 }

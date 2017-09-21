@@ -127,7 +127,7 @@ public class PortalRepoTest {
 		VxFOnBoardedDescriptor vobd = new VxFOnBoardedDescriptor(bmeta);
 		vobd.setLastOnboarding(new Date());
 		vobd.setObMANOprovider(mprovider1);
-		vobd.setOnBoardingStatus(OnBoardingStatus.SUCCESS);
+		vobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
 		bmeta.getVxfOnBoardedDescriptors().add(vobd);
 
 		portalJpaControllerTest.updatePortalUser(bu);

@@ -53,7 +53,7 @@ public class VxFOnBoardedDescriptor {
 	
 	private Date lastOnboarding;
 	
-	private String deployId = UUID.randomUUID().toString()+"(temporary)";
+	private String deployId = "(N/A)";
 
 	public VxFOnBoardedDescriptor() {		
 	}

@@ -2173,9 +2173,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);			
 			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
+			return builder.build();
+			//throw new WebApplicationException(builder.build());
 		}
 	}
 

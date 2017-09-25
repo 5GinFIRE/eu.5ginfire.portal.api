@@ -15,57 +15,60 @@
 
 package portal.api.osm.client;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.ws.rs.core.Response;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
 
-import portal.api.cloudOAuth.OAuthUser;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
-import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.NsdBuilder.NsdImpl;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
+/**
+ * @author ctranoris
+ *
+ */
 public class OSMClient {
 
 	/**	 */
 	private static final String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
 	/**	 */
-	//private static final String BASE_SERVICE_URL = "https://localhost:8008/api/running";
-	private static final String BASE_SERVICE_URL = "https://10.0.2.2:8008/api/running";
+	private static final String BASE_URL = "https://localhost:8008/api";
+	private static final String BASE_SERVICE_URL = BASE_URL + "/running";
+	private static final String BASE_OPERATIONS_URL = BASE_URL + "/operations";
+	private static final String BASE_OPERATIONAL_URL = BASE_URL + "/operational";
 	
+	//private static final String BASE_SERVICE_URL = "https://10.0.2.15:8008/api/running";
+	
+	private static OSMClient instance;
+	
+	public static OSMClient getInstance() {
+		if ( instance == null) {
+			instance = new OSMClient();
+			instance.init();
+		}
+		return instance;
+	}
 	
 	
 	/** */
@@ -127,13 +130,19 @@ public class OSMClient {
 		
 		OSMClient.init();
 		
+//		
+//		Nsd fu = getNSDbyID( "cirros_2vnf_nsd" );
+//		System.out.println("=== NSD POJO object response: " + fu.toString());
+//
+//
+//		Vnfd vnfd = getVNFDbyID( "cirros_vnfd" );
+//		System.out.println("=== VNFD POJO object response: " + vnfd.toString());
 		
-		Nsd fu = getNSDbyID( "cirros_2vnf_nsd" );
-		System.out.println("=== NSD POJO object response: " + fu.toString());
+		
+		createOnBoardPackage();
+		
 
-
-		Vnfd vnfd = getVNFDbyID( "cirros_vnfd" );
-		System.out.println("=== VNFD POJO object response: " + vnfd.toString());
+		getOSMdownloadjobs("");
 		
 		// /*
 		// * Send HTTP PUT request to update customer info, using CXF WebClient
@@ -170,7 +179,98 @@ public class OSMClient {
 		System.exit(0);
 	}
 
+
 	
+	private static void createOnBoardPackage() {
+		String paURL ="http://192.168.1.5:13000/5ginfireportal/services/api/repo/packages/67ce4a0f-8c41-40e9-a2ad-bd2f8a783fe8/lab_vnfd.tar.gz";
+		String packageID= "a test uuid";
+		OSMClient.getInstance().createOnBoardPackage(paURL, packageID);
+	}
+	
+	public void createOnBoardPackage(String packageURL, String packageID) {
+
+		//BASE_SERVICE_URL + "/vnfd-catalog/vnfd/" 
+		//
+		
+		System.out.println("Sending HTTPS createOnBoardPackage");
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
+		HttpPost httppost = new HttpPost( BASE_OPERATIONS_URL + "/package-create"  );
+		BasicHeader bh = new BasicHeader("Accept", "application/vnd.yang.collection+json");
+		httppost.addHeader(bh);
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); //this is hardcoded admin/admin
+		httppost.addHeader(bh2);
+		BasicHeader bh3 = new BasicHeader("Content-Type", "application/vnd.yang.data+json");
+		httppost.addHeader(bh3);
+		
+
+		HttpResponse response;
+		try {
+			StringEntity params =new StringEntity("{" + 
+					"\"input\":{" + 
+					"\"external-url\": \"" + packageURL + "\"," + 
+					"\"package-type\":\"VNFD\"," + 
+					"\"package-id\":\"" + packageID + "\"" + 
+					"}" + 
+					"}");
+			httppost.setEntity( params );
+			
+			response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			InputStream inStream = (InputStream) entity.getContent();
+			String s = IOUtils.toString( inStream ) ; 
+			System.out.println( "response = " + s  );
+			httpclient.getConnectionManager().shutdown();
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		
+	}
+	
+	
+
+	/**
+	 * @param reqURL
+	 * @return
+	 */
+	public static String getOSMdownloadjobs(String jobid) {
+
+		System.out.println("Sending HTTPS GET request to query  info");
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
+		HttpGet httpget = new HttpGet( BASE_OPERATIONAL_URL + "/download-jobs" );
+		BasicHeader bh = new BasicHeader("Accept", "application/json");
+		httpget.addHeader(bh);
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); //this is hardcoded admin/admin
+		httpget.addHeader(bh2);
+
+		HttpResponse response;
+		try {
+			response = httpclient.execute(httpget);
+			HttpEntity entity = response.getEntity();
+			String s =  response.getStatusLine().toString() ;
+			if ( response.getEntity()  != null ) {
+				InputStream inStream = (InputStream) entity.getContent();
+				s = IOUtils.toString( inStream ) ; 				
+			}
+			System.out.println( "response = " + s  );
+			httpclient.getConnectionManager().shutdown();
+			return s;
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return null;
+	}
+
 	/**
 	 * @param reqURL
 	 * @return
@@ -209,7 +309,7 @@ public class OSMClient {
 	 * @param aNSDid
 	 * @return
 	 */
-	public static Nsd getNSDbyID(String aNSDid) {
+	public Nsd getNSDbyID(String aNSDid) {
 
 
 		String response = getOSMResponse( BASE_SERVICE_URL + "/nsd-catalog/nsd/" + aNSDid );
@@ -233,7 +333,7 @@ public class OSMClient {
 		return null;
 	}
 
-	public static Vnfd getVNFDbyID(String aVNFDid) {
+	public  Vnfd getVNFDbyID(String aVNFDid) {
 
 
 		OSMClient.init();

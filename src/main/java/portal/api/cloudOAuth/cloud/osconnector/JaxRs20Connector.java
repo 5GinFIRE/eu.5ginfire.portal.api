@@ -34,6 +34,10 @@ import com.woorea.openstack.base.client.OpenStackRequest;
 import com.woorea.openstack.base.client.OpenStackResponse;
 import com.woorea.openstack.base.client.OpenStackResponseException;
 
+/**
+ * @author ctranoris
+ *
+ */
 public class JaxRs20Connector implements OpenStackClientConnector {
 
 	protected Client client = OpenStack.CLIENT;

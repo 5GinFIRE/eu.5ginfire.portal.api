@@ -34,6 +34,7 @@ public class VxFMetadata extends Product{
 	
 	private String certifiedBy;	
 
+
 	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
 	
 	

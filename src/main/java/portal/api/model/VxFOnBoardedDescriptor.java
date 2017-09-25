@@ -61,6 +61,10 @@ public class VxFOnBoardedDescriptor {
 	
 	private String deployId = "(N/A)";
 
+	private String vxfMANOProviderID;	
+	
+	private long tempvxfID;
+
 	public VxFOnBoardedDescriptor() {		
 	}
 	
@@ -117,11 +121,23 @@ public class VxFOnBoardedDescriptor {
 	}
 		
 	public long getVxfid() {
-		return vxf.getId();
+		if ( vxf != null ) {
+			return vxf.getId();
+		}else {
+			return this.tempvxfID;
+		}
 	}
 
 	public void setVxfid(long vxfid) {
-		
+		this.tempvxfID = vxfid; 
 	}
-	
+
+	public String getVxfMANOProviderID() {
+		return vxfMANOProviderID;
+	}
+
+	public void setVxfMANOProviderID(String vxfMANOProviderID) {
+		this.vxfMANOProviderID = vxfMANOProviderID;
+	}
+
 }

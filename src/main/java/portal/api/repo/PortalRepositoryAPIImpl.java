@@ -567,11 +567,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// VxFMetadata sm = (VxFMetadata)
 		// portalRepositoryRef.getProductByID(bid);
-		
-		for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors() ) {
-			vxFOnBoardedDescriptor.setVxf ( vxf );
+
+		for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors()) {
+			vxFOnBoardedDescriptor.setVxf(vxf);
 		}
-		
+
 		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
@@ -669,8 +669,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			e.printStackTrace();
 		}
-		
-		
 
 		// save product
 		prod = portalRepositoryRef.updateProductInfo(prod);
@@ -755,10 +753,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@GET
 	@Path("/osmvnfds/{vxfid}")
 	@Produces("application/json")
-	public Response getOSMVNFMetadataByID(@PathParam("vxfid") String vxfid) {
+	public Response getOSMVNFMetadataByKOSMMANOID(@PathParam("vxfid") String vxfid) {
 		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
 
-		Vnfd vnfd = OSMClient.getVNFDbyID(vxfid);
+		Vnfd vnfd = OSMClient.getInstance().getVNFDbyID(vxfid);
 
 		if (vnfd != null) {
 			return Response.ok().entity(vnfd).build();
@@ -2157,7 +2155,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with name=" + c.getId()+ " cannot be updated");
+			builder.entity("Requested VxFOnBoardedDescriptor with name=" + c.getId() + " cannot be updated");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -2181,48 +2179,89 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);			
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
 			return builder.build();
-			//throw new WebApplicationException(builder.build());
+			// throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
+	@GET
+	@Path("/admin/vxfobds/{mpid}/status")
+	@Produces("application/json")
+	public Response getVxFOnBoardedDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
+		
+		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
+		
+		if (sm == null) {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
+			return builder.build();
+		}
+
+		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
+			
+			Vnfd vnfd = OSMClient.getInstance().getVNFDbyID( sm.getVxfMANOProviderID()  );
+			if ( vnfd == null) {
+				sm.setOnBoardingStatus( OnBoardingStatus.FAILED);
+			} else {
+				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
+			}
+			
+
+			sm = portalRepositoryRef.updateVxFOnBoardedDescriptor( sm );
+
+		}
+
+		return Response.ok().entity(sm).build();
+
+	}
+
 	@PUT
 	@Path("/admin/vxfobds/{mpid}/onboard")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response onBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
+
+		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		c.setDeployId(UUID.randomUUID().toString());
+		VxFMetadata vxf = c.getVxf();
+		if ( vxf == null ) {
+			vxf = (VxFMetadata) portalRepositoryRef.getProductByID( c.getVxfid() );
+		}
+		c.setVxfMANOProviderID(  vxf.getName() );
 		
-		c.setOnBoardingStatus( OnBoardingStatus.FAILED );		
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
+		logger.info("VxF Package Location: " + vxf.getPackageLocation() );
+		OSMClient.getInstance().createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
+
+		
+		
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId()+ " cannot be onboarded");
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
 			return builder.build();
 		}
 
 	}
 
-	
 	@PUT
 	@Path("/admin/vxfobds/{mpid}/offboard")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
-		
-		c.setOnBoardingStatus( OnBoardingStatus.OFFBOARDED );		
+
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId()+ " cannot be onboarded");
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
 			return builder.build();
 		}
 

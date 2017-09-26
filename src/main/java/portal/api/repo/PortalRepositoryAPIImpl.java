@@ -2201,9 +2201,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
 			
-			Vnfd vnfd = OSMClient.getInstance().getVNFDbyID( sm.getVxfMANOProviderID()  );
+			Vnfd vnfd = null;
+			List<Vnfd> vnfds = OSMClient.getInstance().getVNFDs();
+			for (Vnfd v : vnfds) {
+				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
+					vnfd = v;
+					break;
+				}
+			}			
+			
+			
 			if ( vnfd == null) {
-				sm.setOnBoardingStatus( OnBoardingStatus.FAILED);
+				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
 			} else {
 				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
 			}
@@ -2229,6 +2238,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( vxf == null ) {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByID( c.getVxfid() );
 		}
+		
+		/**
+		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage we just get a response something like
+		 * response = {"output": {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}}
+		 * which does not provide any information. The OSM RIFTIO API says that we could get information about onboarding (create or update) jobs
+		 * see https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
+		 * with /api/operational/download-jobs, but this does not return pending jobs.
+		 * So the only solution is to ask again OSM if something is installed or not, so for now the client (the portal ) must check
+		 * via the getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM.
+		 * OSM uses the ID of the yaml description
+		 * Thus we asume that the vxf name can be equal to the VNF ID in the portal, and we use it for now as the OSM ID.
+		 * Later in future, either OSM API provide more usefull response or we extract info from the VNFD package
+		 *  
+		 */
 		c.setVxfMANOProviderID(  vxf.getName() );
 		
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);

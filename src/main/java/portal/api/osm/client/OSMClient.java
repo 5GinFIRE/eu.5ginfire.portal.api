@@ -27,8 +27,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.http.HttpEntity;
@@ -47,6 +49,7 @@ import org.codehaus.jackson.map.MappingJsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import portal.api.model.MANOprovider;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
@@ -60,22 +63,27 @@ public class OSMClient {
 	private static final String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
 	/**	 */
-	private static final String BASE_URL = "https://localhost:8008/api";
-	private static final String BASE_SERVICE_URL = BASE_URL + "/running";
-	private static final String BASE_OPERATIONS_URL = BASE_URL + "/operations";
-	private static final String BASE_OPERATIONAL_URL = BASE_URL + "/operational";
+	private static final String BASE_INIT_URL = "https://localhost:8008";
+	private String BASE_URL ;
+	private String BASE_SERVICE_URL;
+	private String BASE_OPERATIONS_URL;
+	private String BASE_OPERATIONAL_URL;
 
 	// private static final String BASE_SERVICE_URL =
 	// "https://10.0.2.15:8008/api/running";
 
-	private static OSMClient instance;
+	
+	private static Map<Integer, OSMClient> instances = new HashMap<>();
 
-	public static OSMClient getInstance() {
-		if (instance == null) {
-			instance = new OSMClient();
-			instance.init();
+
+	public static OSMClient getInstance( MANOprovider  mano) {
+		OSMClient osmapi = instances.get( mano.getId() );
+		if (osmapi == null) {
+			osmapi = new OSMClient( mano.getApiEndpoint() );
+			osmapi.init();
+			instances.put( mano.getId(), osmapi);
 		}
-		return instance;
+		return osmapi;
 	}
 
 	/** */
@@ -86,10 +94,23 @@ public class OSMClient {
 	 */
 	private static Scheme httpsScheme = null;
 
+	
+	public OSMClient() {
+		this( BASE_INIT_URL );
+	}
+	
+	public OSMClient(String apiEndpoint) {
+		BASE_URL = apiEndpoint + "/api";
+		BASE_SERVICE_URL = BASE_URL + "/running";
+		BASE_OPERATIONS_URL = BASE_URL + "/operations";
+		BASE_OPERATIONAL_URL = BASE_URL + "/operational";
+	}
+
+
 	/**
 	 * 
 	 */
-	private static void init() {
+	private void init() {
 		/**
 		 * the following can be used with a good certificate, for now we just trust it
 		 * import a certificate keytool -import -alias riftiolocalvm -file Riftio.crt
@@ -135,7 +156,7 @@ public class OSMClient {
 
 	public static void main(String[] args) {
 
-		OSMClient.init();
+		
 
 		//
 		// Nsd fu = getNSDbyID( "cirros_2vnf_nsd" );
@@ -154,8 +175,9 @@ public class OSMClient {
 //		Vnfd vnfd = OSMClient.getInstance().getVNFDbyID("d0cb056b-8995-11e7-8b54-00163e11a1e2");
 //		System.out.println("=== VNFD POJO object response: " + vnfd.toString());
 		
-
-		List<Vnfd> vnfds = OSMClient.getInstance().getVNFDs();
+		OSMClient osm = new OSMClient();
+		osm.init();
+		List<Vnfd> vnfds = osm.getVNFDs();
 		for (Vnfd v : vnfds) {
 			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());			
 		}
@@ -172,18 +194,13 @@ public class OSMClient {
 		System.exit(0);
 	}
 
-	private static void createOnBoardPackage() {
-		String paURL = "http://192.168.1.5:13000/5ginfireportal/services/api/repo/packages/67ce4a0f-8c41-40e9-a2ad-bd2f8a783fe8/lab_vnfd.tar.gz";
-		String packageID = "a test uuid";
-		OSMClient.getInstance().createOnBoardPackage(paURL, packageID);
-	}
 
 	public void createOnBoardPackage(String packageURL, String packageID) {
 
 		// BASE_SERVICE_URL + "/vnfd-catalog/vnfd/"
 		//
 
-		System.out.println("Sending HTTPS createOnBoardPackage");
+		System.out.println("Sending HTTPS createOnBoardPackage towards: " + BASE_OPERATIONS_URL);
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
 		HttpPost httppost = new HttpPost(BASE_OPERATIONS_URL + "/package-create");
@@ -218,7 +235,7 @@ public class OSMClient {
 	 * @param reqURL
 	 * @return
 	 */
-	public static String getOSMdownloadjobs(String jobid) {
+	public String getOSMdownloadjobs(String jobid) {
 
 		System.out.println("Sending HTTPS GET request to query  info");
 		DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -312,7 +329,6 @@ public class OSMClient {
 
 	public Vnfd getVNFDbyID(String aVNFDid) {
 
-		OSMClient.init();
 		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd/" + aVNFDid);
 
 		MappingJsonFactory factory = new MappingJsonFactory();
@@ -336,7 +352,6 @@ public class OSMClient {
 
 	public List<Vnfd> getVNFDs() {
 
-		OSMClient.init();
 		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd");
 
 		MappingJsonFactory factory = new MappingJsonFactory();

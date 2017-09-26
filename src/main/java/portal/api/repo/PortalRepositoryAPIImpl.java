@@ -750,22 +750,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 
-	@GET
-	@Path("/osmvnfds/{vxfid}")
-	@Produces("application/json")
-	public Response getOSMVNFMetadataByKOSMMANOID(@PathParam("vxfid") String vxfid) {
-		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
-
-		Vnfd vnfd = OSMClient.getInstance().getVNFDbyID(vxfid);
-
-		if (vnfd != null) {
-			return Response.ok().entity(vnfd).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
-		}
-	}
+	
 
 	@GET
 	@Path("/admin/vxfs/{vxfid}")
@@ -2114,6 +2099,26 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 
+	@GET
+	@Path("/manoprovider/{mpid}/vnfds/{vxfid}")
+	@Produces("application/json")
+	public Response getOSMVNFMetadataByKOSMMANOID(@PathParam("mpid") int manoprovid, @PathParam("vxfid") String vxfid) {
+		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
+
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
+		
+		Vnfd vnfd = OSMClient.getInstance(sm).getVNFDbyID(vxfid);
+
+		if (vnfd != null) {
+			return Response.ok().entity(vnfd).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
 	/********************************************************************************
 	 * 
 	 * admin VxFOnBoardedDescriptors
@@ -2202,7 +2207,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
 			
 			Vnfd vnfd = null;
-			List<Vnfd> vnfds = OSMClient.getInstance().getVNFDs();
+			List<Vnfd> vnfds = OSMClient.getInstance( sm.getObMANOprovider() ).getVNFDs();
 			for (Vnfd v : vnfds) {
 				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
 					vnfd = v;
@@ -2254,10 +2259,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		 */
 		c.setVxfMANOProviderID(  vxf.getName() );
 		
+		c.setLastOnboarding( new Date() );
+		
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		logger.info("VxF Package Location: " + vxf.getPackageLocation() );
-		OSMClient.getInstance().createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
+		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
 
 		
 		

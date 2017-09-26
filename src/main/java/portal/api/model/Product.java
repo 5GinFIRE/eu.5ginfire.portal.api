@@ -92,7 +92,9 @@ public class Product {
 	@Column(name = "SCREENSPATH", columnDefinition = "LONGTEXT")		
 	private String screenshots= null; //comma separated file paths
 
-	
+
+	@Basic()
+	private String vendor = null;
 	
 	
 	public String getScreenshots() {
@@ -258,6 +260,14 @@ public class Product {
 				return p;
 		}
 		return null;
+	}
+
+	public String getVendor() {
+		return vendor;
+	}
+
+	public void setVendor(String vendor) {
+		this.vendor = vendor;
 	}
 
 }

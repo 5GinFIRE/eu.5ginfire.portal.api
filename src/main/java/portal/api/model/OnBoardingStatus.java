@@ -20,5 +20,6 @@ public enum OnBoardingStatus {
 	FAILED,
 	ONBOARDED,
 	OFFBOARDED,
+	OFFBOARDING,
 	ONBOARDING
 }

@@ -2285,7 +2285,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
-
+		//TODO: Implement this towards MANO
+		
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {

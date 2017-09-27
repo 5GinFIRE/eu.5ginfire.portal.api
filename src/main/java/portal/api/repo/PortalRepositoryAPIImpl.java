@@ -474,7 +474,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getAllVxFs(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getVxFs categoryid=" + categoryid);
 
-		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs(categoryid);
+		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs(categoryid, true);
 		return Response.ok().entity(vxfs).build();
 
 	}
@@ -491,7 +491,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			List<VxFMetadata> vxfs;
 
 			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
-				vxfs = portalRepositoryRef.getVxFs(categoryid);
+				vxfs = portalRepositoryRef.getVxFs(categoryid, false);
 			} else {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
 			}

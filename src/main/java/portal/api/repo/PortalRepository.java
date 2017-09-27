@@ -104,8 +104,8 @@ public class PortalRepository {
 		portalJpaController.deleteUser(userid);
 	}
 
-	public List<VxFMetadata> getVxFs(Long categoryid) {
-		List<VxFMetadata> ls = portalJpaController.readVxFsMetadata(categoryid,0, 100000);
+	public List<VxFMetadata> getVxFs(Long categoryid, boolean isPublished) {
+		List<VxFMetadata> ls = portalJpaController.readVxFsMetadata(categoryid,0, 100000, isPublished);
 		
 		return ls;
 	}

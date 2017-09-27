@@ -375,21 +375,35 @@ public class PortalJpaController {
 	// }
 
 	@SuppressWarnings("unchecked")
-	public List<VxFMetadata> readVxFsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<VxFMetadata> readVxFsMetadata(Long categoryid, int firstResult, int maxResults, boolean isPublished) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		// Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
-
-		if ((categoryid != null) && (categoryid >= 0))
+		String s = "";
+		
+		if ((categoryid != null) && (categoryid >= 0)) {
+			if (isPublished) {
+				s = "a.published=TRUE";
+			}
 			q = entityManager
-					.createQuery("SELECT a FROM VxFMetadata a WHERE a.categories.id=" + categoryid + " ORDER BY a.id");
-		else
-			q = entityManager.createQuery("SELECT a FROM VxFMetadata a ORDER BY a.id");
+					.createQuery("SELECT a FROM VxFMetadata a WHERE " + s + " AND a.categories.id=" + categoryid + " ORDER BY a.id");
+		}
+		else {
+			if (isPublished) {
+				s = "WHERE a.published=TRUE";
+			}
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a " + s + " ORDER BY a.id");
+		}
 
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
+	
+	
+	
+	
+	
 
 	@SuppressWarnings("unchecked")
 	public List<VxFMetadata> readVxFsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {

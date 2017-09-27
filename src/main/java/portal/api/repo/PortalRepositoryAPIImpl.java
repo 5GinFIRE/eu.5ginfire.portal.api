@@ -2213,15 +2213,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					vnfd = v;
 					break;
 				}
-			}			
-			
+			}
 			
 			if ( vnfd == null) {
 				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
 			} else {
 				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
-			}
-			
+			}			
 
 			sm = portalRepositoryRef.updateVxFOnBoardedDescriptor( sm );
 

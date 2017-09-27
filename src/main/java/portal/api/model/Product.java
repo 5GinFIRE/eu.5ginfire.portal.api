@@ -92,7 +92,6 @@ public class Product {
 	@Column(name = "SCREENSPATH", columnDefinition = "LONGTEXT")		
 	private String screenshots= null; //comma separated file paths
 
-
 	@Basic()
 	private String vendor = null;
 	

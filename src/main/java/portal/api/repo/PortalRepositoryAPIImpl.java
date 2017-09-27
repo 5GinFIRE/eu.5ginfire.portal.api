@@ -2255,6 +2255,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		 * Later in future, either OSM API provide more usefull response or we extract info from the VNFD package
 		 *  
 		 */
+		
 		c.setVxfMANOProviderID(  vxf.getName() );
 		
 		c.setLastOnboarding( new Date() );

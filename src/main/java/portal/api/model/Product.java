@@ -57,6 +57,7 @@ public class Product {
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 
+	
 	@Basic()
 	private String uuid = null;
 	@Basic()
@@ -95,6 +96,10 @@ public class Product {
 	@Basic()
 	private String vendor = null;
 	
+
+	@Basic()
+	private boolean published;	
+
 	
 	public String getScreenshots() {
 		return screenshots;
@@ -269,4 +274,12 @@ public class Product {
 		this.vendor = vendor;
 	}
 
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
 }

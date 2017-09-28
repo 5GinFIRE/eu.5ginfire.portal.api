@@ -18,9 +18,12 @@ package portal.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 
 
@@ -34,6 +37,9 @@ public class VxFMetadata extends Product{
 
 	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
 	
+
+	@Lob
+	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
 	private String termsOfUse;	
 	
 	

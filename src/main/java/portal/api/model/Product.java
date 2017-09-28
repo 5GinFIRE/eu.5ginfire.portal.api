@@ -34,6 +34,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -67,8 +68,9 @@ public class Product {
 	@Basic()
 	private String shortDescription = null;
 
-	@Basic()
-	@Column(name = "LONGDESCRIPTION", columnDefinition = "LONGTEXT")
+
+	@Lob
+	@Column(name = "LDESCRIPTION", columnDefinition = "LONGTEXT")
 	private String longDescription = null;
 	@Basic()
 	private String version = null;

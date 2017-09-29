@@ -667,9 +667,23 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
 					
 					File f = new File( vxffilepath );
-					VNFExtractor vnfExtract = new VNFExtractor( f );
-					vnfExtract.extractDescriptor();
-			        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()   );
+					if ( prod instanceof VxFMetadata) {
+						VNFExtractor vnfExtract = new VNFExtractor( f );
+						VNFDescriptor vnfd = vnfExtract.extractDescriptor();
+						if ( vnfd!=null ) {
+							VNFRequirements vr = new VNFRequirements( vnfd );			
+							prod.setDescriptorHTML( vr.toHTML() );
+						}
+				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
+					}else if ( prod instanceof ExperimentMetadata) {
+						NSExtractor nsExtract = new NSExtractor( f );
+						NSDescriptor ns = nsExtract.extractDescriptor();
+						if ( ns!=null ) {
+							NSRequirements vr = new NSRequirements(ns, new ArrayList<VNFDescriptor>() ) ;			
+							prod.setDescriptorHTML( vr.toHTML() );
+						}
+				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						
+					}
 					
 				}
 			}

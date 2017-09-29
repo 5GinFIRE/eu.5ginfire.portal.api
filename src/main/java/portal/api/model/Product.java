@@ -111,6 +111,11 @@ public class Product {
 	@Lob
 	@Column(name = "DESCRIPTOR", columnDefinition = "LONGTEXT")
 	private String descriptor;	
+	
+
+	@Lob
+	@Column(name = "DESCRIPTORHTML", columnDefinition = "LONGTEXT")
+	private String descriptorHTML;	
 
 	
 	public String getScreenshots() {
@@ -310,6 +315,14 @@ public class Product {
 
 	public void setDescriptor(String descriptor) {
 		this.descriptor = descriptor;
+	}
+
+	public String getDescriptorHTML() {
+		return descriptorHTML;
+	}
+
+	public void setDescriptorHTML(String descriptorHTML) {
+		this.descriptorHTML = descriptorHTML;
 	}
 
 }

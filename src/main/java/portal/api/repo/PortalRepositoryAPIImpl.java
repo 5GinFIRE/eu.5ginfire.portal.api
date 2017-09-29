@@ -94,7 +94,10 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.util.EmailUtil;
+import pt.it.av.atnog.extractors.NSExtractor;
 import pt.it.av.atnog.extractors.VNFExtractor;
+import pt.it.av.atnog.nsdescriptor.NSDescriptor;
+import pt.it.av.atnog.requirements.NSRequirements;
 import pt.it.av.atnog.requirements.VNFRequirements;
 import pt.it.av.atnog.vnfdescriptor.VNFDescriptor;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
@@ -360,7 +363,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	// VxFS API
 
-	private Product addNewProductData(Product prod, Attachment image, Attachment vxfFile,
+	private Product addNewProductData(Product prod, Attachment image, Attachment submittedFile,
 			List<Attachment> screenshots) {
 
 		String uuid = UUID.randomUUID().toString();
@@ -407,17 +410,31 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 			}
 
-			if (vxfFile != null) {
-				String vxfFileNamePosted = getFileName(vxfFile.getHeaders());
-				logger.info("vxfFile = " + vxfFileNamePosted);
-				if (!vxfFileNamePosted.equals("")) {
-					String vxffilepath = saveFile(vxfFile, tempDir + vxfFileNamePosted);
+			if (submittedFile != null) {
+				String aFileNamePosted = getFileName(submittedFile.getHeaders());
+				logger.info("vxfFile = " + aFileNamePosted);
+				if (!aFileNamePosted.equals("")) {
+					String vxffilepath = saveFile(submittedFile, tempDir + aFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/" + vxfFileNamePosted);
+					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/" + aFileNamePosted);
 					File f = new File( vxffilepath );
-					VNFExtractor vnfExtract = new VNFExtractor( f );
-					vnfExtract.extractDescriptor();
-			        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
+					if ( prod instanceof VxFMetadata) {
+						VNFExtractor vnfExtract = new VNFExtractor( f );
+						VNFDescriptor vnfd = vnfExtract.extractDescriptor();
+						if ( vnfd!=null ) {
+							VNFRequirements vr = new VNFRequirements( vnfd );			
+							prod.setDescriptorHTML( vr.toHTML() );
+						}
+				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
+					}else if ( prod instanceof ExperimentMetadata) {
+						NSExtractor nsExtract = new NSExtractor( f );
+						NSDescriptor ns = nsExtract.extractDescriptor();
+						if ( ns!=null ) {
+							NSRequirements vr = new NSRequirements(ns, new ArrayList<VNFDescriptor>() ) ;			
+							prod.setDescriptorHTML( vr.toHTML() );
+						}
+				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						
+					}
 				}
 			}
 
@@ -1176,16 +1193,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		ExperimentMetadata app = new ExperimentMetadata();
+		ExperimentMetadata experiment = new ExperimentMetadata();
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("application", ats));
-			app = parser.readValueAs(ExperimentMetadata.class);
+			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("exprm", ats));
+			experiment = parser.readValueAs(ExperimentMetadata.class);
 
-			logger.info("Received @POST for app : " + app.getName());
-//			logger.info("Received @POST for app.containers : " + app.getContainers().size());
-//			logger.info("Received @POST for app.containers(0).name : " + app.getContainers().get(0).getName());
+			logger.info("Received @POST for experiment : " + experiment.getName());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -1194,10 +1209,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		// ExperimentMetadata sm = new ExperimentMetadata();
-		app = (ExperimentMetadata) addNewProductData(app, getAttachmentByName("prodIcon", ats),
+		experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
-		return Response.ok().entity(app).build();
+		return Response.ok().entity(experiment).build();
 
 	}
 

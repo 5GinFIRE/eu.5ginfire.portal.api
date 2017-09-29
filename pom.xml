@@ -247,7 +247,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 		<dependency>
 			<groupId>pt.it.av.atnog</groupId>
 			<artifactId>NFVRequirementsExtractor</artifactId>
-			<version>1.0</version>
+			<version>1.0.2</version>
 		</dependency>
 	</dependencies>
 

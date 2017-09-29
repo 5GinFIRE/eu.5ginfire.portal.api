@@ -244,6 +244,11 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<artifactId>swagger-ui</artifactId>
 			<version>3.1.7</version>
 		</dependency>
+		<dependency>
+			<groupId>pt.it.av.atnog</groupId>
+			<artifactId>NFVRequirementsExtractor</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 

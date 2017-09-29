@@ -101,6 +101,16 @@ public class Product {
 
 	@Basic()
 	private boolean published;	
+	
+
+	@Lob
+	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
+	private String termsOfUse;	
+	
+
+	@Lob
+	@Column(name = "DESCRIPTOR", columnDefinition = "LONGTEXT")
+	private String descriptor;	
 
 	
 	public String getScreenshots() {
@@ -284,4 +294,22 @@ public class Product {
 	public void setPublished(boolean published) {
 		this.published = published;
 	}
+	
+
+	public String getTermsOfUse() {
+		return termsOfUse;
+	}
+
+	public void setTermsOfUse(String termsOfUse) {
+		this.termsOfUse = termsOfUse;
+	}
+
+	public String getDescriptor() {
+		return descriptor;
+	}
+
+	public void setDescriptor(String descriptor) {
+		this.descriptor = descriptor;
+	}
+
 }

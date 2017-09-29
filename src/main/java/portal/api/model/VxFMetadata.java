@@ -37,10 +37,6 @@ public class VxFMetadata extends Product{
 
 	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
 	
-
-	@Lob
-	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
-	private String termsOfUse;	
 	
 	
 	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
@@ -92,14 +88,6 @@ public class VxFMetadata extends Product{
 
 	public void setSupportedMANOPlatforms(List<MANOplatform> supportedMANOPlatforms) {
 		this.supportedMANOPlatforms = supportedMANOPlatforms;
-	}
-
-	public String getTermsOfUse() {
-		return termsOfUse;
-	}
-
-	public void setTermsOfUse(String termsOfUse) {
-		this.termsOfUse = termsOfUse;
 	}
 
 	

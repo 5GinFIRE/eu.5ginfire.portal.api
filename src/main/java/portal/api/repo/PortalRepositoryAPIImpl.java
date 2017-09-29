@@ -94,6 +94,9 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.util.EmailUtil;
+import pt.it.av.atnog.extractors.VNFExtractor;
+import pt.it.av.atnog.requirements.VNFRequirements;
+import pt.it.av.atnog.vnfdescriptor.VNFDescriptor;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 //CORS support
@@ -411,6 +414,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					String vxffilepath = saveFile(vxfFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
 					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/" + vxfFileNamePosted);
+					File f = new File( vxffilepath );
+					VNFExtractor vnfExtract = new VNFExtractor( f );
+					vnfExtract.extractDescriptor();
+			        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
 				}
 			}
 
@@ -641,6 +648,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
 					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
+					
+					File f = new File( vxffilepath );
+					VNFExtractor vnfExtract = new VNFExtractor( f );
+					vnfExtract.extractDescriptor();
+			        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()   );
+					
 				}
 			}
 

@@ -39,27 +39,28 @@ public class ExperimentMetadata extends Product{
 	public void setPackagingFormat(PackagingFormat packagingFormat) {
 		this.packagingFormat = packagingFormat;
 	}
-	
+
 	
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
-	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
+	private List<ExperimentOnBoardDescriptor> experimentOnBoardedDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
 	
 	
-	public List<VxFOnBoardedDescriptor> getVxfOnBoardedDescriptors() {
-		return vxfOnBoardedDescriptors;
-	}
-
-	public void setVxfOnBoardedDescriptors(List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors) {
-		this.vxfOnBoardedDescriptors = vxfOnBoardedDescriptors;
-	}
-
+	
 	public boolean isValid() {
 		return valid;
 	}
 
 	public void setValid(boolean valid) {
 		this.valid = valid;
+	}
+
+	public List<ExperimentOnBoardDescriptor> getExperimentOnBoardedDescriptors() {
+		return experimentOnBoardedDescriptors;
+	}
+
+	public void setExperimentOnBoardedDescriptors(List<ExperimentOnBoardDescriptor> experimentOnBoardedDescriptors) {
+		this.experimentOnBoardedDescriptors = experimentOnBoardedDescriptors;
 	}
 	
 	

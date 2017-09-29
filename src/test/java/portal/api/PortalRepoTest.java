@@ -315,7 +315,7 @@ public class PortalRepoTest {
 		deployArtifact.setName(bmeta2.getName());
 		deployArtifact.setUuid(bmeta2.getUuid());
 		container.getDeployArtifacts().add(deployArtifact);
-		app.getContainers().add(container);
+		//app.getContainers().add(container);
 		bu.addProduct(app);
 
 		// now create a dployment
@@ -327,10 +327,10 @@ public class PortalRepoTest {
 		DeployContainer deplContainer = new DeployContainer();
 		deplContainer.setName("deploy1");
 		DeployArtifact deployArtifactInst = new DeployArtifact();
-		deployArtifactInst
-				.setName(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getName());
-		deployArtifactInst
-				.setUuid(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getUuid());
+//		deployArtifactInst
+//				.setName(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getName());
+//		deployArtifactInst
+//				.setUuid(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getUuid());
 		deplContainer.getDeployArtifacts().add(deployArtifactInst);
 		SubscribedResource targetResource = new SubscribedResource();
 		targetResource.setURL("targetIP");

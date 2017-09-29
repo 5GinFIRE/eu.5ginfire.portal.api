@@ -35,51 +35,74 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
  * maintains information and status of a VNF on which MANO providers is on-boarded
  * see https://github.com/5GinFIRE/eu.5ginfire.portal.api/issues/10 
  */
-@Entity(name = "VxFOnBoardedDescriptor")
+@Entity(name = "OnBoardDescriptor")
 @JsonIgnoreProperties(value = { "vxf" })
 
-public class VxFOnBoardedDescriptor extends OnBoardDescriptor{
+public class OnBoardDescriptor {
 
-		
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id = 0;
+	
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
-	private VxFMetadata vxf;
-		
+	private MANOprovider obMANOprovider;
+
+	private  OnBoardingStatus onBoardingStatus = OnBoardingStatus.UNKNOWN;
 	
+	private Date lastOnboarding;
+	
+	private String deployId = "(N/A)";
+
 	private String vxfMANOProviderID;	
 	
-	private long tempvxfID;
 
-	public VxFOnBoardedDescriptor() {		
+	public OnBoardDescriptor() {		
 	}
 	
-	public VxFOnBoardedDescriptor(VxFMetadata v) {
-		this.vxf = v;
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public MANOprovider getObMANOprovider() {
+		return obMANOprovider;
+	}
+
+	public void setObMANOprovider(MANOprovider obMANOprovider) {
+		this.obMANOprovider = obMANOprovider;
 	}
 
 	
-
-	public VxFMetadata getVxf() {
-		return vxf;
+	public OnBoardingStatus getOnBoardingStatus() {
+		return onBoardingStatus;
 	}
 
-	public void setVxf(VxFMetadata vxf) {
-		this.vxf = vxf;
+	public void setOnBoardingStatus(OnBoardingStatus onBoardingStatus) {
+		this.onBoardingStatus = onBoardingStatus;
 	}
-	
+
+	public Date getLastOnboarding() {
+		return lastOnboarding;
+	}
+
+	public void setLastOnboarding(Date lastOnboarding) {
+		this.lastOnboarding = lastOnboarding;
+	}
+
+	public String getDeployId() {
+		return deployId;
+	}
+
+	public void setDeployId(String deployId) {
+		this.deployId = deployId;
+	}
 		
-	public long getVxfid() {
-		if ( vxf != null ) {
-			return vxf.getId();
-		}else {
-			return this.tempvxfID;
-		}
-	}
-
-	public void setVxfid(long vxfid) {
-		this.tempvxfID = vxfid; 
-	}
+	
 
 	public String getVxfMANOProviderID() {
 		return vxfMANOProviderID;

@@ -41,16 +41,17 @@ public class ExperimentMetadata extends Product{
 	}
 	
 	
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
-	private List<Container> containers = new ArrayList<Container>();
-
-	public List<Container> getContainers() {
-		return containers;
+	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
+	
+	
+	public List<VxFOnBoardedDescriptor> getVxfOnBoardedDescriptors() {
+		return vxfOnBoardedDescriptors;
 	}
 
-	public void setContainers(List<Container> containers) {
-		this.containers = containers;
+	public void setVxfOnBoardedDescriptors(List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors) {
+		this.vxfOnBoardedDescriptors = vxfOnBoardedDescriptors;
 	}
 
 	public boolean isValid() {

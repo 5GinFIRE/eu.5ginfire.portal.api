@@ -1184,8 +1184,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			app = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for app : " + app.getName());
-			logger.info("Received @POST for app.containers : " + app.getContainers().size());
-			logger.info("Received @POST for app.containers(0).name : " + app.getContainers().get(0).getName());
+//			logger.info("Received @POST for app.containers : " + app.getContainers().size());
+//			logger.info("Received @POST for app.containers(0).name : " + app.getContainers().get(0).getName());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -1214,7 +1214,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			appmeta = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for app : " + appmeta.getName());
-			logger.info("Received @POST for app.containers : " + appmeta.getContainers().size());
+//			logger.info("Received @POST for app.containers : " + appmeta.getContainers().size());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();

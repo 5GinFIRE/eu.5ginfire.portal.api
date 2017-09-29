@@ -28,6 +28,9 @@
 		<class>portal.api.model.MANOplatform</class>
 		<class>portal.api.model.MANOprovider</class>
 		<class>portal.api.model.VxFOnBoardedDescriptor</class>
+		<class>portal.api.model.ExperimentOnBoardDescriptor</class>
+		<class>portal.api.model.OnBoardDescriptor</class>
+		
 		
 
 
@@ -78,6 +81,8 @@
 		<class>portal.api.model.MANOplatform</class>
 		<class>portal.api.model.MANOprovider</class>
 		<class>portal.api.model.VxFOnBoardedDescriptor</class>
+		<class>portal.api.model.ExperimentOnBoardDescriptor</class>
+		<class>portal.api.model.OnBoardDescriptor</class>
 
 
 

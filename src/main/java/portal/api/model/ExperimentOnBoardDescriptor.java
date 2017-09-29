@@ -32,61 +32,62 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * @author ctranoris
- * maintains information and status of a VNF on which MANO providers is on-boarded
- * see https://github.com/5GinFIRE/eu.5ginfire.portal.api/issues/10 
+ * maintains information and status of an Experiment (in terms of NSD currently) on which MANO providers is on-boarded
+ * see https://github.com/5GinFIRE/eu.5ginfire.portal.api/issues/7 
  */
-@Entity(name = "VxFOnBoardedDescriptor")
-@JsonIgnoreProperties(value = { "vxf" })
+@Entity(name = "ExperimentOnBoardDescriptor")
+@JsonIgnoreProperties(value = { "experiment" })
 
-public class VxFOnBoardedDescriptor extends OnBoardDescriptor{
+public class ExperimentOnBoardDescriptor extends OnBoardDescriptor{
 
 		
 
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
-	private VxFMetadata vxf;
+	private ExperimentMetadata experiment;
 		
 	
-	private String vxfMANOProviderID;	
+	private String experimentMANOProviderID;	
 	
-	private long tempvxfID;
+	private long tempExperimentID;
 
-	public VxFOnBoardedDescriptor() {		
+	public ExperimentOnBoardDescriptor() {		
 	}
 	
-	public VxFOnBoardedDescriptor(VxFMetadata v) {
-		this.vxf = v;
+	public ExperimentOnBoardDescriptor(ExperimentMetadata v) {
+		this.experiment = v;
 	}
 
 	
 
-	public VxFMetadata getVxf() {
-		return vxf;
+	public ExperimentMetadata getVxf() {
+		return experiment;
 	}
 
-	public void setVxf(VxFMetadata vxf) {
-		this.vxf = vxf;
+	public void setVxf(ExperimentMetadata e) {
+		this.experiment = e;
 	}
 	
 		
-	public long getVxfid() {
-		if ( vxf != null ) {
-			return vxf.getId();
+	public long getExperimentid() {
+		if ( experiment != null ) {
+			return experiment.getId();
 		}else {
-			return this.tempvxfID;
+			return this.tempExperimentID;
 		}
 	}
 
-	public void setVxfid(long vxfid) {
-		this.tempvxfID = vxfid; 
+	public void setExperimentid(long e) {
+		this.tempExperimentID = e; 
 	}
 
-	public String getVxfMANOProviderID() {
-		return vxfMANOProviderID;
+	public String getExperimentMANOProviderID() {
+		return experimentMANOProviderID;
 	}
 
-	public void setVxfMANOProviderID(String vxfMANOProviderID) {
-		this.vxfMANOProviderID = vxfMANOProviderID;
+	public void setExperimentMANOProviderID(String experimentMANOProviderID) {
+		this.experimentMANOProviderID = experimentMANOProviderID;
 	}
+
 
 }

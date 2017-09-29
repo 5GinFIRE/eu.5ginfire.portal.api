@@ -28,6 +28,19 @@ import javax.persistence.OneToMany;
 public class ExperimentMetadata extends Product{
 
 
+	private boolean valid;
+
+	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
+	
+	public PackagingFormat getPackagingFormat() {
+		return packagingFormat;
+	}
+
+	public void setPackagingFormat(PackagingFormat packagingFormat) {
+		this.packagingFormat = packagingFormat;
+	}
+	
+	
 	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable()
 	private List<Container> containers = new ArrayList<Container>();
@@ -38,6 +51,14 @@ public class ExperimentMetadata extends Product{
 
 	public void setContainers(List<Container> containers) {
 		this.containers = containers;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
 	}
 	
 	

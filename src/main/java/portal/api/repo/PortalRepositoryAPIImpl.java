@@ -79,6 +79,7 @@ import portal.api.model.DeployContainer;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
 import portal.api.model.InstalledVxFStatus;
 import portal.api.model.MANOplatform;
@@ -1127,7 +1128,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			List<ExperimentMetadata> apps;
 
 			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
-				apps = portalRepositoryRef.getApps(categoryid);
+				apps = portalRepositoryRef.getExperiments(categoryid, false);
 			} else {
 				apps = portalRepositoryRef.getAppsByUserID((long) u.getId());
 			}
@@ -1147,7 +1148,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getAllApps(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getApps categoryid=" + categoryid);
-		List<ExperimentMetadata> vxfs = portalRepositoryRef.getApps(categoryid);
+		List<ExperimentMetadata> vxfs = portalRepositoryRef.getExperiments(categoryid, true);
 		return Response.ok().entity(vxfs).build();
 	}
 
@@ -2334,6 +2335,186 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
+			return builder.build();
+		}
+
+	}
+	
+	
+
+	/********************************************************************************
+	 * 
+	 * admin ExperimentOnBoardDescriptors
+	 * 
+	 ********************************************************************************/
+
+	@GET
+	@Path("/admin/experimentobds/")
+	@Produces("application/json")
+	public Response getExperimentOnBoardDescriptors() {
+		return Response.ok().entity(portalRepositoryRef.getExperimentOnBoardDescriptors()).build();
+	}
+
+	@POST
+	@Path("/admin/experimentobds/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		ExperimentOnBoardDescriptor u = portalRepositoryRef.addExperimentOnBoardDescriptor(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested ExperimentOnBoardDescriptor with name=" + c.getId() + " cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@PUT
+	@Path("/admin/experimentobds/{mpid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateExperimentOnBoardDescriptor(@PathParam("mpid") int mpid, ExperimentOnBoardDescriptor c) {
+
+		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested ExperimentOnBoardDescriptor with name=" + c.getId() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+
+	@DELETE
+	@Path("/admin/experimentobds/{mpid}")
+	public Response deleteExperimentOnBoardDescriptor(@PathParam("mpid") int mpid) {
+
+		portalRepositoryRef.deleteExperimentOnBoardDescriptor(mpid);
+		return Response.ok().build();
+
+	}
+
+	@GET
+	@Path("/admin/experimentobds/{mpid}")
+	@Produces("application/json")
+	public Response getExperimentOnBoardDescriptorById(@PathParam("mpid") int mpid) {
+		ExperimentOnBoardDescriptor sm = portalRepositoryRef.getExperimentOnBoardDescriptorByID(mpid);
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("ExperimentOnBoardDescriptor " + mpid + " not found in portal registry");
+			return builder.build();
+			// throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@GET
+	@Path("/admin/experimentobds/{mpid}/status")
+	@Produces("application/json")
+	public Response getExperimentOnBoardDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
+		
+		ExperimentOnBoardDescriptor sm = portalRepositoryRef.getExperimentOnBoardDescriptorByID(mpid);
+		
+		if (sm == null) {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
+			return builder.build();
+		}
+
+		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
+			
+			Vnfd vnfd = null;
+			List<Vnfd> vnfds = OSMClient.getInstance( sm.getObMANOprovider() ).getVNFDs();
+			for (Vnfd v : vnfds) {
+				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
+					vnfd = v;
+					break;
+				}
+			}
+			
+			if ( vnfd == null) {
+				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
+			} else {
+				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
+			}			
+
+			sm = portalRepositoryRef.updateExperimentOnBoardDescriptor( sm );
+
+		}
+
+		return Response.ok().entity(sm).build();
+
+	}
+
+	@PUT
+	@Path("/admin/experimentobds/{mpid}/onboard")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response onExperimentBoardDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor c) {
+
+		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		c.setDeployId(UUID.randomUUID().toString());
+		ExperimentMetadata vxf = c.getExperiment();
+		if ( vxf == null ) {
+			vxf = (ExperimentMetadata) portalRepositoryRef.getProductByID( c.getExperimentid() );
+		}
+		
+		/**
+		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage we just get a response something like
+		 * response = {"output": {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}}
+		 * which does not provide any information. The OSM RIFTIO API says that we could get information about onboarding (create or update) jobs
+		 * see https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
+		 * with /api/operational/download-jobs, but this does not return pending jobs.
+		 * So the only solution is to ask again OSM if something is installed or not, so for now the client (the portal ) must check
+		 * via the getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM.
+		 * OSM uses the ID of the yaml description
+		 * Thus we asume that the vxf name can be equal to the VNF ID in the portal, and we use it for now as the OSM ID.
+		 * Later in future, either OSM API provide more usefull response or we extract info from the VNFD package
+		 *  
+		 */
+		
+		c.setVxfMANOProviderID(  vxf.getName() );
+		
+		c.setLastOnboarding( new Date() );
+		
+		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+
+		logger.info("Experiment Package Location: " + vxf.getPackageLocation() );
+		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
+
+		
+		
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested ExperimentOnBoardDescriptor with ID=" + c.getId() + " cannot be onboarded");
+			return builder.build();
+		}
+
+	}
+
+	@PUT
+	@Path("/admin/experimentobds/{mpid}/offboard")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response offBoardExperimentDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor c) {
+
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+		//TODO: Implement this towards MANO
+		
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested ExperimentOnBoardDescriptor with ID=" + c.getId() + " cannot be onboarded");
 			return builder.build();
 		}
 

@@ -60,11 +60,11 @@ public class ExperimentOnBoardDescriptor extends OnBoardDescriptor{
 
 	
 
-	public ExperimentMetadata getVxf() {
+	public ExperimentMetadata getExperiment() {
 		return experiment;
 	}
 
-	public void setVxf(ExperimentMetadata e) {
+	public void setExperiment(ExperimentMetadata e) {
 		this.experiment = e;
 	}
 	

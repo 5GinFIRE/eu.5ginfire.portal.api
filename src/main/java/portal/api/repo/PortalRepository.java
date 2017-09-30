@@ -17,6 +17,7 @@ package portal.api.repo;
 
 import portal.api.impl.PortalJpaController;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
@@ -110,6 +111,18 @@ public class PortalRepository {
 		return ls;
 	}
 	
+
+	/**
+	 * returns first 100000 apps only :-)
+	 * @param categoryid 
+	 * @return list of apps
+	 */
+	public List<ExperimentMetadata> getExperiments(Long categoryid, boolean isPublished) {
+		List<ExperimentMetadata> ls = portalJpaController.readExperimentsMetadata(categoryid, 0, 100000, isPublished);		
+		return ls;
+	}
+
+	
 	public void deleteProduct(int vxfid) {
 		portalJpaController.deleteProduct(vxfid);
 		
@@ -186,16 +199,6 @@ public class PortalRepository {
 		
 	}
 
-
-	/**
-	 * returns first 100000 apps only :-)
-	 * @param categoryid 
-	 * @return list of apps
-	 */
-	public List<ExperimentMetadata> getApps(Long categoryid) {
-		List<ExperimentMetadata> ls = portalJpaController.readAppsMetadata(categoryid, 0, 100000);		
-		return ls;
-	}
 
 
 //	public ExperimentMetadata getExperimentMetadataByID(int appid) {
@@ -410,6 +413,41 @@ public class PortalRepository {
 	public VxFOnBoardedDescriptor getVxFOnBoardedDescriptorByID(int mpid) {
 		return portalJpaController.readVxFOnBoardedDescriptorById( mpid );
 	}
+
+
+	
+	public Object getExperimentOnBoardDescriptors() {
+
+		List<ExperimentOnBoardDescriptor> ls = portalJpaController.readExperimentOnBoardDescriptors(0, 100000);
+		return ls;	
+	}
+
+
+	public ExperimentOnBoardDescriptor addExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		portalJpaController.saveExperimentOnBoardDescriptor(c);
+		return c;
+	}
+
+
+	public ExperimentOnBoardDescriptor updateExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		ExperimentOnBoardDescriptor bmr = portalJpaController.updateExperimentOnBoardDescriptor(c);
+		return bmr;
+	}
+
+
+	public void deleteExperimentOnBoardDescriptor(int mpid) {
+		portalJpaController.deleteExperimentOnBoardDescriptor(mpid);
+		
+	}
+
+
+	public ExperimentOnBoardDescriptor getExperimentOnBoardDescriptorByID(int mpid) {
+		return portalJpaController.readExperimentOnBoardDescriptorById( mpid );
+	}
+
+
+	
+
 
 
 

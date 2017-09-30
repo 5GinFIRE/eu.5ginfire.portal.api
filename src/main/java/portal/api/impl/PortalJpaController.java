@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -605,15 +606,26 @@ public class PortalJpaController {
 		return q.getResultList();
 	}
 
-	public List<ExperimentMetadata> readAppsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<ExperimentMetadata> readExperimentsMetadata(Long categoryid, int firstResult, int maxResults, boolean isPublished) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q;
+		String s = "";
 
-		if ((categoryid != null) && (categoryid >= 0))
-			q = entityManager.createQuery(
-					"SELECT a FROM ExperimentMetadata a WHERE a.categories.id=" + categoryid + " ORDER BY a.id");
-		else
-			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a ORDER BY a.id");
+
+		if ((categoryid != null) && (categoryid >= 0)) {
+			if (isPublished) {
+				s = "a.published=TRUE";
+			}
+			q = entityManager
+					.createQuery("SELECT a FROM ExperimentMetadata a WHERE " + s + " AND a.categories.id=" + categoryid + " ORDER BY a.id");
+		}
+		else {
+			if (isPublished) {
+				s = "WHERE a.published=TRUE";
+			}
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a " + s + " ORDER BY a.id");
+		}
+		
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -1034,6 +1046,59 @@ public class PortalJpaController {
 	public VxFOnBoardedDescriptor readVxFOnBoardedDescriptorById(int i) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(VxFOnBoardedDescriptor.class, i);
+	}
+
+
+	
+	public List<ExperimentOnBoardDescriptor> readExperimentOnBoardDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM ExperimentOnBoardDescriptors m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor mprovider) {
+		logger.info("Will save ExperimentOnBoardDescriptors = " + mprovider.getDeployId() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public ExperimentOnBoardDescriptor updateExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		ExperimentOnBoardDescriptor resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteExperimentOnBoardDescriptor(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		ExperimentOnBoardDescriptor c = entityManager.find( ExperimentOnBoardDescriptor.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public ExperimentOnBoardDescriptor readExperimentOnBoardDescriptorById(int i) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(ExperimentOnBoardDescriptor.class, i);
 	}
 
 }

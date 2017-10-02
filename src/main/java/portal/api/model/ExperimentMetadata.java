@@ -43,7 +43,7 @@ public class ExperimentMetadata extends Product{
 	
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
-	private List<ExperimentOnBoardDescriptor> experimentOnBoardedDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
+	private List<ExperimentOnBoardDescriptor> experimentOnBoardDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
 	
 	
 	
@@ -55,12 +55,12 @@ public class ExperimentMetadata extends Product{
 		this.valid = valid;
 	}
 
-	public List<ExperimentOnBoardDescriptor> getExperimentOnBoardedDescriptors() {
-		return experimentOnBoardedDescriptors;
+	public List<ExperimentOnBoardDescriptor> getExperimentOnBoardDescriptors() {
+		return experimentOnBoardDescriptors;
 	}
 
-	public void setExperimentOnBoardedDescriptors(List<ExperimentOnBoardDescriptor> experimentOnBoardedDescriptors) {
-		this.experimentOnBoardedDescriptors = experimentOnBoardedDescriptors;
+	public void setExperimentOnBoardDescriptors(List<ExperimentOnBoardDescriptor> e) {
+		this.experimentOnBoardDescriptors = e;
 	}
 	
 	

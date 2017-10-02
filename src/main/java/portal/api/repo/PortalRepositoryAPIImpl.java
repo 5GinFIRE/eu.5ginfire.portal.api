@@ -1240,10 +1240,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("application", ats));
+			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("exprm", ats));
 			appmeta = parser.readValueAs(ExperimentMetadata.class);
 
-			logger.info("Received @POST for app : " + appmeta.getName());
+			logger.info("Received @POST for experiment : " + appmeta.getName());
 //			logger.info("Received @POST for app.containers : " + appmeta.getContainers().size());
 
 		} catch (JsonProcessingException e) {
@@ -1254,7 +1254,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// ExperimentMetadata appmeta = (ExperimentMetadata)
 		// portalRepositoryRef.getProductByID(aid);
-
+		
+		for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
+			veDescriptor.setExperiment( appmeta );
+		}
+		
 		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 

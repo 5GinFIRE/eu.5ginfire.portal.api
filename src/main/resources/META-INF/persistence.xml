@@ -74,10 +74,8 @@
 		<class>portal.api.model.Product</class>
 		<class>portal.api.model.ProductExtensionItem</class>
 		<class>portal.api.model.PortalProperty</class>
-		<class>portal.api.model.Container</class>
 		<class>portal.api.model.DeployArtifact</class>
 		<class>portal.api.model.DeploymentDescriptor</class>
-		<class>portal.api.model.DeployContainer</class>
 		<class>portal.api.model.MANOplatform</class>
 		<class>portal.api.model.MANOprovider</class>
 		<class>portal.api.model.VxFOnBoardedDescriptor</class>

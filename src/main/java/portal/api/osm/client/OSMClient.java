@@ -177,12 +177,22 @@ public class OSMClient {
 		
 		OSMClient osm = new OSMClient();
 		osm.init();
-		List<Vnfd> vnfds = osm.getVNFDs();
-		for (Vnfd v : vnfds) {
-			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());			
+//		List<Vnfd> vnfds = osm.getVNFDs();
+//		for (Vnfd v : vnfds) {
+//			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());			
+//		}
+//		for (Vnfd v : vnfds) {
+//			System.out.println("=== LIST VNFDs POJO object id: " + v.getId()+", Name: " + v.getName());			
+//		}
+		
+		
+		
+		List<Nsd> nsds = osm.getNSDs();
+		for (Nsd v : nsds) {
+			System.out.println("=== LIST NSDs POJO object response: " + v.toString());			
 		}
-		for (Vnfd v : vnfds) {
-			System.out.println("=== LIST VNFDs POJO object id: " + v.getId()+", Name: " + v.getName());
+		for (Nsd v : nsds) {
+			System.out.println("=== LIST NSDs POJO object id: " + v.getId()+", Name: " + v.getName());
 			
 		}
 		
@@ -195,7 +205,7 @@ public class OSMClient {
 	}
 
 
-	public void createOnBoardPackage(String packageURL, String packageID) {
+	public void createOnBoardVNFDPackage(String packageURL, String packageID) {
 
 		// BASE_SERVICE_URL + "/vnfd-catalog/vnfd/"
 		//
@@ -230,6 +240,40 @@ public class OSMClient {
 		}
 
 	}
+	
+	public void createOnBoardNSDPackage(String packageURL, String packageID) {
+
+		System.out.println("Sending HTTPS createOnBoardPackage towards: " + BASE_OPERATIONS_URL);
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
+		HttpPost httppost = new HttpPost(BASE_OPERATIONS_URL + "/package-create");
+		BasicHeader bh = new BasicHeader("Accept", "application/vnd.yang.collection+json");
+		httppost.addHeader(bh);
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded admin/admin
+		httppost.addHeader(bh2);
+		BasicHeader bh3 = new BasicHeader("Content-Type", "application/vnd.yang.data+json");
+		httppost.addHeader(bh3);
+
+		HttpResponse response;
+		try {
+			StringEntity params = new StringEntity("{" + "\"input\":{" + "\"external-url\": \"" + packageURL + "\","
+					+ "\"package-type\":\"NSD\"," + "\"package-id\":\"" + packageID + "\"" + "}" + "}");
+			httppost.setEntity(params);
+
+			response = httpclient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+			InputStream inStream = (InputStream) entity.getContent();
+			String s = IOUtils.toString(inStream);
+			System.out.println("response = " + s);
+			httpclient.getConnectionManager().shutdown();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
 
 	/**
 	 * @param reqURL
@@ -371,6 +415,36 @@ public class OSMClient {
 			
 			
 			return vnfds;
+
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+	public List<Nsd> getNSDs() {
+
+		String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd");
+
+		MappingJsonFactory factory = new MappingJsonFactory();
+		JsonParser parser;
+		try {
+			parser = factory.createJsonParser(response);
+			JsonNode tr = parser.readValueAsTree().get("nsd:nsd"); // needs a massage
+			
+			ArrayList<Nsd> nsds = new ArrayList<>();
+			
+			for (JsonNode jsonNode : tr) {
+				String s = jsonNode.toString();
+				JsonParser jnsd = factory.createJsonParser(s);
+				Nsd nsd = jnsd.readValueAs(Nsd.class);
+				nsds.add(nsd);
+			}
+			
+			
+			return nsds;
 
 		} catch (IllegalStateException | IOException e) {
 			// TODO Auto-generated catch block

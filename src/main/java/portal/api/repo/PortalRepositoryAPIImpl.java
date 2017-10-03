@@ -101,6 +101,7 @@ import pt.it.av.atnog.nsdescriptor.NSDescriptor;
 import pt.it.av.atnog.requirements.NSRequirements;
 import pt.it.av.atnog.requirements.VNFRequirements;
 import pt.it.av.atnog.vnfdescriptor.VNFDescriptor;
+import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 //CORS support
@@ -2166,6 +2167,64 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 	
 	
+	@GET
+	@Path("/manoprovider/{mpid}/vnfds/")
+	@Produces("application/json")
+	public Response getOSMVNFMetadata(@PathParam("mpid") int manoprovid) {
+
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
+		
+		 List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
+
+		if (vnfd != null) {
+			return Response.ok().entity(vnfd).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
+	@GET
+	@Path("/manoprovider/{mpid}/nsds/{nsdid}")
+	@Produces("application/json")
+	public Response getOSM_NSD_MetadataByKOSMMANOID(@PathParam("mpid") int manoprovid, @PathParam("vxfid") String nsdid) {
+		logger.info("getOSMVNFMetadataByID  nsdid=" + nsdid);
+
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
+		
+		Nsd nsd = OSMClient.getInstance(sm).getNSDbyID( nsdid );
+
+		if (nsd != null) {
+			return Response.ok().entity(nsd).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("nsdid with id=" + nsdid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
+	@GET
+	@Path("/manoprovider/{mpid}/nsds/")
+	@Produces("application/json")
+	public Response getOSM_NSD_Metadata(@PathParam("mpid") int manoprovid) {
+
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
+		
+		 List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
+
+		if (nsd != null) {
+			return Response.ok().entity(nsd).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
 	/********************************************************************************
 	 * 
 	 * admin VxFOnBoardedDescriptors
@@ -2310,7 +2369,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		logger.info("VxF Package Location: " + vxf.getPackageLocation() );
-		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
+		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardVNFDPackage( vxf.getPackageLocation(), c.getDeployId());
 
 		
 		
@@ -2427,22 +2486,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if (sm == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
+			builder.entity("ExperimentOnBoardDescriptor " + mpid + " not found in portal registry");
 			return builder.build();
 		}
 
 		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
 			
-			Vnfd vnfd = null;
-			List<Vnfd> vnfds = OSMClient.getInstance( sm.getObMANOprovider() ).getVNFDs();
-			for (Vnfd v : vnfds) {
+			Nsd nsd = null;
+			List<Nsd> nsds = OSMClient.getInstance( sm.getObMANOprovider() ).getNSDs();
+			for (Nsd v : nsds) {
 				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
-					vnfd = v;
+					nsd = v;
 					break;
 				}
 			}
 			
-			if ( vnfd == null) {
+			if ( nsd == null) {
 				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
 			} else {
 				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
@@ -2464,9 +2523,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		c.setDeployId(UUID.randomUUID().toString());
-		ExperimentMetadata vxf = c.getExperiment();
-		if ( vxf == null ) {
-			vxf = (ExperimentMetadata) portalRepositoryRef.getProductByID( c.getExperimentid() );
+		ExperimentMetadata em = c.getExperiment();
+		if ( em == null ) {
+			em = (ExperimentMetadata) portalRepositoryRef.getProductByID( c.getExperimentid() );
 		}
 		
 		/**
@@ -2483,14 +2542,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		 *  
 		 */
 		
-		c.setVxfMANOProviderID(  vxf.getName() );
+		c.setVxfMANOProviderID(  em.getName() );
 		
 		c.setLastOnboarding( new Date() );
 		
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
-		logger.info("Experiment Package Location: " + vxf.getPackageLocation() );
-		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardPackage( vxf.getPackageLocation(), c.getDeployId());
+		logger.info("Experiment Package Location: " + em.getPackageLocation() );
+		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardNSDPackage( em.getPackageLocation(), c.getDeployId());
 
 		
 		

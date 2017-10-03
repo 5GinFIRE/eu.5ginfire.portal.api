@@ -249,6 +249,7 @@ public class OSMClient {
 		HttpPost httppost = new HttpPost(BASE_OPERATIONS_URL + "/package-create");
 		BasicHeader bh = new BasicHeader("Accept", "application/vnd.yang.collection+json");
 		httppost.addHeader(bh);
+		
 		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded admin/admin
 		httppost.addHeader(bh2);
 		BasicHeader bh3 = new BasicHeader("Content-Type", "application/vnd.yang.data+json");

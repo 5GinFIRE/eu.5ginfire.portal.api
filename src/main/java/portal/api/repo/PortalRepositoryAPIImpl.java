@@ -74,14 +74,11 @@ import portal.api.cloudOAuth.OAuthClientManager;
 import portal.api.cloudOAuth.OAuthUser;
 import portal.api.cloudOAuth.OAuthUtils;
 import portal.api.model.Category;
-import portal.api.model.DeployArtifact;
-import portal.api.model.DeployContainer;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
-import portal.api.model.InstalledVxFStatus;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.OnBoardingStatus;
@@ -1684,7 +1681,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 
 			deployment.setDateCreated(new Date());
-			deployment.setStatus(DeploymentDescriptorStatus.PENDING_ADMIN_AUTH);
+			deployment.setStatus(DeploymentDescriptorStatus.UNDER_REVIEW);
 
 			u = portalRepositoryRef.getUserByID(u.getId());
 			deployment.setOwner(u); // reattach from the DB model
@@ -1695,12 +1692,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			deployment.setBaseApplication(baseApplication); // reattach from the
 															// DB model
 
-			for (DeployContainer dc : deployment.getDeployContainers()) {
-				dc.getTargetResource().setOwner(u);// reattach from the DB
-													// model, in case missing
-													// from the request
-			}
-
+			
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 
 			return Response.ok().entity(deployment).build();
@@ -1765,18 +1757,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((u != null)) {
 
-			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only
-				// admin
-				// can
-				// alter
-				// a
-				// deployment
-				d.setStatus(DeploymentDescriptorStatus.QUEUED);
+			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
+				d.setStatus(DeploymentDescriptorStatus.SCHEDULED);
 			else if (action.equals("UNINSTALL")
 					&& (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getId() == d.getOwner().getId()))
-				d.setStatus(DeploymentDescriptorStatus.UNINSTALLING);
+				d.setStatus(DeploymentDescriptorStatus.REJECTED);
 			else if (action.equals("DENY") && (u.getRoles().contains(UserRoleType.PORTALADMIN)))
-				d.setStatus(DeploymentDescriptorStatus.DENIED);
+				d.setStatus(DeploymentDescriptorStatus.REJECTED);
 
 			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
 			d.setOwner(deploymentOwner); // reattach from the DB model
@@ -1784,17 +1771,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
 					.getProductByID(d.getBaseApplication().getId());
 			d.setBaseApplication(baseApplication); // reattach from the DB model
-
-			for (DeployContainer dc : d.getDeployContainers()) {
-
-				dc.getTargetResource().setOwner(deploymentOwner);// reattach
-																	// from the
-																	// DB model,
-																	// in case
-																	// missing
-																	// from the
-																	// request
-			}
 
 			DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
@@ -1847,144 +1823,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 
-	@GET
-	@Path("/registerresource/deployments/target/uuid/{uuid}")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public Response getDeployContainerByTargetResourceUUID(@PathParam("uuid") String uuid) {
+	
 
-		SubscribedResource res = updateLastSeenResource(uuid);
-		if (res != null)
-			logger.info("Received req for Deployent by client: " + res.getUuid() + ", URLs:" + res.getURL()
-					+ ", OwnerID:" + res.getOwner().getId());
+	
 
-		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
-		for (DeploymentDescriptor deploymentDescriptor : deployments)
-			if ((deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.PENDING_ADMIN_AUTH)
-					&& (deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.DENIED)
-					&& (deploymentDescriptor.getStatus() != DeploymentDescriptorStatus.UNINSTALLED)) {
-				List<DeployContainer> dcs = deploymentDescriptor.getDeployContainers();
-				for (DeployContainer dc : dcs) {
-					if ((dc.getTargetResource() != null) && (dc.getTargetResource().getUuid().equals(uuid))) {
-						dc.setMasterDeploymentStatus(deploymentDescriptor.getStatus());
-						return Response.ok().entity(dc).build();
-					}
-				}
-			}
-
-		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("Deploy Container for TargetResource not found");
-		throw new WebApplicationException(builder.build());
-
-	}
-
-	// /registerresource/deployments/target/uuid/"+
-	// clientUUID+"/installedvxfuuid/"+installedVxFUUID+"/status/"+status"
-
-	@PUT
-	@Path("/registerresource/deployments/target/uuid/{clientUUID}/installedvxfuuid/{installedVxFUUID}/status/{status}/deployContainerid/{cid}")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public Response updateDeployContainerTargetResourceStatus(@PathParam("clientUUID") String clientUUID,
-			@PathParam("installedVxFUUID") String installedVxFUUID, @PathParam("status") String status,
-			@PathParam("cid") Long deployContainerId) {
-
-		SubscribedResource res = updateLastSeenResource(clientUUID);
-		if (res != null)
-			logger.info("Received ResourceStatus: " + status + ", for Deployent by client: " + res.getUuid() + ", URLs:"
-					+ res.getURL() + ", OwnerID:" + res.getOwner().getId() + ", installedVxFUUID:" + installedVxFUUID);
-
-		List<DeploymentDescriptor> deployments = portalRepositoryRef.getAllDeploymentDescriptors();
-		for (DeploymentDescriptor deploymentDescriptor : deployments) {
-			List<DeployContainer> dcs = deploymentDescriptor.getDeployContainers();
-			for (DeployContainer dc : dcs) {
-				if ((deployContainerId == dc.getId()) && (dc.getTargetResource() != null)
-						&& dc.getTargetResource().getUuid().equals(clientUUID)) {
-					List<DeployArtifact> artifacts = dc.getDeployArtifacts();
-					for (DeployArtifact deployArtifact : artifacts)
-						if (deployArtifact.getUuid().equals(installedVxFUUID)) {
-							deployArtifact.setStatus(InstalledVxFStatus.valueOf(status));
-
-						}
-
-					deploymentDescriptor.setStatus(resolveStatus(deploymentDescriptor)); // we
-																							// must
-																							// write
-																							// here
-																							// code
-																							// to
-																							// properly
-																							// find
-																							// the
-																							// status!
-					portalRepositoryRef.updateDeploymentDescriptor(deploymentDescriptor);
-
-					return Response.status(Status.OK).build();
-				} else {
-					logger.info(" dc.getTargetResource()==null !! PROBLEM");
-				}
-			}
-
-		}
-
-		logger.info("Deploy Container for TargetResource not found");
-		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("Deploy Container for TargetResource not found");
-		throw new WebApplicationException(builder.build());
-
-	}
-
-	private DeploymentDescriptorStatus resolveStatus(DeploymentDescriptor deploymentDescriptor) {
-
-		Boolean allInstalled = true;
-		Boolean allUnInstalled = true;
-		DeploymentDescriptorStatus status = deploymentDescriptor.getStatus();
-
-		List<DeployContainer> containers = deploymentDescriptor.getDeployContainers();
-		for (DeployContainer deployContainer : containers) {
-			List<DeployArtifact> artifacts = deployContainer.getDeployArtifacts();
-			for (DeployArtifact deployArtifact : artifacts) {
-				if (deployArtifact.getStatus() != InstalledVxFStatus.STARTED)
-					allInstalled = false;
-				if (deployArtifact.getStatus() != InstalledVxFStatus.UNINSTALLED)
-					allUnInstalled = false;
-
-				if ((deployArtifact.getStatus() == InstalledVxFStatus.FAILED))
-					return DeploymentDescriptorStatus.FAILED;
-				if ((deployArtifact.getStatus() == InstalledVxFStatus.UNINSTALLING))
-					return DeploymentDescriptorStatus.UNINSTALLING;
-				if ((deployArtifact.getStatus() == InstalledVxFStatus.CONFIGURING)
-						|| (deployArtifact.getStatus() == InstalledVxFStatus.DOWNLOADING)
-						|| (deployArtifact.getStatus() == InstalledVxFStatus.DOWNLOADED)
-						|| (deployArtifact.getStatus() == InstalledVxFStatus.INSTALLING)
-						|| (deployArtifact.getStatus() == InstalledVxFStatus.INSTALLED)
-						|| (deployArtifact.getStatus() == InstalledVxFStatus.STARTING))
-					return DeploymentDescriptorStatus.INSTALLING;
-			}
-		}
-
-		if (allInstalled)
-			return DeploymentDescriptorStatus.INSTALLED;
-		else if (allUnInstalled)
-			return DeploymentDescriptorStatus.UNINSTALLED;
-		else
-			return status;
-	}
-
-	private SubscribedResource updateLastSeenResource(String clientUUID) {
-
-		SubscribedResource res = portalRepositoryRef.getSubscribedResourceByUUID(clientUUID);
-		if (res != null) {
-			res.setLastUpdate(new Date()); // each time Portal Client Polls api,
-											// we update this Last seen of
-											// client
-			PortalUser reattachedUser = portalRepositoryRef.getUserByID(res.getOwner().getId());
-			res.setOwner(reattachedUser);
-			portalRepositoryRef.updateSubscribedResourceInfo(res.getId(), res);
-		}
-
-		return res;
-	}
+	
 
 	/********************************************************************************
 	 * 

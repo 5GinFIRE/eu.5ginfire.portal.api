@@ -30,9 +30,7 @@ import portal.api.model.PortalUser;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.model.Category;
-import portal.api.model.Container;
 import portal.api.model.DeployArtifact;
-import portal.api.model.DeployContainer;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ProductExtensionItem;
@@ -309,12 +307,9 @@ public class PortalRepoTest {
 		app.setLongDescription("longDescription");
 		app.setShortDescription("shortDescription");
 		app.getCategories().add(c);
-		Container container = new Container(); // add a container
-		container.setName("Container0");
 		DeployArtifact deployArtifact = new DeployArtifact();
 		deployArtifact.setName(bmeta2.getName());
 		deployArtifact.setUuid(bmeta2.getUuid());
-		container.getDeployArtifacts().add(deployArtifact);
 		//app.getContainers().add(container);
 		bu.addProduct(app);
 
@@ -323,19 +318,18 @@ public class PortalRepoTest {
 		dd.setBaseApplication(app);
 		dd.setName("a test DeployDescriptor");
 		dd.setOwner(bu);
-		dd.setStatus(DeploymentDescriptorStatus.PENDING_ADMIN_AUTH);
-		DeployContainer deplContainer = new DeployContainer();
-		deplContainer.setName("deploy1");
+		dd.setStatus(DeploymentDescriptorStatus.SCHEDULED);
+
 		DeployArtifact deployArtifactInst = new DeployArtifact();
 //		deployArtifactInst
 //				.setName(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getName());
 //		deployArtifactInst
 //				.setUuid(dd.getBaseApplication().getContainers().get(0).getDeployArtifacts().get(0).getUuid());
-		deplContainer.getDeployArtifacts().add(deployArtifactInst);
+		
+
 		SubscribedResource targetResource = new SubscribedResource();
 		targetResource.setURL("targetIP");
-		deplContainer.setTargetResource(targetResource);
-		dd.getDeployContainers().add(deplContainer);
+
 		bu.getDeployments().add(dd);// now add the deployment to the user
 
 		portalJpaControllerTest.saveUser(bu);
@@ -343,10 +337,9 @@ public class PortalRepoTest {
 		PortalUser testbu = portalJpaControllerTest.readPortalUserByUsername("ausername123");
 
 		assertEquals(1, testbu.getDeployments().size());
-		assertEquals(1, testbu.getDeployments().get(0).getDeployContainers().size());
+
 		assertEquals("myapp", testbu.getDeployments().get(0).getBaseApplication().getName());
-		assertEquals("targetIP",
-				testbu.getDeployments().get(0).getDeployContainers().get(0).getTargetResource().getURL());
+
 
 	}
 

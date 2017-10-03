@@ -49,13 +49,18 @@ public class DeploymentDescriptor {
 	private String name = null;
 
 	@Basic()
-	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.INIT;
+	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.UNDER_REVIEW;
 	
 	
 
 	@Basic()
 	private Date dateCreated;
 
+	@Basic()
+	private Date startReqDate;
+
+	@Basic()	
+	private Date endReqDate;
 
 
 	public Date getDateCreated() {
@@ -75,18 +80,7 @@ public class DeploymentDescriptor {
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 	
-	@OneToMany(cascade = { CascadeType.ALL })
-	@JoinTable()
-	private List<DeployContainer> deployContainers = new ArrayList<DeployContainer>();
 	
-	
-	public List<DeployContainer> getDeployContainers() {
-		return deployContainers;
-	}
-
-	public void setDeployContainers(List<DeployContainer> deployContainers) {
-		this.deployContainers = deployContainers;
-	}
 
 	public int getId() {
 		return id;
@@ -128,6 +122,22 @@ public class DeploymentDescriptor {
 
 	public void setStatus(DeploymentDescriptorStatus status) {
 		this.status = status;
+	}
+
+	public Date getStartReqDate() {
+		return startReqDate;
+	}
+
+	public void setStartReqDate(Date startReqDate) {
+		this.startReqDate = startReqDate;
+	}
+
+	public Date getEndReqDate() {
+		return endReqDate;
+	}
+
+	public void setEndReqDate(Date endReqDate) {
+		this.endReqDate = endReqDate;
 	}
 
 }

@@ -315,7 +315,7 @@ public class PortalRepoTest {
 
 		// now create a dployment
 		DeploymentDescriptor dd = new DeploymentDescriptor();
-		dd.setBaseApplication(app);
+		dd.setExperiment(app);
 		dd.setName("a test DeployDescriptor");
 		dd.setOwner(bu);
 		dd.setStatus(DeploymentDescriptorStatus.SCHEDULED);
@@ -338,7 +338,7 @@ public class PortalRepoTest {
 
 		assertEquals(1, testbu.getDeployments().size());
 
-		assertEquals("myapp", testbu.getDeployments().get(0).getBaseApplication().getName());
+		assertEquals("myapp", testbu.getDeployments().get(0).getExperiment().getName());
 
 
 	}

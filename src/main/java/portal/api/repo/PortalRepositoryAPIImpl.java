@@ -1688,8 +1688,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			u.getDeployments().add(deployment);
 
 			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
-					.getProductByID(deployment.getBaseApplication().getId());
-			deployment.setBaseApplication(baseApplication); // reattach from the
+					.getProductByID(deployment.getExperiment().getId());
+			deployment.setExperiment(baseApplication); // reattach from the
 															// DB model
 
 			
@@ -1750,37 +1750,32 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/deployments/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d,
-			@QueryParam("action") String action) {
+	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if ((u != null)) {
 
-			if (action.equals("AUTH") && (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
-				d.setStatus(DeploymentDescriptorStatus.SCHEDULED);
-			else if (action.equals("UNINSTALL")
-					&& (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getId() == d.getOwner().getId()))
-				d.setStatus(DeploymentDescriptorStatus.REJECTED);
-			else if (action.equals("DENY") && (u.getRoles().contains(UserRoleType.PORTALADMIN)))
-				d.setStatus(DeploymentDescriptorStatus.REJECTED);
+			if (  (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
+			{
+				PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
+				d.setOwner(deploymentOwner); // reattach from the DB model
 
-			PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
-			d.setOwner(deploymentOwner); // reattach from the DB model
+				ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
+						.getProductByID(d.getExperiment() .getId());
+				d.setExperiment(baseApplication); // reattach from the DB model
 
-			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
-					.getProductByID(d.getBaseApplication().getId());
-			d.setBaseApplication(baseApplication); // reattach from the DB model
+				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
-			DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
+				logger.info("updateDeployment for id: " + d.getId());
+				return Response.ok().entity(deployment).build();
+				
+			}
 
-			logger.info("updateDeployment for id: " + d.getId());
-
-			return Response.ok().entity(deployment).build();
 
 		}
 
-		ResponseBuilder builder = Response.status(Status.FORBIDDEN);
+		ResponseBuilder builder = Response.status(Status.NOT_ACCEPTABLE);
 		builder.entity("User not found in portal registry or not logged in as admin");
 		throw new WebApplicationException(builder.build());
 

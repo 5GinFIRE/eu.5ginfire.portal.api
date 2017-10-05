@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -29,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -47,6 +49,17 @@ public class DeploymentDescriptor {
 	
 	@Basic()
 	private String name = null;
+	
+
+	@Lob
+	@Column(name = "LDESCRIPTION", columnDefinition = "LONGTEXT")
+	private String description = null;
+	
+
+
+	@Lob
+	@Column(name = "FEEDBACK", columnDefinition = "LONGTEXT")
+	private String feedback = null;
 
 	@Basic()
 	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.UNDER_REVIEW;
@@ -62,6 +75,10 @@ public class DeploymentDescriptor {
 	@Basic()	
 	private Date endReqDate;
 
+	@Basic()	
+	private Date startDate;
+	@Basic()	
+	private Date endDate;
 
 	public Date getDateCreated() {
 		return dateCreated;
@@ -73,9 +90,9 @@ public class DeploymentDescriptor {
 
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
-	private ExperimentMetadata baseApplication = null;
-	
-	
+	private ExperimentMetadata experiment = null;
+
+
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
@@ -99,13 +116,6 @@ public class DeploymentDescriptor {
 	}
 
 	
-	public ExperimentMetadata getBaseApplication() {
-		return baseApplication;
-	}
-
-	public void setBaseApplication(ExperimentMetadata baseApplication) {
-		this.baseApplication = baseApplication;
-	}
 
 	public PortalUser getOwner() {
 		return owner;
@@ -115,7 +125,15 @@ public class DeploymentDescriptor {
 		this.owner = owner;
 	}
 
+	
+	public ExperimentMetadata getExperiment() {
+		return experiment;
+	}
 
+	public void setExperiment(ExperimentMetadata e) {
+		this.experiment = e;
+	}
+	
 	public DeploymentDescriptorStatus getStatus() {
 		return status;
 	}
@@ -140,4 +158,36 @@ public class DeploymentDescriptor {
 		this.endReqDate = endReqDate;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(String feedback) {
+		this.feedback = feedback;
+	}
+
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 }

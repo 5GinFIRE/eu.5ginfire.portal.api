@@ -20,7 +20,8 @@ public enum DeploymentDescriptorStatus {
 		UNDER_REVIEW,
 		SCHEDULED,
 		REJECTED,
-		RUNNING
+		RUNNING,
+		COMPLETED
 		
 }
 

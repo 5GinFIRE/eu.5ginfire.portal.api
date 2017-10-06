@@ -3,7 +3,10 @@ eu.5ginfire.portal.api
 
 eu.5ginfire.portal.api Web Service is a RESTful service for 5GinFIRE project  (http://www.5ginfire.eu)
 
-[API documentation](https://5ginfire.github.io/eu.5ginfire.portal.api/doc/html2-client/)
+API Documentation
+--------
+
+Please check the [API documentation](https://5ginfire.github.io/eu.5ginfire.portal.api/doc/html2-client/)
 
 
 Quick testing

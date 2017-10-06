@@ -234,6 +234,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<artifactId>eu.5ginFIRE.riftioyangschema2java</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<!-- swagger spec will be under http://localhost:13000/5ginfireportal/services/api/swagger.json . TO create useful clients and specs go to https://editor.swagger.io-->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-swagger</artifactId>

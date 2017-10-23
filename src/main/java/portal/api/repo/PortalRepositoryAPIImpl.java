@@ -420,6 +420,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					if ( prod instanceof VxFMetadata) {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
 						VNFDescriptor vnfd = vnfExtract.extractDescriptor();
+						prod.setName( vnfd.id );
+						prod.setVersion( vnfd.version );
+						prod.setVendor(  vnfd.vendor );
+						prod.setShortDescription( vnfd.name);
+						prod.setLongDescription( vnfd.description );
 						if ( vnfd!=null ) {
 							VNFRequirements vr = new VNFRequirements( vnfd );			
 							prod.setDescriptorHTML( vr.toHTML() );

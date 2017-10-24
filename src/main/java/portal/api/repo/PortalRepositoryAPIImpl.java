@@ -419,12 +419,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					File f = new File( vxffilepath );
 					if ( prod instanceof VxFMetadata) {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
-						VNFDescriptor vnfd = vnfExtract.extractDescriptor();
-						prod.setName( vnfd.id );
-						prod.setVersion( vnfd.version );
-						prod.setVendor(  vnfd.vendor );
-						prod.setShortDescription( vnfd.name);
-						prod.setLongDescription( vnfd.description );
+						Vnfd vnfd = vnfExtract.extractVnfdDescriptor() ;
+						prod.setName( vnfd.getId()  );
+						prod.setVersion( vnfd.getVersion() );
+						prod.setVendor(  vnfd.getVendor() );
+						prod.setShortDescription( vnfd.getName());
+						prod.setLongDescription( vnfd.getDescription() );
 						if ( vnfd!=null ) {
 							VNFRequirements vr = new VNFRequirements( vnfd );			
 							prod.setDescriptorHTML( vr.toHTML() );
@@ -432,9 +432,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
 					}else if ( prod instanceof ExperimentMetadata) {
 						NSExtractor nsExtract = new NSExtractor( f );
-						NSDescriptor ns = nsExtract.extractDescriptor();
+						Nsd ns = nsExtract.extractNsDescriptor();
+						prod.setName( ns.getId()  );
+						prod.setVersion( ns.getVersion() );
+						prod.setVendor(  ns.getVendor() );
+						prod.setShortDescription( ns.getName());
+						prod.setLongDescription( ns.getDescription() );
 						if ( ns!=null ) {
-							NSRequirements vr = new NSRequirements(ns, new ArrayList<VNFDescriptor>() ) ;			
+							NSRequirements vr = new NSRequirements(ns ) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
 						}
 				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						
@@ -673,7 +678,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					File f = new File( vxffilepath );
 					if ( prod instanceof VxFMetadata) {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
-						VNFDescriptor vnfd = vnfExtract.extractDescriptor();
+						Vnfd vnfd = vnfExtract.extractVnfdDescriptor(); 
 						if ( vnfd!=null ) {
 							VNFRequirements vr = new VNFRequirements( vnfd );			
 							prod.setDescriptorHTML( vr.toHTML() );
@@ -681,9 +686,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
 					}else if ( prod instanceof ExperimentMetadata) {
 						NSExtractor nsExtract = new NSExtractor( f );
-						NSDescriptor ns = nsExtract.extractDescriptor();
+						Nsd ns = nsExtract.extractNsDescriptor();
+						prod.setName( ns.getId()  );
+						prod.setVersion( ns.getVersion() );
+						prod.setVendor(  ns.getVendor() );
+						prod.setShortDescription( ns.getName());
+						prod.setLongDescription( ns.getDescription() );
+						
 						if ( ns!=null ) {
-							NSRequirements vr = new NSRequirements(ns, new ArrayList<VNFDescriptor>() ) ;			
+							NSRequirements vr = new NSRequirements(ns) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
 						}
 				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						

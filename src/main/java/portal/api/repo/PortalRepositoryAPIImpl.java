@@ -442,7 +442,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								}
 							}
 							
-						}						
+						} else {
+							return null;
+						}
 					}else if ( prod instanceof ExperimentMetadata) {
 						NSExtractor nsExtract = new NSExtractor( f );
 						Nsd ns = nsExtract.extractNsDescriptor();
@@ -464,9 +466,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 									logger.info("imgfile saved to = " + imgfile);
 									prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
 								}
-							}	
-					        
-					        
+							}
+						} else {
+							return null;
 						}					
 					}
 				}
@@ -495,6 +497,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 
 		// we must replace given product categories with the ones from our DB
@@ -598,7 +601,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
+	if (vxf != null ) {
 		return Response.ok().entity(vxf).build();
+	} else {
+		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+		builder.entity("Requested entity cannot be installed");
+		throw new WebApplicationException(builder.build());
+	}
 
 	}
 
@@ -777,6 +786,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		} catch (IOException e) {
 
 			e.printStackTrace();
+			return null;
 		}
 
 		// save product
@@ -1290,8 +1300,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// ExperimentMetadata sm = new ExperimentMetadata();
 		experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
-
-		return Response.ok().entity(experiment).build();
+		if (experiment != null ) {
+			return Response.ok().entity(experiment).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested entity cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
 
 	}
 

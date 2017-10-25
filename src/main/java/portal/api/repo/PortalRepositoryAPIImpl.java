@@ -15,6 +15,7 @@
 
 package portal.api.repo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -402,7 +403,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if (image != null) {
 				String imageFileNamePosted = getFileName(image.getHeaders());
 				logger.info("image = " + imageFileNamePosted);
-				if (!imageFileNamePosted.equals("")) {
+				if (!imageFileNamePosted.equals("")) {					
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
 					prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
@@ -420,29 +421,53 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					if ( prod instanceof VxFMetadata) {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
 						Vnfd vnfd = vnfExtract.extractVnfdDescriptor() ;
-						prod.setName( vnfd.getId()  );
-						prod.setVersion( vnfd.getVersion() );
-						prod.setVendor(  vnfd.getVendor() );
-						prod.setShortDescription( vnfd.getName());
-						prod.setLongDescription( vnfd.getDescription() );
 						if ( vnfd!=null ) {
+							prod.setName( vnfd.getId()  );
+							prod.setVersion( vnfd.getVersion() );
+							prod.setVendor(  vnfd.getVendor() );
+							prod.setShortDescription( vnfd.getName());
+							prod.setLongDescription( vnfd.getDescription() );
 							VNFRequirements vr = new VNFRequirements( vnfd );			
 							prod.setDescriptorHTML( vr.toHTML() );
-						}
-				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
+					        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
+							
+							if ( vnfExtract.getIconfilePath() != null) {
+								
+								String imageFileNamePosted = vnfd.getLogo();
+								logger.info("image = " + imageFileNamePosted);
+								if (!imageFileNamePosted.equals("")) {
+									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									logger.info("imgfile saved to = " + imgfile);
+									prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
+								}
+							}
+							
+						}						
 					}else if ( prod instanceof ExperimentMetadata) {
 						NSExtractor nsExtract = new NSExtractor( f );
 						Nsd ns = nsExtract.extractNsDescriptor();
-						prod.setName( ns.getId()  );
-						prod.setVersion( ns.getVersion() );
-						prod.setVendor(  ns.getVendor() );
-						prod.setShortDescription( ns.getName());
-						prod.setLongDescription( ns.getDescription() );
 						if ( ns!=null ) {
+							prod.setName( ns.getId()  );
+							prod.setVersion( ns.getVersion() );
+							prod.setVendor(  ns.getVendor() );
+							prod.setShortDescription( ns.getName());
+							prod.setLongDescription( ns.getDescription() );
 							NSRequirements vr = new NSRequirements(ns ) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
-						}
-				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						
+					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );							
+							if ( nsExtract.getIconfilePath() != null) {
+								
+								String imageFileNamePosted = ns.getLogo();
+								logger.info("image = " + imageFileNamePosted);
+								if (!imageFileNamePosted.equals("")) {
+									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									logger.info("imgfile saved to = " + imgfile);
+									prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
+								}
+							}	
+					        
+					        
+						}					
 					}
 				}
 			}
@@ -680,24 +705,49 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
 						Vnfd vnfd = vnfExtract.extractVnfdDescriptor(); 
 						if ( vnfd!=null ) {
+							prod.setName( vnfd.getId()  );
+							prod.setVersion( vnfd.getVersion() );
+							prod.setVendor(  vnfd.getVendor() );
+							prod.setShortDescription( vnfd.getName());
+							prod.setLongDescription( vnfd.getDescription() );
 							VNFRequirements vr = new VNFRequirements( vnfd );			
 							prod.setDescriptorHTML( vr.toHTML() );
-						}
-				        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );						
+					        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
+							
+							if ( vnfExtract.getIconfilePath() != null) {
+								
+								String imageFileNamePosted = vnfd.getLogo();
+								logger.info("image = " + imageFileNamePosted);
+								if (!imageFileNamePosted.equals("")) {
+									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									logger.info("imgfile saved to = " + imgfile);
+									prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+								}
+							}
+						}					
 					}else if ( prod instanceof ExperimentMetadata) {
 						NSExtractor nsExtract = new NSExtractor( f );
-						Nsd ns = nsExtract.extractNsDescriptor();
-						prod.setName( ns.getId()  );
-						prod.setVersion( ns.getVersion() );
-						prod.setVendor(  ns.getVendor() );
-						prod.setShortDescription( ns.getName());
-						prod.setLongDescription( ns.getDescription() );
-						
+						Nsd ns = nsExtract.extractNsDescriptor();						
 						if ( ns!=null ) {
+							prod.setName( ns.getId()  );
+							prod.setVersion( ns.getVersion() );
+							prod.setVendor(  ns.getVendor() );
+							prod.setShortDescription( ns.getName());
+							prod.setLongDescription( ns.getDescription() );
 							NSRequirements vr = new NSRequirements(ns) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
-						}
-				        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );						
+					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );							
+							if ( nsExtract.getIconfilePath() != null) {
+								
+								String imageFileNamePosted = ns.getLogo();
+								logger.info("image = " + imageFileNamePosted);
+								if (!imageFileNamePosted.equals("")) {
+									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									logger.info("imgfile saved to = " + imgfile);
+									prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+								}
+							}
+						}					
 					}
 					
 				}
@@ -1396,6 +1446,27 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		return null;
 	}
+	
+	// Attachment utils ///////////////////////
+		private String saveFile(ByteArrayOutputStream att, String filePath) throws IOException {
+			
+
+			File f = new File(filePath);
+		    FileOutputStream fos;
+			try {
+			    fos = new FileOutputStream ( f );
+			    att.writeTo(fos);
+			    fos.close();
+				return f.getAbsolutePath();
+			} catch(IOException ioe) {
+			    // Handle exception here
+			    ioe.printStackTrace();
+			} finally {
+			}
+
+			return null;
+			
+		}
 
 	private String getFileName(MultivaluedMap<String, String> header) {
 		String[] contentDisposition = header.getFirst("Content-Disposition").split(";");

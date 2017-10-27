@@ -44,16 +44,10 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 
 		<shiro.version>1.2.3</shiro.version>
 		<jetty.version>9.2.1.v20140609</jetty.version>
-		<comwooreanova.version>3.2.1</comwooreanova.version>
 	</properties>
 
 
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-client</artifactId>
@@ -189,40 +183,17 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<version>5.1.33</version>
 		</dependency>
 
-		<!-- FI-WARE cloud access related -->
 		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>nova-client</artifactId>
-			<version>${comwooreanova.version}</version>
+			<groupId>org.pacesys</groupId>
+			<artifactId>openstack4j</artifactId>
+			<version>3.1.0</version>
+			<classifier>withdeps</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>nova-model</artifactId>
-			<version>${comwooreanova.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>keystone-model</artifactId>
-			<version>${comwooreanova.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>keystone-client</artifactId>
-			<version>${comwooreanova.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>2.6</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<!-- END FI-WARE cloud access related -->
-
+	            <groupId>org.slf4j</groupId>
+	            <artifactId>slf4j-simple</artifactId>
+	            <version>1.7.5</version>
+	        </dependency>
 
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -234,7 +205,8 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<artifactId>eu.5ginFIRE.riftioyangschema2java</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		<!-- swagger spec will be under http://localhost:13000/5ginfireportal/services/api/swagger.json . TO create useful clients and specs go to https://editor.swagger.io-->
+		<!-- swagger spec will be under http://localhost:13000/5ginfireportal/services/api/swagger.json 
+			. TO create useful clients and specs go to https://editor.swagger.io -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-service-description-swagger</artifactId>
@@ -349,7 +321,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 				<executions>
 					<execution>
 						<id>format-classes</id>
-						<goals>						
+						<goals>
 							<goal>format</goal>
 						</goals>
 					</execution>

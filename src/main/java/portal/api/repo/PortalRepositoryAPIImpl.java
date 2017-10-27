@@ -54,8 +54,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
-import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrant;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -64,16 +62,7 @@ import org.apache.shiro.subject.Subject;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.MappingJsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
 
-import com.woorea.openstack.keystone.model.Access.Service.Endpoint;
-import com.woorea.openstack.keystone.model.Tenant;
-import com.woorea.openstack.nova.model.Server;
-
-import portal.api.cloudOAuth.KeystoneCloudAccess;
-import portal.api.cloudOAuth.OAuthClientManager;
-import portal.api.cloudOAuth.OAuthUser;
-import portal.api.cloudOAuth.OAuthUtils;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
@@ -95,10 +84,8 @@ import portal.api.osm.client.OSMClient;
 import portal.api.util.EmailUtil;
 import pt.it.av.atnog.extractors.NSExtractor;
 import pt.it.av.atnog.extractors.VNFExtractor;
-import pt.it.av.atnog.nsdescriptor.NSDescriptor;
 import pt.it.av.atnog.requirements.NSRequirements;
 import pt.it.av.atnog.requirements.VNFRequirements;
-import pt.it.av.atnog.vnfdescriptor.VNFDescriptor;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
@@ -131,7 +118,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			+ File.separator + "metadata" + File.separator;
 
 	private PortalRepository portalRepositoryRef;
-	private OAuthClientManager oAuthClientManagerRef;
 
 	public static final String KEYSTONE_AUTH_URL = "http://cloud.lab.fi-ware.org:4730/v2.0";
 
@@ -943,9 +929,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		this.portalRepositoryRef = portalRepositoryRef;
 	}
 
-	public void setoAuthClientManagerRef(OAuthClientManager oAuthClientManagerRef) {
-		this.oAuthClientManagerRef = oAuthClientManagerRef;
-	}
+
 
 	// Sessions related API
 
@@ -1540,165 +1524,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return null;
 	}
 
-	/*****************************************
-	 * OAUTH2 cloud Related API
-	 *********************************************/
 
-	@GET
-	@Path("/oauth2/")
-	@Produces("application/json")
-	public Response oauth2Sessions(@QueryParam("oath2serverurl") String oath2serverurl,
-			@QueryParam("oath2requestkey") String oath2requestkey) {
-
-		// the params
-		logger.info("Received GET oath2serverurl: " + oath2serverurl);
-		logger.info("Received GET oath2requestkey: " + oath2requestkey);
-
-		return Response.seeOther(oAuthClientManagerRef.getAuthorizationServiceURI(getCallbackURI(), oath2requestkey))
-				.build();
-	}
-
-	@GET
-	@Path("/oauth2/login")
-	@Produces("text/html")
-	// @Produces("application/json")
-	public Response oauth2login(@QueryParam("code") String code) {
-
-		// This one is the callback URL, which is called by the cloud OAUTH2
-		// service
-		logger.info("Received authorized request token code: " + code + ". Preparing AuthorizationCodeGrant header.");
-
-		AuthorizationCodeGrant codeGrant = new AuthorizationCodeGrant(code, getCallbackURI());
-		logger.info(
-				"Requesting OAuth server accessTokenService to replace an authorized request token with an access token");
-		ClientAccessToken accessToken = oAuthClientManagerRef.getAccessToken(codeGrant);
-		if (accessToken == null) {
-			String msg = "NO_OAUTH_ACCESS_TOKEN, Problem replacing your authorization key for OAuth access token,  please report to portal admin";
-			logger.info(msg);
-			return Response.status(Status.UNAUTHORIZED).entity(msg).build();
-		}
-
-		try {
-			logger.info("OAUTH2 accessTokenService accessToken = " + accessToken.toString());
-			String authHeader = oAuthClientManagerRef.createAuthorizationHeader(accessToken);
-			logger.info("OAUTH2 accessTokenService authHeader = " + authHeader);
-			logger.info("accessToken getTokenType= " + accessToken.getTokenType());
-			logger.info("accessToken getTokenKey= " + accessToken.getTokenKey());
-			logger.info("accessToken getRefreshToken= " + accessToken.getRefreshToken());
-			logger.info("accessToken getExpiresIn= " + accessToken.getExpiresIn());
-
-			Tenant t = KeystoneCloudAccess.getFirstTenant(accessToken.getTokenKey());
-			OAuthUser fu = OAuthUtils.getOAuthUser(authHeader, accessToken); // get
-																				// user
-																				// information
-																				// since
-																				// we
-																				// are
-																				// authorized
-																				// via
-																				// oauth
-			fu.setxOAuth2Token(accessToken.getTokenKey());
-			fu.setTenantName(t.getName());
-			fu.setTenantId(t.getId());
-			fu.setCloudToken(KeystoneCloudAccess.getAccessModel(t, accessToken.getTokenKey()).getToken().getId());
-
-			// check if user exists in Portal database
-			PortalUser u = portalRepositoryRef.getUserByUsername(fu.getNickName());
-
-			String roamPassword = UUID.randomUUID().toString(); // creating a
-																// temporary
-																// session
-																// password, to
-																// login
-			if (u == null) {
-				u = new PortalUser(); // create as new user
-				u.setEmail(fu.getEmail());
-				u.setUsername(fu.getNickName());
-				;
-				u.setName(fu.getDisplayName());
-				u.setOrganization("FI-WARE");
-				u.addRole(UserRoleType.TESTBED_PROVIDER);
-				u.setPassword(roamPassword);
-				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
-				portalRepositoryRef.addPortalUserToUsers(u);
-			} else {
-				u.setEmail(fu.getEmail());
-				u.setName(fu.getDisplayName());
-				u.setPassword(roamPassword);
-				u.setOrganization("FI-WARE");
-				u.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
-				u = portalRepositoryRef.updateUserInfo(u.getId(), u);
-			}
-
-			UserSession userSession = new UserSession();
-			userSession.setPortalUser(u);
-			userSession.setPassword(roamPassword);
-			userSession.setUsername(u.getUsername());
-			userSession.setCLOUDUser(fu);
-
-			Subject currentUser = SecurityUtils.getSubject();
-			if (currentUser != null) {
-				AuthenticationToken token = new UsernamePasswordToken(userSession.getUsername(),
-						userSession.getPassword());
-				try {
-					currentUser.login(token);
-
-				} catch (AuthenticationException ae) {
-
-					return Response.status(Status.UNAUTHORIZED).build();
-				}
-			}
-
-			userSession.setPassword("");// trick so not to send in response
-			ObjectMapper mapper = new ObjectMapper();
-
-			// see
-			// https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage
-			// there are CORS issues so to do this trich the popup window
-			// communicates with the parent window ia this script
-			String comScript = "<script type='text/javascript'>function receiveMessage(event){"
-					+ "event.source.postMessage('" + mapper.writeValueAsString(userSession) + "', event.origin);" + "}"
-					+ "window.addEventListener('message', receiveMessage, false);" + "</script>";
-
-			return Response.ok("<html><body><p>Succesful Login</p>" + comScript + "</body></html>"
-
-			).build();
-
-		} catch (RuntimeException ex) {
-			ex.printStackTrace();
-			return Response.status(Status.UNAUTHORIZED).entity("USER Access problem").build();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return Response.ok().build();
-
-	}
-
-	private URI getCallbackURI() {
-		return URI.create(uri.getBaseUri() + "repo/oauth2/login");
-	}
-
-	@GET
-	@Path("/cloud/computeendpoints")
-	@Produces("application/json")
-	public Response getCLOUDServiceCatalogComputeEndpoints(@QueryParam("xauthtoken") String xauthtoken) {
-
-		List<Endpoint> scatalog = KeystoneCloudAccess.getServiceCatalogEndpointsOnlyCompute(xauthtoken);
-
-		return Response.ok(scatalog).build();
-	}
-
-	@GET
-	@Path("/cloud/servers")
-	@Produces("application/json")
-	public Response getCLOUDServiceComputeServers(@QueryParam("endPointPublicURL") String endPointPublicURL,
-			@QueryParam("cloudAccessToken") String cloudAccessToken) {
-
-		ArrayList<Server> servers = KeystoneCloudAccess.getServers(endPointPublicURL, cloudAccessToken);
-
-		return Response.ok(servers).build();
-	}
 
 	@GET
 	@Path("/admin/properties/")

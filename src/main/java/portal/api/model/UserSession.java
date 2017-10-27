@@ -15,7 +15,6 @@
 
 package portal.api.model;
 
-import portal.api.cloudOAuth.OAuthUser;
 
 public class UserSession {
 
@@ -23,7 +22,6 @@ public class UserSession {
 	private String username = null;
 	private String password = null;
 	private PortalUser portalUser = null;
-	private OAuthUser CLOUDUser = null;
 	
 	
 	
@@ -47,11 +45,5 @@ public class UserSession {
 	}
 	public void setPortalUser(PortalUser portalUser) {
 		this.portalUser = portalUser;
-	}
-	public OAuthUser getCLOUDUser() {
-		return CLOUDUser;
-	}
-	public void setCLOUDUser(OAuthUser cloudUser) {
-		CLOUDUser = cloudUser;
 	}
 }

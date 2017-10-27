@@ -31,8 +31,6 @@
 
 			<bean class="portal.api.repo.PortalRepositoryAPIImpl">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
-				<property name="oAuthClientManagerRef" ref="oAuthClientManagerBean" />
-				<!-- property name="cloudService" ref="cloudServiceClient" -->
 
 			</bean>
 
@@ -163,10 +161,12 @@
 		<property name="jpaVendorAdapter" ref="jpaAdapter" />
 	</bean>
 
-	<!-- MySQL bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
-		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary" 
-		/> <property name="showSql" value="false" /> <property name="database" value="MYSQL" 
-		/> <property name="generateDdl" value="true" /> </bean> -->
+	<!-- MYSQL -->
+	<!--bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
+		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary"/>
+		 <property name="showSql" value="false" /> 
+		 <property name="database" value="MYSQL"/> 
+		<property name="generateDdl" value="true" /> </bean --> 
 	<!-- H2 -->
 	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
@@ -204,11 +204,6 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-	<bean id="oAuthClientManagerBean" class="portal.api.cloudOAuth.OAuthClientManager">
-		<property name="authorizationURI"
-			value="http://account.lab.cloud.org/oauth2/authorize" />
-		<property name="accessTokenService" ref="atServiceClient" />
-	</bean>
 
 
 </beans>

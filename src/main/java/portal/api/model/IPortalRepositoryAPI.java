@@ -17,8 +17,6 @@ package portal.api.model;
 
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;

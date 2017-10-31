@@ -25,8 +25,8 @@ import java.nio.file.Paths;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.VxFMetadata;
 import portal.api.model.IRepositoryWebClient;
+import portal.api.model.VxFMetadata;
 
 /**
  * A test repository for mocking a repo

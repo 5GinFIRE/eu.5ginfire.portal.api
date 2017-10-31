@@ -15,31 +15,25 @@
 
 package portal.api.repo;
 
-import portal.api.impl.PortalJpaController;
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.ExperimentOnBoardDescriptor;
-import portal.api.model.PortalProperty;
-import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
-import portal.api.model.VxFOnBoardedDescriptor;
-import portal.api.model.Category;
-import portal.api.model.DeploymentDescriptor;
-import portal.api.model.InstalledVxF;
-import portal.api.model.MANOplatform;
-import portal.api.model.MANOprovider;
-import portal.api.model.Product;
-import portal.api.model.SubscribedResource;
-import portal.api.model.UserSession;
-
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.impl.PortalJpaController;
+import portal.api.model.Category;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
+import portal.api.model.Product;
+import portal.api.model.SubscribedResource;
+import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 
 /**
  * @author ctranoris

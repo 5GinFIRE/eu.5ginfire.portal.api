@@ -11,7 +11,7 @@
 To properly run it make sure that in your environment the artifact eu.5ginFIRE.riftioyangschema2java is already installed with </description>
 
 	<properties>
-		<jackson.version>1.9.4</jackson.version>
+		<jackson.version>2.8.7</jackson.version>
 		<maven-license-plugin.version>1.2.5</maven-license-plugin.version>
 		<cxf.version>3.1.11</cxf.version>
 		<httpclient.version>4.2.1</httpclient.version>
@@ -74,21 +74,18 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<artifactId>cxf-rt-rs-security-oauth2</artifactId>
 			<version>${cxf.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+				<version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+        </dependency>
+        
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>

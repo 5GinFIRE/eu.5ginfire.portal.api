@@ -17,17 +17,14 @@ package portal.api.util;
 
 import java.security.Principal;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -35,9 +32,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.servlet.SimpleCookie;
 
 public class ShiroBasicAuthInterceptor extends AbstractPhaseInterceptor<Message> {
 	private static final transient Log logger = LogFactory.getLog(ShiroBasicAuthInterceptor.class.getName());

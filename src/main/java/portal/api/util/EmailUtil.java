@@ -15,10 +15,6 @@
 
 package portal.api.util;
 
-import portal.api.impl.PortalJpaController;
-import portal.api.repo.PortalRepository;
-import portal.api.repo.PortalRepositoryAPIImpl;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
@@ -28,13 +24,13 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.repo.PortalRepository;
 
 public class EmailUtil {
 

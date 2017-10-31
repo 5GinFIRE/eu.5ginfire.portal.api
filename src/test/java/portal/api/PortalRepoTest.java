@@ -15,40 +15,36 @@
 
 package portal.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 import java.util.UUID;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import portal.api.impl.PortalJpaController;
+import portal.api.model.Category;
+import portal.api.model.DeployArtifact;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.OnBoardingStatus;
 import portal.api.model.PackagingFormat;
 import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
-import portal.api.model.VxFOnBoardedDescriptor;
-import portal.api.model.Category;
-import portal.api.model.DeployArtifact;
-import portal.api.model.DeploymentDescriptor;
-import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ProductExtensionItem;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserRoleType;
+import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.util.EncryptionUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:contextTest.xml" })

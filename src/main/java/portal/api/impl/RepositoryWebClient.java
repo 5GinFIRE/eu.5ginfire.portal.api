@@ -20,13 +20,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -34,12 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
 
-import portal.api.model.VxFMetadata;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+
 import portal.api.model.IRepositoryWebClient;
+import portal.api.model.VxFMetadata;
 
 public class RepositoryWebClient implements IRepositoryWebClient {
 
@@ -52,7 +51,7 @@ public class RepositoryWebClient implements IRepositoryWebClient {
 
 		try {
 			List<Object> providers = new ArrayList<Object>();
-			providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+			providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 			WebClient client = WebClient.create(url, providers);
 			Response r = client.accept("application/json").type("application/json").get();
 			if ( r.getStatus() == Response.Status.OK.getStatusCode() ){

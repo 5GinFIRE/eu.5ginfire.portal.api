@@ -40,9 +40,13 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import portal.api.model.MANOprovider;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
@@ -172,13 +176,13 @@ public class OSMClient {
 		
 		OSMClient osm = new OSMClient();
 		osm.init();
-//		List<Vnfd> vnfds = osm.getVNFDs();
-//		for (Vnfd v : vnfds) {
-//			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());			
-//		}
-//		for (Vnfd v : vnfds) {
-//			System.out.println("=== LIST VNFDs POJO object id: " + v.getId()+", Name: " + v.getName());			
-//		}
+		List<Vnfd> vnfds = osm.getVNFDs();
+		for (Vnfd v : vnfds) {
+			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());			
+		}
+		for (Vnfd v : vnfds) {
+			System.out.println("=== LIST VNFDs POJO object id: " + v.getId()+", Name: " + v.getName());			
+		}
 		
 		
 		
@@ -349,15 +353,22 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd/" + aNSDid);
 
-		MappingJsonFactory factory = new MappingJsonFactory();
-		JsonParser parser;
-		try {
-			parser = factory.createJsonParser(response);
 
-			JsonNode tr = parser.readValueAsTree().get("nsd:nsd"); // needs a massage
-			String s = tr.toString();
-			JsonParser jnsd = factory.createJsonParser(s);
-			Nsd nsd = jnsd.readValueAs(Nsd.class);
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        
+		
+		try {
+
+			JsonNode tr = mapper.readTree( response ).findValue("nsd:nsd"); // needs a massage
+			if ( tr == null ) {
+            	tr = mapper.readTree( response ).findValue("nsd");
+            }
+			tr = tr.get(0);
+            String s = tr.toString();   
+            s = s.replaceAll("vnfd:", ""); //some yaml files contain  nsd: prefix in every key which is not common in json
+			
+            Nsd nsd = mapper.readValue( s , Nsd.class);
+            
 			return nsd;
 
 		} catch (IllegalStateException | IOException e) {
@@ -372,16 +383,22 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd/" + aVNFDid);
 
-		MappingJsonFactory factory = new MappingJsonFactory();
-		JsonParser parser;
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        
+		
 		try {
-			parser = factory.createJsonParser(response);
-			// entity.writeTo(System.out);
-			JsonNode tr = parser.readValueAsTree().get("vnfd:vnfd"); // needs a massage
-			String s = tr.toString();
-			JsonParser jnsd = factory.createJsonParser(s);
-			Vnfd vnfd = jnsd.readValueAs(Vnfd.class);
-			return vnfd;
+
+			JsonNode tr = mapper.readTree( response ).findValue("vnfd:vnfd"); // needs a massage
+			if ( tr == null ) {
+            	tr = mapper.readTree( response ).findValue("vnfd");
+            }
+			tr = tr.get(0);
+            String s = tr.toString();   
+            s = s.replaceAll("vnfd:", ""); //some yaml files contain  nsd: prefix in every key which is not common in json
+			
+            Vnfd v = mapper.readValue( s , Vnfd.class);
+            
+			return v;
 
 		} catch (IllegalStateException | IOException e) {
 			// TODO Auto-generated catch block
@@ -395,18 +412,21 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd");
 
-		MappingJsonFactory factory = new MappingJsonFactory();
-		JsonParser parser;
+
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        
+
 		try {
-			parser = factory.createJsonParser(response);
-			JsonNode tr = parser.readValueAsTree().get("vnfd:vnfd"); // needs a massage
-			
+
+			JsonNode tr = mapper.readTree( response ).findValue("vnfd:vnfd");
+			if ( tr == null ) {
+            	tr = mapper.readTree( response ).findValue("vnfd");
+            }
+
 			ArrayList<Vnfd> vnfds = new ArrayList<>();
 			
 			for (JsonNode jsonNode : tr) {
-				String s = jsonNode.toString();
-				JsonParser jnsd = factory.createJsonParser(s);
-				Vnfd vnfd = jnsd.readValueAs(Vnfd.class);
+				Vnfd vnfd = mapper.readValue( jsonNode.toString()  , Vnfd.class);
 				vnfds.add(vnfd);
 			}
 			
@@ -425,18 +445,17 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd");
 
-		MappingJsonFactory factory = new MappingJsonFactory();
-		JsonParser parser;
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 		try {
-			parser = factory.createJsonParser(response);
-			JsonNode tr = parser.readValueAsTree().get("nsd:nsd"); // needs a massage
-			
+
+			JsonNode tr = mapper.readTree( response ).findValue("nsd:nsd");
+			if ( tr == null ) {
+            	tr = mapper.readTree( response ).findValue("nsd");
+            }
 			ArrayList<Nsd> nsds = new ArrayList<>();
 			
 			for (JsonNode jsonNode : tr) {
-				String s = jsonNode.toString();
-				JsonParser jnsd = factory.createJsonParser(s);
-				Nsd nsd = jnsd.readValueAs(Nsd.class);
+				Nsd nsd = mapper.readValue( jsonNode.toString() , Nsd.class );
 				nsds.add(nsd);
 			}
 			

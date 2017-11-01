@@ -12,7 +12,7 @@ else
 	git pull
 fi
 
-#sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
+sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
 
 
 echo "Build nfv-requirements-extractor"
@@ -25,12 +25,12 @@ else
 	git pull
 fi
 
-#sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
+sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
 
 echo "Build eu.5ginfire.portal.api"
 cd $dirlocation
 cd eu.5ginfire.portal.api
-#sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
+sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
 cp target/eu.5ginfire.portal.api-0.0.1-SNAPSHOT.war docker-compose-nginx-jetty-mysql/jetty/wars/
 
 echo "Updating eu.5ginfire.portal.web"

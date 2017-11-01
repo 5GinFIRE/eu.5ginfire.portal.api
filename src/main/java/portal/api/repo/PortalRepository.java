@@ -258,7 +258,7 @@ public class PortalRepository {
 		return bp;
 	}
 
-	public Object getProperties() {
+	public List<PortalProperty> getProperties() {
 
 		List<PortalProperty> ls = portalJpaController.readProperties(0, 100000);
 		return ls;	

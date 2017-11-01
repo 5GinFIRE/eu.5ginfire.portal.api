@@ -1531,7 +1531,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/properties/")
 	@Produces("application/json")
 	public Response getProperties() {
-		return Response.ok().entity(portalRepositoryRef.getProperties()).build();
+		List<PortalProperty> props = portalRepositoryRef.getProperties();
+		for (PortalProperty portalProperty : props) {
+			if ( portalProperty.getName().equals("mailpassword") ) {
+				portalProperty.setValue("***");
+			}
+		}
+		return Response.ok().entity( props ).build();
 	}
 
 	@PUT
@@ -1542,7 +1548,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		PortalProperty previousProperty = portalRepositoryRef.getPropertyByID(propid);
 
 		PortalProperty u = portalRepositoryRef.updateProperty(p);
-
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
@@ -1559,6 +1564,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getPropertyById(@PathParam("propid") int propid) {
 		PortalProperty sm = portalRepositoryRef.getPropertyByID(propid);
 
+		if ( sm.getName().equals("mailpassword") ) {
+			sm.setValue("");
+		}
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {

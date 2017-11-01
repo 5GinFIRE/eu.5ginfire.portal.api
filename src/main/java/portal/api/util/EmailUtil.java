@@ -22,6 +22,7 @@ import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -43,6 +44,7 @@ public class EmailUtil {
 		// Session session = Session.getDefaultInstance(props, null);
 
 		props.setProperty("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", "true");
 		if ((PortalRepository.getPropertyByName("mailhost").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailhost").getValue().isEmpty()))
 			props.setProperty("mail.host", PortalRepository.getPropertyByName("mailhost").getValue());
 		if ((PortalRepository.getPropertyByName("mailuser").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailuser").getValue().isEmpty()))
@@ -50,12 +52,22 @@ public class EmailUtil {
 		if ((PortalRepository.getPropertyByName("mailpassword").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailpassword").getValue().isEmpty()))
 			props.setProperty("mail.password", PortalRepository.getPropertyByName("mailpassword").getValue());
 
+
 		String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+		final String username = PortalRepository.getPropertyByName("mailuser").getValue();
+		final String password = PortalRepository.getPropertyByName("mailpassword").getValue();
+		
 		String subj = PortalRepository.getPropertyByName("activationEmailSubject").getValue();
 		logger.info("adminemail = " + adminemail);
 		logger.info("subj = " + subj);
 
-		Session mailSession = Session.getDefaultInstance(props, null);
+		Session mailSession =  Session.getInstance(props,
+				  new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				  });
+		
 		Transport transport;
 		try {
 			transport = mailSession.getTransport();

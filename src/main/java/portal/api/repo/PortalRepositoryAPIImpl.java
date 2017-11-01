@@ -230,6 +230,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return r;
 	}
+	
+	@POST
+	@Path("/register/verify")
+	@Produces("application/json")
+	@Consumes("multipart/form-data")
+	public Response addNewRegisterUserVerify(List<Attachment> ats) {
+
+		String username = getAttachmentStringValue("username", ats);
+		String rid = getAttachmentStringValue("rid", ats);
+		
+		PortalUser u = portalRepositoryRef.getUserByUsername(username); 
+		if ( u.getOrganization().contains("^^") ) {
+			u.setOrganization( u.getOrganization().substring(0,  u.getOrganization().indexOf("^^") )  );
+			u.setActive( true );
+		}
+		 u = portalRepositoryRef.updateUserInfo( u.getId(), u);
+		//getAttachmentStringValue("username", ats)
+		
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested user with username=" + u.getUsername() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
 
 	@PUT
 	@Path("/admin/users/{userid}")
@@ -981,6 +1009,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			try {
 				currentUser.login(token);
 				PortalUser portalUser = portalRepositoryRef.getUserByUsername(userSession.getUsername());
+				
+				if ( ! portalUser.getActive()) {
+					logger.info("User [" + currentUser.getPrincipal() + "] is not Active");
+					return Response.status(Status.UNAUTHORIZED).build();					
+				}
+				
+				
 				portalUser.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
 				userSession.setPortalUser(portalUser);
 				userSession.setPassword("");

@@ -408,7 +408,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// String[] i = extparmval.split("=");
 		// prod.addExtensionItem(i[0], i[1]);
 		// }
-
+		
 		URI endpointUrl = uri.getBaseUri();
 
 		String tempDir = METADATADIR + uuid + File.separator;
@@ -421,7 +421,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("")) {					
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
 				}
 			}
 
@@ -431,7 +431,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!aFileNamePosted.equals("")) {
 					String vxffilepath = saveFile(submittedFile, tempDir + aFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + uuid + "/" + aFileNamePosted);
+					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + uuid + "/" + aFileNamePosted);
 					File f = new File( vxffilepath );
 					if ( prod instanceof VxFMetadata) {
 						VNFExtractor vnfExtract = new VNFExtractor( f );
@@ -453,7 +453,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								if (!imageFileNamePosted.equals("")) {
 									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
 								}
 							}
 							
@@ -479,7 +479,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								if (!imageFileNamePosted.equals("")) {
 									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl + "repo/images/" + uuid + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
 								}
 							}
 						} else {
@@ -500,7 +500,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + uuid + "/" + shotFileNamePosted;
+					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -712,7 +712,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("unknown")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
 				}
 			}
 
@@ -722,7 +722,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("unknown")) {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
+					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
 					
 					File f = new File( vxffilepath );
 					if ( prod instanceof VxFMetadata) {
@@ -745,7 +745,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								if (!imageFileNamePosted.equals("")) {
 									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
 								}
 							}
 						}					
@@ -768,7 +768,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								if (!imageFileNamePosted.equals("")) {
 									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
 								}
 							}
 						}					
@@ -788,7 +788,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl + "repo/images/" + prod.getUuid() + "/" + shotFileNamePosted;
+					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -913,7 +913,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf.setLongDescription("");
 
 			vxf.setPackageLocation(
-					endpointUrl + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
+					endpointUrl.toString().replace("http:", "") + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 			// }else if (uuid.equals("12cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
 			// vxf = new VxFMetadata(uuid, "AN example service");
 			// vxf.setShortDescription("An example local service");
@@ -935,7 +935,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// URI endpointUrl = uri.getBaseUri();
 
 			vxf.setPackageLocation(
-					endpointUrl + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
+					endpointUrl.toString().replace("http:", "") + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
 		} else {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID(uuid);
 		}
@@ -1276,7 +1276,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		logger.info("Received GET for app uuid: " + uuid);
 		ExperimentMetadata app = null;
 
-		URI endpointUrl = uri.getBaseUri();
 		app = (ExperimentMetadata) portalRepositoryRef.getProductByUUID(uuid);
 
 		if (app != null) {

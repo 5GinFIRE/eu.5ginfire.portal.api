@@ -2446,5 +2446,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return Response.ok().build();
 
 	}
+	
+	@GET
+	@Path("/admin/infrastructures/{infraid}")
+	@Produces("application/json")
+	public Response getInfrastructureById(@PathParam("infraid") int infraid) {
+		Infrastructure sm = portalRepositoryRef.getInfrastructureByID( infraid );
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("Infrastructure " + infraid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
 
 }

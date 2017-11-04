@@ -68,6 +68,7 @@ import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
@@ -1690,7 +1691,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					.getProductByID(deployment.getExperiment().getId());
 			deployment.setExperiment(baseApplication); // reattach from the
 															// DB model
-
+			
+			
 			
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 

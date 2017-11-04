@@ -47,5 +47,27 @@ public class DeploymentDescriptorVxFPlacement {
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
 	private Infrastructure infrastructure = null;
+
+
+	public ConstituentVxF getConstituentVxF() {
+		return constituentVxF;
+	}
+
+
+	public void setConstituentVxF(ConstituentVxF constituentVxF) {
+		this.constituentVxF = constituentVxF;
+	}
+
+
+	public Infrastructure getInfrastructure() {
+		return infrastructure;
+	}
+
+
+	public void setInfrastructure(Infrastructure infrastructure) {
+		this.infrastructure = infrastructure;
+	}
+	
+	
 	
 }

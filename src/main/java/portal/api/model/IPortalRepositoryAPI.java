@@ -71,7 +71,7 @@ public interface IPortalRepositoryAPI {
 	Response getAppMetadataByUUID(String uuid);		
 	Response getAppofUser( int userid, int appid);
 	Response updateAppMetadata(int aid, List<Attachment> attachements);
-	Response addAppMetadata( List<Attachment> attachements);
+	Response addExperimentMetadata( List<Attachment> attachements);
 	void deleteApp(int appid);
 	
 	

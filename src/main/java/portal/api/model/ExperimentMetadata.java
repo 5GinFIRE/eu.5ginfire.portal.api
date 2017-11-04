@@ -45,8 +45,20 @@ public class ExperimentMetadata extends Product{
 	@JoinTable()
 	private List<ExperimentOnBoardDescriptor> experimentOnBoardDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
 	
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<ConstituentVxF> constituentVxF = new ArrayList<ConstituentVxF>();
 	
 	
+	
+	public List<ConstituentVxF> getConstituentVxF() {
+		return constituentVxF;
+	}
+
+	public void setConstituentVxF(List<ConstituentVxF> constituentVxF) {
+		this.constituentVxF = constituentVxF;
+	}
+
 	public boolean isValid() {
 		return valid;
 	}

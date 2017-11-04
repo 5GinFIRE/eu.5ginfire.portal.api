@@ -65,6 +65,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 import portal.api.model.Category;
+import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
@@ -89,6 +90,7 @@ import pt.it.av.atnog.extractors.VNFExtractor;
 import pt.it.av.atnog.requirements.NSRequirements;
 import pt.it.av.atnog.requirements.VNFRequirements;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
+import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.descriptor.ConstituentVnfd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 //CORS support
@@ -472,7 +474,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							prod.setLongDescription( ns.getDescription() );
 							NSRequirements vr = new NSRequirements(ns ) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );							
+					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );
+					        
+					        for (ConstituentVnfd v : ns.getConstituentVnfd()) {
+					        	ConstituentVxF cvxf = new ConstituentVxF();
+					        	cvxf.setMembervnfIndex( v.getMemberVnfIndex().intValue() ); //ok we will survive with this
+					        	cvxf.setVnfdidRef( v.getVnfdIdRef() );
+					        	
+					        	VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName( v.getVnfdIdRef() );
+					        	
+					        	cvxf.setVxfref( vxf );
+					        	
+								((ExperimentMetadata) prod).getConstituentVxF().add( cvxf  );
+							}
 							if ( nsExtract.getIconfilePath() != null) {
 								
 								String imageFileNamePosted = ns.getLogo();
@@ -761,7 +775,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							prod.setLongDescription( ns.getDescription() );
 							NSRequirements vr = new NSRequirements(ns) ;			
 							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );							
+					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );		
+					        ((ExperimentMetadata) prod).getConstituentVxF().clear();
+					        for (ConstituentVnfd v : ns.getConstituentVnfd()) {
+					        	ConstituentVxF cvxf = new ConstituentVxF();
+					        	cvxf.setMembervnfIndex( v.getMemberVnfIndex().intValue() ); //ok we will survive with this
+					        	cvxf.setVnfdidRef( v.getVnfdIdRef() );
+					        	
+					        	VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName( v.getVnfdIdRef() );
+					        	
+					        	cvxf.setVxfref( vxf );
+					        	
+								((ExperimentMetadata) prod).getConstituentVxF().add( cvxf  );
+							}
+					        
 							if ( nsExtract.getIconfilePath() != null) {
 								
 								String imageFileNamePosted = ns.getLogo();
@@ -1292,7 +1319,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@POST
 	@Path("/admin/experiments/")
 	@Consumes("multipart/form-data")
-	public Response addAppMetadata(List<Attachment> ats) {
+	public Response addExperimentMetadata(List<Attachment> ats) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 

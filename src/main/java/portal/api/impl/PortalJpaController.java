@@ -435,6 +435,14 @@ public class PortalJpaController {
 		Product u = entityManager.find(Product.class, id);
 		return u;
 	}
+	
+
+	public Product readProductByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.name LIKE '" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (Product) q.getSingleResult();
+	}
 
 	// public VxFMetadata readVxFMetadataByUUID(String uuid) {
 	// EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -1159,5 +1167,6 @@ public class PortalJpaController {
 		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (Infrastructure) q.getSingleResult();
 	}
+
 
 }

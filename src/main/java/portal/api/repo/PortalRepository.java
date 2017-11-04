@@ -150,6 +150,14 @@ public class PortalRepository {
 	public Product getProductByUUID(String uuid) {
 		return (Product) portalJpaController.readProductByUUID(uuid);
 	}
+	
+
+
+	public Product getProductByName(String name) {
+		return (Product) portalJpaController.readProductByName(name);
+	}
+
+
 
 
 	
@@ -468,7 +476,6 @@ public class PortalRepository {
 		portalJpaController.deletInfrastructure( infraid );
 		
 	}
-
 
 	
 

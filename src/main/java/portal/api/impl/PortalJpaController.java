@@ -31,6 +31,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Infrastructure;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -1099,6 +1100,64 @@ public class PortalJpaController {
 	public ExperimentOnBoardDescriptor readExperimentOnBoardDescriptorById(int i) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(ExperimentOnBoardDescriptor.class, i);
+	}
+
+	public List<Infrastructure> readInfrastructures(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveInfrastructure(Infrastructure c) {
+		logger.info("Will save ExperimentOnBoardDescriptors = " + c.getName() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( c );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public Infrastructure readInfrastructureById(int infraid) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(Infrastructure.class, infraid);
+	}
+
+	public Infrastructure updateInfrastructure(Infrastructure c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		Infrastructure resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deletInfrastructure(int infraid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Infrastructure c = entityManager.find( Infrastructure.class, infraid );
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public Infrastructure readInfrastructureByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (Infrastructure) q.getSingleResult();
 	}
 
 }

@@ -70,6 +70,7 @@ import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
+import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.OnBoardingStatus;
@@ -2391,4 +2392,59 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 	}
+	
+	
+
+	@GET
+	@Path("/admin/infrastructures/")
+	@Produces("application/json")
+	public Response getAdminInfrastructures() {
+		return Response.ok().entity(portalRepositoryRef.getInfrastructures()).build();
+	}
+	
+
+	@POST
+	@Path("/admin/infrastructures/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addInfrastructure(Infrastructure c) {
+		Infrastructure u = portalRepositoryRef.addInfrastructure(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested Infrastructure with name=" + c.getName() + " cannot be created");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	@PUT
+	@Path("/admin/infrastructures/{infraid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateInfrastructure(@PathParam("infraid") int infraid, Infrastructure c) {
+		Infrastructure previousCategory = portalRepositoryRef.getInfrastructureByID( infraid );
+
+		Infrastructure u = portalRepositoryRef.updateInfrastructureInfo(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested Infrastructure with name=" + c.getName() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+	
+
+	@DELETE
+	@Path("/admin/infrastructures/{infraid}")
+	public Response deleteInfrastructure(@PathParam("infraid") int infraid) {
+		portalRepositoryRef.deleteInfrastructure( infraid );
+		return Response.ok().build();
+
+	}
+
 }

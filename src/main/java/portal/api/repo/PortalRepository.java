@@ -26,6 +26,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.PortalProperty;
@@ -437,6 +438,35 @@ public class PortalRepository {
 
 	public ExperimentOnBoardDescriptor getExperimentOnBoardDescriptorByID(int mpid) {
 		return portalJpaController.readExperimentOnBoardDescriptorById( mpid );
+	}
+
+
+	public List<Infrastructure> getInfrastructures() {
+		List<Infrastructure> ls = portalJpaController.readInfrastructures(0, 100000);
+		return ls;	
+	}
+
+
+	public Infrastructure addInfrastructure(Infrastructure c) {
+		portalJpaController.saveInfrastructure(c);
+		return c;
+	}
+
+
+	public Infrastructure getInfrastructureByID(int infraid) {
+		return portalJpaController.readInfrastructureById( infraid );
+	}
+
+
+	public Infrastructure updateInfrastructureInfo(Infrastructure c) {
+		Infrastructure bmr = portalJpaController.updateInfrastructure(c);
+		return bmr;
+	}
+
+
+	public void deleteInfrastructure(int infraid) {
+		portalJpaController.deletInfrastructure( infraid );
+		
 	}
 
 

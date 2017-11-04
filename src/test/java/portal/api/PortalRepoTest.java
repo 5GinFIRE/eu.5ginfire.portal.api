@@ -34,6 +34,7 @@ import portal.api.model.DeployArtifact;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.OnBoardingStatus;
@@ -181,7 +182,14 @@ public class PortalRepoTest {
 		portalJpaControllerTest.saveUser(bu);
 		portalJpaControllerTest.getAllUsersPrinted();
 		assertEquals(2, portalJpaControllerTest.countUsers());
-
+		
+		Infrastructure i = new Infrastructure();
+		i.setName("TESTI");
+		portalJpaControllerTest.saveInfrastructure(i);
+		
+		i = portalJpaControllerTest.readInfrastructureByName( "TESTI" );
+		assertEquals("TESTI", i.getName());
+		
 	}
 
 	@Test

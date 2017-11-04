@@ -21,6 +21,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * @author ctranoris
+ *
+ */
 @Entity(name = "Infrastructure")
 public class Infrastructure {
 

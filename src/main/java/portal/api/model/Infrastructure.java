@@ -25,10 +25,10 @@ import javax.persistence.Id;
  * @author ctranoris
  *
  */
+
 @Entity(name = "Infrastructure")
 public class Infrastructure {
 
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id = 0;
@@ -39,32 +39,37 @@ public class Infrastructure {
 	private String name = null;
 	@Basic()
 	private String email = null;
-	
-	
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public String getOrganization() {
 		return organization;
 	}
+
 	public void setOrganization(String organization) {
 		this.organization = organization;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public String getEmail() {
 		return email;
 	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	
+
 }

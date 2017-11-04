@@ -32,6 +32,7 @@
 		<class>portal.api.model.OnBoardDescriptor</class>
 		<class>portal.api.model.Infrastructure</class>
 		<class>portal.api.model.ConstituentVxF</class>
+		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
 		
 		
 
@@ -84,6 +85,7 @@
 		<class>portal.api.model.OnBoardDescriptor</class>
 		<class>portal.api.model.Infrastructure</class>
 		<class>portal.api.model.ConstituentVxF</class>
+		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
 
 
 

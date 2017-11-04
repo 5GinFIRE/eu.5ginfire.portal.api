@@ -15,7 +15,9 @@
 
 package portal.api.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -27,8 +29,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 /**
@@ -59,6 +63,7 @@ public class DeploymentDescriptor {
 
 	@Basic()
 	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.UNDER_REVIEW;
+	
 	
 	
 
@@ -93,7 +98,19 @@ public class DeploymentDescriptor {
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 	
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<DeploymentDescriptorVxFPlacement> vxfPlacements = new ArrayList<DeploymentDescriptorVxFPlacement>();
 	
+	
+
+	public List<DeploymentDescriptorVxFPlacement> getVxfPlacements() {
+		return vxfPlacements;
+	}
+
+	public void setVxfPlacements(List<DeploymentDescriptorVxFPlacement> vxfPlacements) {
+		this.vxfPlacements = vxfPlacements;
+	}
 
 	public int getId() {
 		return id;

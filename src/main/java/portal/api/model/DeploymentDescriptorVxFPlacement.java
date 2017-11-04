@@ -15,56 +15,37 @@
 
 package portal.api.model;
 
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 
-@Entity(name = "ConstituentVxF")
-public class ConstituentVxF {
+/**
+ * @author ctranoris
+ *
+ */
+@Entity(name = "Product")
+public class DeploymentDescriptorVxFPlacement {
 
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id = 0;
 
-	@Basic()
-	private int membervnfIndex;
 
-	@Basic()
-	private String vnfdidRef;
+
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@JoinColumns({ @JoinColumn() })
+	private ConstituentVxF constituentVxF = null;
 	
-	@OneToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-	@JoinTable()
-	private VxFMetadata vxfref;
 
-	public int getMembervnfIndex() {
-		return membervnfIndex;
-	}
-
-	public void setMembervnfIndex(int membervnfIndex) {
-		this.membervnfIndex = membervnfIndex;
-	}
-
-	public String getVnfdidRef() {
-		return vnfdidRef;
-	}
-
-	public void setVnfdidRef(String vnfdidRef) {
-		this.vnfdidRef = vnfdidRef;
-	}
-
-	public VxFMetadata getVxfref() {
-		return vxfref;
-	}
-
-	public void setVxfref(VxFMetadata vxfref) {
-		this.vxfref = vxfref;
-	}
-    
-	
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@JoinColumns({ @JoinColumn() })
+	private Infrastructure infrastructure = null;
 	
 }

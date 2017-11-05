@@ -229,7 +229,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (r.getStatusInfo().getStatusCode() == Status.OK.getStatusCode()) {
 			logger.info("Email message: " + msg);
-			EmailUtil.SendRegistrationActivationEmail(user.getEmail(), msg);
+			String subj = PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+			EmailUtil.SendRegistrationActivationEmail(user.getEmail(), msg, subj);
 		}
 
 		return r;
@@ -1696,6 +1697,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 
+			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+			if ( (adminemail!=null) && ( !adminemail.equals("")) )
+			{
+				String subj = "5GinFIREPortal New Deployment Request";
+				EmailUtil.SendRegistrationActivationEmail( adminemail, "5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail(), subj);
+			}
+			
 			return Response.ok().entity(deployment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1769,6 +1777,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
 				logger.info("updateDeployment for id: " + d.getId());
+				
+				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+				if ( (adminemail!=null) && ( !adminemail.equals("")) )
+				{
+					String subj = "5GinFIREPortal New Deployment Request";
+					EmailUtil.SendRegistrationActivationEmail( deploymentOwner.getEmail(), "5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail(), subj);
+				}
+				
+				
+				
 				return Response.ok().entity(deployment).build();
 				
 			}

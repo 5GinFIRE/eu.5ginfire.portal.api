@@ -37,7 +37,7 @@ public class EmailUtil {
 
 	private static final transient Log logger = LogFactory.getLog(EmailUtil.class.getName());
 
-	public static void SendRegistrationActivationEmail(String email, String messageBody) {
+	public static void SendRegistrationActivationEmail(String email, String messageBody, String subj) {
 
 		Properties props = new Properties();
 
@@ -57,7 +57,7 @@ public class EmailUtil {
 		final String username = PortalRepository.getPropertyByName("mailuser").getValue();
 		final String password = PortalRepository.getPropertyByName("mailpassword").getValue();
 		
-		String subj = PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+		
 		logger.info("adminemail = " + adminemail);
 		logger.info("subj = " + subj);
 
@@ -78,6 +78,7 @@ public class EmailUtil {
 			msg.setSubject(subj);
 			msg.setContent(messageBody, "text/html; charset=ISO-8859-1");
 			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(email, email));
+			msg.addRecipient(Message.RecipientType.CC, new InternetAddress(adminemail, adminemail));
 
 			transport.connect();
 			transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));

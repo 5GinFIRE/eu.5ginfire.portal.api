@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
@@ -28,6 +29,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,43 +47,47 @@ public class EmailUtil {
 
 		props.setProperty("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.auth", "true");
-		if ((PortalRepository.getPropertyByName("mailhost").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailhost").getValue().isEmpty()))
+		if ((PortalRepository.getPropertyByName("mailhost").getValue() != null)
+				&& (!PortalRepository.getPropertyByName("mailhost").getValue().isEmpty()))
 			props.setProperty("mail.host", PortalRepository.getPropertyByName("mailhost").getValue());
-		if ((PortalRepository.getPropertyByName("mailuser").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailuser").getValue().isEmpty()))
+		if ((PortalRepository.getPropertyByName("mailuser").getValue() != null)
+				&& (!PortalRepository.getPropertyByName("mailuser").getValue().isEmpty()))
 			props.setProperty("mail.user", PortalRepository.getPropertyByName("mailuser").getValue());
-		if ((PortalRepository.getPropertyByName("mailpassword").getValue()!=null)&&(!PortalRepository.getPropertyByName("mailpassword").getValue().isEmpty()))
+		if ((PortalRepository.getPropertyByName("mailpassword").getValue() != null)
+				&& (!PortalRepository.getPropertyByName("mailpassword").getValue().isEmpty()))
 			props.setProperty("mail.password", PortalRepository.getPropertyByName("mailpassword").getValue());
-
 
 		String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 		final String username = PortalRepository.getPropertyByName("mailuser").getValue();
 		final String password = PortalRepository.getPropertyByName("mailpassword").getValue();
-		
-		
+
 		logger.info("adminemail = " + adminemail);
 		logger.info("subj = " + subj);
 
-		Session mailSession =  Session.getInstance(props,
-				  new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-				  });
-		
+		Session mailSession = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+
 		Transport transport;
 		try {
 			transport = mailSession.getTransport();
 
 			MimeMessage msg = new MimeMessage(mailSession);
 			msg.setSentDate(new Date());
-			msg.setFrom(new InternetAddress( adminemail , adminemail));
+			msg.setFrom(new InternetAddress(adminemail, adminemail));
 			msg.setSubject(subj);
 			msg.setContent(messageBody, "text/html; charset=ISO-8859-1");
 			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(email, email));
 			msg.addRecipient(Message.RecipientType.CC, new InternetAddress(adminemail, adminemail));
 
 			transport.connect();
-			transport.sendMessage(msg, msg.getRecipients(Message.RecipientType.TO));
+
+			Address[] recips = (Address[]) ArrayUtils.addAll(msg.getRecipients(Message.RecipientType.TO),
+					msg.getRecipients(Message.RecipientType.CC));
+
+			transport.sendMessage(msg, recips);
 
 			transport.close();
 

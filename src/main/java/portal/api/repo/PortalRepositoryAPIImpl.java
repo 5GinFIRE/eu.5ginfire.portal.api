@@ -1707,7 +1707,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if ((adminemail != null) && (!adminemail.equals(""))) {
 				String subj = "[5GinFIREPortal] New Deployment Request";
 				EmailUtil.SendRegistrationActivationEmail(adminemail,
-						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ ", Status: " + deployment.getStatus().name()+ ", Description: " + deployment.getDescription()   ,
+						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ "\n<br/> Status: " + deployment.getStatus().name()+ "\n<br/> Description: " + deployment.getDescription()   ,
 						subj);
 			}
 
@@ -1789,7 +1789,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if ((adminemail != null) && (!adminemail.equals(""))) {
 					String subj = "[5GinFIREPortal] Deployment Request";
 					EmailUtil.SendRegistrationActivationEmail(deploymentOwner.getEmail(),
-							"5GinFIREPortal Deployment Request for experiment: " + d.getName() + "\nStatus: " + d.getStatus().name()+ "\nFeedback: " + d.getFeedback() + "\n\n The 5GinFIRE team" ,
+							"5GinFIREPortal Deployment Request for experiment: " + d.getName() + "\n<br/>Status: " + d.getStatus().name()+ "\n<br/>Feedback: " + d.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
 							subj);
 				}
 

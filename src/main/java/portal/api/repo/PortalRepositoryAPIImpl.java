@@ -229,7 +229,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (r.getStatusInfo().getStatusCode() == Status.OK.getStatusCode()) {
 			logger.info("Email message: " + msg);
-			String subj = PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+			String subj = "[5GinFIREPortal] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
 			EmailUtil.SendRegistrationActivationEmail(user.getEmail(), msg, subj);
 		}
 
@@ -1706,7 +1706,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if ((adminemail != null) && (!adminemail.equals(""))) {
 				String subj = "[5GinFIREPortal] New Deployment Request";
 				EmailUtil.SendRegistrationActivationEmail(adminemail,
-						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ ", Status: " + deployment.getStatus().name()+ ", Description: " + deployment.getDescription()  ,
+						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ ", Status: " + deployment.getStatus().name()+ ", Description: " + deployment.getDescription()   ,
 						subj);
 			}
 

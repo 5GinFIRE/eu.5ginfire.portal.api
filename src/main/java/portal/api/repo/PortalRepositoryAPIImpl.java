@@ -855,8 +855,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// now fix category product references
 		for (Category catToUpdate : prod.getCategories()) {
 			Product p = portalRepositoryRef.getProductByID(prod.getId());
-			catToUpdate.addProduct(p);
-			portalRepositoryRef.updateCategoryInfo(catToUpdate);
+			Category c = portalRepositoryRef.getCategoryByID( catToUpdate.getId() );
+			c.addProduct(p);
+			portalRepositoryRef.updateCategoryInfo(c);
 		}
 
 		if (vxfOwner.getProductById(prod.getId()) == null)

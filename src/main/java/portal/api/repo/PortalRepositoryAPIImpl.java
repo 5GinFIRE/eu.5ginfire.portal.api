@@ -235,7 +235,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return r;
 	}
-	
+
 	@POST
 	@Path("/register/verify")
 	@Produces("application/json")
@@ -244,15 +244,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		String username = getAttachmentStringValue("username", ats);
 		String rid = getAttachmentStringValue("rid", ats);
-		
-		PortalUser u = portalRepositoryRef.getUserByUsername(username); 
-		if ( u.getOrganization().contains("^^") ) {
-			u.setOrganization( u.getOrganization().substring(0,  u.getOrganization().indexOf("^^") )  );
-			u.setActive( true );
+
+		PortalUser u = portalRepositoryRef.getUserByUsername(username);
+		if (u.getOrganization().contains("^^")) {
+			u.setOrganization(u.getOrganization().substring(0, u.getOrganization().indexOf("^^")));
+			u.setActive(true);
 		}
-		 u = portalRepositoryRef.updateUserInfo( u.getId(), u);
-		//getAttachmentStringValue("username", ats)
-		
+		u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+		// getAttachmentStringValue("username", ats)
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -262,7 +261,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-
 
 	@PUT
 	@Path("/admin/users/{userid}")
@@ -413,7 +411,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// String[] i = extparmval.split("=");
 		// prod.addExtensionItem(i[0], i[1]);
 		// }
-		
+
 		URI endpointUrl = uri.getBaseUri();
 
 		String tempDir = METADATADIR + uuid + File.separator;
@@ -423,10 +421,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if (image != null) {
 				String imageFileNamePosted = getFileName(image.getHeaders());
 				logger.info("image = " + imageFileNamePosted);
-				if (!imageFileNamePosted.equals("")) {					
+				if (!imageFileNamePosted.equals("")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/"
+							+ imageFileNamePosted);
 				}
 			}
 
@@ -436,72 +435,78 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!aFileNamePosted.equals("")) {
 					String vxffilepath = saveFile(submittedFile, tempDir + aFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + uuid + "/" + aFileNamePosted);
-					File f = new File( vxffilepath );
-					if ( prod instanceof VxFMetadata) {
-						VNFExtractor vnfExtract = new VNFExtractor( f );
-						Vnfd vnfd = vnfExtract.extractVnfdDescriptor() ;
-						if ( vnfd!=null ) {
-							prod.setName( vnfd.getId()  );
-							prod.setVersion( vnfd.getVersion() );
-							prod.setVendor(  vnfd.getVendor() );
-							prod.setShortDescription( vnfd.getName());
-							prod.setLongDescription( vnfd.getDescription() );
-							VNFRequirements vr = new VNFRequirements( vnfd );			
-							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
-							
-							if ( vnfExtract.getIconfilePath() != null) {
-								
+					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + uuid + "/"
+							+ aFileNamePosted);
+					File f = new File(vxffilepath);
+					if (prod instanceof VxFMetadata) {
+						VNFExtractor vnfExtract = new VNFExtractor(f);
+						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
+						if (vnfd != null) {
+							prod.setName(vnfd.getId());
+							prod.setVersion(vnfd.getVersion());
+							prod.setVendor(vnfd.getVendor());
+							prod.setShortDescription(vnfd.getName());
+							prod.setLongDescription(vnfd.getDescription());
+							VNFRequirements vr = new VNFRequirements(vnfd);
+							prod.setDescriptorHTML(vr.toHTML());
+							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
+
+							if (vnfExtract.getIconfilePath() != null) {
+
 								String imageFileNamePosted = vnfd.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									String imgfile = saveFile(vnfExtract.getIconfilePath(),
+											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
+											+ "/" + imageFileNamePosted);
 								}
 							}
-							
+
 						} else {
 							return null;
 						}
-					}else if ( prod instanceof ExperimentMetadata) {
-						NSExtractor nsExtract = new NSExtractor( f );
+					} else if (prod instanceof ExperimentMetadata) {
+						NSExtractor nsExtract = new NSExtractor(f);
 						Nsd ns = nsExtract.extractNsDescriptor();
-						if ( ns!=null ) {
-							prod.setName( ns.getId()  );
-							prod.setVersion( ns.getVersion() );
-							prod.setVendor(  ns.getVendor() );
-							prod.setShortDescription( ns.getName());
-							prod.setLongDescription( ns.getDescription() );
-							NSRequirements vr = new NSRequirements(ns ) ;			
-							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );
-					        
-					        for (ConstituentVnfd v : ns.getConstituentVnfd()) {
-					        	ConstituentVxF cvxf = new ConstituentVxF();
-					        	cvxf.setMembervnfIndex( v.getMemberVnfIndex().intValue() ); //ok we will survive with this
-					        	cvxf.setVnfdidRef( v.getVnfdIdRef() );
-					        	
-					        	VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName( v.getVnfdIdRef() );
-					        	
-					        	cvxf.setVxfref( vxf );
-					        	
-								((ExperimentMetadata) prod).getConstituentVxF().add( cvxf  );
+						if (ns != null) {
+							prod.setName(ns.getId());
+							prod.setVersion(ns.getVersion());
+							prod.setVendor(ns.getVendor());
+							prod.setShortDescription(ns.getName());
+							prod.setLongDescription(ns.getDescription());
+							NSRequirements vr = new NSRequirements(ns);
+							prod.setDescriptorHTML(vr.toHTML());
+							prod.setDescriptor(nsExtract.getDescriptorYAMLfile());
+
+							for (ConstituentVnfd v : ns.getConstituentVnfd()) {
+								ConstituentVxF cvxf = new ConstituentVxF();
+								cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
+																							// this
+								cvxf.setVnfdidRef(v.getVnfdIdRef());
+
+								VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
+
+								cvxf.setVxfref(vxf);
+
+								((ExperimentMetadata) prod).getConstituentVxF().add(cvxf);
 							}
-							if ( nsExtract.getIconfilePath() != null) {
-								
+							if (nsExtract.getIconfilePath() != null) {
+
 								String imageFileNamePosted = ns.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									String imgfile = saveFile(nsExtract.getIconfilePath(),
+											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
+											+ "/" + imageFileNamePosted);
 								}
 							}
 						} else {
 							return null;
-						}					
+						}
 					}
 				}
 			}
@@ -517,7 +522,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/" + shotFileNamePosted;
+					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/"
+							+ shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -633,13 +639,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
 				getListOfAttachmentsByName("screenshots", ats));
 
-	if (vxf != null ) {
-		return Response.ok().entity(vxf).build();
-	} else {
-		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-		builder.entity("Requested entity cannot be installed");
-		throw new WebApplicationException(builder.build());
-	}
+		if (vxf != null) {
+			return Response.ok().entity(vxf).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested entity cannot be installed");
+			throw new WebApplicationException(builder.build());
+		}
 
 	}
 
@@ -729,7 +735,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!imageFileNamePosted.equals("unknown")) {
 					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
+							+ imageFileNamePosted);
 				}
 			}
 
@@ -739,71 +746,77 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if (!vxfFileNamePosted.equals("unknown")) {
 					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + prod.getUuid() + "/" + vxfFileNamePosted);
-					
-					File f = new File( vxffilepath );
-					if ( prod instanceof VxFMetadata) {
-						VNFExtractor vnfExtract = new VNFExtractor( f );
-						Vnfd vnfd = vnfExtract.extractVnfdDescriptor(); 
-						if ( vnfd!=null ) {
-							prod.setName( vnfd.getId()  );
-							prod.setVersion( vnfd.getVersion() );
-							prod.setVendor(  vnfd.getVendor() );
-							prod.setShortDescription( vnfd.getName());
-							prod.setLongDescription( vnfd.getDescription() );
-							VNFRequirements vr = new VNFRequirements( vnfd );			
-							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( vnfExtract.getDescriptorYAMLfile()  );
-							
-							if ( vnfExtract.getIconfilePath() != null) {
-								
+					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/"
+							+ prod.getUuid() + "/" + vxfFileNamePosted);
+
+					File f = new File(vxffilepath);
+					if (prod instanceof VxFMetadata) {
+						VNFExtractor vnfExtract = new VNFExtractor(f);
+						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
+						if (vnfd != null) {
+							prod.setName(vnfd.getId());
+							prod.setVersion(vnfd.getVersion());
+							prod.setVendor(vnfd.getVendor());
+							prod.setShortDescription(vnfd.getName());
+							prod.setLongDescription(vnfd.getDescription());
+							VNFRequirements vr = new VNFRequirements(vnfd);
+							prod.setDescriptorHTML(vr.toHTML());
+							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
+
+							if (vnfExtract.getIconfilePath() != null) {
+
 								String imageFileNamePosted = vnfd.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile( vnfExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									String imgfile = saveFile(vnfExtract.getIconfilePath(),
+											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
+											+ prod.getUuid() + "/" + imageFileNamePosted);
 								}
 							}
-						}					
-					}else if ( prod instanceof ExperimentMetadata) {
-						NSExtractor nsExtract = new NSExtractor( f );
-						Nsd ns = nsExtract.extractNsDescriptor();						
-						if ( ns!=null ) {
-							prod.setName( ns.getId()  );
-							prod.setVersion( ns.getVersion() );
-							prod.setVendor(  ns.getVendor() );
-							prod.setShortDescription( ns.getName());
-							prod.setLongDescription( ns.getDescription() );
-							NSRequirements vr = new NSRequirements(ns) ;			
-							prod.setDescriptorHTML( vr.toHTML() );
-					        prod.setDescriptor( nsExtract.getDescriptorYAMLfile()   );		
-					        ((ExperimentMetadata) prod).getConstituentVxF().clear();
-					        for (ConstituentVnfd v : ns.getConstituentVnfd()) {
-					        	ConstituentVxF cvxf = new ConstituentVxF();
-					        	cvxf.setMembervnfIndex( v.getMemberVnfIndex().intValue() ); //ok we will survive with this
-					        	cvxf.setVnfdidRef( v.getVnfdIdRef() );
-					        	
-					        	VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName( v.getVnfdIdRef() );
-					        	
-					        	cvxf.setVxfref( vxf );
-					        	
-								((ExperimentMetadata) prod).getConstituentVxF().add( cvxf  );
+						}
+					} else if (prod instanceof ExperimentMetadata) {
+						NSExtractor nsExtract = new NSExtractor(f);
+						Nsd ns = nsExtract.extractNsDescriptor();
+						if (ns != null) {
+							prod.setName(ns.getId());
+							prod.setVersion(ns.getVersion());
+							prod.setVendor(ns.getVendor());
+							prod.setShortDescription(ns.getName());
+							prod.setLongDescription(ns.getDescription());
+							NSRequirements vr = new NSRequirements(ns);
+							prod.setDescriptorHTML(vr.toHTML());
+							prod.setDescriptor(nsExtract.getDescriptorYAMLfile());
+							((ExperimentMetadata) prod).getConstituentVxF().clear();
+							for (ConstituentVnfd v : ns.getConstituentVnfd()) {
+								ConstituentVxF cvxf = new ConstituentVxF();
+								cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
+																							// this
+								cvxf.setVnfdidRef(v.getVnfdIdRef());
+
+								VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
+
+								cvxf.setVxfref(vxf);
+
+								((ExperimentMetadata) prod).getConstituentVxF().add(cvxf);
 							}
-					        
-							if ( nsExtract.getIconfilePath() != null) {
-								
+
+							if (nsExtract.getIconfilePath() != null) {
+
 								String imageFileNamePosted = ns.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile( nsExtract.getIconfilePath() , tempDir + imageFileNamePosted);
+									String imgfile = saveFile(nsExtract.getIconfilePath(),
+											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + imageFileNamePosted);
+									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
+											+ prod.getUuid() + "/" + imageFileNamePosted);
 								}
 							}
-						}					
+						}
 					}
-					
+
 				}
 			}
 
@@ -818,7 +831,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/" + shotFileNamePosted;
+					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
+							+ shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
 				}
@@ -914,8 +928,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 
-	
-
 	@GET
 	@Path("/admin/vxfs/{vxfid}")
 	@Produces("application/json")
@@ -942,8 +954,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf.setIconsrc("");
 			vxf.setLongDescription("");
 
-			vxf.setPackageLocation(
-					endpointUrl.toString().replace("http:", "") + "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
+			vxf.setPackageLocation(endpointUrl.toString().replace("http:", "")
+					+ "repo/packages/77777777-668b-4c75-99a9-39b24ed3d8be/examplevxf.tar.gz");
 			// }else if (uuid.equals("12cab8b8-668b-4c75-99a9-39b24ed3d8be")) {
 			// vxf = new VxFMetadata(uuid, "AN example service");
 			// vxf.setShortDescription("An example local service");
@@ -964,8 +976,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf.setLongDescription("");
 			// URI endpointUrl = uri.getBaseUri();
 
-			vxf.setPackageLocation(
-					endpointUrl.toString().replace("http:", "") + "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
+			vxf.setPackageLocation(endpointUrl.toString().replace("http:", "")
+					+ "repo/packages/22cab8b8-668b-4c75-99a9-39b24ed3d8be/examplevxfErrInstall.tar.gz");
 		} else {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID(uuid);
 		}
@@ -987,8 +999,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
 		this.portalRepositoryRef = portalRepositoryRef;
 	}
-
-
 
 	// Sessions related API
 
@@ -1039,13 +1049,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			try {
 				currentUser.login(token);
 				PortalUser portalUser = portalRepositoryRef.getUserByUsername(userSession.getUsername());
-				
-				if ( ! portalUser.getActive()) {
+
+				if (!portalUser.getActive()) {
 					logger.info("User [" + currentUser.getPrincipal() + "] is not Active");
-					return Response.status(Status.UNAUTHORIZED).build();					
+					return Response.status(Status.UNAUTHORIZED).build();
 				}
-				
-				
+
 				portalUser.setCurrentSessionID(ws.getHttpServletRequest().getSession().getId());
 				userSession.setPortalUser(portalUser);
 				userSession.setPassword("");
@@ -1349,7 +1358,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// ExperimentMetadata sm = new ExperimentMetadata();
 		experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
-		if (experiment != null ) {
+		if (experiment != null) {
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -1372,7 +1381,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			appmeta = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for experiment : " + appmeta.getName());
-//			logger.info("Received @POST for app.containers : " + appmeta.getContainers().size());
+			// logger.info("Received @POST for app.containers : " +
+			// appmeta.getContainers().size());
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -1382,11 +1392,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// ExperimentMetadata appmeta = (ExperimentMetadata)
 		// portalRepositoryRef.getProductByID(aid);
-		
+
 		for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
-			veDescriptor.setExperiment( appmeta );
+			veDescriptor.setExperiment(appmeta);
 		}
-		
+
 		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
@@ -1510,27 +1520,26 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		return null;
 	}
-	
+
 	// Attachment utils ///////////////////////
-		private String saveFile(ByteArrayOutputStream att, String filePath) throws IOException {
-			
+	private String saveFile(ByteArrayOutputStream att, String filePath) throws IOException {
 
-			File f = new File(filePath);
-		    FileOutputStream fos;
-			try {
-			    fos = new FileOutputStream ( f );
-			    att.writeTo(fos);
-			    fos.close();
-				return f.getAbsolutePath();
-			} catch(IOException ioe) {
-			    // Handle exception here
-			    ioe.printStackTrace();
-			} finally {
-			}
-
-			return null;
-			
+		File f = new File(filePath);
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(f);
+			att.writeTo(fos);
+			fos.close();
+			return f.getAbsolutePath();
+		} catch (IOException ioe) {
+			// Handle exception here
+			ioe.printStackTrace();
+		} finally {
 		}
+
+		return null;
+
+	}
 
 	private String getFileName(MultivaluedMap<String, String> header) {
 		String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
@@ -1589,19 +1598,17 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return null;
 	}
 
-
-
 	@GET
 	@Path("/admin/properties/")
 	@Produces("application/json")
 	public Response getProperties() {
 		List<PortalProperty> props = portalRepositoryRef.getProperties();
 		for (PortalProperty portalProperty : props) {
-			if ( portalProperty.getName().equals("mailpassword") ) {
+			if (portalProperty.getName().equals("mailpassword")) {
 				portalProperty.setValue("***");
 			}
 		}
-		return Response.ok().entity( props ).build();
+		return Response.ok().entity(props).build();
 	}
 
 	@PUT
@@ -1628,7 +1635,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getPropertyById(@PathParam("propid") int propid) {
 		PortalProperty sm = portalRepositoryRef.getPropertyByID(propid);
 
-		if ( sm.getName().equals("mailpassword") ) {
+		if (sm.getName().equals("mailpassword")) {
 			sm.setValue("");
 		}
 		if (sm != null) {
@@ -1691,19 +1698,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
 					.getProductByID(deployment.getExperiment().getId());
 			deployment.setExperiment(baseApplication); // reattach from the
-															// DB model
-			
-			
-			
+														// DB model
+
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
 
 			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
-			if ( (adminemail!=null) && ( !adminemail.equals("")) )
-			{
+			if ((adminemail != null) && (!adminemail.equals(""))) {
 				String subj = "5GinFIREPortal New Deployment Request";
-				EmailUtil.SendRegistrationActivationEmail( adminemail, "5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail(), subj);
+				EmailUtil.SendRegistrationActivationEmail(adminemail,
+						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail(),
+						subj);
 			}
-			
+
 			return Response.ok().entity(deployment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1765,32 +1771,30 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((u != null)) {
 
-			if (  (u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
 			{
 				PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
 				d.setOwner(deploymentOwner); // reattach from the DB model
 
 				ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
-						.getProductByID(d.getExperiment() .getId());
+						.getProductByID(d.getExperiment().getId());
 				d.setExperiment(baseApplication); // reattach from the DB model
 
 				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
 				logger.info("updateDeployment for id: " + d.getId());
-				
-				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
-				if ( (adminemail!=null) && ( !adminemail.equals("")) )
-				{
-					String subj = "5GinFIREPortal New Deployment Request";
-					EmailUtil.SendRegistrationActivationEmail( deploymentOwner.getEmail(), "5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail(), subj);
-				}
-				
-				
-				
-				return Response.ok().entity(deployment).build();
-				
-			}
 
+				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+				if ((adminemail != null) && (!adminemail.equals(""))) {
+					String subj = "5GinFIREPortal Deployment Request";
+					EmailUtil.SendRegistrationActivationEmail(deploymentOwner.getEmail(),
+							"5GinFIREPortal Deployment Request by user : " + u.getUsername() + ", " + u.getEmail() + ", Status: " + d.getStatus().name() ,
+							subj);
+				}
+
+				return Response.ok().entity(deployment).build();
+
+			}
 
 		}
 
@@ -1836,12 +1840,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-
-	
-
-	
-
-	
 
 	/********************************************************************************
 	 * 
@@ -2010,8 +2008,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getOSMVNFMetadataByKOSMMANOID(@PathParam("mpid") int manoprovid, @PathParam("vxfid") String vxfid) {
 		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
 
-		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
-		
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
+
 		Vnfd vnfd = OSMClient.getInstance(sm).getVNFDbyID(vxfid);
 
 		if (vnfd != null) {
@@ -2022,16 +2020,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
 	@GET
 	@Path("/manoprovider/{mpid}/vnfds/")
 	@Produces("application/json")
 	public Response getOSMVNFMetadata(@PathParam("mpid") int manoprovid) {
 
-		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
-		
-		 List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
+
+		List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
 
 		if (vnfd != null) {
 			return Response.ok().entity(vnfd).build();
@@ -2041,17 +2038,17 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
 	@GET
 	@Path("/manoprovider/{mpid}/nsds/{nsdid}")
 	@Produces("application/json")
-	public Response getOSM_NSD_MetadataByKOSMMANOID(@PathParam("mpid") int manoprovid, @PathParam("vxfid") String nsdid) {
+	public Response getOSM_NSD_MetadataByKOSMMANOID(@PathParam("mpid") int manoprovid,
+			@PathParam("vxfid") String nsdid) {
 		logger.info("getOSMVNFMetadataByID  nsdid=" + nsdid);
 
-		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
-		
-		Nsd nsd = OSMClient.getInstance(sm).getNSDbyID( nsdid );
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
+
+		Nsd nsd = OSMClient.getInstance(sm).getNSDbyID(nsdid);
 
 		if (nsd != null) {
 			return Response.ok().entity(nsd).build();
@@ -2061,16 +2058,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
 	@GET
 	@Path("/manoprovider/{mpid}/nsds/")
 	@Produces("application/json")
 	public Response getOSM_NSD_Metadata(@PathParam("mpid") int manoprovid) {
 
-		MANOprovider sm = portalRepositoryRef.getMANOproviderByID( manoprovid );
-		
-		 List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
+		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
+
+		List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
 
 		if (nsd != null) {
 			return Response.ok().entity(nsd).build();
@@ -2080,8 +2076,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
-	
+
 	/********************************************************************************
 	 * 
 	 * admin VxFOnBoardedDescriptors
@@ -2158,9 +2153,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}/status")
 	@Produces("application/json")
 	public Response getVxFOnBoardedDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
-		
+
 		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
-		
+
 		if (sm == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
@@ -2168,23 +2163,24 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
-			
+
 			Vnfd vnfd = null;
-			List<Vnfd> vnfds = OSMClient.getInstance( sm.getObMANOprovider() ).getVNFDs();
+			List<Vnfd> vnfds = OSMClient.getInstance(sm.getObMANOprovider()).getVNFDs();
 			for (Vnfd v : vnfds) {
-				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
+				if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
+						|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
 					vnfd = v;
 					break;
 				}
 			}
-			
-			if ( vnfd == null) {
-				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
-			} else {
-				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
-			}			
 
-			sm = portalRepositoryRef.updateVxFOnBoardedDescriptor( sm );
+			if (vnfd == null) {
+				sm.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+			} else {
+				sm.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+			}
+
+			sm = portalRepositoryRef.updateVxFOnBoardedDescriptor(sm);
 
 		}
 
@@ -2201,35 +2197,38 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		c.setDeployId(UUID.randomUUID().toString());
 		VxFMetadata vxf = c.getVxf();
-		if ( vxf == null ) {
-			vxf = (VxFMetadata) portalRepositoryRef.getProductByID( c.getVxfid() );
+		if (vxf == null) {
+			vxf = (VxFMetadata) portalRepositoryRef.getProductByID(c.getVxfid());
 		}
-		
+
 		/**
-		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage we just get a response something like
-		 * response = {"output": {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}}
-		 * which does not provide any information. The OSM RIFTIO API says that we could get information about onboarding (create or update) jobs
-		 * see https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
+		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage
+		 * we just get a response something like response = {"output":
+		 * {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}} which does not
+		 * provide any information. The OSM RIFTIO API says that we could get
+		 * information about onboarding (create or update) jobs see
+		 * https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
 		 * with /api/operational/download-jobs, but this does not return pending jobs.
-		 * So the only solution is to ask again OSM if something is installed or not, so for now the client (the portal ) must check
-		 * via the getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM.
-		 * OSM uses the ID of the yaml description
-		 * Thus we asume that the vxf name can be equal to the VNF ID in the portal, and we use it for now as the OSM ID.
-		 * Later in future, either OSM API provide more usefull response or we extract info from the VNFD package
-		 *  
+		 * So the only solution is to ask again OSM if something is installed or not, so
+		 * for now the client (the portal ) must check via the
+		 * getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM. OSM
+		 * uses the ID of the yaml description Thus we asume that the vxf name can be
+		 * equal to the VNF ID in the portal, and we use it for now as the OSM ID. Later
+		 * in future, either OSM API provide more usefull response or we extract info
+		 * from the VNFD package
+		 * 
 		 */
-		
-		c.setVxfMANOProviderID(  vxf.getName() );
-		
-		c.setLastOnboarding( new Date() );
-		
+
+		c.setVxfMANOProviderID(vxf.getName());
+
+		c.setLastOnboarding(new Date());
+
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
-		logger.info("VxF Package Location: " + vxf.getPackageLocation() );
-		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardVNFDPackage( vxf.getPackageLocation(), c.getDeployId());
+		logger.info("VxF Package Location: " + vxf.getPackageLocation());
+		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardVNFDPackage(vxf.getPackageLocation(),
+				c.getDeployId());
 
-		
-		
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
@@ -2248,8 +2247,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
-		//TODO: Implement this towards MANO
-		
+		// TODO: Implement this towards MANO
+
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
@@ -2259,8 +2258,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 	}
-	
-	
 
 	/********************************************************************************
 	 * 
@@ -2338,9 +2335,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/{mpid}/status")
 	@Produces("application/json")
 	public Response getExperimentOnBoardDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
-		
+
 		ExperimentOnBoardDescriptor sm = portalRepositoryRef.getExperimentOnBoardDescriptorByID(mpid);
-		
+
 		if (sm == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("ExperimentOnBoardDescriptor " + mpid + " not found in portal registry");
@@ -2348,23 +2345,24 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
-			
+
 			Nsd nsd = null;
-			List<Nsd> nsds = OSMClient.getInstance( sm.getObMANOprovider() ).getNSDs();
+			List<Nsd> nsds = OSMClient.getInstance(sm.getObMANOprovider()).getNSDs();
 			for (Nsd v : nsds) {
-				if ( v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID()) || v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID()) )	{
+				if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
+						|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
 					nsd = v;
 					break;
 				}
 			}
-			
-			if ( nsd == null) {
-				sm.setOnBoardingStatus( OnBoardingStatus.UNKNOWN );
-			} else {
-				sm.setOnBoardingStatus( OnBoardingStatus.ONBOARDED);				
-			}			
 
-			sm = portalRepositoryRef.updateExperimentOnBoardDescriptor( sm );
+			if (nsd == null) {
+				sm.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+			} else {
+				sm.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+			}
+
+			sm = portalRepositoryRef.updateExperimentOnBoardDescriptor(sm);
 
 		}
 
@@ -2381,35 +2379,37 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		c.setDeployId(UUID.randomUUID().toString());
 		ExperimentMetadata em = c.getExperiment();
-		if ( em == null ) {
-			em = (ExperimentMetadata) portalRepositoryRef.getProductByID( c.getExperimentid() );
+		if (em == null) {
+			em = (ExperimentMetadata) portalRepositoryRef.getProductByID(c.getExperimentid());
 		}
-		
+
 		/**
-		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage we just get a response something like
-		 * response = {"output": {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}}
-		 * which does not provide any information. The OSM RIFTIO API says that we could get information about onboarding (create or update) jobs
-		 * see https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
+		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage
+		 * we just get a response something like response = {"output":
+		 * {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}} which does not
+		 * provide any information. The OSM RIFTIO API says that we could get
+		 * information about onboarding (create or update) jobs see
+		 * https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
 		 * with /api/operational/download-jobs, but this does not return pending jobs.
-		 * So the only solution is to ask again OSM if something is installed or not, so for now the client (the portal ) must check
-		 * via the getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM.
-		 * OSM uses the ID of the yaml description
-		 * Thus we asume that the vxf name can be equal to the VNF ID in the portal, and we use it for now as the OSM ID.
-		 * Later in future, either OSM API provide more usefull response or we extract info from the VNFD package
-		 *  
+		 * So the only solution is to ask again OSM if something is installed or not, so
+		 * for now the client (the portal ) must check via the
+		 * getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM. OSM
+		 * uses the ID of the yaml description Thus we asume that the vxf name can be
+		 * equal to the VNF ID in the portal, and we use it for now as the OSM ID. Later
+		 * in future, either OSM API provide more usefull response or we extract info
+		 * from the VNFD package
+		 * 
 		 */
-		
-		c.setVxfMANOProviderID(  em.getName() );
-		
-		c.setLastOnboarding( new Date() );
-		
+
+		c.setVxfMANOProviderID(em.getName());
+
+		c.setLastOnboarding(new Date());
+
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
-		logger.info("Experiment Package Location: " + em.getPackageLocation() );
-		OSMClient.getInstance( u.getObMANOprovider() ).createOnBoardNSDPackage( em.getPackageLocation(), c.getDeployId());
+		logger.info("Experiment Package Location: " + em.getPackageLocation());
+		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardNSDPackage(em.getPackageLocation(), c.getDeployId());
 
-		
-		
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
@@ -2428,8 +2428,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
-		//TODO: Implement this towards MANO
-		
+		// TODO: Implement this towards MANO
+
 		if (u != null) {
 			return Response.ok().entity(u).build();
 		} else {
@@ -2439,8 +2439,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 	}
-	
-	
 
 	@GET
 	@Path("/admin/infrastructures/")
@@ -2448,7 +2446,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getAdminInfrastructures() {
 		return Response.ok().entity(portalRepositoryRef.getInfrastructures()).build();
 	}
-	
 
 	@POST
 	@Path("/admin/infrastructures/")
@@ -2465,13 +2462,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-	
+
 	@PUT
 	@Path("/admin/infrastructures/{infraid}")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateInfrastructure(@PathParam("infraid") int infraid, Infrastructure c) {
-		Infrastructure previousCategory = portalRepositoryRef.getInfrastructureByID( infraid );
+		Infrastructure previousCategory = portalRepositoryRef.getInfrastructureByID(infraid);
 
 		Infrastructure u = portalRepositoryRef.updateInfrastructureInfo(c);
 
@@ -2484,21 +2481,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 	}
-	
 
 	@DELETE
 	@Path("/admin/infrastructures/{infraid}")
 	public Response deleteInfrastructure(@PathParam("infraid") int infraid) {
-		portalRepositoryRef.deleteInfrastructure( infraid );
+		portalRepositoryRef.deleteInfrastructure(infraid);
 		return Response.ok().build();
 
 	}
-	
+
 	@GET
 	@Path("/admin/infrastructures/{infraid}")
 	@Produces("application/json")
 	public Response getInfrastructureById(@PathParam("infraid") int infraid) {
-		Infrastructure sm = portalRepositoryRef.getInfrastructureByID( infraid );
+		Infrastructure sm = portalRepositoryRef.getInfrastructureByID(infraid);
 
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
@@ -2508,6 +2504,5 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
-
 
 }

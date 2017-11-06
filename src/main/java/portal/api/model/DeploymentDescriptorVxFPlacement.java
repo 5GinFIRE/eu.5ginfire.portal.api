@@ -29,7 +29,7 @@ import javax.persistence.ManyToOne;
  * @author ctranoris
  *
  */
-@Entity(name = "Product")
+@Entity(name = "DeploymentDescriptorVxFPlacement")
 public class DeploymentDescriptorVxFPlacement {
 
 	

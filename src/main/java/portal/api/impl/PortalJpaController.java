@@ -441,7 +441,7 @@ public class PortalJpaController {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.name LIKE '" + name + "'");
-		return (q.getResultList().size() == 0) ? null : (Product) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (Product) q.getResultList().get(0);
 	}
 
 	// public VxFMetadata readVxFMetadataByUUID(String uuid) {

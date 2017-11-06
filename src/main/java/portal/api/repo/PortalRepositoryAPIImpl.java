@@ -2228,7 +2228,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		logger.info("VxF Package Location: " + vxf.getPackageLocation());
-		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardVNFDPackage(vxf.getPackageLocation(),
+		
+
+		
+		String pLocation = vxf.getPackageLocation();
+		if ( !pLocation.contains( "http" )  ) {
+			pLocation = "https:" + pLocation;
+		}
+		
+		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
 				c.getDeployId());
 
 		if (u != null) {
@@ -2409,8 +2417,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
+		String pLocation = em.getPackageLocation();
+		if ( !pLocation.contains( "http" )  ) {
+			pLocation = "https:" + pLocation;
+		}
+		
 		logger.info("Experiment Package Location: " + em.getPackageLocation());
-		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardNSDPackage(em.getPackageLocation(), c.getDeployId());
+		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardNSDPackage( pLocation , c.getDeployId());
 
 		if (u != null) {
 			return Response.ok().entity(u).build();

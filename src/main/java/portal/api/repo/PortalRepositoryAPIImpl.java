@@ -219,6 +219,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		user.setEmail(getAttachmentStringValue("useremail", ats));
 		user.setActive(false);// in any case the user should be not active
 		user.addRole(UserRoleType.EXPERIMENTER); // otherwise in post he can choose
+		user.addRole(UserRoleType.VXF_DEVELOPER); // otherwise in post he can choose
 		// PORTALADMIN, and the
 		// immediately register :-)
 

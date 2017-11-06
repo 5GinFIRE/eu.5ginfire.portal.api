@@ -30,6 +30,7 @@ sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven 
 echo "Build eu.5ginfire.portal.api"
 cd $dirlocation
 cd eu.5ginfire.portal.api
+git pull
 sudo docker run -it --rm -v "/home/ubuntu/.m2":/root/.m2 -v "$(pwd)":/opt/maven -w /opt/maven maven:3.5.2-jdk-8 mvn clean install
 cp target/eu.5ginfire.portal.api-0.0.1-SNAPSHOT.war docker-compose-nginx-jetty-mysql/jetty/wars/
 

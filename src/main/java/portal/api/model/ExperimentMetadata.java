@@ -28,16 +28,51 @@ import javax.persistence.OneToMany;
 public class ExperimentMetadata extends Product{
 
 
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-	@JoinTable()
-	private List<Container> containers = new ArrayList<Container>();
+	private boolean valid;
 
-	public List<Container> getContainers() {
-		return containers;
+	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
+	
+	public PackagingFormat getPackagingFormat() {
+		return packagingFormat;
 	}
 
-	public void setContainers(List<Container> containers) {
-		this.containers = containers;
+	public void setPackagingFormat(PackagingFormat packagingFormat) {
+		this.packagingFormat = packagingFormat;
+	}
+
+	
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<ExperimentOnBoardDescriptor> experimentOnBoardDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
+	
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<ConstituentVxF> constituentVxF = new ArrayList<ConstituentVxF>();
+	
+	
+	
+	public List<ConstituentVxF> getConstituentVxF() {
+		return constituentVxF;
+	}
+
+	public void setConstituentVxF(List<ConstituentVxF> constituentVxF) {
+		this.constituentVxF = constituentVxF;
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
+	}
+
+	public List<ExperimentOnBoardDescriptor> getExperimentOnBoardDescriptors() {
+		return experimentOnBoardDescriptors;
+	}
+
+	public void setExperimentOnBoardDescriptors(List<ExperimentOnBoardDescriptor> e) {
+		this.experimentOnBoardDescriptors = e;
 	}
 	
 	

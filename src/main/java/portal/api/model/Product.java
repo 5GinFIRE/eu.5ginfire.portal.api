@@ -34,6 +34,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -57,6 +58,7 @@ public class Product {
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 
+	
 	@Basic()
 	private String uuid = null;
 	@Basic()
@@ -66,8 +68,9 @@ public class Product {
 	@Basic()
 	private String shortDescription = null;
 
-	@Basic()
-	@Column(name = "LONGDESCRIPTION", columnDefinition = "LONGTEXT")
+
+	@Lob
+	@Column(name = "LDESCRIPTION", columnDefinition = "LONGTEXT")
 	private String longDescription = null;
 	@Basic()
 	private String version = null;
@@ -92,8 +95,28 @@ public class Product {
 	@Column(name = "SCREENSPATH", columnDefinition = "LONGTEXT")		
 	private String screenshots= null; //comma separated file paths
 
+	@Basic()
+	private String vendor = null;
 	
+
+	@Basic()
+	private boolean published;	
 	
+
+	@Lob
+	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
+	private String termsOfUse;	
+	
+
+	@Lob
+	@Column(name = "DESCRIPTOR", columnDefinition = "LONGTEXT")
+	private String descriptor;	
+	
+
+	@Lob
+	@Column(name = "DESCRIPTORHTML", columnDefinition = "LONGTEXT")
+	private String descriptorHTML;	
+
 	
 	public String getScreenshots() {
 		return screenshots;
@@ -258,6 +281,48 @@ public class Product {
 				return p;
 		}
 		return null;
+	}
+
+	public String getVendor() {
+		return vendor;
+	}
+
+	public void setVendor(String vendor) {
+		this.vendor = vendor;
+	}
+
+
+	public boolean isPublished() {
+		return published;
+	}
+
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+	
+
+	public String getTermsOfUse() {
+		return termsOfUse;
+	}
+
+	public void setTermsOfUse(String termsOfUse) {
+		this.termsOfUse = termsOfUse;
+	}
+
+	public String getDescriptor() {
+		return descriptor;
+	}
+
+	public void setDescriptor(String descriptor) {
+		this.descriptor = descriptor;
+	}
+
+	public String getDescriptorHTML() {
+		return descriptorHTML;
+	}
+
+	public void setDescriptorHTML(String descriptorHTML) {
+		this.descriptorHTML = descriptorHTML;
 	}
 
 }

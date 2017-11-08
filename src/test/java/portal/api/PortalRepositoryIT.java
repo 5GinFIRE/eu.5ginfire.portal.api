@@ -18,10 +18,6 @@ package portal.api;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import portal.api.model.PortalUser;
-import portal.api.model.UserSession;
-import portal.api.util.EncryptionUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,15 +32,19 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import portal.api.model.PortalUser;
+import portal.api.model.UserSession;
 
 //RUN a single Integration Test only, but runs all unit tests
 //mvn clean -Pjetty.integration -Dit.test=PortalRepositoryIT verify
@@ -143,7 +143,7 @@ public class PortalRepositoryIT {
 
 	private void deleteUserById(int id) {
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 
 		WebClient client = WebClient.create(endpointUrl + "/services/api/repo/admin/users/" + id, providers);
 		client.cookie(cookieJSESSIONID);
@@ -154,7 +154,7 @@ public class PortalRepositoryIT {
 
 	private PortalUser updateUser(int id, PortalUser bu) throws JsonParseException, IOException {
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 
 		WebClient client = WebClient.create(endpointUrl + "/services/api/repo/admin/users/" + id, providers);
 		client.cookie(cookieJSESSIONID);
@@ -169,7 +169,7 @@ public class PortalRepositoryIT {
 
 	private PortalUser getUserById(int id) throws JsonParseException, IOException {
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 
 		WebClient client = WebClient.create(endpointUrl + "/services/api/repo/admin/users/" + id, providers);
 		client.cookie(cookieJSESSIONID);
@@ -185,7 +185,7 @@ public class PortalRepositoryIT {
 	private PortalUser addUser(PortalUser bu) throws JsonParseException, IOException {
 
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 		
 		//without session cookie first! SHould return 401 (UNAUTHORIZED)
 		WebClient client = WebClient.create(endpointUrl + "/services/api/repo/admin/users", providers);
@@ -233,7 +233,7 @@ public class PortalRepositoryIT {
 
 	private Response execPOSTonURLForAPILogin(String url, String username, String passw) {
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 
 		WebClient client = WebClient.create(url, providers, username, passw, null);
 
@@ -249,7 +249,7 @@ public class PortalRepositoryIT {
 
 	private Response execGETonURL(String url, Cookie sessioncookie) {
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 
 		WebClient client = WebClient.create(url, providers);
 
@@ -263,7 +263,7 @@ public class PortalRepositoryIT {
 
 //	private Response execGETonURL(String url) {
 //		List<Object> providers = new ArrayList<Object>();
-//		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+//		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 //
 //		WebClient client = WebClient.create(url, providers);
 //		Cookie cookie = new Cookie("X-Portal-Key", "123456") ;

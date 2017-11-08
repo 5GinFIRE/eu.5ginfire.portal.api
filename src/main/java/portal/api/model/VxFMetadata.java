@@ -15,26 +15,78 @@
 
 package portal.api.model;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Basic;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 
 
 @Entity(name = "VxFMetadata")
 public class VxFMetadata extends Product{
 
 
+	private boolean certified;
+	
+	private String certifiedBy;	
 
+	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
+	
+	
+	
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@JoinTable()
+	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
+
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
+	
+	
+	public List<VxFOnBoardedDescriptor> getVxfOnBoardedDescriptors() {
+		return vxfOnBoardedDescriptors;
+	}
+
+	public void setVxfOnBoardedDescriptors(List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors) {
+		this.vxfOnBoardedDescriptors = vxfOnBoardedDescriptors;
+	}
+
+
+
+	public boolean isCertified() {
+		return certified;
+	}
+
+	public void setCertified(boolean certified) {
+		this.certified = certified;
+	}
+
+	public String getCertifiedBy() {
+		return certifiedBy;
+	}
+
+	public void setCertifiedBy(String certifiedBy) {
+		this.certifiedBy = certifiedBy;
+	}
+
+	public PackagingFormat getPackagingFormat() {
+		return packagingFormat;
+	}
+
+	public void setPackagingFormat(PackagingFormat packagingFormat) {
+		this.packagingFormat = packagingFormat;
+	}
+
+	public List<MANOplatform> getSupportedMANOPlatforms() {
+		return supportedMANOPlatforms;
+	}
+
+	public void setSupportedMANOPlatforms(List<MANOplatform> supportedMANOPlatforms) {
+		this.supportedMANOPlatforms = supportedMANOPlatforms;
+	}
+
+	
+	
 }

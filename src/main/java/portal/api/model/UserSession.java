@@ -15,7 +15,6 @@
 
 package portal.api.model;
 
-import portal.api.fiware.FIWAREUser;
 
 public class UserSession {
 
@@ -23,7 +22,6 @@ public class UserSession {
 	private String username = null;
 	private String password = null;
 	private PortalUser portalUser = null;
-	private FIWAREUser FIWAREUser = null;
 	
 	
 	
@@ -47,11 +45,5 @@ public class UserSession {
 	}
 	public void setPortalUser(PortalUser portalUser) {
 		this.portalUser = portalUser;
-	}
-	public FIWAREUser getFIWAREUser() {
-		return FIWAREUser;
-	}
-	public void setFIWAREUser(FIWAREUser fIWAREUser) {
-		FIWAREUser = fIWAREUser;
 	}
 }

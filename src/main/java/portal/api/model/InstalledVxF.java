@@ -15,19 +15,11 @@
 
 package portal.api.model;
 
-import java.util.UUID;
-
 import javax.persistence.Basic;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
-import org.apache.openjpa.persistence.Externalizer;
-import org.apache.openjpa.persistence.Factory;
-import org.apache.openjpa.persistence.Type;
 
 
 @Entity(name = "InstalledVxF")

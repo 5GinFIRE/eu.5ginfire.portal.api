@@ -15,11 +15,7 @@
 
 package portal.api.util;
 
-import portal.api.model.PortalUser;
-import portal.api.repo.PortalRepository;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.security.auth.login.FailedLoginException;
@@ -36,13 +32,14 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.Factory;
+
+import portal.api.model.PortalUser;
+import portal.api.model.UserRoleType;
+import portal.api.repo.PortalRepository;
 
 public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 
@@ -62,12 +59,16 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		PortalUser bu = portalRepositoryRef.getUserByUsername( arg0.toString() );
 		if (bu!=null){
 
-			String r = bu.getRole();
-			if ((r==null) || (r.isEmpty())){
-				r="ROLE_EXPERIMENTER"; //SERVICE_PLATFORM_PROVIDER
+			
+			//String r = bu.getRole();
+			if ( bu.getRoles().isEmpty()  ){
+				bu.addRole( UserRoleType.EXPERIMENTER );
 			}
-			logger.info("PrincipalCollection Role=" + r);
-			ai.addRole(r);
+			for (UserRoleType role : bu.getRoles()) {
+				logger.info("PrincipalCollection Role=" + role.toString());
+				ai.addRole( role.toString() );
+				
+			}
 		}
 		
 		

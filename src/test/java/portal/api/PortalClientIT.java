@@ -27,10 +27,11 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 import portal.api.model.InstalledVxF;
 import portal.api.model.InstalledVxFStatus;
@@ -51,7 +52,7 @@ public class PortalClientIT {
 
 		logger.info("Executing TEST = testPortalRSInstallServiceNotFound");
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 		String uuid = UUID.fromString("55cab8b8-668b-4c75-99a9-39b24ed3d8be").toString();
 		InstalledVxF is = prepareInstalledService(uuid);
 
@@ -90,7 +91,7 @@ public class PortalClientIT {
 		logger.info("Executing TEST = testPortalRSInstallServiceAndGetStatus");
 
 		List<Object> providers = new ArrayList<Object>();
-		providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
+		providers.add(new com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider());
 		String uuid = UUID.fromString("77777777-668b-4c75-99a9-39b24ed3d8be").toString();
 
 		// first delete an existing installation if exists

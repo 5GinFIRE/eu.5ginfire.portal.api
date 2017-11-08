@@ -17,8 +17,6 @@ package portal.api.model;
 
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -73,7 +71,7 @@ public interface IPortalRepositoryAPI {
 	Response getAppMetadataByUUID(String uuid);		
 	Response getAppofUser( int userid, int appid);
 	Response updateAppMetadata(int aid, List<Attachment> attachements);
-	Response addAppMetadata( List<Attachment> attachements);
+	Response addExperimentMetadata( List<Attachment> attachements);
 	void deleteApp(int appid);
 	
 	

@@ -15,27 +15,26 @@
 
 package portal.api.repo;
 
-import portal.api.impl.PortalJpaController;
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.PortalProperty;
-import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
-import portal.api.model.Category;
-import portal.api.model.DeploymentDescriptor;
-import portal.api.model.InstalledVxF;
-import portal.api.model.Product;
-import portal.api.model.SubscribedResource;
-import portal.api.model.UserSession;
-
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import portal.api.impl.PortalJpaController;
+import portal.api.model.Category;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Infrastructure;
+import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
+import portal.api.model.Product;
+import portal.api.model.SubscribedResource;
+import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 
 /**
  * @author ctranoris
@@ -101,11 +100,23 @@ public class PortalRepository {
 		portalJpaController.deleteUser(userid);
 	}
 
-	public List<VxFMetadata> getVxFs(Long categoryid) {
-		List<VxFMetadata> ls = portalJpaController.readVxFsMetadata(categoryid,0, 100000);
+	public List<VxFMetadata> getVxFs(Long categoryid, boolean isPublished) {
+		List<VxFMetadata> ls = portalJpaController.readVxFsMetadata(categoryid,0, 100000, isPublished);
 		
 		return ls;
 	}
+	
+
+	/**
+	 * returns first 100000 apps only :-)
+	 * @param categoryid 
+	 * @return list of apps
+	 */
+	public List<ExperimentMetadata> getExperiments(Long categoryid, boolean isPublished) {
+		List<ExperimentMetadata> ls = portalJpaController.readExperimentsMetadata(categoryid, 0, 100000, isPublished);		
+		return ls;
+	}
+
 	
 	public void deleteProduct(int vxfid) {
 		portalJpaController.deleteProduct(vxfid);
@@ -139,6 +150,14 @@ public class PortalRepository {
 	public Product getProductByUUID(String uuid) {
 		return (Product) portalJpaController.readProductByUUID(uuid);
 	}
+	
+
+
+	public Product getProductByName(String name) {
+		return (Product) portalJpaController.readProductByName(name);
+	}
+
+
 
 
 	
@@ -183,16 +202,6 @@ public class PortalRepository {
 		
 	}
 
-
-	/**
-	 * returns first 100000 apps only :-)
-	 * @param categoryid 
-	 * @return list of apps
-	 */
-	public List<ExperimentMetadata> getApps(Long categoryid) {
-		List<ExperimentMetadata> ls = portalJpaController.readAppsMetadata(categoryid, 0, 100000);		
-		return ls;
-	}
 
 
 //	public ExperimentMetadata getExperimentMetadataByID(int appid) {
@@ -258,7 +267,7 @@ public class PortalRepository {
 		return bp;
 	}
 
-	public Object getProperties() {
+	public List<PortalProperty> getProperties() {
 
 		List<PortalProperty> ls = portalJpaController.readProperties(0, 100000);
 		return ls;	
@@ -314,6 +323,162 @@ public class PortalRepository {
 	public SubscribedResource getSubscribedResourceByUUID(String uuid) {
 		return portalJpaController.readSubscribedResourceByuuid(uuid);
 	}
+
+
+	public Object getMANOplatforms() {
+
+		List<MANOplatform> ls = portalJpaController.readMANOplatforms(0, 100000);
+		return ls;	
+	}
+
+
+	public MANOplatform addMANOplatform(MANOplatform c) {
+		portalJpaController.saveMANOplatform(c);
+		return c;
+	}
+
+
+	public MANOplatform getMANOplatformByID(int catid) {
+		return portalJpaController.readMANOplatformById(catid);
+	}
+
+
+	public MANOplatform updateMANOplatformInfo(MANOplatform c) {
+		MANOplatform bmr = portalJpaController.updateMANOplatform(c);
+		return bmr;
+	}
+
+
+	public void deleteMANOplatform(int mpid) {
+		portalJpaController.deleteMANOplatform(mpid);
+		
+	}
+
+	
+
+
+	public Object getMANOproviders() {
+
+		List<MANOprovider> ls = portalJpaController.readMANOproviders(0, 100000);
+		return ls;	
+	}
+
+
+	public MANOprovider addMANOprovider(MANOprovider c) {
+		portalJpaController.saveMANOprovider(c);
+		return c;
+	}
+
+
+	public MANOprovider getMANOproviderByID(int catid) {
+		return portalJpaController.readMANOproviderById(catid);
+	}
+
+
+	public MANOprovider updateMANOproviderInfo(MANOprovider c) {
+		MANOprovider bmr = portalJpaController.updateMANOprovider(c);
+		return bmr;
+	}
+
+
+	public void deleteMANOprovider(int mpid) {
+		portalJpaController.deleteMANOprovider(mpid);
+		
+	}
+
+	
+
+	public Object getVxFOnBoardedDescriptors() {
+
+		List<VxFOnBoardedDescriptor> ls = portalJpaController.readVxFOnBoardedDescriptors(0, 100000);
+		return ls;	
+	}
+
+
+	public VxFOnBoardedDescriptor addVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		portalJpaController.saveVxFOnBoardedDescriptor(c);
+		return c;
+	}
+
+
+	public VxFOnBoardedDescriptor updateVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		VxFOnBoardedDescriptor bmr = portalJpaController.updateVxFOnBoardedDescriptor(c);
+		return bmr;
+	}
+
+
+	public void deleteVxFOnBoardedDescriptor(int mpid) {
+		portalJpaController.deleteVxFOnBoardedDescriptor(mpid);
+		
+	}
+
+
+	public VxFOnBoardedDescriptor getVxFOnBoardedDescriptorByID(int mpid) {
+		return portalJpaController.readVxFOnBoardedDescriptorById( mpid );
+	}
+
+
+	
+	public Object getExperimentOnBoardDescriptors() {
+
+		List<ExperimentOnBoardDescriptor> ls = portalJpaController.readExperimentOnBoardDescriptors(0, 100000);
+		return ls;	
+	}
+
+
+	public ExperimentOnBoardDescriptor addExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		portalJpaController.saveExperimentOnBoardDescriptor(c);
+		return c;
+	}
+
+
+	public ExperimentOnBoardDescriptor updateExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		ExperimentOnBoardDescriptor bmr = portalJpaController.updateExperimentOnBoardDescriptor(c);
+		return bmr;
+	}
+
+
+	public void deleteExperimentOnBoardDescriptor(int mpid) {
+		portalJpaController.deleteExperimentOnBoardDescriptor(mpid);
+		
+	}
+
+
+	public ExperimentOnBoardDescriptor getExperimentOnBoardDescriptorByID(int mpid) {
+		return portalJpaController.readExperimentOnBoardDescriptorById( mpid );
+	}
+
+
+	public List<Infrastructure> getInfrastructures() {
+		List<Infrastructure> ls = portalJpaController.readInfrastructures(0, 100000);
+		return ls;	
+	}
+
+
+	public Infrastructure addInfrastructure(Infrastructure c) {
+		portalJpaController.saveInfrastructure(c);
+		return c;
+	}
+
+
+	public Infrastructure getInfrastructureByID(int infraid) {
+		return portalJpaController.readInfrastructureById( infraid );
+	}
+
+
+	public Infrastructure updateInfrastructureInfo(Infrastructure c) {
+		Infrastructure bmr = portalJpaController.updateInfrastructure(c);
+		return bmr;
+	}
+
+
+	public void deleteInfrastructure(int infraid) {
+		portalJpaController.deletInfrastructure( infraid );
+		
+	}
+
+	
+
 
 
 

@@ -4,6 +4,12 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="eu.5ginFIRE.riftioyangschema2java-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/eu.5ginFIRE.riftioyangschema2java/eu.5ginFIRE.riftioyangschema2java">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="NFVRequirementsExtractor-1.0.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/nfv-requirements-extractor/nfv-requirements-extractor">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="java-output-path" value="/eu.5ginfire.portal.api/target/classes"/>
         <property name="context-root" value="eu.5ginfire.portal.api"/>
     </wb-module>

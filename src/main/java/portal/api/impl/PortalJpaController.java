@@ -21,22 +21,27 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.PortalProperty;
-import portal.api.model.PortalUser;
-import portal.api.model.VxFMetadata;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Infrastructure;
 import portal.api.model.InstalledVxF;
+import portal.api.model.MANOplatform;
+import portal.api.model.MANOprovider;
+import portal.api.model.PortalProperty;
+import portal.api.model.PortalUser;
 import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
+import portal.api.model.UserRoleType;
+import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 
 /**
  * This class maintains the entity manager and get a broker element from DB
@@ -47,30 +52,27 @@ import portal.api.model.SubscribedResource;
 public class PortalJpaController {
 	private static final transient Log logger = LogFactory.getLog(PortalJpaController.class.getName());
 
-
 	@PersistenceUnit
 	private EntityManagerFactory entityManagerFactory;
-
 
 	public void initData() {
 		PortalUser admin = readPortalUserById(1);
 		logger.info("======================== admin  = " + admin);
-		
-		if (admin==null){
+
+		if (admin == null) {
 			PortalUser bu = new PortalUser();
 			bu.setName("Portal Administrator");
 			bu.setUsername("admin");
 			bu.setPassword("changeme");
 			bu.setEmail("");
 			bu.setOrganization("");
-			bu.setRole("ROLE_PORTALADMIN");
+			bu.addRole( UserRoleType.PORTALADMIN );
 			bu.setActive(true);
 			saveUser(bu);
-			
+
 			Category c = new Category();
 			c.setName("None");
 			saveCategory(c);
-			
 
 			PortalProperty p = new PortalProperty();
 			p.setName("adminEmail");
@@ -86,11 +88,9 @@ public class PortalJpaController {
 			saveProperty(p);
 			p = new PortalProperty("mailpassword", "pass");
 			saveProperty(p);
-			
-			
+
 		}
-		
-		
+
 	}
 
 	public long countInstalledVxFs() {
@@ -131,14 +131,14 @@ public class PortalJpaController {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.name='" + name + "'");
-		return (q.getResultList().size()==0)?null:(InstalledVxF) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (InstalledVxF) q.getSingleResult();
 	}
 
 	public InstalledVxF readInstalledVxFByUUID(final String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.uuid='" + uuid + "'");
-		return (q.getResultList().size()==0)?null:(InstalledVxF) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (InstalledVxF) q.getSingleResult();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -171,8 +171,9 @@ public class PortalJpaController {
 		List<InstalledVxF> lb = entityManager.createQuery("select p from InstalledVxF p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			InstalledVxF iVxF = (InstalledVxF) iterator.next();
-			logger.info("=== InstalledVxF found: " + iVxF.getName() + ", Id: " + iVxF.getId() + ", Uuid: " + iVxF.getUuid() + ", RepoUrl: " + iVxF.getRepoUrl()
-					+ ", InstalledVersion: " + iVxF.getInstalledVersion() + ", PackageURL: " + iVxF.getPackageURL() + ", PackageLocalPath: "
+			logger.info("=== InstalledVxF found: " + iVxF.getName() + ", Id: " + iVxF.getId() + ", Uuid: "
+					+ iVxF.getUuid() + ", RepoUrl: " + iVxF.getRepoUrl() + ", InstalledVersion: "
+					+ iVxF.getInstalledVersion() + ", PackageURL: " + iVxF.getPackageURL() + ", PackageLocalPath: "
 					+ iVxF.getPackageLocalPath() + ", Status: " + iVxF.getStatus());
 
 		}
@@ -182,9 +183,7 @@ public class PortalJpaController {
 
 	public PortalJpaController() {
 		logger.info(">>>>>>>>>>>>>> PortalJpaController constructor  <<<<<<<<<<<<<<<<<<");
-		
-		
-		
+
 	}
 
 	public String echo(String message) {
@@ -205,7 +204,7 @@ public class PortalJpaController {
 
 		entityTransaction.commit();
 	}
-	
+
 	public void deleteAllProducts() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -220,8 +219,6 @@ public class PortalJpaController {
 		entityTransaction.commit();
 
 	}
-
-	
 
 	public void deleteAllUsers() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -248,47 +245,42 @@ public class PortalJpaController {
 		entityTransaction.begin();
 
 		entityManager.persist(bu);
-		
-		
+
 		entityManager.flush();
 		entityTransaction.commit();
 
 	}
-	
 
 	public PortalUser readPortalUserByUsername(String username) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.username='" + username + "'");
-		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
 	}
-	
+
 	public PortalUser readPortalUserBySessionID(String id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.currentSessionID='" + id + "'");
-		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
 	}
-	
 
 	public PortalUser readPortalUserByEmail(String email) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.email='" + email + "'");
-		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
 	}
 
-	
 	public PortalUser readPortalUserById(int userid) {
-		
-		
+
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(PortalUser.class, userid);
-		
-//		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.id=" + userid );		
-//		return (q.getResultList().size()==0)?null:(PortalUser) q.getSingleResult();
-		
+
+		// Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE
+		// m.id=" + userid );
+		// return (q.getResultList().size()==0)?null:(PortalUser)
+		// q.getSingleResult();
+
 	}
-	
-	
-	
+
 	public PortalUser updatePortalUser(PortalUser bu) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -300,7 +292,7 @@ public class PortalJpaController {
 
 		return resis;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<PortalUser> readUsers(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -310,7 +302,7 @@ public class PortalJpaController {
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
-	
+
 	public long countUsers() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -327,15 +319,14 @@ public class PortalJpaController {
 		List<PortalUser> lb = entityManager.createQuery("select p from PortalUser p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			PortalUser bu = (PortalUser) iterator.next();
-			logger.info("	======> PortalUser found: " + bu.getName() + ", Id: " + bu.getId() + ", Id: " + bu.getOrganization() + ", username: " + bu.getUsername());
+			logger.info("	======> PortalUser found: " + bu.getName() + ", Id: " + bu.getId() + ", Id: "
+					+ bu.getOrganization() + ", username: " + bu.getUsername());
 
 			List<Product> products = bu.getProducts();
 			for (Product prod : products) {
-				logger.info("	======> vxfMetadata found: " + prod.getName() + 
-						", Id: " + prod.getId() + ", getUuid: " + prod.getUuid()
-						+ ", getName: " + prod.getName());
+				logger.info("	======> vxfMetadata found: " + prod.getName() + ", Id: " + prod.getId() + ", getUuid: "
+						+ prod.getUuid() + ", getName: " + prod.getName());
 			}
-			
 
 		}
 		logger.info("================= getAll() ==================END");
@@ -353,11 +344,11 @@ public class PortalJpaController {
 		entityTransaction.commit();
 
 	}
-	
+
 	public Product updateProduct(Product bm) {
 		logger.info("================= updateProduct ==================");
-		logger.info("bmgetId="+bm.getId());
-		logger.info("bm getName= "+bm.getName());
+		logger.info("bmgetId=" + bm.getId());
+		logger.info("bm getName= " + bm.getName());
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
@@ -369,48 +360,61 @@ public class PortalJpaController {
 		return resis;
 	}
 
-	
-//	public VxFMetadata updateVxFMetadata(VxFMetadata bm) {
-//		logger.info("================= updateVxFMetadata ==================");
-//		logger.info("bmgetId="+bm.getId());
-//		logger.info("bm getName= "+bm.getName());
-//		logger.info("bm getPackageLocation= "+bm.getPackageLocation());
-//		EntityManager entityManager = entityManagerFactory.createEntityManager();
-//
-//		EntityTransaction entityTransaction = entityManager.getTransaction();
-//
-//		entityTransaction.begin();
-//		VxFMetadata resis = entityManager.merge(bm);
-//		entityTransaction.commit();
-//
-//		return resis;
-//	}
-	
+	// public VxFMetadata updateVxFMetadata(VxFMetadata bm) {
+	// logger.info("================= updateVxFMetadata ==================");
+	// logger.info("bmgetId="+bm.getId());
+	// logger.info("bm getName= "+bm.getName());
+	// logger.info("bm getPackageLocation= "+bm.getPackageLocation());
+	// EntityManager entityManager = entityManagerFactory.createEntityManager();
+	//
+	// EntityTransaction entityTransaction = entityManager.getTransaction();
+	//
+	// entityTransaction.begin();
+	// VxFMetadata resis = entityManager.merge(bm);
+	// entityTransaction.commit();
+	//
+	// return resis;
+	// }
+
 	@SuppressWarnings("unchecked")
-	public List<VxFMetadata> readVxFsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<VxFMetadata> readVxFsMetadata(Long categoryid, int firstResult, int maxResults, boolean isPublished) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
+		// Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
+		String s = "";
 		
-		if ((categoryid!=null) && (categoryid>=0))
-			q = entityManager.createQuery("SELECT a FROM VxFMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
-		else
-			q = entityManager.createQuery("SELECT a FROM VxFMetadata a ORDER BY a.id");
+		if ((categoryid != null) && (categoryid >= 0)) {
+			if (isPublished) {
+				s = "a.published=TRUE";
+			}
+			q = entityManager
+					.createQuery("SELECT a FROM VxFMetadata a WHERE " + s + " AND a.categories.id=" + categoryid + " ORDER BY a.id");
+		}
+		else {
+			if (isPublished) {
+				s = "WHERE a.published=TRUE";
+			}
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a " + s + " ORDER BY a.id");
+		}
 
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
+	
+	
+	
+	
 	
 
 	@SuppressWarnings("unchecked")
 	public List<VxFMetadata> readVxFsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
+		// Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
-		
-		if ((ownerid!=null) && (ownerid>=0))
-			q = entityManager.createQuery("SELECT a FROM VxFMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
+
+		if ((ownerid != null) && (ownerid >= 0))
+			q = entityManager.createQuery("SELECT a FROM VxFMetadata a WHERE a.owner.id=" + ownerid + " ORDER BY a.id");
 		else
 			q = entityManager.createQuery("SELECT a FROM VxFMetadata a ORDER BY a.id");
 
@@ -418,39 +422,47 @@ public class PortalJpaController {
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
-	
 
 	public Product readProductByUUID(String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.uuid='" + uuid + "'");
-		return (q.getResultList().size()==0)?null:(Product) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (Product) q.getSingleResult();
 	}
-	
+
 	public Product readProductByID(long id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Product u = entityManager.find(Product.class, id);
 		return u;
 	}
+	
 
-//	public VxFMetadata readVxFMetadataByUUID(String uuid) {
-//		EntityManager entityManager = entityManagerFactory.createEntityManager();
-//
-//		Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m WHERE m.uuid='" + uuid + "'");
-//		return (q.getResultList().size()==0)?null:(VxFMetadata) q.getSingleResult();
-//	}
-//	
-//	public VxFMetadata readVxFMetadataByID(int vxfid) {
-//		EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		VxFMetadata u = entityManager.find(VxFMetadata.class, vxfid);
-//		return u;
-//	}
+	public Product readProductByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
+		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.name LIKE '" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (Product) q.getResultList().get(0);
+	}
+
+	// public VxFMetadata readVxFMetadataByUUID(String uuid) {
+	// EntityManager entityManager = entityManagerFactory.createEntityManager();
+	//
+	// Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m WHERE
+	// m.uuid='" + uuid + "'");
+	// return (q.getResultList().size()==0)?null:(VxFMetadata)
+	// q.getSingleResult();
+	// }
+	//
+	// public VxFMetadata readVxFMetadataByID(int vxfid) {
+	// EntityManager entityManager = entityManagerFactory.createEntityManager();
+	// VxFMetadata u = entityManager.find(VxFMetadata.class, vxfid);
+	// return u;
+	// }
 
 	public void deleteUser(int userid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		PortalUser u = entityManager.find(PortalUser.class, userid);
-		
+
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
@@ -459,10 +471,10 @@ public class PortalJpaController {
 
 		entityTransaction.commit();
 	}
-	
+
 	public void deleteProduct(int id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Product p = entityManager.find(Product.class, id);		
+		Product p = entityManager.find(Product.class, id);
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
@@ -475,9 +487,10 @@ public class PortalJpaController {
 	public List<Product> readProducts(Long categoryid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q;
-		
-		if ((categoryid!=null) && (categoryid>=0))
-			q = entityManager.createQuery("SELECT a FROM Product a WHERE a.category.id="+categoryid+" ORDER BY a.id");
+
+		if ((categoryid != null) && (categoryid >= 0))
+			q = entityManager
+					.createQuery("SELECT a FROM Product a WHERE a.category.id=" + categoryid + " ORDER BY a.id");
 		else
 			q = entityManager.createQuery("SELECT a FROM Product a ORDER BY a.id");
 
@@ -486,28 +499,24 @@ public class PortalJpaController {
 		return q.getResultList();
 	}
 
-	
 	public void getAllProductsPrinted() {
 		logger.info("================= getAllProductsPrinted() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		List<Product> lb = readProducts(null,0,10000);
+		List<Product> lb = readProducts(null, 0, 10000);
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			Product prod = (Product) iterator.next();
-			
-				logger.info("	=================> Product found: " + prod.getName() + ", Id: " + prod.getId() + ", getUuid: " + prod.getUuid()
-						+ ", getName: " + prod.getName()
-						+ ", Owner.name: " + prod.getOwner().getName() );
-			
+
+			logger.info("	=================> Product found: " + prod.getName() + ", Id: " + prod.getId()
+					+ ", getUuid: " + prod.getUuid() + ", getName: " + prod.getName() + ", Owner.name: "
+					+ prod.getOwner().getName());
 
 		}
 		logger.info("================= getAllProductsPrinted() ==================END");
 
 	}
-	
 
-	
 	public void saveSubscribedResource(SubscribedResource sm) {
 		logger.info("Will save SubscribedResource = " + sm.getURL());
 
@@ -522,7 +531,7 @@ public class PortalJpaController {
 		entityTransaction.commit();
 
 	}
-	
+
 	public SubscribedResource updateSubscribedResource(SubscribedResource sm) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -536,34 +545,31 @@ public class PortalJpaController {
 	}
 
 	public SubscribedResource readSubscribedResourceById(int userid) {
-		
-		
+
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(SubscribedResource.class, userid);
-		
+
 	}
-	
+
 	public SubscribedResource readSubscribedResourceByuuid(String uuid) {
-		
+
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM SubscribedResource m WHERE m.uuid='" + uuid + "'");
-		return (q.getResultList().size()==0)?null:(SubscribedResource) q.getSingleResult();
-		
-		
+		return (q.getResultList().size() == 0) ? null : (SubscribedResource) q.getSingleResult();
+
 	}
-	
-	
+
 	public void deleteSubscribedResource(int smId) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		SubscribedResource sm = entityManager.find(SubscribedResource.class, smId);	
+		SubscribedResource sm = entityManager.find(SubscribedResource.class, smId);
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
 		entityManager.remove(sm);
 		entityTransaction.commit();
 	}
-	
+
 	public long countSubscribedResources() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -572,7 +578,6 @@ public class PortalJpaController {
 		return (Long) q.getSingleResult();
 	}
 
-	
 	public void getAllSubscribedResourcesPrinted() {
 		logger.info("================= getSubscribedResource() ==================START");
 
@@ -581,7 +586,7 @@ public class PortalJpaController {
 		List<SubscribedResource> lb = entityManager.createQuery("select p from SubscribedResource p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			SubscribedResource sm = (SubscribedResource) iterator.next();
-			logger.info("	======> SubscribedResource found: " + sm.getURL() + ", Id: " + sm.getId()  );			
+			logger.info("	======> SubscribedResource found: " + sm.getURL() + ", Id: " + sm.getId());
 
 		}
 	}
@@ -598,11 +603,8 @@ public class PortalJpaController {
 		entityManager.flush();
 
 		entityTransaction.commit();
-		
+
 	}
-	
-
-
 
 	public List<SubscribedResource> readSubscribedResources(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -613,30 +615,40 @@ public class PortalJpaController {
 		return q.getResultList();
 	}
 
-
-
-	public List<ExperimentMetadata> readAppsMetadata(Long categoryid, int firstResult, int maxResults) {
+	public List<ExperimentMetadata> readExperimentsMetadata(Long categoryid, int firstResult, int maxResults, boolean isPublished) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q;
+		String s = "";
+
+
+		if ((categoryid != null) && (categoryid >= 0)) {
+			if (isPublished) {
+				s = "a.published=TRUE";
+			}
+			q = entityManager
+					.createQuery("SELECT a FROM ExperimentMetadata a WHERE " + s + " AND a.categories.id=" + categoryid + " ORDER BY a.id");
+		}
+		else {
+			if (isPublished) {
+				s = "WHERE a.published=TRUE";
+			}
+			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a " + s + " ORDER BY a.id");
+		}
 		
-		if ((categoryid!=null) && (categoryid>=0))
-			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a WHERE a.categories.id="+categoryid+" ORDER BY a.id");
-		else
-			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a ORDER BY a.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public List<ExperimentMetadata> readAppsMetadataForOwnerID(Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		//Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
+		// Query q = entityManager.createQuery("SELECT m FROM VxFMetadata m");
 		Query q;
-		
-		if ((ownerid!=null) && (ownerid>=0))
-			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a WHERE a.owner.id="+ownerid+" ORDER BY a.id");
+
+		if ((ownerid != null) && (ownerid >= 0))
+			q = entityManager
+					.createQuery("SELECT a FROM ExperimentMetadata a WHERE a.owner.id=" + ownerid + " ORDER BY a.id");
 		else
 			q = entityManager.createQuery("SELECT a FROM ExperimentMetadata a ORDER BY a.id");
 
@@ -679,7 +691,7 @@ public class PortalJpaController {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		Category  resis = entityManager.merge(c);
+		Category resis = entityManager.merge(c);
 		entityTransaction.commit();
 
 		return resis;
@@ -694,7 +706,7 @@ public class PortalJpaController {
 		entityTransaction.begin();
 		entityManager.remove(c);
 		entityTransaction.commit();
-		
+
 	}
 
 	public void deleteAllCategories() {
@@ -709,7 +721,7 @@ public class PortalJpaController {
 		entityManager.flush();
 
 		entityTransaction.commit();
-		
+
 	}
 
 	public void getAllCategoriesPrinted() {
@@ -720,16 +732,11 @@ public class PortalJpaController {
 		List<Category> lb = entityManager.createQuery("select p from Category p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			Category sm = (Category) iterator.next();
-			logger.info("	======> Category found: " + sm.getName() + ", Id: " + sm.getId()  );			
+			logger.info("	======> Category found: " + sm.getName() + ", Id: " + sm.getId());
 
 		}
-		
+
 	}
-
-
-	
-	
-	
 
 	public void saveProperty(PortalProperty p) {
 		logger.info("Will PortalProperty = " + p.getName());
@@ -742,7 +749,7 @@ public class PortalJpaController {
 		entityManager.persist(p);
 		entityManager.flush();
 		entityTransaction.commit();
-		
+
 	}
 
 	public void deleteProperty(int propid) {
@@ -754,7 +761,7 @@ public class PortalJpaController {
 		entityTransaction.begin();
 		entityManager.remove(c);
 		entityTransaction.commit();
-		
+
 	}
 
 	public PortalProperty updateProperty(PortalProperty p) {
@@ -763,7 +770,7 @@ public class PortalJpaController {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		PortalProperty  bp = entityManager.merge(p);
+		PortalProperty bp = entityManager.merge(p);
 		entityTransaction.commit();
 
 		return bp;
@@ -783,7 +790,7 @@ public class PortalJpaController {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		Query q = entityManager.createQuery("SELECT m FROM PortalProperty m WHERE m.name='" + name + "'");
-		return (q.getResultList().size()==0)?null:(PortalProperty) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (PortalProperty) q.getSingleResult();
 
 	}
 
@@ -811,7 +818,7 @@ public class PortalJpaController {
 		entityTransaction.begin();
 		entityManager.remove(c);
 		entityTransaction.commit();
-		
+
 	}
 
 	public DeploymentDescriptor readDeploymentByID(int deploymentId) {
@@ -826,18 +833,340 @@ public class PortalJpaController {
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		DeploymentDescriptor  resis = entityManager.merge(d);
+		DeploymentDescriptor resis = entityManager.merge(d);
 		entityTransaction.commit();
 
 		return resis;
 	}
 
+	public void saveMANOplatform(MANOplatform mp) {
+		logger.info("Will save MANOplatform = " + mp.getName());
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist(mp);
+		entityManager.flush();
+		entityTransaction.commit();
+
+	}
+
+	public long countMANOplatforms() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT COUNT(s) FROM MANOplatform s");
+		return (Long) q.getSingleResult();
+	}
+
+	public MANOplatform readMANOplatformById(int i) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(MANOplatform.class, i);
+	}
+
+	public void deleteAllMANOplatforms() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+
+		Query q = entityManager.createQuery("DELETE FROM MANOplatform");
+		q.executeUpdate();
+		entityManager.flush();
+
+		entityTransaction.commit();
+
+	}
+
+	public MANOplatform readMANOplatformByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (MANOplatform) q.getSingleResult();
+	}
+
+	public void saveMANOprovider(MANOprovider mprovider) {
+		logger.info("Will save MANOprovider = " + mprovider.getName());
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public long countMANOproviders() {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT COUNT(s) FROM MANOprovider s");
+		return (Long) q.getSingleResult();
+	}
 	
+	public MANOprovider readMANOproviderByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (MANOprovider) q.getSingleResult();
+	}
+	
+	public void deleteAllMANOproviders() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+
+		Query q = entityManager.createQuery("DELETE FROM MANOprovider");
+		q.executeUpdate();
+		entityManager.flush();
+
+		entityTransaction.commit();
+
+	}
+
+	public List<MANOplatform> readMANOplatforms(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public MANOplatform updateMANOplatform(MANOplatform c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		MANOplatform resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteMANOplatform(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		MANOplatform c = entityManager.find(MANOplatform.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+	
+	
+	
+	public List<MANOprovider> readMANOproviders(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public MANOprovider updateMANOprovider(MANOprovider c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		MANOprovider resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteMANOprovider(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		MANOprovider c = entityManager.find(MANOprovider.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public MANOprovider readMANOproviderById(int i) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(MANOprovider.class, i);
+	}
 
 	
+	public List<VxFOnBoardedDescriptor> readVxFOnBoardedDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM VxFOnBoardedDescriptor m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveVxFOnBoardedDescriptor(VxFOnBoardedDescriptor mprovider) {
+		logger.info("Will save VxFOnBoardedDescriptor = " + mprovider.getDeployId() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public VxFOnBoardedDescriptor updateVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		VxFOnBoardedDescriptor resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteVxFOnBoardedDescriptor(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		VxFOnBoardedDescriptor c = entityManager.find( VxFOnBoardedDescriptor.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public VxFOnBoardedDescriptor readVxFOnBoardedDescriptorById(int i) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(VxFOnBoardedDescriptor.class, i);
+	}
 
 
 	
+	public List<ExperimentOnBoardDescriptor> readExperimentOnBoardDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-	
+		Query q = entityManager.createQuery("SELECT m FROM ExperimentOnBoardDescriptors m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor mprovider) {
+		logger.info("Will save ExperimentOnBoardDescriptors = " + mprovider.getDeployId() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( mprovider );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public ExperimentOnBoardDescriptor updateExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		ExperimentOnBoardDescriptor resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deleteExperimentOnBoardDescriptor(int mpid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		ExperimentOnBoardDescriptor c = entityManager.find( ExperimentOnBoardDescriptor.class, mpid);
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public ExperimentOnBoardDescriptor readExperimentOnBoardDescriptorById(int i) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(ExperimentOnBoardDescriptor.class, i);
+	}
+
+	public List<Infrastructure> readInfrastructures(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m  ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	public void saveInfrastructure(Infrastructure c) {
+		logger.info("Will save ExperimentOnBoardDescriptors = " + c.getName() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( c );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	public Infrastructure readInfrastructureById(int infraid) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find(Infrastructure.class, infraid);
+	}
+
+	public Infrastructure updateInfrastructure(Infrastructure c) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		Infrastructure resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	public void deletInfrastructure(int infraid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Infrastructure c = entityManager.find( Infrastructure.class, infraid );
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	public Infrastructure readInfrastructureByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : (Infrastructure) q.getSingleResult();
+	}
+
+
 }

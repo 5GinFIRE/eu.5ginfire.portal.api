@@ -28,7 +28,8 @@ import javax.persistence.ManyToMany;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity(name = "Category")
 @JsonIgnoreProperties(value = {  "products" }, ignoreUnknown = true )

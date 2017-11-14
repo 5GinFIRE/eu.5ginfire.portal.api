@@ -50,6 +50,25 @@ public class MANOprovider implements IMANOprovider {
 
 	@Basic()
 	private String apiEndpoint = null;
+	
+	
+
+	
+	/**
+	 * base64-encoding of username:password
+	 */
+	@Basic()
+	private String authorizationBasicHeader = null;
+
+
+	public String getAuthorizationBasicHeader() {
+		return authorizationBasicHeader;
+	}
+
+
+	public void setAuthorizationBasicHeader(String authorizationBasicHeader) {
+		this.authorizationBasicHeader = authorizationBasicHeader;
+	}
 
 
 	public String getApiEndpoint() {

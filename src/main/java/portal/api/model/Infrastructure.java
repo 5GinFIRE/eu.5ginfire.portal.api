@@ -39,6 +39,17 @@ public class Infrastructure {
 	private String name = null;
 	@Basic()
 	private String email = null;
+	
+	@Basic()
+	private String datacentername = null;
+
+	public String getDatacentername() {
+		return datacentername;
+	}
+
+	public void setDatacentername(String datacentername) {
+		this.datacentername = datacentername;
+	}
 
 	public int getId() {
 		return id;

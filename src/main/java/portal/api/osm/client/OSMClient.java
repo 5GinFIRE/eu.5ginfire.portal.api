@@ -77,6 +77,8 @@ public class OSMClient {
 	private String BASE_OPERATIONS_URL;
 	private String BASE_OPERATIONAL_URL;
 
+	private MANOprovider manoProvider;
+
 	// private static final String BASE_SERVICE_URL =
 	// "https://10.0.2.15:8008/api/running";
 
@@ -85,7 +87,7 @@ public class OSMClient {
 	public static OSMClient getInstance(MANOprovider mano) {
 		OSMClient osmapi = instances.get(mano.getId());
 		if (osmapi == null) {
-			osmapi = new OSMClient(mano.getApiEndpoint());
+			osmapi = new OSMClient( mano );
 			osmapi.init();
 			instances.put(mano.getId(), osmapi);
 		}
@@ -100,11 +102,13 @@ public class OSMClient {
 	 */
 	// private static Scheme httpsScheme = null;
 
-	public OSMClient() {
-		this(BASE_INIT_URL);
-	}
+//	public OSMClient() {
+//		this(BASE_INIT_URL);
+//	}
 
-	public OSMClient(String apiEndpoint) {
+	public OSMClient(MANOprovider mano) {
+		this.manoProvider = mano;
+		String apiEndpoint = mano.getApiEndpoint();		
 		BASE_URL = apiEndpoint + "/api";
 		BASE_SERVICE_URL = BASE_URL + "/running";
 		BASE_OPERATIONS_URL = BASE_URL + "/operations";
@@ -183,7 +187,11 @@ public class OSMClient {
 		// OSMClient.getInstance().getVNFDbyID("d0cb056b-8995-11e7-8b54-00163e11a1e2");
 		// System.out.println("=== VNFD POJO object response: " + vnfd.toString());
 
-		OSMClient osm = new OSMClient();
+		MANOprovider mp = new MANOprovider();
+		mp.setApiEndpoint( BASE_INIT_URL );
+		mp.setAuthorizationBasicHeader( "YWRtaW46YWRtaW4=" );
+		
+		OSMClient osm = new OSMClient(mp);
 		osm.init();
 		List<Vnfd> vnfds = osm.getVNFDs();
 		for (Vnfd v : vnfds) {
@@ -246,7 +254,7 @@ public class OSMClient {
 			HttpPost httppost = new HttpPost(BASE_OPERATIONS_URL + "/package-create");
 			BasicHeader bh = new BasicHeader("Accept", "application/vnd.yang.collection+json");
 			httppost.addHeader(bh);
-			BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded
+			BasicHeader bh2 = new BasicHeader("Authorization", "Basic " + this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded
 																							// admin/admin
 			httppost.addHeader(bh2);
 			BasicHeader bh3 = new BasicHeader("Content-Type", "application/vnd.yang.data+json");
@@ -280,7 +288,7 @@ public class OSMClient {
 		BasicHeader bh = new BasicHeader("Accept", "application/vnd.yang.collection+json");
 		httppost.addHeader(bh);
 
-		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded admin/admin
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic " + this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded admin/admin
 		httppost.addHeader(bh2);
 		BasicHeader bh3 = new BasicHeader("Content-Type", "application/vnd.yang.data+json");
 		httppost.addHeader(bh3);
@@ -318,7 +326,7 @@ public class OSMClient {
 		HttpGet httpget = new HttpGet(BASE_OPERATIONAL_URL + "/download-jobs");
 		BasicHeader bh = new BasicHeader("Accept", "application/json");
 		httpget.addHeader(bh);
-		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded admin/admin
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic "  + this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded admin/admin
 		httpget.addHeader(bh2);
 
 		HttpResponse response;
@@ -355,7 +363,7 @@ public class OSMClient {
 		HttpGet httpget = new HttpGet(reqURL);
 		BasicHeader bh = new BasicHeader("Accept", "application/json");
 		httpget.addHeader(bh);
-		BasicHeader bh2 = new BasicHeader("Authorization", "Basic YWRtaW46YWRtaW4="); // this is hardcoded admin/admin
+		BasicHeader bh2 = new BasicHeader("Authorization", "Basic " +  this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded admin/admin
 		httpget.addHeader(bh2);
 
 		HttpResponse response;

@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -1282,9 +1283,65 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/experiments")
 	@Produces("application/json")
 	public Response getAllApps(@QueryParam("categoryid") Long categoryid) {
-		logger.info("getApps categoryid=" + categoryid);
+		logger.info("getexperiments categoryid=" + categoryid);
 		List<ExperimentMetadata> vxfs = portalRepositoryRef.getExperiments(categoryid, true);
 		return Response.ok().entity(vxfs).build();
+	}
+	
+	
+	/**
+	 * @return all User's Valid experiments as well as allo Public and Valid experiments 
+	 */
+	@GET
+	@Path("/admin/experiments/deployable")
+	@Produces("application/json")
+	public Response getAllDeployableExperiments() {
+		
+		//
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+
+		if (u != null) {
+			List<ExperimentMetadata> userexpr;
+
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
+				userexpr = portalRepositoryRef.getExperiments( (long) -1 , false);
+			} else {
+				userexpr = portalRepositoryRef.getAppsByUserID((long) u.getId());
+			}
+
+			
+			List<ExperimentMetadata> deplExps = new ArrayList<ExperimentMetadata>( userexpr );
+			List<ExperimentMetadata> pubExps = new ArrayList<ExperimentMetadata>( portalRepositoryRef.getExperiments( (long) -1 , true) );
+			
+			for (ExperimentMetadata e : pubExps) {
+				boolean found = false;
+				for (ExperimentMetadata depl : deplExps) {
+					if (  depl.getId() == e.getId() ) {
+						found = true;					
+					}
+				}
+				
+				if ( !found ) {
+					deplExps.add(e);//add no duplicate pubic experiments
+				}				
+				
+			}
+			
+			for (Iterator<ExperimentMetadata> iter = deplExps.listIterator(); iter.hasNext(); ) { //filter only valid
+				ExperimentMetadata a = iter.next();
+			    if ( !a.isValid() ) {
+			        iter.remove();
+			    }
+			}
+			
+			
+			return Response.ok().entity( deplExps ).build();
+
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("User not found in portal registry or not logged in");
+			throw new WebApplicationException(builder.build());
+		}
 	}
 
 	@GET

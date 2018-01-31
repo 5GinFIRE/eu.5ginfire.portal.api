@@ -19,8 +19,12 @@ Clone all three projects:
 
 [eu.5ginFIRE.riftioyangschema2java](https://github.com/5GinFIRE/eu.5ginFIRE.riftioyangschema2java)
 
-
 Install riftioyangschema2java project. Get into the project and run
+`mvn clean install`
+
+[nfv-requirements-extractor](https://github.com/5GinFIRE/nfv-requirements-extractor)
+
+Install nfv-requirements-extractor project. Get into the project and run
 `mvn clean install`
 
 Get into the eu.5ginfire.portal.api project and run

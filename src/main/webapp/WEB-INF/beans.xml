@@ -3,12 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
 	xmlns:cxf="http://cxf.apache.org/core" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd ">
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd  http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<context:property-placeholder />
 	<context:annotation-config />
 	<bean
-		class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer" />
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
 	<bean
 		class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer" />
 
@@ -204,6 +204,17 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
+  <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+    <package>portal.api.routes</package>
+  </camelContext>
 
+  <!-- lets configure the default ActiveMQ broker URL -->
+  <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
+    <property name="connectionFactory">
+      <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://localhost?broker.persistent=false&amp;broker.useJmx=true"/>
+      </bean>
+    </property>
+  </bean>
 
 </beans>

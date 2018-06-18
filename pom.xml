@@ -96,9 +96,14 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<artifactId>camel-spring</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
-		   <dependency>
+		<dependency>
 	      <groupId>org.apache.camel</groupId>
 	      <artifactId>camel-jms</artifactId>
+			<version>${camel.version}</version>
+	    </dependency>
+		<dependency>
+	      <groupId>org.apache.camel</groupId>
+	      <artifactId>camel-stream</artifactId>
 			<version>${camel.version}</version>
 	    </dependency>
 	    
@@ -108,6 +113,12 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 				<version>${camel.version}</version>
 		</dependency>
 	
+	
+		<dependency>
+	      <groupId>org.apache.activemq</groupId>
+	      <artifactId>activemq-camel</artifactId>
+			<version>5.15.3</version>
+	    </dependency>
 	    <dependency>
 	      <groupId>org.apache.activemq</groupId>
 	      <artifactId>activemq-broker</artifactId>

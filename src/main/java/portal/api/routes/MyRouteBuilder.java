@@ -25,13 +25,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.camel.component.ActiveMQComponent;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http4.HttpClientConfigurer;
 import org.apache.camel.component.http4.HttpComponent;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.spring.Main;
 import org.apache.camel.util.jsse.SSLContextParameters;
@@ -53,6 +58,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import portal.api.bugzilla.model.Bug;
 import portal.api.bugzilla.model.Bugs;
 
 /**
@@ -63,11 +69,29 @@ import portal.api.bugzilla.model.Bugs;
  */
 public class MyRouteBuilder extends RouteBuilder {
 
+	private static String BUGZILLAURL = "portal.5ginfire.eu:443/bugstaging";
 	/**
 	 * Allow this route to be run as an application
 	 */
 	public static void main(String[] args) throws Exception {
-		new Main().run(args);
+		//new Main().run(args);
+		
+		CamelContext context = new DefaultCamelContext();
+		try {
+			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&amp;broker.useJmx=true"); 
+			context.addComponent("jms", ActiveMQComponent.jmsComponentAutoAcknowledge(connectionFactory));			
+
+			context.addRoutes( new MyRouteBuilder() );
+			context.start();
+						
+			SomeBean sb = new SomeBean();			
+			sb.someMethod("a body"); 
+            Thread.sleep(60000);
+		} finally {			
+            context.stop();
+        }
+		
+		
 	}
 
 	private static ModelCamelContext actx;
@@ -79,8 +103,6 @@ public class MyRouteBuilder extends RouteBuilder {
 		HttpComponent httpComponent = getContext().getComponent("https4", HttpComponent.class);
 		httpComponent.setHttpClientConfigurer(new MyHttpClientConfigurer());
 		
-		
-
 		// populate the message queue with some messages
 		from("file:src/data?noop=true").to("jms:test.MyQueue");
 
@@ -92,24 +114,37 @@ public class MyRouteBuilder extends RouteBuilder {
 		.bean(new SomeBean());
 
 		from("direct:start")
-		.toD( "https4://portal.5ginfire.eu:443/bugzilla/rest.cgi/bug/${header.id}?throwExceptionOnFailure=false");
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.id}?throwExceptionOnFailure=false") ;
 		
 
 		from("direct:IssueByAlias")
-		.toD( "https4://portal.5ginfire.eu:443/bugzilla/rest.cgi/bug?alias=${header.alias}&throwExceptionOnFailure=false");
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug?alias=${header.alias}&throwExceptionOnFailure=false")
+		.bean( ABug.class , "aMethod" )
+		.bean( ABug.class, "getBugId")
+		.setHeader( "id" ).body() 
+		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
+		.setBody()
+		.simple(  "{  \"comment\" : \"a comment\" }" )
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.id}/comment?api_key=VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z&throwExceptionOnFailure=false")
+		.to("stream:out");
+//		.bean( ABug.class , "aMethod" )
+//		.to("stream:out");
 		
 		from("direct:newIssue")
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
 		//.setHeader("X-BUGZILLA-API-KEY", constant("VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z") )
-		.toD( "https4://portal.5ginfire.eu:443/bugzilla/rest.cgi/bug?api_key=VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z&throwExceptionOnFailure=false");
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug?api_key=VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z&throwExceptionOnFailure=false");
 		
+		
+		
+		//from("timer://myTimer?period=5000").setBody().simple("Hello World Camel fired at ${header.firedTime}").bean(new SomeBean());
 
 	}
 
 	public static class SomeBean {
 
 		public void someMethod(String body) {
-			System.out.println("Received: " + body);
+			System.out.println("Body in SomeBean: " + body);
 
 			System.out.println("==========GET A BUG==================");
 			FluentProducerTemplate template = actx.createFluentProducerTemplate().to("direct:start");
@@ -131,26 +166,26 @@ public class MyRouteBuilder extends RouteBuilder {
 			System.out.println("Received: " + result);
 			
 			
-			String response = result;
-			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-
-			try {
-				Bugs b = mapper.readValue(response.toString(), Bugs.class);
-
-				if ((b != null) && (b.getBugs() != null) && (b.getBugs().size() > 0)) {
-					
-					System.out.println("=============== b.getBugs().get(0) = " + b.getBugs().get(0).getId() );
-				}
-
-			} catch (JsonParseException e) {
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			System.out.println("============================");
+//			String response = result;
+//			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+//
+//			try {
+//				Bugs b = mapper.readValue(response.toString(), Bugs.class);
+//
+//				if ((b != null) && (b.getBugs() != null) && (b.getBugs().size() > 0)) {
+//					
+//					System.out.println("=============== b.getBugs().get(0) = " + b.getBugs().get(0).getId() );
+//				}
+//
+//			} catch (JsonParseException e) {
+//				e.printStackTrace();
+//			} catch (JsonMappingException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//
+//			System.out.println("============================");
 			
 			
 //			System.out.println("==========POST NEW BUG==================");
@@ -209,5 +244,38 @@ public class MyRouteBuilder extends RouteBuilder {
 			}
 		}
 
+	}
+	
+	public static class ABug {
+
+		public static Bug aMethod(String body) {
+
+			String response = body;
+			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+
+			try {
+				Bugs b = mapper.readValue(response.toString(), Bugs.class);
+
+				if ((b != null) && (b.getBugs() != null) && (b.getBugs().size() > 0)) {
+					
+					System.out.println("=============== b.getBugs().get(0) = " + b.getBugs().get(0).getId() );
+					return b.getBugs().get(0);
+				}
+
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+
+		}
+		
+		public static String getBugId(Bug b) {
+
+			return b.getId() + "";
+		}
 	}
 }

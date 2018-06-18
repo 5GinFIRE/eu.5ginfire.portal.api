@@ -49,7 +49,7 @@ public class BugzillaClient {
 		return instance;
 	}
 
-	private static final String BASE_SERVICE_URL = "https://portal.5ginfire.eu/bugzilla/rest.cgi";
+	private static final String BASE_SERVICE_URL = "https://portal.5ginfire.eu/bugstaging/rest.cgi";
 
 	private static final String API_KEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
 

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -2575,6 +2576,50 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			builder.entity("Infrastructure " + infraid + " not found in portal registry");
 			throw new WebApplicationException(builder.build());
 		}
+	}
+	
+	@POST
+	@Path("/sfawrap")
+	@Produces("text/xml")
+	@Consumes("text/xml")
+	public Response getSFA( String xmlreq) {
+		logger.info("/sfawrap param=" + xmlreq );
+		//AggregateManager.listAvailableResources
+		
+
+		
+		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs( null, true);
+		
+		Date d = new Date();
+		StringBuilder sfaresponse = new StringBuilder();
+		//sfaresponse.append( "<?xml version=\"1.0\"?>" );
+		sfaresponse.append( "<rspec xmlns=\"http://www.protogeni.net/resources/rspec/2\"  type=\"advertisement\" valid_until=\"" + "2020-05-20T16:03:57+03:00" +  "\" generated=\"" + "2018-06-20T16:03:57+03:00"  + "\">" );
+		sfaresponse.append( "<statistics call=\"ListResources\">" );
+		sfaresponse.append( "<aggregate status=\"success\" name=\"5ginfire\" elapsed=\"0.1\"/>" );
+		sfaresponse.append( "</statistics>" );
+		sfaresponse.append( "<network name=\"5ginfire\">" );
+		
+		for (VxFMetadata vxFMetadata : vxfs) {
+			sfaresponse.append( " <node component_manager_id=\"urn:publicid:IDN+5ginfire+authority+cm\"  component_id=\"urn:publicid:IDN+upatras:p2e+node+" + vxFMetadata.getUuid()  + "\"  component_name=\"" + vxFMetadata.getName() + "\" site_id=\"urn:publicid:IDN+5ginfire:p2e+authority+sa\">" );
+			sfaresponse.append( "<displayname>" + vxFMetadata.getName() + "</displayname>" );
+			sfaresponse.append( "<package>" + vxFMetadata.getPackageLocation()  + "</package>" );
+			sfaresponse.append( "" );
+			sfaresponse.append( "<location country=\"unknown\" longitude=\"21.7885\" latitude=\"38.2845\"/>" );
+			sfaresponse.append( " <description>" + vxFMetadata.getShortDescription() + "</description>" );
+			sfaresponse.append( "" );
+			sfaresponse.append( "<lease from=\"" + d.toString() + "\" until=\"" + d.toString() + "\">false</lease>" );
+			sfaresponse.append( "</node>" );
+		}
+		
+		
+		
+		sfaresponse.append( "</network>" );
+		sfaresponse.append( "</rspec>" );
+		
+
+		
+		return Response.ok().entity( sfaresponse.toString() ).build();
+
 	}
 
 }

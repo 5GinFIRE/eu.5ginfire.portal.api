@@ -18,6 +18,7 @@ package portal.api.routes;
 
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -46,6 +47,13 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import portal.api.bugzilla.model.Bugs;
 
 /**
  * A simple example router from a file system to an ActiveMQ queue and then to a
@@ -86,6 +94,10 @@ public class MyRouteBuilder extends RouteBuilder {
 		from("direct:start")
 		.toD( "https4://portal.5ginfire.eu:443/bugzilla/rest.cgi/bug/${header.id}?throwExceptionOnFailure=false");
 		
+
+		from("direct:IssueByAlias")
+		.toD( "https4://portal.5ginfire.eu:443/bugzilla/rest.cgi/bug?alias=${header.alias}&throwExceptionOnFailure=false");
+		
 		from("direct:newIssue")
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
 		//.setHeader("X-BUGZILLA-API-KEY", constant("VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z") )
@@ -103,27 +115,63 @@ public class MyRouteBuilder extends RouteBuilder {
 			FluentProducerTemplate template = actx.createFluentProducerTemplate().to("direct:start");
 
 			String result = template
-					.withHeader("id", "1")
+					.withHeader("id", "1")										
 					.request(String.class);
 			System.out.println("Received: " + result);
 
 			System.out.println("============================");
-			
-			
-			System.out.println("==========POST NEW BUG==================");
-			template = actx.createFluentProducerTemplate().to("direct:newIssue");
+
+
+			System.out.println("==========GET A BUG By ALIAS==================");
+			template = actx.createFluentProducerTemplate().to("direct:IssueByAlias");
 
 			result = template
-					.withHeader("id", "1")
-					.withHeader("X-BUGZILLA-API-KEY", "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z" )
-					.withBody( "{  \"product\" : \"Staging\", \"component\" : \"Staging component\",  \"version\" : \"unspecified\",  \"summary\" : \"This is a test bug - please disregard " +  UUID.randomUUID().toString() +  "\""
-							+ ",  \"description\" : \"This is a test bug - please disregard " +  UUID.randomUUID().toString() +  "\""
-							+ ",  \"cc\" : \"[tranoris@ieee.org,info@tinydevops.eu]"  
-							+  "\"}" )
+					.withHeader("alias", "64a52a4d-526d-49eb-9f30-38f9f40c5d55")					
 					.request(String.class);
-			System.out.println("POST result Received: " + result);
+			System.out.println("Received: " + result);
+			
+			
+			String response = result;
+			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+
+			try {
+				Bugs b = mapper.readValue(response.toString(), Bugs.class);
+
+				if ((b != null) && (b.getBugs() != null) && (b.getBugs().size() > 0)) {
+					
+					System.out.println("=============== b.getBugs().get(0) = " + b.getBugs().get(0).getId() );
+				}
+
+			} catch (JsonParseException e) {
+				e.printStackTrace();
+			} catch (JsonMappingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
 			System.out.println("============================");
+			
+			
+//			System.out.println("==========POST NEW BUG==================");
+//			template = actx.createFluentProducerTemplate().to("direct:newIssue");
+//
+//			String alias =  UUID.randomUUID().toString();
+//			result = template
+//					.withHeader("id", "1")
+//					.withHeader("X-BUGZILLA-API-KEY", "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z" )
+//					.withBody( "{  \"product\" : \"Staging\", \"component\" : \"Staging component\",  \"version\" : \"unspecified\",  \"summary\" : \"This is a test bug - please disregard " +  alias +  "\""
+//							+ ",  \"description\" : \"This is a test bug - please disregard " +  alias +  "\""
+//							+ ",  \"alias\" : \"" +  alias +  "\""
+//							+ ",  \"cc\" : \"tranoris@ieee.org\"" 
+//							+  "}" )
+//					.request(String.class);
+//			System.out.println("POST result Received: " + result);
+//
+//			System.out.println("============================");
+			
+			
+			
 		}
 	}
 

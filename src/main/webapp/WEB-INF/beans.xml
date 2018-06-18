@@ -120,6 +120,7 @@
 				/viewVxFMarketplace.html = anon
 				/viewInstalledVxFs.html = anon
 				/services/api/client/** = anon, rest
+				/services/api/repo/sfawrap/** = anon, rest
 				/services/api/repo/vxfs/** = anon, rest
 				/services/api/repo/packages/** = anon, rest
 				/services/api/repo/images/** = anon, rest

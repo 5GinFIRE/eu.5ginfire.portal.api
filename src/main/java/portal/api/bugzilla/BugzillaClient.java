@@ -70,8 +70,9 @@ public class BugzillaClient {
 		str.append("\"component\": \"" + component + "\",");
 		str.append("\"alias\": \"" + alias + "\",");
 		str.append("\"summary\": \"" + summary + "\",");
-		
+
 		str.append("\"description\": \"" + description + "\",");
+		str.append("\"cc\": \"" + descriptor.getOwner().getEmail() + "\",");
 		str.append("\"version\" : \"unspecified\"");
 		str.append("}");
 

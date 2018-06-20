@@ -84,9 +84,12 @@ public class MyRouteBuilder extends RouteBuilder {
 			context.addRoutes( new MyRouteBuilder() );
 			context.start();
 						
-			SomeBean sb = new SomeBean();			
-			sb.someMethod("a body"); 
-            Thread.sleep(60000);
+			AProcess sb = new AProcess();			
+			//sb.exampleProcess("a body"); 
+			sb.exampleSeda( "seda example" );
+			
+			
+            Thread.sleep(10000);
 		} finally {			
             context.stop();
         }
@@ -111,7 +114,7 @@ public class MyRouteBuilder extends RouteBuilder {
 
 		// set up a listener on the file component
 		from("file://target/test?noop=true")
-		.bean(new SomeBean());
+		.bean(new AProcess());
 
 		from("direct:start")
 		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.id}?throwExceptionOnFailure=false") ;
@@ -136,14 +139,24 @@ public class MyRouteBuilder extends RouteBuilder {
 		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug?api_key=VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z&throwExceptionOnFailure=false");
 		
 		
+		from("seda:users?multipleConsumers=true")
+		.setBody()
+		.simple(  "route A" )
+		.to("stream:out");
+		
+		
+		from("seda:users?multipleConsumers=true")
+		.setBody()
+		.simple(  "route B" )
+		.to("stream:out");
 		
 		//from("timer://myTimer?period=5000").setBody().simple("Hello World Camel fired at ${header.firedTime}").bean(new SomeBean());
 
 	}
 
-	public static class SomeBean {
+	public static class AProcess {
 
-		public void someMethod(String body) {
+		public void exampleProcess(String body) {
 			System.out.println("Body in SomeBean: " + body);
 
 			System.out.println("==========GET A BUG==================");
@@ -207,6 +220,13 @@ public class MyRouteBuilder extends RouteBuilder {
 			
 			
 			
+		}
+		
+		public void exampleSeda(String body) {
+			System.out.println("========= send exampleSeda ==================");
+			FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:users?multipleConsumers=true");
+			String result = template.request(String.class);
+			System.out.println("Received: " + result);
 		}
 	}
 

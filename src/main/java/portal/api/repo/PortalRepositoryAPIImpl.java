@@ -66,6 +66,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
+import portal.api.bus.BusController;
 import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
@@ -198,6 +199,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		u = portalRepositoryRef.addPortalUserToUsers(user);
 
 		if (u != null) {
+			BusController.getInstance().newUserAdded( u );			
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

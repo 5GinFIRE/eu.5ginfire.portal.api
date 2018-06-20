@@ -205,10 +205,14 @@
 	<bean id="atServiceClient" factory-bean="atServiceClientFactory"
 		factory-method="createWebClient" />
 
-  <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
-    <package>portal.api.routes</package>
+  <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
+    <package>portal.api.bugzilla</package>    
   </camelContext>
-
+  
+  <bean id="busController" class="portal.api.bus.BusController">
+	<property name="actx" ref="camelContext" />
+	</bean>
+	
   <!-- lets configure the default ActiveMQ broker URL -->
   <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">
     <property name="connectionFactory">

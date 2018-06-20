@@ -1749,7 +1749,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			for (DeploymentDescriptor d : u.getDeployments()) {
 				logger.info("deployment already for userid: " + d.getId());
 			}
-
+			String uuid = UUID.randomUUID().toString();
+			deployment.setUuid(uuid);
 			deployment.setDateCreated(new Date());
 			deployment.setStatus(DeploymentDescriptorStatus.UNDER_REVIEW);
 
@@ -1763,6 +1764,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 														// DB model
 
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+			
+			BusController.getInstance().newDeploymentRequest( deployment );	
 
 			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 			if ((adminemail != null) && (!adminemail.equals(""))) {

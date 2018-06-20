@@ -35,6 +35,7 @@ import portal.api.bugzilla.model.Bug;
 import portal.api.bugzilla.model.Bugs;
 import portal.api.bugzilla.model.User;
 import portal.api.bugzilla.model.Users;
+import portal.api.model.DeploymentDescriptor;
 
 public class BugzillaClient {
 
@@ -53,26 +54,37 @@ public class BugzillaClient {
 
 	private static final String API_KEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
 
-	public static void main(String[] args) throws MalformedURLException {
+	
+	
+	public static String transformDeployment2BugBody(DeploymentDescriptor descriptor) {
 
-//		 logger.info( BugzillaClient.getInstance().getBugById("1").getSummary() );
-//		 String chkmail = "tranoris@ece.upatras.gr";
-//		 User u = BugzillaClient.getInstance().getUser( chkmail );
-//		 if ( u != null ) {
-//		 logger.info( u.getRealName() + ", email = " + u.getEmail());
-//		 }else {
-//		 logger.info("User " + chkmail + " does not exist");
-//		 }
-//		 BugzillaClient.getInstance().createUser("participants@5ginfire.eu", "5GinFIRE mailing list account", "xxx");
-		 
-		 
-		//String[] cclist = {"tranoris@softwareagility.gr", "tranoris@ieee.org"};
-		String[] cclist = new String[0];
-		BugzillaClient.getInstance().createBug("Staging", "Staging component", "A test issue", "A test issue description", cclist);
-		 
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[BYPORTAL] New Deployment Request";
+		String description = "By owner " + descriptor.getOwner().getUsername() ;
+		String alias = descriptor.getUuid() ;
+		
+		StringBuilder str = new StringBuilder();
+		str.append("{");
+		str.append("\"product\": \"" + product + "\",");
+		str.append("\"component\": \"" + component + "\",");
+		str.append("\"alias\": \"" + alias + "\",");
+		str.append("\"summary\": \"" + summary + "\",");
+		
+		str.append("\"description\": \"" + description + "\",");
+		str.append("\"version\" : \"unspecified\"");
+		str.append("}");
 
+		return str.toString();
 	}
-
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Create a user in Bugzilla, 
 	 * @param email

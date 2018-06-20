@@ -47,6 +47,10 @@ public class DeploymentDescriptor {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id = 0;
 	
+
+	@Basic()
+	private String uuid = null;
+	
 	@Basic()
 	private String name = null;
 	
@@ -81,13 +85,6 @@ public class DeploymentDescriptor {
 	@Basic()	
 	private Date endDate;
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
 
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
@@ -102,7 +99,14 @@ public class DeploymentDescriptor {
 	@JoinTable()
 	private List<DeploymentDescriptorVxFPlacement> vxfPlacements = new ArrayList<DeploymentDescriptorVxFPlacement>();
 	
-	
+	public DeploymentDescriptor() {
+	}
+
+	public DeploymentDescriptor(String uuid, String name) {
+		super();
+		this.name = name;
+		this.uuid = uuid;
+	}
 
 	public List<DeploymentDescriptorVxFPlacement> getVxfPlacements() {
 		return vxfPlacements;
@@ -110,6 +114,15 @@ public class DeploymentDescriptor {
 
 	public void setVxfPlacements(List<DeploymentDescriptorVxFPlacement> vxfPlacements) {
 		this.vxfPlacements = vxfPlacements;
+	}
+	
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 
 	public int getId() {
@@ -202,5 +215,13 @@ public class DeploymentDescriptor {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

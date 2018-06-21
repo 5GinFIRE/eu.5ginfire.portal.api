@@ -645,6 +645,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				getListOfAttachmentsByName("screenshots", ats));
 
 		if (vxf != null) {
+
+			BusController.getInstance().newVxFAdded( vxf );		
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -1421,6 +1423,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 		if (experiment != null) {
+
+			BusController.getInstance().newNSFAdded( experiment );		
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -2290,7 +2294,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setLastOnboarding(new Date());
 
-		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+		VxFOnBoardedDescriptor vxfobds = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		logger.info("VxF Package Location: " + vxf.getPackageLocation());
 		
@@ -2301,11 +2305,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			pLocation = "https:" + pLocation;
 		}
 		
-		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
+		OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
 				c.getDeployId());
 
-		if (u != null) {
-			return Response.ok().entity(u).build();
+		if (vxfobds != null) {
+			BusController.getInstance().onBoardVxF( vxfobds );
+			return Response.ok().entity(vxfobds).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
@@ -2325,6 +2330,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// TODO: Implement this towards MANO
 
 		if (u != null) {
+			BusController.getInstance().offBoardVxF( u );
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -2480,7 +2486,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		c.setLastOnboarding(new Date());
 
-		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
 		String pLocation = em.getPackageLocation();
 		if ( !pLocation.contains( "http" )  ) {
@@ -2488,10 +2494,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		
 		logger.info("Experiment Package Location: " + em.getPackageLocation());
-		OSMClient.getInstance(u.getObMANOprovider()).createOnBoardNSDPackage( pLocation , c.getDeployId());
+		OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage( pLocation , c.getDeployId());
 
-		if (u != null) {
-			return Response.ok().entity(u).build();
+		if (uexpobd != null) {
+			BusController.getInstance().onBoardNSD( uexpobd );
+			return Response.ok().entity(uexpobd).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested ExperimentOnBoardDescriptor with ID=" + c.getId() + " cannot be onboarded");
@@ -2511,6 +2518,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// TODO: Implement this towards MANO
 
 		if (u != null) {
+			BusController.getInstance().offBoardNSD( u );
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

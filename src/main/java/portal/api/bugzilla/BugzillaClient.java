@@ -41,6 +41,7 @@ import portal.api.bugzilla.model.Users;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
+import portal.api.model.PortalUser;
 
 public class BugzillaClient {
 
@@ -190,6 +191,15 @@ public class BugzillaClient {
 	}
 	
 	
+	public static User transformUser2BugzillaUser(PortalUser portalUser){
+		
+		User u = new User();
+		u.setEmail( portalUser.getEmail()  );
+		u.setFullName( portalUser.getName() );
+		//u.setPassword( portalUser.getPassword() ); //no password. The user needs to reset it in the other system (e.g. Bugzilla)
+		return u;
+		
+	}
 	
 	/**
 	 * Create a user in Bugzilla, 

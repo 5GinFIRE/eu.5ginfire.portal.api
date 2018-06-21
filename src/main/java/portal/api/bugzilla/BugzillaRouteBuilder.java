@@ -80,49 +80,55 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 
 			context.addRoutes( new BugzillaRouteBuilder() );
 			context.start();
-
 			
-			// test New Deployment
-			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:deployments.create?multipleConsumers=true");
-			String uuid = "02b0b0d9-d73a-451f-8cb2-79d398a375b4"; //UUID.randomUUID().toString();
-			DeploymentDescriptor deployment = new DeploymentDescriptor( uuid , "An Experiment");
-			deployment.setDescription("test asfdsf\n test asfdsf\n test asfdsf\n");
+			//test new user
+			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:users.create?multipleConsumers=true");
 			PortalUser owner = new PortalUser();
-			owner.setUsername( "admin" );
-			owner.setEmail( "tranoris@ece.upatras.gr" );
-			deployment.setOwner(owner);
-			deployment.setDateCreated( new Date());
-			deployment.setStartReqDate( new Date());
-			deployment.setEndReqDate( new Date());
-			ExperimentMetadata exper = new ExperimentMetadata();
-			exper.setName( "An experiment NSD" ); 
-			deployment.setExperiment(exper);
-			//template.withBody( deployment ).asyncSend();
+			owner.setEmail( "tranoris@example.org" );
+			owner.setName( "Christos Tranoris");
+			owner.setPasswordUnencrypted( "12345123456" );
+			template.withBody( owner ).asyncSend();		
 			
-
-            Thread.sleep(4000);
-
-			// test Update Deployment
-			FluentProducerTemplate templateUpd = context.createFluentProducerTemplate().to("seda:deployments.update?multipleConsumers=true");
-			//DeploymentDescriptor deployment = new DeploymentDescriptor( uuid, "An Experiment");
-			//deployment.setDescription("test asfdsf\n test asfdsf\n test asfdsf\n");
-			//PortalUser owner = new PortalUser();
-			//owner.setUsername( "admin" );
-			//owner.setEmail( "tranoris@ece.upatras.gr" );
-			//deployment.setOwner(owner);
-			//deployment.setDateCreated( new Date());
-			//deployment.setStartReqDate( new Date());
-			//deployment.setEndReqDate( new Date());
+//			// test New Deployment
+//			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:deployments.create?multipleConsumers=true");
+//			String uuid = "02b0b0d9-d73a-451f-8cb2-79d398a375b4"; //UUID.randomUUID().toString();
+//			DeploymentDescriptor deployment = new DeploymentDescriptor( uuid , "An Experiment");
+//			deployment.setDescription("test asfdsf\n test asfdsf\n test asfdsf\n");
+//			PortalUser owner = new PortalUser();
+//			owner.setUsername( "admin" );
+//			owner.setEmail( "tranoris@ece.upatras.gr" );
+//			deployment.setOwner(owner);
+//			deployment.setDateCreated( new Date());
+//			deployment.setStartReqDate( new Date());
+//			deployment.setEndReqDate( new Date());
+//			ExperimentMetadata exper = new ExperimentMetadata();
+//			exper.setName( "An experiment NSD" ); 
+//			deployment.setExperiment(exper);
+//			template.withBody( deployment ).asyncSend();			
+//
+//            Thread.sleep(4000);
+//
+//			// test Update Deployment
+//			FluentProducerTemplate templateUpd = context.createFluentProducerTemplate().to("seda:deployments.update?multipleConsumers=true");
+//			//DeploymentDescriptor deployment = new DeploymentDescriptor( uuid, "An Experiment");
+//			//deployment.setDescription("test asfdsf\n test asfdsf\n test asfdsf\n");
+//			//PortalUser owner = new PortalUser();
+//			//owner.setUsername( "admin" );
+//			//owner.setEmail( "tranoris@ece.upatras.gr" );
+//			//deployment.setOwner(owner);
+//			//deployment.setDateCreated( new Date());
+//			//deployment.setStartReqDate( new Date());
+//			//deployment.setEndReqDate( new Date());
+//			
+//			deployment.setStatus( DeploymentDescriptorStatus.SCHEDULED );
+//			deployment.setStartDate(  new Date() );
+//			deployment.setEndDate(  new Date() );
+//			deployment.setFeedback( "A feedback\n more feedback " );			
+//			templateUpd.withBody( deployment ).asyncSend();
 			
-			deployment.setStatus( DeploymentDescriptorStatus.SCHEDULED );
-			deployment.setStartDate(  new Date() );
-			deployment.setEndDate(  new Date() );
-			deployment.setFeedback( "A feedback\n more feedback " );			
-			templateUpd.withBody( deployment ).asyncSend();
 			
 			
-			
-            Thread.sleep(10000);
+            Thread.sleep(60000);
 		} finally {			
             context.stop();
         }
@@ -138,6 +144,26 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		HttpComponent httpComponent = getContext().getComponent("https4", HttpComponent.class);
 		httpComponent.setHttpClientConfigurer(new MyHttpClientConfigurer());
 
+		/**
+		 * Create user route, from seda:users.create?multipleConsumers=true
+		 */
+		
+		from("seda:users.create?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformUser2BugzillaUser")
+		.marshal().json( JsonLibrary.Jackson, true)
+		.convertBodyTo( String.class ).to("stream:out")
+		.errorHandler(deadLetterChannel("direct:dlq_users")
+				.maximumRedeliveries( 10 ) //let's try 10 times to send it....
+				.redeliveryDelay( 60000 ).useOriginalMessage()
+				.deadLetterHandleNewException( false )
+				//.logExhaustedMessageHistory(false)
+				.logExhausted(true)
+				.logHandled(true)
+				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
+				.retryAttemptedLogLevel( LoggingLevel.WARN) )
+		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/user?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
+		.to("stream:out");
 		
 		/**
 		 * Create Deployment Route
@@ -183,6 +209,14 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.uuid}?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
 		.to("stream:out");
 
+		//dead Letter Queue Users if everything fails to connect
+		from("direct:dlq_users")
+		.setBody()
+//		.body(DeploymentDescriptor.class)
+//		.bean( BugzillaClient.class, "transformDeployment2BugBody")
+		.body(String.class)
+		.to("stream:out");
+		
 		//dead Letter Queue if everything fails to connect
 		from("direct:dlq_deployments")
 		.setBody()

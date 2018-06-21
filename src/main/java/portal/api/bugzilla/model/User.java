@@ -19,6 +19,8 @@ public class User {
     private Boolean canLogin;
     @JsonProperty("email")
     private String email;
+    @JsonProperty("login")
+    private String login;
     @JsonProperty("email_enabled")
     private Boolean emailEnabled;
     @JsonProperty("groups")
@@ -29,8 +31,12 @@ public class User {
     private String loginDeniedText;
     @JsonProperty("name")
     private String name;
+    @JsonProperty("password")
+    private String password;
     @JsonProperty("real_name")
     private String realName;
+    @JsonProperty("full_name")
+    private String fullName;
     @JsonProperty("saved_reports")
     private List<Object> savedReports = null;
     @JsonProperty("saved_searches")
@@ -46,6 +52,16 @@ public class User {
     @JsonProperty("can_login")
     public void setCanLogin(Boolean canLogin) {
         this.canLogin = canLogin;
+    }
+    
+    @JsonProperty("login")
+    public String getLogin() {
+        return login;
+    }
+
+    @JsonProperty("login")
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     @JsonProperty("email")
@@ -97,6 +113,16 @@ public class User {
     public void setLoginDeniedText(String loginDeniedText) {
         this.loginDeniedText = loginDeniedText;
     }
+    
+    @JsonProperty("password")
+    public String getPassword() {
+        return password;
+    }
+
+    @JsonProperty("password")
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     @JsonProperty("name")
     public String getName() {
@@ -116,6 +142,16 @@ public class User {
     @JsonProperty("real_name")
     public void setRealName(String realName) {
         this.realName = realName;
+    }
+    
+    @JsonProperty("full_name")
+    public String getFulllName() {
+        return fullName;
+    }
+
+    @JsonProperty("full_name")
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     @JsonProperty("saved_reports")

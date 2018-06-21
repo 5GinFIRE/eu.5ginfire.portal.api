@@ -4,7 +4,11 @@ import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.model.ModelCamelContext;
 
 import portal.api.model.DeploymentDescriptor;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.PortalUser;
+import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 
 /**
  * Exposes messages to Bus. Usually they should be aynchronous.
@@ -82,6 +86,43 @@ public class BusController {
 
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:deployments.update?multipleConsumers=true");
 		template.withBody( deployment ).asyncSend();
+		
+	}
+
+
+	public void newVxFAdded(VxFMetadata vxf) {
+		
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void newNSFAdded(ExperimentMetadata experiment) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void onBoardVxF(VxFOnBoardedDescriptor vxfobds) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void offBoardVxF(VxFOnBoardedDescriptor u) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void onBoardNSD(ExperimentOnBoardDescriptor uexpobd) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void offBoardNSD(ExperimentOnBoardDescriptor u) {
+		// TODO Auto-generated method stub
 		
 	}
 	

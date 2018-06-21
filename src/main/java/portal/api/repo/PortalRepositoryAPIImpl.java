@@ -1848,7 +1848,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
 				logger.info("updateDeployment for id: " + d.getId());
-
+				
+				BusController.getInstance().updateDeploymentRequest( deployment );
+				
 				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 				if ((adminemail != null) && (!adminemail.equals(""))) {
 					String subj = "[5GinFIREPortal] Deployment Request";

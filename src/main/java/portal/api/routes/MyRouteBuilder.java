@@ -95,7 +95,7 @@ public class MyRouteBuilder extends RouteBuilder {
 			context.addComponent("jms", ActiveMQComponent.jmsComponentAutoAcknowledge(connectionFactory));			
 
 
-			context.addRoutes( new BugzillaRouteBuilder() );
+			context.addRoutes( new MyRouteBuilder() );			
 			context.start();
 						
 			AProcess sb = new AProcess();			

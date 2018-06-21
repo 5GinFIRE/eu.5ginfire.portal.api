@@ -6,6 +6,8 @@ import java.net.MalformedURLException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
@@ -33,15 +35,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import portal.api.bugzilla.model.Bug;
 import portal.api.bugzilla.model.Bugs;
+import portal.api.bugzilla.model.Comment;
 import portal.api.bugzilla.model.User;
 import portal.api.bugzilla.model.Users;
 import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.DeploymentDescriptorVxFPlacement;
 
 public class BugzillaClient {
 
 	private static final transient Log logger = LogFactory.getLog(BugzillaClient.class.getName());
 
+	/** */
 	private static BugzillaClient instance;
+
+
+	/** */
+	private static final String BASE_SERVICE_URL = "https://portal.5ginfire.eu";
+	/** */
+	private static final String BUGZILLA_BASE_SERVICE_URL = "https://portal.5ginfire.eu/bugstaging/rest.cgi";
+	/** */
+	private static final String API_KEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
+
+	/** */
+	private static final String BUGHEADER =   "*************************************************\n"
+											+ "THIS IS AN AUTOMATED ISSUE CREATED BY PORTAL API.\n"
+											+ "*************************************************\n";
+
 
 	public static BugzillaClient getInstance() {
 		if (instance == null) {
@@ -49,40 +69,125 @@ public class BugzillaClient {
 		}
 		return instance;
 	}
-
-	private static final String BASE_SERVICE_URL = "https://portal.5ginfire.eu/bugstaging/rest.cgi";
-
-	private static final String API_KEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
-
-	
-	
-	public static String transformDeployment2BugBody(DeploymentDescriptor descriptor) {
+		
+	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
 
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
-		String summary = "[BYPORTAL] New Deployment Request";
-		String description = "By owner " + descriptor.getOwner().getUsername() ;
+		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
+
+		String description = getDeploymentDescription( descriptor );		
 		
-		StringBuilder str = new StringBuilder();
-		str.append("{");
-		str.append("\"product\": \"" + product + "\",");
-		str.append("\"component\": \"" + component + "\",");
-		str.append("\"alias\": \"" + alias + "\",");
-		str.append("\"summary\": \"" + summary + "\",");
-
-		str.append("\"description\": \"" + description + "\",");
-		str.append("\"cc\": \"" + descriptor.getOwner().getEmail() + "\",");
-		str.append("\"version\" : \"unspecified\"");
-		str.append("}");
-
-		return str.toString();
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.SCHEDULED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
+			status = "IN_PROGRESS";
+		} else  if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}
+		
+		
+		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
+		
+		return b;
 	}
 	
 	
+	public static Comment transformDeployment2BugComment(DeploymentDescriptor descriptor) {
+		
+		String description = getDeploymentDescription( descriptor );
+				
+		Comment b = createComment( description);
+		
+		return b;
+	}
 	
 	
+	/**
+	 * @param descriptor
+	 * @return
+	 */
+	private static String getDeploymentDescription(DeploymentDescriptor descriptor) {
+		StringBuilder description =  new StringBuilder( BUGHEADER );
+
+		description.append( "\nSTATUS: " + descriptor.getStatus() + "\n");
+		if ( descriptor.getStartDate() != null ) {
+			description.append( "\nFeedback: " + descriptor.getFeedback() );
+			description.append( "\nScheduled Start Date: " + descriptor.getStartDate().toString() );
+			description.append( "\nScheduled End Date: " + descriptor.getEndDate().toString() );
+		} else {
+			description.append( "\nNOT YET SCHEDULED \n");			
+		}
+		
+		
+		description.append(
+						"\nDeployment Request by user :" + descriptor.getOwner().getUsername() 
+						+"\nHere are the details:\n"
+						+ "\nExperiment name: " + descriptor.getName() 
+						+ "\nDescription: " + descriptor.getDescription() 
+						+ "\nDate Created: " + descriptor.getDateCreated().toString() 
+						+ "\nRequested Tentative Start date: " + descriptor.getStartReqDate().toString() 
+						+ "\nRequested Tentative End date: " + descriptor.getEndReqDate().toString() 
+						+ "\nExperiment (NSD) requested: " + descriptor.getExperiment().getName() );
+		
+
+		description.append( "\nConstituent VxF Placement " ) ;
+		for (DeploymentDescriptorVxFPlacement pl : descriptor.getVxfPlacements()) {
+			description.append( "\n  Constituent VxF: " + pl.getConstituentVxF().getVxfref().getName() + " - Infrastructure: " + pl.getInfrastructure().getName() );			
+		}
+		
+		
+				
+						 
+		description.append( "\n*************************************************\n");
+		description.append( "\nTo manage this Request, go to: " + BASE_SERVICE_URL + "/#!/edit_deployment/" + descriptor.getId() ); 
+		return description.toString();
+	}
+
+
+	public static Comment createComment( String description ) {
+		
+		Comment c = new Comment();
+		c.setComment(description);
+		c.setIs_markdown( false );
+		c.setIs_private( false );	
+		return c;
+	}
 	
+	
+	/**
+	 * @param product
+	 * @param component
+	 * @param summary
+	 * @param alias
+	 * @param description
+	 * @param ccemail
+	 * @return
+	 */
+	public static Bug createBug(String product, String component, String summary, String alias, String description, String ccemail, String status, String resolution ) {
+		
+		Bug b = new Bug();
+		b.setProduct(product);
+		b.setComponent(component);
+		b.setSummary(summary);
+		b.setVersion( "unspecified" );
+		List<Object> aliaslist = new ArrayList<>();
+		aliaslist.add(alias);		
+		b.setAlias( aliaslist );
+		List<String> cclist = new ArrayList<>();
+		cclist.add( ccemail );		
+		b.setCc(cclist); 
+		b.setDescription(description.toString());		
+		b.setStatus(status);
+		b.setResolution(resolution);
+				
+		return b;
+	}
 	
 	
 	
@@ -95,7 +200,7 @@ public class BugzillaClient {
 	 */
 	public boolean createUser(String email, String realName, String password) {
 
-		String url = BASE_SERVICE_URL + "/user?&api_key=" + API_KEY;
+		String url = BUGZILLA_BASE_SERVICE_URL + "/user?&api_key=" + API_KEY;
 
 		logger.info("Sending HTTPS createUser towards: " + url);
 
@@ -134,77 +239,6 @@ public class BugzillaClient {
 	}
 
 	
-	/**
-	 * @param product
-	 * @param component
-	 * @param summary
-	 * @param summary
-	 * @return bug ID or null if fails to create a new Bug
-	 */
-	public String createBug(String product, String component, String summary, String description, String[] cclist ) {
-
-		String url = BASE_SERVICE_URL + "/bug?&api_key=" + API_KEY;
-
-		logger.info("Sending HTTPS createUser towards: " + url);
-
-		CloseableHttpClient httpclient = returnHttpClient();
-
-		HttpPost httppost = new HttpPost(url);
-		BasicHeader bh = new BasicHeader("Accept", "application/json");
-		httppost.addHeader(bh);
-
-		HttpResponse response;
-		try {
-			StringBuilder str = new StringBuilder();
-			str.append( "{" );
-			str.append( "\"product\": \"" + product + "\"," );
-			str.append( "\"component\": \"" + component + "\"," );
-			str.append( "\"summary\": \"" + summary + "\"," );
-			
-			if (cclist!=null) {
-				str.append( "\"cc\": [" );			
-				String list = "\"" + String.join("\", \"", cclist) + "\"";
-				str.append( list );
-				str.append( "]," );
-			}
-			str.append( "\"description\": \"" + description + "\"," );
-			str.append(  "\"version\" : \"unspecified\"" );
-			 str.append( "}" );
-					
-					
-			StringEntity params = new StringEntity( str.toString() );
-			httppost.setEntity(params);
-
-			response = httpclient.execute(httppost);
-			
-			if ( ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK )  || ( response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED )  ) {			
-				HttpEntity entity = response.getEntity();
-				InputStream inStream = (InputStream) entity.getContent();
-				String s = IOUtils.toString(inStream);
-				logger.info("response = " + s);
-				
-				ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-				
-				
-				JsonNode tr = mapper.readTree( s ).get("id");
-				//tr = tr.get(0);
-				String bugID = tr.toString();
-
-				logger.info("Bug created with id = " + bugID + ". Summary = " + summary );
-				return bugID;
-			} else {
-				logger.info( response.getStatusLine().getReasonPhrase() + " - Bug cannot be created. Summary = " + summary );
-				return null;
-				
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return null;
-	}
 	
 	
 	
@@ -214,7 +248,7 @@ public class BugzillaClient {
 	 */
 	public User getUser(String username) {
 		String response = BugzillaClient.getInstance()
-				.getBzResponse(BASE_SERVICE_URL + "/user/" + username + "?&api_key=" + API_KEY);
+				.getBzResponse(BUGZILLA_BASE_SERVICE_URL + "/user/" + username + "?&api_key=" + API_KEY);
 
 		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 
@@ -241,7 +275,7 @@ public class BugzillaClient {
 	 */
 	public Bug getBugById(String bugID) {
 		String response = BugzillaClient.getInstance()
-				.getBzResponse(BASE_SERVICE_URL + "/bug/" + bugID + "?&api_key=" + API_KEY);
+				.getBzResponse(BUGZILLA_BASE_SERVICE_URL + "/bug/" + bugID + "?&api_key=" + API_KEY);
 
 		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 

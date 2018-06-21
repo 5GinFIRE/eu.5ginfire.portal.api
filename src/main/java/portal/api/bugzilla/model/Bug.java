@@ -31,6 +31,8 @@ public class Bug {
     private String classification;
     @JsonProperty("component")
     private String component;
+    @JsonProperty("comment")
+    private Comment comment;
     @JsonProperty("creation_time")
     private String creationTime;
     @JsonProperty("creator")
@@ -81,6 +83,8 @@ public class Bug {
     private String status;
     @JsonProperty("summary")
     private String summary;
+    @JsonProperty("description")
+    private String description;
     @JsonProperty("target_milestone")
     private String targetMilestone;
     @JsonProperty("url")
@@ -97,6 +101,20 @@ public class Bug {
         return alias;
     }
 
+    @JsonIgnore
+    public String getAliasFirst() {
+    	
+    	if ( alias!= null ) {    	
+    		if ( alias.size() >0 ) {
+    			return (String) alias.get(0).toString();
+    		}
+    	}
+        
+        return "";
+    }
+    
+    
+    
     @JsonProperty("alias")
     public void setAlias(List<Object> alias) {
         this.alias = alias;
@@ -170,6 +188,16 @@ public class Bug {
     @JsonProperty("component")
     public void setComponent(String component) {
         this.component = component;
+    }
+    
+    @JsonProperty("comment")
+    public Comment getComment() {
+        return comment;
+    }
+
+    @JsonProperty("comment")
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 
     @JsonProperty("creation_time")
@@ -421,6 +449,18 @@ public class Bug {
     public void setSummary(String summary) {
         this.summary = summary;
     }
+    
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    
 
     @JsonProperty("target_milestone")
     public String getTargetMilestone() {

@@ -477,6 +477,11 @@ public class PortalRepository {
 		
 	}
 
+
+	public DeploymentDescriptor getDeploymentByUUID(String uuid) {
+		return (DeploymentDescriptor) portalJpaController.readDeploymentByUUID( uuid );
+	}
+
 	
 
 

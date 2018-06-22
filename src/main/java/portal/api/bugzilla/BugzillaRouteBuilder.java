@@ -82,13 +82,12 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 			context.start();
 			
 			//test new user
-			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:users.create?multipleConsumers=true");
-			PortalUser owner = new PortalUser();
-			owner.setEmail( "tranoris@example.org" );
-			owner.setName( "Christos Tranoris");
-			owner.setPasswordUnencrypted( "12345123456" );
-			template.withBody( owner ).asyncSend();		
-			
+//			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:users.create?multipleConsumers=true");
+//			PortalUser owner = new PortalUser();
+//			owner.setEmail( "tranoris@example.org" );
+//			owner.setName( "Christos Tranoris");
+//			template.withBody( owner ).asyncSend();		
+//			
 //			// test New Deployment
 //			FluentProducerTemplate template = context.createFluentProducerTemplate().to("seda:deployments.create?multipleConsumers=true");
 //			String uuid = "02b0b0d9-d73a-451f-8cb2-79d398a375b4"; //UUID.randomUUID().toString();
@@ -145,6 +144,45 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		httpComponent.setHttpClientConfigurer(new MyHttpClientConfigurer());
 
 		/**
+		 * Create New Issue in Bugzilla. The body is a {@link Bug}
+		 */
+		from("direct:bugzilla.newIssue")
+		.marshal().json( JsonLibrary.Jackson, true)
+		.convertBodyTo( String.class ).to("stream:out")
+		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
+				.maximumRedeliveries( 120 ) //let's try for the next 2 hours to send it....
+				.redeliveryDelay( 60000 ).useOriginalMessage()
+				.deadLetterHandleNewException( false )
+				//.logExhaustedMessageHistory(false)
+				.logExhausted(true)
+				.logHandled(true)
+				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
+				.retryAttemptedLogLevel( LoggingLevel.WARN) )
+		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
+		.to("stream:out");
+		
+		/**
+		 * Update issue in bugzilla. The body is a {@link Bug}. header.uuid is used to select the bug
+		 */
+		from("direct:bugzilla.updateIssue")
+		.marshal().json( JsonLibrary.Jackson, true)
+		.convertBodyTo( String.class ).to("stream:out")
+		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
+				.maximumRedeliveries( 120 ) //let's try for the next 2 hours to send it....
+				.redeliveryDelay( 60000 ).useOriginalMessage()
+				.deadLetterHandleNewException( false )
+				//.logExhaustedMessageHistory(false)
+				.logExhausted(true)
+				.logHandled(true)
+				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
+				.retryAttemptedLogLevel( LoggingLevel.WARN) )
+		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.PUT))
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.uuid}?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
+		.to("stream:out");
+		
+		
+		/**
 		 * Create user route, from seda:users.create?multipleConsumers=true
 		 */
 		
@@ -165,26 +203,13 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/user?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
 		.to("stream:out");
 		
+		
 		/**
-		 * Create Deployment Route
+		 * Create Deployment Route Issue
 		 */
 		from("seda:deployments.create?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
-		.marshal().json( JsonLibrary.Jackson, true)
-		.convertBodyTo( String.class ).to("stream:out")
-		.errorHandler(deadLetterChannel("direct:dlq_deployments")
-				.maximumRedeliveries( 120 ) //let's try for the next 2 hours to send it....
-				.redeliveryDelay( 60000 ).useOriginalMessage()
-				.deadLetterHandleNewException( false )
-				//.logExhaustedMessageHistory(false)
-				.logExhausted(true)
-				.logHandled(true)
-				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
-				.retryAttemptedLogLevel( LoggingLevel.WARN) )
-		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
-		//.setHeader("X-BUGZILLA-API-KEY", constant( BUGZILLAKEY ) )
-		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
-		.to("stream:out");
+		.to("direct:bugzilla.newIssue");
 		
 		
 		/**
@@ -192,24 +217,14 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */
 		from("seda:deployments.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
-		.process( BugDeploymentUpdateProcessor )
-		.marshal().json( JsonLibrary.Jackson, true)
-		.convertBodyTo( String.class ).to("stream:out")
-		.errorHandler(deadLetterChannel("direct:dlq")
-				.maximumRedeliveries( 120 ) //let's try for the next 2 hours to send it....
-				.redeliveryDelay( 60000 ).useOriginalMessage()
-				.deadLetterHandleNewException( false )
-				//.logExhaustedMessageHistory(false)
-				.logExhausted(true)
-				.logHandled(true)
-				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
-				.retryAttemptedLogLevel( LoggingLevel.WARN) )
-		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.PUT))
-		//.setHeader("X-BUGZILLA-API-KEY", constant( BUGZILLAKEY ) )		
-		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.uuid}?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true")
-		.to("stream:out");
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		
+		
 
-		//dead Letter Queue Users if everything fails to connect
+		/**
+		 * dead Letter Queue Users if everything fails to connect
+		 */
 		from("direct:dlq_users")
 		.setBody()
 //		.body(DeploymentDescriptor.class)
@@ -217,11 +232,29 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.body(String.class)
 		.to("stream:out");
 		
-		//dead Letter Queue if everything fails to connect
-		from("direct:dlq_deployments")
+		
+		/**
+		 * Create VxF Validate New Route
+		 */
+		from("seda:vxf.validate.new?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		.to("direct:bugzilla.newIssue");
+		
+
+		/**
+		 * Create VxF Validation Update Route
+		 */
+		from("seda:vxf.validate.update?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		
+		
+		/**
+		 * dead Letter Queue if everything fails to connect
+		 */
+		from("direct:dlq_bugzilla")
 		.setBody()
-//		.body(DeploymentDescriptor.class)
-//		.bean( BugzillaClient.class, "transformDeployment2BugBody")
 		.body(String.class)
 		.to("stream:out");
 		
@@ -229,35 +262,32 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 
 	
 
-	Processor BugDeploymentUpdateProcessor = new Processor() {
+	Processor BugHeaderExtractProcessor = new Processor() {
 		
 		@Override
 		public void process(Exchange exchange) throws Exception {
 
 			Map<String, Object> headers = exchange.getIn().getHeaders(); 
-			Bug desc = exchange.getIn().getBody( Bug.class ); 
-		    headers.put("uuid", desc.getAliasFirst()  );
+			Bug aBug = exchange.getIn().getBody( Bug.class ); 
+		    headers.put("uuid", aBug.getAliasFirst()  );
 		    exchange.getOut().setHeaders(headers);
 		    
 		    //copy Description to Comment
-		    desc.setComment( BugzillaClient.createComment( desc.getDescription() ) );
+		    aBug.setComment( BugzillaClient.createComment( aBug.getDescription() ) );
 		    //delete Description
-		    desc.setDescription( null );
-		    desc.setAlias( null ); //dont put any Alias		    
-		    //desc.setStatus( "IN_PROGRESS" );
-		    		    
-//		    desc.setProduct( null );
-//		    desc.setVersion( null );
-//		    desc.setSummary( null );
-//		    desc.setComponent( null);
-		    desc.setCc( null );
+		    aBug.setDescription( null );
+		    aBug.setAlias( null ); //dont put any Alias		
+		    aBug.setCc( null );
 		    
-		    exchange.getOut().setBody( desc  );
+		    exchange.getOut().setBody( aBug  );
 		    // copy attachements from IN to OUT to propagate them
 		    exchange.getOut().setAttachments(exchange.getIn().getAttachments());
 			
 		}
 	};
+	
+	
+	
 
 
 	public class MyHttpClientConfigurer implements HttpClientConfigurer {

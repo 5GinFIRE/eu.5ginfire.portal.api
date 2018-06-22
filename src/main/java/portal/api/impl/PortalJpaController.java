@@ -1168,5 +1168,11 @@ public class PortalJpaController {
 		return (q.getResultList().size() == 0) ? null : (Infrastructure) q.getSingleResult();
 	}
 
+	public DeploymentDescriptor readDeploymentByUUID(String uuid) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.uuid='" + uuid + "'");
+		return (q.getResultList().size() == 0) ? null : (DeploymentDescriptor) q.getSingleResult();
+	}
+
 
 }

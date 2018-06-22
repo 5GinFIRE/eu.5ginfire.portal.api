@@ -85,6 +85,7 @@ import portal.api.model.Product;
 import portal.api.model.SubscribedResource;
 import portal.api.model.UserRoleType;
 import portal.api.model.UserSession;
+import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
@@ -647,6 +648,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (vxf != null) {
 
 			BusController.getInstance().newVxFAdded( vxf );		
+			BusController.getInstance().validateVxF(vxf);
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -686,6 +688,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+		
+		
+		BusController.getInstance().updatedVxF(vxf);
 
 		return Response.ok().entity(vxf).build();
 
@@ -1424,7 +1429,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 		if (experiment != null) {
 
-			BusController.getInstance().newNSFAdded( experiment );		
+			BusController.getInstance().newNSDAdded( experiment );		
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -1768,6 +1773,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 														// DB model
 
 			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+						
+			deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
 			
 			BusController.getInstance().newDeploymentRequest( deployment );	
 

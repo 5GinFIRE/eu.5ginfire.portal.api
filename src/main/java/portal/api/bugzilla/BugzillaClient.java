@@ -42,6 +42,8 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.PortalUser;
+import portal.api.model.ValidationStatus;
+import portal.api.model.VxFMetadata;
 
 public class BugzillaClient {
 
@@ -200,170 +202,49 @@ public class BugzillaClient {
 		return u;
 		
 	}
-	
-	/**
-	 * Create a user in Bugzilla, 
-	 * @param email
-	 * @param realName
-	 * @param password
-	 * @return true if user is created otherwise false
-	 */
-	public boolean createUser(String email, String realName, String password) {
 
-		String url = BUGZILLA_BASE_SERVICE_URL + "/user?&api_key=" + API_KEY;
 
-		logger.info("Sending HTTPS createUser towards: " + url);
+	public static Bug transformVxFValidation2BugBody(VxFMetadata vxf) {
 
-		CloseableHttpClient httpclient = returnHttpClient();
+		String product = "5GinFIRE Operations";
+		String component = "Validation" ;
+		String summary = "[PORTAL] Validation Request for VxF:" + vxf.getName() + ", Owner: " + vxf.getOwner().getUsername();
+		String alias = vxf.getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( BUGHEADER );
+		description.append( "\n Validation Status: " + vxf.getValidationStatus()  );
+		description.append( "\n Certified: " + String.valueOf( vxf.isCertified() ).toUpperCase() );
+		
+		description.append( "\n\n VxF: " + vxf.getName());
+		description.append( "\n Owner: " +  vxf.getOwner().getUsername() );
+		description.append( "\n Vendor: " +  vxf.getVendor() );
+		description.append( "\n Version: " + vxf.getVersion() );
+		description.append( "\n Archive: " + vxf.getPackageLocation() );
+		description.append( "\n UUID: " + vxf.getUuid()  );
+		description.append( "\n ID: " + vxf.getId()   );
+		description.append( "\n Certified by: " + vxf.getCertifiedBy() );
+		
 
-		HttpPost httppost = new HttpPost(url);
-		BasicHeader bh = new BasicHeader("Accept", "application/json");
-		httppost.addHeader(bh);
-
-		HttpResponse response;
-		try {
-			StringEntity params = new StringEntity("{" + "\"email\": \"" + email + "\"," + "\"full_name\": \""
-					+ realName + "\"," + "\"password\": \"" + password + "\"" + "}");
-			httppost.setEntity(params);
-
-			response = httpclient.execute(httppost);
-			
-			if ( ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK )  || ( response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED )  ) {			
-				HttpEntity entity = response.getEntity();
-				InputStream inStream = (InputStream) entity.getContent();
-				String s = IOUtils.toString(inStream);
-				logger.info("response = " + s);
-				return true;
-			} else {
-				logger.info("User email already exists : " + email );
-				return false;
-				
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit//" + vxf.getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( vxf.getValidationStatus().equals( ValidationStatus.UNDER_REVIEW ) )  {
+			status = "IN_PROGRESS";
+		} else  if ( vxf.isCertified()  &&  ( vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( !vxf.isCertified()  &&  ( vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
 		}
-
-		return false;
-	}
-
-	
-	
-	
-	
-	/**
-	 * @param username
-	 * @return the {@link User} found or null
-	 */
-	public User getUser(String username) {
-		String response = BugzillaClient.getInstance()
-				.getBzResponse(BUGZILLA_BASE_SERVICE_URL + "/user/" + username + "?&api_key=" + API_KEY);
-
-		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-
-		try {
-			Users users = mapper.readValue(response.toString(), Users.class);
-
-			if ((users != null) && (users.getUsers() != null) && (users.getUsers().size() > 0)) {
-				return users.getUsers().get(0);
-			}
-
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * @param bugID
-	 * @return the {@link Bug} found or null
-	 */
-	public Bug getBugById(String bugID) {
-		String response = BugzillaClient.getInstance()
-				.getBzResponse(BUGZILLA_BASE_SERVICE_URL + "/bug/" + bugID + "?&api_key=" + API_KEY);
-
-		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-
-		try {
-			Bugs b = mapper.readValue(response.toString(), Bugs.class);
-
-			if ((b != null) && (b.getBugs() != null) && (b.getBugs().size() > 0)) {
-				return b.getBugs().get(0);
-			}
-
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * @param reqURL
-	 * @return
-	 */
-	private String getBzResponse(String reqURL) {
-
-		logger.info("Sending HTTPS GET request to query  info: " + reqURL);
-
-		CloseableHttpClient httpclient = returnHttpClient();
-
-		HttpGet httpget = new HttpGet(reqURL);
-		BasicHeader bh = new BasicHeader("Accept", "application/json");
-		httpget.addHeader(bh);
-		// BasicHeader bh2 = new BasicHeader("Authorization", "Basic " +
-		// this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded
-		// admin/admin
-		// httpget.addHeader(bh2);
-
-		HttpResponse response;
-		try {
-			response = httpclient.execute(httpget);
-			HttpEntity entity = response.getEntity();
-			InputStream inStream = (InputStream) entity.getContent();
-			String s = IOUtils.toString(inStream);
-			logger.info("response = " + s);
-
-			return s;
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private CloseableHttpClient returnHttpClient() {
-		try {
-			HttpClientBuilder h = HttpClientBuilder.create();
-
-			SSLContext sslContext;
-			sslContext = new SSLContextBuilder().loadTrustMaterial(null, (certificate, authType) -> true).build();
-			CloseableHttpClient httpclient = HttpClients.custom().setSSLContext(sslContext)
-					.setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-
-			return httpclient;
-		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
+		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), vxf.getOwner().getEmail(), status, resolution);
+		
+		return b;
 	}
 
 }

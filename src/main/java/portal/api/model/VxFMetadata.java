@@ -18,6 +18,7 @@ package portal.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinTable;
@@ -32,6 +33,9 @@ public class VxFMetadata extends Product{
 	
 	private String certifiedBy;	
 
+	@Basic()
+	private ValidationStatus validationStatus = ValidationStatus.NOT_STARTED;
+	
 	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
 	
 	
@@ -87,6 +91,14 @@ public class VxFMetadata extends Product{
 		this.supportedMANOPlatforms = supportedMANOPlatforms;
 	}
 
-	
+
+	public ValidationStatus getValidationStatus() {
+		return validationStatus;
+	}
+
+	public void setValidationStatus(ValidationStatus validationStatus) {
+		this.validationStatus = validationStatus;
+	}
+
 	
 }

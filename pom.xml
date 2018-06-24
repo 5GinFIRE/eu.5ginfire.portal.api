@@ -44,7 +44,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 		<spring.version>4.3.14.RELEASE</spring.version>
 
 		<shiro.version>1.2.3</shiro.version>
-		<jetty.version>9.2.1.v20140609</jetty.version>
+		<jetty.version>9.4.7.v20170914</jetty.version>
 	</properties>
 
 

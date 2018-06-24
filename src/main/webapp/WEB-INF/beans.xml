@@ -11,12 +11,10 @@
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
 	<bean
 		class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer" />
-
+	
 	<bean id="portalRepositoryBean" class="portal.api.repo.PortalRepository">
 		<property name="portalJpaController" ref="portalJpaControllerRef" />
 	</bean>
-
-
 
 	<!-- CXF Swagger2Feature -->
 	<bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">

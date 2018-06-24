@@ -48,12 +48,14 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 import portal.api.bugzilla.model.Bug;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
+import portal.api.repo.PortalRepository;
 import portal.api.routes.MyRouteBuilder.ABug;
 
 /**
@@ -64,8 +66,8 @@ import portal.api.routes.MyRouteBuilder.ABug;
  */
 public class BugzillaRouteBuilder extends RouteBuilder {
 
-	private static String BUGZILLAKEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
-	private static String BUGZILLAURL = "portal.5ginfire.eu:443/bugstaging";
+	private static String BUGZILLAKEY = "";
+	private static String BUGZILLAURL = "portal.5ginfire.eu:443/bugzilla";
 	
 
 	//private static ModelCamelContext actx;
@@ -138,7 +140,20 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 	
 	public void configure() {
 
-		ModelCamelContext actx = this.getContext();
+		if (PortalRepository.getPropertyByName("bugzillaurl").getValue() != null) {
+			BUGZILLAURL = PortalRepository.getPropertyByName("bugzillaurl").getValue();
+		}
+		if (PortalRepository.getPropertyByName("bugzillakey").getValue() != null) {
+			BUGZILLAKEY = PortalRepository.getPropertyByName("bugzillakey").getValue();
+		}
+		
+		if ( ( BUGZILLAURL == null ) || BUGZILLAURL.equals( "" ) ){
+			return; //no routing towards Bugzilla
+		}
+		if ( ( BUGZILLAKEY == null ) || BUGZILLAKEY.equals( "" ) ){
+			return;//no routing towards Bugzilla
+		}
+		
 
 		HttpComponent httpComponent = getContext().getComponent("https4", HttpComponent.class);
 		httpComponent.setHttpClientConfigurer(new MyHttpClientConfigurer());
@@ -246,6 +261,22 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */
 		from("seda:vxf.validate.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		
+		/**
+		 * Create NSD Validate New Route
+		 */
+		from("seda:nsd.validate.new?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformNSDValidation2BugBody")
+		.to("direct:bugzilla.newIssue");
+		
+
+		/**
+		 * Create NSD Validation Update Route
+		 */
+		from("seda:nsd.validate.update?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformNSDValidation2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
 		

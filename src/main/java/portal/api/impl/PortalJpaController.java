@@ -74,23 +74,48 @@ public class PortalJpaController {
 			c.setName("None");
 			saveCategory(c);
 
-			PortalProperty p = new PortalProperty();
-			p.setName("adminEmail");
-			p.setValue("info@example.org");
-			saveProperty(p);
-			p = new PortalProperty();
-			p.setName("activationEmailSubject");
-			p.setValue("Activation Email Subject");
-			saveProperty(p);
-			p = new PortalProperty("mailhost", "example.org");
-			saveProperty(p);
-			p = new PortalProperty("mailuser", "exampleusername");
-			saveProperty(p);
-			p = new PortalProperty("mailpassword", "pass");
-			saveProperty(p);
+			
 
 		}
+		
+		initProperties();
 
+	}
+	
+	
+	private void initProperties(){
+		if (readPropertyByName("adminEmail") == null){
+			PortalProperty p = new PortalProperty("adminEmail", "info@example.org");
+			saveProperty(p);
+		}
+		if (readPropertyByName("activationEmailSubject") == null){
+			PortalProperty p = new PortalProperty("activationEmailSubject", "Activation Email Subject");
+			saveProperty(p);
+		}
+		if (readPropertyByName("mailhost") == null){
+			PortalProperty p = new PortalProperty("mailhost", "example.org");
+			saveProperty(p);
+		}
+		if (readPropertyByName("mailuser") == null){
+			PortalProperty p = new PortalProperty("mailuser", "exampleusername");
+			saveProperty(p);
+		}
+		if (readPropertyByName("mailpassword") == null){
+			PortalProperty p = new PortalProperty("mailpassword", "pass");
+			saveProperty(p);
+		}
+		if (readPropertyByName("maindomain") == null){
+			PortalProperty p = new PortalProperty("maindomain", "https://portal.5ginfire.eu");
+			saveProperty(p);
+		}
+		if (readPropertyByName("bugzillaurl") == null){
+			PortalProperty p = new PortalProperty("bugzillaurl", "portal.5ginfire.eu:443/bugstaging");
+			saveProperty(p);
+		}
+		if (readPropertyByName("bugzillakey") == null){
+			PortalProperty p = new PortalProperty("bugzillakey", "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z");
+			saveProperty(p);
+		}
 	}
 
 	public long countInstalledVxFs() {

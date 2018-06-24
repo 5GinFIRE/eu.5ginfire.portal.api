@@ -29,73 +29,127 @@ import javax.persistence.OneToMany;
 public class VxFMetadata extends Product{
 
 
+	/**
+	 * 
+	 */
 	private boolean certified;
 	
+	/**
+	 * 
+	 */
 	private String certifiedBy;	
 
+	/**
+	 * 
+	 */
 	@Basic()
 	private ValidationStatus validationStatus = ValidationStatus.NOT_STARTED;
 	
+	/**
+	 * 
+	 */
 	private PackagingFormat packagingFormat = PackagingFormat.OSMvTWO;
 	
 	
 	
+	/**
+	 * 
+	 */
 	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable()
 	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
 
+	/**
+	 * 
+	 */
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
 	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
 	
 	
+	/**
+	 * @return
+	 */
 	public List<VxFOnBoardedDescriptor> getVxfOnBoardedDescriptors() {
 		return vxfOnBoardedDescriptors;
 	}
 
+	/**
+	 * @param vxfOnBoardedDescriptors
+	 */
 	public void setVxfOnBoardedDescriptors(List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors) {
 		this.vxfOnBoardedDescriptors = vxfOnBoardedDescriptors;
 	}
 
 
 
+	/**
+	 * @return
+	 */
 	public boolean isCertified() {
 		return certified;
 	}
 
+	/**
+	 * @param certified
+	 */
 	public void setCertified(boolean certified) {
 		this.certified = certified;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getCertifiedBy() {
 		return certifiedBy;
 	}
 
+	/**
+	 * @param certifiedBy
+	 */
 	public void setCertifiedBy(String certifiedBy) {
 		this.certifiedBy = certifiedBy;
 	}
 
+	/**
+	 * @return
+	 */
 	public PackagingFormat getPackagingFormat() {
 		return packagingFormat;
 	}
 
+	/**
+	 * @param packagingFormat
+	 */
 	public void setPackagingFormat(PackagingFormat packagingFormat) {
 		this.packagingFormat = packagingFormat;
 	}
 
+	/**
+	 * @return
+	 */
 	public List<MANOplatform> getSupportedMANOPlatforms() {
 		return supportedMANOPlatforms;
 	}
 
+	/**
+	 * @param supportedMANOPlatforms
+	 */
 	public void setSupportedMANOPlatforms(List<MANOplatform> supportedMANOPlatforms) {
 		this.supportedMANOPlatforms = supportedMANOPlatforms;
 	}
 
 
+	/**
+	 * @return
+	 */
 	public ValidationStatus getValidationStatus() {
 		return validationStatus;
 	}
 
+	/**
+	 * @param validationStatus
+	 */
 	public void setValidationStatus(ValidationStatus validationStatus) {
 		this.validationStatus = validationStatus;
 	}

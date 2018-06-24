@@ -41,9 +41,11 @@ import portal.api.bugzilla.model.Users;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
+import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
 import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
+import portal.api.repo.PortalRepository;
 
 public class BugzillaClient {
 
@@ -54,11 +56,7 @@ public class BugzillaClient {
 
 
 	/** */
-	private static final String BASE_SERVICE_URL = "https://portal.5ginfire.eu";
-	/** */
-	private static final String BUGZILLA_BASE_SERVICE_URL = "https://portal.5ginfire.eu/bugstaging/rest.cgi";
-	/** */
-	private static final String API_KEY = "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z";
+	private static String BASE_SERVICE_URL = "https://portal.5ginfire.eu";
 
 	/** */
 	private static final String BUGHEADER =   "*************************************************\n"
@@ -69,9 +67,15 @@ public class BugzillaClient {
 	public static BugzillaClient getInstance() {
 		if (instance == null) {
 			instance = new BugzillaClient();
+			
+			if (PortalRepository.getPropertyByName("maindomain").getValue() != null) {
+				BASE_SERVICE_URL = PortalRepository.getPropertyByName("maindomain").getValue();
+			}
 		}
 		return instance;
 	}
+	
+	
 		
 	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
 
@@ -243,6 +247,49 @@ public class BugzillaClient {
 		
 		
 		Bug b = createBug(product, component, summary, alias, description.toString(), vxf.getOwner().getEmail(), status, resolution);
+		
+		return b;
+	}
+	
+	
+	public static Bug transformNSDValidation2BugBody(ExperimentMetadata nsd) {
+
+		String product = "5GinFIRE Operations";
+		String component = "Validation" ;
+		String summary = "[PORTAL] Validation Request for NSD:" + nsd.getName() + ", Owner: " + nsd.getOwner().getUsername();
+		String alias = nsd.getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( BUGHEADER );
+		description.append( "\n Validation Status: " + nsd.getValidationStatus()  );
+		description.append( "\n Valid: " + String.valueOf( nsd.isValid() ).toUpperCase() );
+		
+		description.append( "\n\n NSD: " + nsd.getName());
+		description.append( "\n Owner: " +  nsd.getOwner().getUsername() );
+		description.append( "\n Vendor: " +  nsd.getVendor() );
+		description.append( "\n Version: " + nsd.getVersion() );
+		description.append( "\n Archive: " + nsd.getPackageLocation() );
+		description.append( "\n UUID: " + nsd.getUuid()  );
+		description.append( "\n ID: " + nsd.getId()   );
+		
+
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit//" + nsd.getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( nsd.getValidationStatus().equals( ValidationStatus.UNDER_REVIEW ) )  {
+			status = "IN_PROGRESS";
+		} else  if ( nsd.isValid()  &&  ( nsd.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( !nsd.isValid()  &&  ( nsd.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}
+		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), nsd.getOwner().getEmail(), status, resolution);
 		
 		return b;
 	}

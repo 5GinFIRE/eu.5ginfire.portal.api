@@ -13,7 +13,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 	<properties>
 		<jackson.version>2.8.7</jackson.version>
 		<maven-license-plugin.version>1.2.5</maven-license-plugin.version>
-		<cxf.version>3.1.11</cxf.version>
+		<cxf.version>3.2.5</cxf.version>
 		<httpclient.version>4.2.1</httpclient.version>
 		<camel.version>2.21.0</camel.version>
 
@@ -487,12 +487,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 								<version>1.2</version>
 								<scope>runtime</scope>
 							</dependency>
-							<dependency>
-								<groupId>org.eclipse.jetty.toolchain</groupId>
-								<artifactId>jetty-xslt-tools</artifactId>
-								<version>1.3</version>
-								<scope>runtime</scope>
-							</dependency>
+							
 						</dependencies>
 						<configuration>
 							<preProcess>
@@ -798,7 +793,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 							<container>
 								<containerId>jetty9x</containerId>
 								<zipUrlInstaller>
-									<url>http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.2.1.v20140609/jetty-distribution-9.2.1.v20140609.tar.gz</url>
+									<url>http://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.7.v20170914/jetty-distribution-9.4.7.v20170914.tar.gz</url>
 								</zipUrlInstaller>
 							</container>
 							<configuration>

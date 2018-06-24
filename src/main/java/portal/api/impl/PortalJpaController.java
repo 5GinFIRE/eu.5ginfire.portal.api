@@ -955,6 +955,21 @@ public class PortalJpaController {
 		entityTransaction.commit();
 
 	}
+		
+	public void deleteAllInfrastructures() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+
+		Query q = entityManager.createQuery("DELETE FROM Infrastructure");
+		q.executeUpdate();
+		entityManager.flush();
+
+		entityTransaction.commit();
+	}
+
 
 	public List<MANOplatform> readMANOplatforms(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();

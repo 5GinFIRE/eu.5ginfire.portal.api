@@ -69,6 +69,7 @@ public class PortalRepoTest {
 		portalJpaControllerTest.deleteAllCategories();
 		portalJpaControllerTest.deleteAllMANOplatforms();
 		portalJpaControllerTest.deleteAllMANOproviders();
+		portalJpaControllerTest.deleteAllInfrastructures();
 
 	}
 

@@ -128,7 +128,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	private PortalRepository portalRepositoryRef;
 
-	public static final String KEYSTONE_AUTH_URL = "http://cloud.lab.fi-ware.org:4730/v2.0";
 
 	// PortalUser related API
 
@@ -1430,6 +1429,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (experiment != null) {
 
 			BusController.getInstance().newNSDAdded( experiment );		
+			BusController.getInstance().validateNSD( experiment );
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

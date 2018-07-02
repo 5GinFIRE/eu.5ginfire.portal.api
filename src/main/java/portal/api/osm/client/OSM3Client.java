@@ -59,7 +59,7 @@ public class OSM3Client {
 	private static final String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
 	/**	 */
-	private static final String BASE_INIT_URL = "https://150.140.184.244:8008";
+	private static final String BASE_INIT_URL = "https://150.140.184.248:9999/";
 	private String BASE_URL;
 	private String BASE_SERVICE_URL;
 	private String BASE_OPERATIONS_URL;
@@ -97,8 +97,8 @@ public class OSM3Client {
 	public OSM3Client(MANOprovider mano) {
 		this.manoProvider = mano;
 		String apiEndpoint = mano.getApiEndpoint();		
-		BASE_URL = apiEndpoint + "/api";
-		BASE_SERVICE_URL = BASE_URL + "/running";
+		BASE_URL = apiEndpoint + "/osm";
+		BASE_SERVICE_URL = BASE_URL + "/";
 		BASE_OPERATIONS_URL = BASE_URL + "/operations";
 		BASE_OPERATIONAL_URL = BASE_URL + "/operational";
 	}
@@ -181,6 +181,9 @@ public class OSM3Client {
 		
 		OSM3Client osm = new OSM3Client(mp);
 		osm.init();
+		
+		authenticate();
+		
 		List<Vnfd> vnfds = osm.getVNFDs();
 		for (Vnfd v : vnfds) {
 			System.out.println("=== LIST VNFDs POJO object response: " + v.toString());
@@ -189,14 +192,14 @@ public class OSM3Client {
 			System.out.println("=== LIST VNFDs POJO object id: " + v.getId() + ", Name: " + v.getName());
 		}
 
-		List<Nsd> nsds = osm.getNSDs();
-		for (Nsd v : nsds) {
-			System.out.println("=== LIST NSDs POJO object response: " + v.toString());
-		}
-		for (Nsd v : nsds) {
-			System.out.println("=== LIST NSDs POJO object id: " + v.getId() + ", Name: " + v.getName());
-
-		}
+//		List<Nsd> nsds = osm.getNSDs();
+//		for (Nsd v : nsds) {
+//			System.out.println("=== LIST NSDs POJO object response: " + v.toString());
+//		}
+//		for (Nsd v : nsds) {
+//			System.out.println("=== LIST NSDs POJO object id: " + v.getId() + ", Name: " + v.getName());
+//
+//		}
 
 		// createOnBoardPackage();
 
@@ -204,6 +207,37 @@ public class OSM3Client {
 
 		System.out.println("\n");
 		System.exit(0);
+	}
+
+	private static void authenticate() {
+
+//		//https://150.140.184.248:9999/osm/vnfpkgm/v1/vnf_packages_content
+//		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfpkgm/v1/vnf_packages_content");
+//
+//		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+//
+//		try {
+//
+//			JsonNode tr = mapper.readTree(response).findValue("project-vnfd:vnfd");
+//			if (tr == null) {
+//				tr = mapper.readTree(response).findValue("vnfd");
+//			}
+//
+//			ArrayList<Vnfd> vnfds = new ArrayList<>();
+//
+//			for (JsonNode jsonNode : tr) {
+//				Vnfd vnfd = mapper.readValue(jsonNode.toString(), Vnfd.class);
+//				vnfds.add(vnfd);
+//			}
+//
+//			return vnfds;
+//
+//		} catch (IllegalStateException | IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		return null;
 	}
 
 	private CloseableHttpClient returnHttpClient() {
@@ -343,13 +377,13 @@ public class OSM3Client {
 	 */
 	public String getOSMResponse(String reqURL) {
 
-		System.out.println("Sending HTTPS GET request to query  info");
+		System.out.println("Sending HTTPS GET request to query  info reqURL=" + reqURL);
 
 
 		CloseableHttpClient httpclient = returnHttpClient() ;
 		
 		HttpGet httpget = new HttpGet(reqURL);
-		BasicHeader bh = new BasicHeader("Accept", "application/json");
+		BasicHeader bh = new BasicHeader("Accept", "application/json;q=0.9,*/*;q=0.8");
 		httpget.addHeader(bh);
 		BasicHeader bh2 = new BasicHeader("Authorization", "Basic " +  this.manoProvider.getAuthorizationBasicHeader()); // this is hardcoded admin/admin
 		httpget.addHeader(bh2);
@@ -435,8 +469,8 @@ public class OSM3Client {
 	}
 
 	public List<Vnfd> getVNFDs() {
-
-		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd");
+		//https://150.140.184.248:9999/osm/vnfpkgm/v1/vnf_packages_content
+		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfpkgm/v1/vnf_packages_content");
 
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 

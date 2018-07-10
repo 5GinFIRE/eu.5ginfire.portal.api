@@ -66,6 +66,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
+import portal.api.bugzilla.model.ErrorMsg;
 import portal.api.bus.BusController;
 import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
@@ -387,7 +388,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// VxFS API
 
 	private Product addNewProductData(Product prod, Attachment image, Attachment submittedFile,
-			List<Attachment> screenshots) {
+			List<Attachment> screenshots) throws IOException {
 
 		String uuid = UUID.randomUUID().toString();
 
@@ -420,7 +421,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		URI endpointUrl = uri.getBaseUri();
 
 		String tempDir = METADATADIR + uuid + File.separator;
-		try {
+		
 			Files.createDirectories(Paths.get(tempDir));
 
 			if (image != null) {
@@ -538,10 +539,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			prod.setScreenshots(screenshotsFilenames);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+
 
 		// we must replace given product categories with the ones from our DB
 		for (Category c : prod.getCategories()) {
@@ -623,7 +621,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		VxFMetadata vxf = new VxFMetadata();
+		VxFMetadata vxf = null;
 		
 		String emsg = "";
 
@@ -634,21 +632,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			logger.info("Received @POST for vxf : " + vxf.getName());
 			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
+			vxf = (VxFMetadata) addNewProductData(vxf,
+					getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
+					getListOfAttachmentsByName("screenshots", ats));
 
 		} catch (JsonProcessingException e) {
+			vxf = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		} catch (IOException e) {
+			vxf = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		}
 
-		vxf = (VxFMetadata) addNewProductData(vxf,
-
-				getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
-				getListOfAttachmentsByName("screenshots", ats));
 
 		if (vxf != null) {
 
@@ -657,8 +656,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested entity cannot be installed. " + emsg);
+			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );						
 			throw new WebApplicationException(builder.build());
+			
 		}
 
 	}
@@ -668,7 +668,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response updateVxFMetadata(@PathParam("bid") int bid, List<Attachment> ats) {
 
-		VxFMetadata vxf = new VxFMetadata();
+		VxFMetadata vxf = null;
+		String emsg = "";
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
@@ -678,33 +679,41 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("Received @POST for vxf : " + vxf.getName());
 			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
 
+			vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
+					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+			
+			
 		} catch (JsonProcessingException e) {
+			vxf = null;
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		} catch (IOException e) {
+			vxf = null;
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		}
+		
+		if (vxf != null) { 
 
-		// VxFMetadata sm = (VxFMetadata)
-		// portalRepositoryRef.getProductByID(bid);
-
-		for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors()) {
-			vxFOnBoardedDescriptor.setVxf(vxf);
+			for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors()) {
+				vxFOnBoardedDescriptor.setVxf(vxf);
+			}
+			BusController.getInstance().updatedVxF(vxf);
+			return Response.ok().entity(vxf).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );		
+			throw new WebApplicationException(builder.build());
 		}
-
-		vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
-				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
-		
-		
-		BusController.getInstance().updatedVxF(vxf);
-
-		return Response.ok().entity(vxf).build();
 
 	}
 
 	// VxFs related API
 
 	private Product updateProductMetadata(Product prod, Attachment image, Attachment prodFile,
-			List<Attachment> screenshots) {
+			List<Attachment> screenshots) throws IOException {
 
 		logger.info("userid = " + prod.getOwner().getId());
 		logger.info("vxfname = " + prod.getName());
@@ -743,7 +752,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		URI endpointUrl = uri.getBaseUri();
 
 		String tempDir = METADATADIR + prod.getUuid() + File.separator;
-		try {
+
 			Files.createDirectories(Paths.get(tempDir));
 
 			if (image != null) {
@@ -859,11 +868,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			prod.setScreenshots(screenshotsFilenames);
 
-		} catch (IOException e) {
-
-			e.printStackTrace();
-			return null;
-		}
+		
 
 		// save product
 		prod = portalRepositoryRef.updateProductInfo(prod);
@@ -1423,20 +1428,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			experiment = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for experiment : " + experiment.getName());
+			// ExperimentMetadata sm = new ExperimentMetadata();
+			experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
+					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 
 		}catch (JsonProcessingException e) {
+			experiment = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		} catch (IOException e) {
+			experiment = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		}
 
-		// ExperimentMetadata sm = new ExperimentMetadata();
-		experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
-				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
 		if (experiment != null) {
 
 			BusController.getInstance().newNSDAdded( experiment );		
@@ -1444,7 +1451,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested entity cannot be installed. " + emsg);
+			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );	
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1453,9 +1460,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@PUT
 	@Path("/admin/experiments/{aid}")
 	@Consumes("multipart/form-data")
-	public Response updateAppMetadata(@PathParam("aid") int aid, List<Attachment> ats) {
+	public Response updateExperimentMetadata(@PathParam("aid") int aid, List<Attachment> ats) {
 
-		ExperimentMetadata appmeta = new ExperimentMetadata();
+		ExperimentMetadata appmeta = null;
+		
+		String emsg= "";
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
@@ -1466,23 +1475,36 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// logger.info("Received @POST for app.containers : " +
 			// appmeta.getContainers().size());
 
+			appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
+					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+
 		} catch (JsonProcessingException e) {
+			appmeta = null;
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		} catch (IOException e) {
+			appmeta = null;
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		}
+		
+		
+		if ( appmeta != null) { 
 
-		// ExperimentMetadata appmeta = (ExperimentMetadata)
-		// portalRepositoryRef.getProductByID(aid);
+			for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
+				veDescriptor.setExperiment(appmeta);
+			}
 
-		for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
-			veDescriptor.setExperiment(appmeta);
+			return Response.ok().entity(appmeta).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );	
+			throw new WebApplicationException(builder.build());
 		}
-
-		appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
-				getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
-
-		return Response.ok().entity(appmeta).build();
+		
+		
 	}
 
 	@DELETE
@@ -1518,7 +1540,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Category with name=" + c.getName() + " cannot be installed");
+			builder.entity( new ErrorMsg( "Requested Category with name=" + c.getName() + " cannot be installed" )  );
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -1536,7 +1558,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Category with name=" + c.getName() + " cannot be updated");
+			builder.entity( new ErrorMsg( "Requested Category with name=" + c.getName() + " cannot be installed" )  );
 			throw new WebApplicationException(builder.build());
 		}
 

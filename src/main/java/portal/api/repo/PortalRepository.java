@@ -26,6 +26,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Image;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -448,6 +449,10 @@ public class PortalRepository {
 		return portalJpaController.readExperimentOnBoardDescriptorById( mpid );
 	}
 
+	/**
+	 * 
+	 * Infrastructure objects
+	 */
 
 	public List<Infrastructure> getInfrastructures() {
 		List<Infrastructure> ls = portalJpaController.readInfrastructures(0, 100000);
@@ -480,6 +485,41 @@ public class PortalRepository {
 
 	public DeploymentDescriptor getDeploymentByUUID(String uuid) {
 		return (DeploymentDescriptor) portalJpaController.readDeploymentByUUID( uuid );
+	}
+	
+	
+	
+	/**
+	 * 
+	 * Image objects
+	 */
+
+	public List<Image> getImages() {
+		List< Image> ls = portalJpaController.readImages(0, 100000);
+		return ls;	
+	}
+
+
+	public Image addImage(Image c) {
+		portalJpaController.saveImage(c);
+		return c;
+	}
+
+
+	public Image getImageByID(int infraid) {
+		return portalJpaController.readImageById( infraid );
+	}
+
+
+	public Image updateImageInfo(Image c) {
+		Image bmr = portalJpaController.updateImage(c);
+		return bmr;
+	}
+
+
+	public void deleteImage(int infraid) {
+		portalJpaController.deletImage( infraid );
+		
 	}
 
 	

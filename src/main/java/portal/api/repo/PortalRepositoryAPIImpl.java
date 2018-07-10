@@ -76,6 +76,7 @@ import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
+import portal.api.model.Image;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -2567,6 +2568,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 	}
+	
+	/**
+	 * 
+	 * Infrastructure object API
+	 */
 
 	@GET
 	@Path("/admin/infrastructures/")
@@ -2632,6 +2638,87 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
+	
+	
+	
+	
+	
+	/**
+	 * 
+	 * Image object API
+	 */
+
+	@GET
+	@Path("/admin/images/")
+	@Produces("application/json")
+	public Response getAdminImages() {
+		return Response.ok().entity(portalRepositoryRef.getImages()).build();
+	}
+
+	@POST
+	@Path("/admin/images/")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addImage( Image c) {
+		Image u = portalRepositoryRef.addImage(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested Image with name=" + c.getName() + " cannot be created");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+
+	@PUT
+	@Path("/admin/images/{infraid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateImage(@PathParam("infraid") int infraid, Image c) {
+		Image previousCategory = portalRepositoryRef.getImageByID(infraid);
+
+		Image u = portalRepositoryRef.updateImageInfo(c);
+
+		if (u != null) {
+			return Response.ok().entity(u).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested Image with name=" + c.getName() + " cannot be updated");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+
+	@DELETE
+	@Path("/admin/images/{infraid}")
+	public Response deleteImage(@PathParam("infraid") int infraid) {
+		portalRepositoryRef.deleteImage(infraid);
+		return Response.ok().build();
+
+	}
+
+	@GET
+	@Path("/admin/images/{infraid}")
+	@Produces("application/json")
+	public Response getImageById(@PathParam("infraid") int infraid) {
+		Image sm = portalRepositoryRef.getImageByID(infraid);
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("Image " + infraid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	
+	
+	/**
+	 * 
+	 * SFA related
+	 */
 	
 	@POST
 	@Path("/sfawrap")

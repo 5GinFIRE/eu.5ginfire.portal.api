@@ -31,6 +31,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.Image;
 import portal.api.model.Infrastructure;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
@@ -48,6 +49,10 @@ import portal.api.model.VxFOnBoardedDescriptor;
  * 
  * @author ctranoris
  * 
+ */
+/**
+ * @author ctranoris
+ *
  */
 public class PortalJpaController {
 	private static final transient Log logger = LogFactory.getLog(PortalJpaController.class.getName());
@@ -1212,6 +1217,94 @@ public class PortalJpaController {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.uuid='" + uuid + "'");
 		return (q.getResultList().size() == 0) ? null : (DeploymentDescriptor) q.getSingleResult();
+	}
+	
+	
+	/**
+	 * 
+	 * Image Objects Handling
+	 */
+	
+
+	/**
+	 * @param firstResult
+	 * @param maxResults
+	 * @return
+	 */
+	public List<Image> readImages(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Image m ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+	/**
+	 * @param c
+	 */
+	public void saveImage( Image c ) {
+		logger.info("Will save Image = " + c.getName() );
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.persist( c );
+		entityManager.flush();
+		entityTransaction.commit();
+		
+	}
+
+	/**
+	 * @param infraid
+	 * @return
+	 */
+	public Image readImageById(int infraid) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		return entityManager.find( Image.class, infraid);
+	}
+
+	/**
+	 * @param c
+	 * @return
+	 */
+	public Image updateImage( Image c ) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		Image resis = entityManager.merge(c);
+		entityTransaction.commit();
+
+		return resis;
+	}
+
+	/**
+	 * @param infraid
+	 */
+	public void deletImage(int infraid) {
+
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Image c = entityManager.find( Image.class, infraid );
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+		entityTransaction.begin();
+		entityManager.remove(c);
+		entityTransaction.commit();
+		
+	}
+
+	/**
+	 * @param name
+	 * @return
+	 */
+	public Image readImageByName(String name) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM Image m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : ( Image ) q.getSingleResult();
 	}
 
 

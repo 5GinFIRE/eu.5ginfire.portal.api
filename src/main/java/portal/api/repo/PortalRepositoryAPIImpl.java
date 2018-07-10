@@ -624,6 +624,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		VxFMetadata vxf = new VxFMetadata();
+		
+		String emsg = "";
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
@@ -635,8 +637,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		}
 
 		vxf = (VxFMetadata) addNewProductData(vxf,
@@ -651,7 +657,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested entity cannot be installed");
+			builder.entity("Requested entity cannot be installed. " + emsg);
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -1410,6 +1416,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		ExperimentMetadata experiment = new ExperimentMetadata();
 
+		String emsg = "";
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("exprm", ats));
@@ -1417,10 +1424,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			logger.info("Received @POST for experiment : " + experiment.getName());
 
-		} catch (JsonProcessingException e) {
+		}catch (JsonProcessingException e) {
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
 		}
 
 		// ExperimentMetadata sm = new ExperimentMetadata();
@@ -1433,7 +1444,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.ok().entity(experiment).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested entity cannot be installed");
+			builder.entity("Requested entity cannot be installed. " + emsg);
 			throw new WebApplicationException(builder.build());
 		}
 

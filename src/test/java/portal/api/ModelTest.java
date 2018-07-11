@@ -23,16 +23,12 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import portal.api.model.MANOprovider;
-import portal.api.osm.client.OSMClientTest;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 
 
@@ -49,9 +45,7 @@ public class ModelTest {
 
 	@Test
 	public void testOSMNSD() {
-		MANOprovider mp = new MANOprovider();
-		OSMClientTest osm = new OSMClientTest(mp);
-		List<Nsd> nsds = osm.getNSDs();
+		List<Nsd> nsds = getNSDs();
 		assertEquals( 4, nsds.size() );
 	}
 	

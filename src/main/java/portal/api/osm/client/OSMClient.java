@@ -15,16 +15,11 @@
 
 package portal.api.osm.client;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,23 +27,18 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 
@@ -66,6 +56,9 @@ import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
  *
  */
 public class OSMClient {
+	
+
+	private static final transient Log logger = LogFactory.getLog( OSMClient.class.getName());
 
 	/**	 */
 	private static final String keyStoreLoc = "src/main/config/clientKeystore.jks";
@@ -229,13 +222,13 @@ public class OSMClient {
 			
 			return httpclient;
 		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.error(e.getStackTrace() );
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 		return null;
@@ -273,7 +266,7 @@ public class OSMClient {
 			System.out.println("response = " + s);
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -307,7 +300,7 @@ public class OSMClient {
 			httpclient.getConnectionManager().shutdown();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -342,7 +335,7 @@ public class OSMClient {
 			return s;
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -377,7 +370,7 @@ public class OSMClient {
 			return s;
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -410,7 +403,7 @@ public class OSMClient {
 			return nsd;
 
 		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -439,7 +432,7 @@ public class OSMClient {
 			return v;
 
 		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -469,7 +462,7 @@ public class OSMClient {
 			return vnfds;
 
 		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 
@@ -497,7 +490,7 @@ public class OSMClient {
 			return nsds;
 
 		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
+			logger.error(e.getStackTrace() );
 			e.printStackTrace();
 		}
 

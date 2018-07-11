@@ -2493,11 +2493,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			Nsd nsd = null;
 			List<Nsd> nsds = OSMClient.getInstance(sm.getObMANOprovider()).getNSDs();
-			for (Nsd v : nsds) {
-				if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
-						|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
-					nsd = v;
-					break;
+			if ( nsds != null ) {
+				for (Nsd v : nsds) {
+					if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
+							|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
+						nsd = v;
+						break;
+					}
 				}
 			}
 

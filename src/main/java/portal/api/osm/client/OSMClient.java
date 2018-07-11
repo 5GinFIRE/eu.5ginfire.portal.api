@@ -223,12 +223,12 @@ public class OSMClient {
 			return httpclient;
 		} catch (KeyManagementException e) {
 			e.printStackTrace();
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		} catch (KeyStoreException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 		return null;
@@ -266,7 +266,7 @@ public class OSMClient {
 			System.out.println("response = " + s);
 
 		} catch (IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -300,7 +300,7 @@ public class OSMClient {
 			httpclient.getConnectionManager().shutdown();
 
 		} catch (IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -335,7 +335,7 @@ public class OSMClient {
 			return s;
 
 		} catch (IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -370,7 +370,7 @@ public class OSMClient {
 			return s;
 
 		} catch (IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -403,7 +403,7 @@ public class OSMClient {
 			return nsd;
 
 		} catch (IllegalStateException | IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -432,7 +432,7 @@ public class OSMClient {
 			return v;
 
 		} catch (IllegalStateException | IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -462,7 +462,7 @@ public class OSMClient {
 			return vnfds;
 
 		} catch (IllegalStateException | IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 
@@ -492,7 +492,7 @@ public class OSMClient {
 			return nsds;
 
 		} catch (IllegalStateException | IOException e) {
-			logger.error(e.getStackTrace() );
+			logger.error(e.getMessage() );
 			e.printStackTrace();
 		}
 

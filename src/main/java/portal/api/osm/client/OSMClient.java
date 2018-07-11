@@ -473,6 +473,8 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd");
 
+		logger.info( "getNSDs response = " + response );
+		
 		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 		try {
 

@@ -72,7 +72,7 @@ public interface IPortalRepositoryAPI {
 	Response getAppofUser( int userid, int appid);
 	Response updateExperimentMetadata(int aid, List<Attachment> attachements);
 	Response addExperimentMetadata( List<Attachment> attachements);
-	void deleteApp(int appid);
+	void deleteExperiment(int appid);
 	
 	
 }

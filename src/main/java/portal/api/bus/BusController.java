@@ -224,5 +224,27 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.offboard?multipleConsumers=true");
 		template.withBody( uexpobd ).asyncSend();		
 	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:vxf.deleted?multipleConsumers=true) that a vxf is deleted
+	 * @param deployment a {@link VxFMetadata}
+	 */
+	public void deletedVxF(VxFMetadata vxf) {
+
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.deleted?multipleConsumers=true");
+		template.withBody( vxf ).asyncSend();
+		
+	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:nsd.deleted?multipleConsumers=true) that a vxf is deleted
+	 * @param deployment a {@link ExperimentMetadata}
+	 */
+	public void deletedExperiment(ExperimentMetadata nsd) {
+
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deleted?multipleConsumers=true");
+		template.withBody( nsd ).asyncSend();
+		
+	}
 	
 }

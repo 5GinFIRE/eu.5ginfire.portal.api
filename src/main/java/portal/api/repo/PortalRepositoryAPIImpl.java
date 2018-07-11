@@ -932,7 +932,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@DELETE
 	@Path("/admin/vxfs/{vxfid}")
 	public void deleteVxF(@PathParam("vxfid") int vxfid) {
-		portalRepositoryRef.deleteProduct(vxfid);
+		
+
+		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
+		
+		if ( ! vxf.isCertified()  ) {
+			portalRepositoryRef.deleteProduct(vxfid);
+			BusController.getInstance().deletedVxF( vxf );			
+		} else {
+			ResponseBuilder builder = Response.status(Status.FORBIDDEN );
+
+			builder.entity( new ErrorMsg( "vxf with id=" + vxfid + " is Certified and will not be deleted" )  );	
+			throw new WebApplicationException(builder.build());
+		}
+			
 	}
 
 	@GET
@@ -1509,8 +1522,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	@DELETE
 	@Path("/admin/experiments/{appid}")
-	public void deleteApp(@PathParam("appid") int appid) {
-		portalRepositoryRef.deleteProduct(appid);
+	public void deleteExperiment(@PathParam("appid") int appid) {
+		
+		ExperimentMetadata nsd = (ExperimentMetadata) portalRepositoryRef.getProductByID( appid );
+		
+		if ( ! nsd.isValid()   ) {
+			portalRepositoryRef.deleteProduct(appid);
+			BusController.getInstance().deletedExperiment( nsd );			
+		} else {
+			ResponseBuilder builder = Response.status(Status.FORBIDDEN );
+			builder.entity( new ErrorMsg( "ExperimentMetadata with id=" + appid + " is Validated and will not be deleted" )  );	
+			throw new WebApplicationException(builder.build());
+		}
 
 	}
 

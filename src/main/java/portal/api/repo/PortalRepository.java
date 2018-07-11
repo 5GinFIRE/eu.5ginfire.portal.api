@@ -26,7 +26,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
-import portal.api.model.Image;
+import portal.api.model.VFImage;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -491,35 +491,40 @@ public class PortalRepository {
 	
 	/**
 	 * 
-	 * Image objects
+	 * VFImage objects
 	 */
 
-	public List<Image> getImages() {
-		List< Image> ls = portalJpaController.readImages(0, 100000);
+	public List<VFImage> getVFImages() {
+		List< VFImage> ls = portalJpaController.readVFImages(0, 100000);
 		return ls;	
 	}
 
 
-	public Image addImage(Image c) {
-		portalJpaController.saveImage(c);
+	public VFImage addVFImage(VFImage c) {
+		portalJpaController.saveVFImage(c);
 		return c;
 	}
 
 
-	public Image getImageByID(int infraid) {
-		return portalJpaController.readImageById( infraid );
+	public VFImage getVFImageByID(int infraid) {
+		return portalJpaController.readVFImageById( infraid );
 	}
 
 
-	public Image updateImageInfo(Image c) {
-		Image bmr = portalJpaController.updateImage(c);
+	public VFImage updateVFImageInfo(VFImage c) {
+		VFImage bmr = portalJpaController.updateVFImage(c);
 		return bmr;
 	}
 
 
-	public void deleteImage(int infraid) {
-		portalJpaController.deletImage( infraid );
+	public void deleteVFImage(int infraid) {
+		portalJpaController.deleteVFImage( infraid );
 		
+	}
+
+
+	public VFImage getVFImageByUUID(String uuid) {
+		return portalJpaController.readVFImageByUUID( uuid);
 	}
 
 	

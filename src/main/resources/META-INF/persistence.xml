@@ -33,7 +33,7 @@
 		<class>portal.api.model.Infrastructure</class>
 		<class>portal.api.model.ConstituentVxF</class>
 		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
-		<class>portal.api.model.Image</class>
+		<class>portal.api.model.VFImage</class>
 		
 		
 
@@ -87,7 +87,7 @@
 		<class>portal.api.model.Infrastructure</class>
 		<class>portal.api.model.ConstituentVxF</class>
 		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
-		<class>portal.api.model.Image</class>
+		<class>portal.api.model.VFImage</class>
 
 
 

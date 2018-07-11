@@ -38,7 +38,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import portal.api.util.EncryptionUtil;
 
 @Entity(name = "PortalUser")
-@JsonIgnoreProperties(value = { "products", "deployments", "subscribedResources" })
+@JsonIgnoreProperties(value = { "products", "vfimages", "deployments", "subscribedResources" })
 public class PortalUser {
 
 	@Id
@@ -75,6 +75,14 @@ public class PortalUser {
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
 	private List<Product> products = new ArrayList<Product>();
+	
+
+	/**
+	 * 
+	 */
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<VFImage> vfimages = new ArrayList<VFImage>();
 	
 
 	public List<UserRoleType> getRoles() {
@@ -269,28 +277,26 @@ public class PortalUser {
 		this.roles.remove(role);		
 	}
 	
-//	public void addApplication(ExperimentMetadata app) {
-//		if (!apps.contains(app)) {
-//			apps.add(app);
-//			app.setOwner(this);
-//		}
-//	}
-//
-//	public List<ExperimentMetadata> getApps() {
-//		return apps;
-//	}
-//
-//	public void setApps(List<ExperimentMetadata> apps) {
-//		this.apps = apps;
-//	}
-//
-//	public ExperimentMetadata getAppById(int appid) {
-//
-//		for (Iterator iterator = apps.iterator(); iterator.hasNext();) {
-//			ExperimentMetadata appMetadata = (ExperimentMetadata) iterator.next();
-//			if (appMetadata.getId() == appid)
-//				return appMetadata;
-//		}
-//		return null;
-//	}
+
+	
+	public List<VFImage> getVFImages() {
+		return vfimages;
+	}
+
+	public void setVFImages(List<VFImage> products) {
+		this.vfimages = products;
+	}
+	
+	public void addVFImage( VFImage prod ) {
+		if (!this.vfimages.contains(prod)) {
+			this.vfimages.add(prod);
+			prod.setOwner(this);
+		}
+	}
+	
+	public void removeFromVFImages( VFImage prod) {
+		if (this.vfimages.contains(prod)) {
+			this.vfimages.remove(prod);
+		}
+	}
 }

@@ -31,7 +31,7 @@ import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
-import portal.api.model.Image;
+import portal.api.model.VFImage;
 import portal.api.model.Infrastructure;
 import portal.api.model.InstalledVxF;
 import portal.api.model.MANOplatform;
@@ -1222,7 +1222,7 @@ public class PortalJpaController {
 	
 	/**
 	 * 
-	 * Image Objects Handling
+	 * VFImage Objects Handling
 	 */
 	
 
@@ -1231,10 +1231,10 @@ public class PortalJpaController {
 	 * @param maxResults
 	 * @return
 	 */
-	public List<Image> readImages(int firstResult, int maxResults) {
+	public List<VFImage> readVFImages(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM Image m ORDER BY m.id");
+		Query q = entityManager.createQuery("SELECT m FROM VFImage m ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -1243,8 +1243,8 @@ public class PortalJpaController {
 	/**
 	 * @param c
 	 */
-	public void saveImage( Image c ) {
-		logger.info("Will save Image = " + c.getName() );
+	public void saveVFImage( VFImage c ) {
+		logger.info("Will save VFImage = " + c.getName() );
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
@@ -1260,22 +1260,22 @@ public class PortalJpaController {
 	 * @param infraid
 	 * @return
 	 */
-	public Image readImageById(int infraid) {
+	public VFImage readVFImageById(int infraid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		return entityManager.find( Image.class, infraid);
+		return entityManager.find( VFImage.class, infraid);
 	}
 
 	/**
 	 * @param c
 	 * @return
 	 */
-	public Image updateImage( Image c ) {
+	public VFImage updateVFImage( VFImage c ) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 
 		entityTransaction.begin();
-		Image resis = entityManager.merge(c);
+		VFImage resis = entityManager.merge(c);
 		entityTransaction.commit();
 
 		return resis;
@@ -1284,10 +1284,10 @@ public class PortalJpaController {
 	/**
 	 * @param infraid
 	 */
-	public void deletImage(int infraid) {
+	public void deleteVFImage(int infraid) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Image c = entityManager.find( Image.class, infraid );
+		VFImage c = entityManager.find( VFImage.class, infraid );
 
 		EntityTransaction entityTransaction = entityManager.getTransaction();
 		entityTransaction.begin();
@@ -1300,11 +1300,19 @@ public class PortalJpaController {
 	 * @param name
 	 * @return
 	 */
-	public Image readImageByName(String name) {
+	public VFImage readVFImageByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM Image m WHERE m.name='" + name + "'");
-		return (q.getResultList().size() == 0) ? null : ( Image ) q.getSingleResult();
+		Query q = entityManager.createQuery("SELECT m FROM VFImage m WHERE m.name='" + name + "'");
+		return (q.getResultList().size() == 0) ? null : ( VFImage ) q.getSingleResult();
+	}
+
+
+	public VFImage readVFImageByUUID(String uuid) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM VFImage m WHERE m.uuid='" + uuid + "'");
+		return (q.getResultList().size() == 0) ? null : (VFImage) q.getSingleResult();
 	}
 
 

@@ -22,6 +22,7 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.PortalUser;
+import portal.api.model.VFImage;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 
@@ -244,6 +245,15 @@ public class BusController {
 
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deleted?multipleConsumers=true");
 		template.withBody( nsd ).asyncSend();
+		
+	}
+
+
+	/**
+	 * @param vfimg
+	 */
+	public void newVFImageAdded(VFImage vfimg) {
+		// TODO Auto-generated method stub
 		
 	}
 	

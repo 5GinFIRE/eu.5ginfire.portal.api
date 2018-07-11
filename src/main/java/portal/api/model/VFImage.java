@@ -38,8 +38,8 @@ import javax.persistence.OneToMany;
  * @author ctranoris
  *
  */
-@Entity(name = "Image")
-public class Image {
+@Entity(name = "VFImage")
+public class VFImage {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +79,7 @@ public class Image {
 	@JoinTable()
 	private List<Infrastructure> deployedInfrastructures = new ArrayList<>();
 
-	public Image(){
+	public VFImage(){
 		
 	}
 	

@@ -29,8 +29,12 @@
 
 			<bean class="portal.api.repo.PortalRepositoryAPIImpl">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
-
 			</bean>
+			<bean class="portal.api.repo.PortalRepositoryVFImageAPI">
+				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
+			</bean>
+			
+			
 
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>

@@ -76,7 +76,7 @@ import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
-import portal.api.model.Image;
+import portal.api.model.VFImage;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -91,6 +91,7 @@ import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
+import portal.api.util.AttachmentUtil;
 import portal.api.util.EmailUtil;
 import pt.it.av.atnog.extractors.NSExtractor;
 import pt.it.av.atnog.extractors.VNFExtractor;
@@ -129,6 +130,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			+ File.separator + "metadata" + File.separator;
 
 	private PortalRepository portalRepositoryRef;
+	
+	
 
 
 	// PortalUser related API
@@ -217,19 +220,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response addNewRegisterUser(List<Attachment> ats) {
 
 		PortalUser user = new PortalUser();
-		user.setName(getAttachmentStringValue("name", ats));
-		user.setUsername(getAttachmentStringValue("username", ats));
-		user.setPassword(getAttachmentStringValue("userpassword", ats));
-		user.setOrganization(getAttachmentStringValue("userorganization", ats) + "^^"
-				+ getAttachmentStringValue("randomregid", ats));
-		user.setEmail(getAttachmentStringValue("useremail", ats));
+		user.setName(AttachmentUtil.getAttachmentStringValue("name", ats));
+		user.setUsername(AttachmentUtil.getAttachmentStringValue("username", ats));
+		user.setPassword(AttachmentUtil.getAttachmentStringValue("userpassword", ats));
+		user.setOrganization(AttachmentUtil.getAttachmentStringValue("userorganization", ats) + "^^"
+				+ AttachmentUtil.getAttachmentStringValue("randomregid", ats));
+		user.setEmail(AttachmentUtil.getAttachmentStringValue("useremail", ats));
 		user.setActive(false);// in any case the user should be not active
 		user.addRole(UserRoleType.EXPERIMENTER); // otherwise in post he can choose
 		user.addRole(UserRoleType.VXF_DEVELOPER); // otherwise in post he can choose
 		// PORTALADMIN, and the
 		// immediately register :-)
 
-		String msg = getAttachmentStringValue("emailmessage", ats);
+		String msg = AttachmentUtil.getAttachmentStringValue("emailmessage", ats);
 		logger.info("Received register for usergetUsername: " + user.getUsername());
 
 		Response r = addUser(user);
@@ -249,8 +252,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response addNewRegisterUserVerify(List<Attachment> ats) {
 
-		String username = getAttachmentStringValue("username", ats);
-		String rid = getAttachmentStringValue("rid", ats);
+		String username = AttachmentUtil.getAttachmentStringValue("username", ats);
+		String rid = AttachmentUtil.getAttachmentStringValue("rid", ats);
 
 		PortalUser u = portalRepositoryRef.getUserByUsername(username);
 		if (u.getOrganization().contains("^^")) {
@@ -258,7 +261,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			u.setActive(true);
 		}
 		u = portalRepositoryRef.updateUserInfo(u.getId(), u);
-		// getAttachmentStringValue("username", ats)
+		// AttachmentUtil.getAttachmentStringValue("username", ats)
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -426,10 +429,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			Files.createDirectories(Paths.get(tempDir));
 
 			if (image != null) {
-				String imageFileNamePosted = getFileName(image.getHeaders());
+				String imageFileNamePosted = AttachmentUtil.getFileName(image.getHeaders());
 				logger.info("image = " + imageFileNamePosted);
 				if (!imageFileNamePosted.equals("")) {
-					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
+					String imgfile = AttachmentUtil.saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
 					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/"
 							+ imageFileNamePosted);
@@ -437,10 +440,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 
 			if (submittedFile != null) {
-				String aFileNamePosted = getFileName(submittedFile.getHeaders());
+				String aFileNamePosted = AttachmentUtil.getFileName(submittedFile.getHeaders());
 				logger.info("vxfFile = " + aFileNamePosted);
 				if (!aFileNamePosted.equals("")) {
-					String vxffilepath = saveFile(submittedFile, tempDir + aFileNamePosted);
+					String vxffilepath = AttachmentUtil.saveFile(submittedFile, tempDir + aFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
 					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + uuid + "/"
 							+ aFileNamePosted);
@@ -463,7 +466,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								String imageFileNamePosted = vnfd.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile(vnfExtract.getIconfilePath(),
+									String imgfile = AttachmentUtil.saveFile(vnfExtract.getIconfilePath(),
 											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
 									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
@@ -504,7 +507,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								String imageFileNamePosted = ns.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile(nsExtract.getIconfilePath(),
+									String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
 											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
 									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
@@ -522,12 +525,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			String screenshotsFilenames = "";
 			int i = 1;
 			for (Attachment shot : ss) {
-				String shotFileNamePosted = getFileName(shot.getHeaders());
+				String shotFileNamePosted = AttachmentUtil.getFileName(shot.getHeaders());
 				logger.info("Found screenshot image shotFileNamePosted = " + shotFileNamePosted);
 				logger.info("shotFileNamePosted = " + shotFileNamePosted);
 				if (!shotFileNamePosted.equals("")) {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
-					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
+					String shotfilepath = AttachmentUtil.saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
 					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid + "/"
 							+ shotFileNamePosted;
@@ -628,14 +631,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("vxf", ats));
+			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("vxf", ats));
 			vxf = parser.readValueAs(VxFMetadata.class);
 
 			logger.info("Received @POST for vxf : " + vxf.getName());
 			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
 			vxf = (VxFMetadata) addNewProductData(vxf,
-					getAttachmentByName("prodIcon", ats), getAttachmentByName("prodFile", ats),
-					getListOfAttachmentsByName("screenshots", ats));
+					AttachmentUtil.getAttachmentByName("prodIcon", ats), AttachmentUtil.getAttachmentByName("prodFile", ats),
+					AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
 
 		} catch (JsonProcessingException e) {
 			vxf = null;
@@ -674,14 +677,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("vxf", ats));
+			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("vxf", ats));
 			vxf = parser.readValueAs(VxFMetadata.class);
 
 			logger.info("Received @POST for vxf : " + vxf.getName());
 			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
 
-			vxf = (VxFMetadata) updateProductMetadata(vxf, getAttachmentByName("prodIcon", ats),
-					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+			vxf = (VxFMetadata) updateProductMetadata(vxf, AttachmentUtil.getAttachmentByName("prodIcon", ats),
+					AttachmentUtil.getAttachmentByName("prodFile", ats), AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
 			
 			
 		} catch (JsonProcessingException e) {
@@ -757,10 +760,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			Files.createDirectories(Paths.get(tempDir));
 
 			if (image != null) {
-				String imageFileNamePosted = getFileName(image.getHeaders());
+				String imageFileNamePosted = AttachmentUtil.getFileName(image.getHeaders());
 				logger.info("image = " + imageFileNamePosted);
 				if (!imageFileNamePosted.equals("unknown")) {
-					String imgfile = saveFile(image, tempDir + imageFileNamePosted);
+					String imgfile = AttachmentUtil.saveFile(image, tempDir + imageFileNamePosted);
 					logger.info("imgfile saved to = " + imgfile);
 					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
 							+ imageFileNamePosted);
@@ -768,10 +771,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 
 			if (prodFile != null) {
-				String vxfFileNamePosted = getFileName(prodFile.getHeaders());
+				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
 				logger.info("vxfFile = " + vxfFileNamePosted);
 				if (!vxfFileNamePosted.equals("unknown")) {
-					String vxffilepath = saveFile(prodFile, tempDir + vxfFileNamePosted);
+					String vxffilepath = AttachmentUtil.saveFile(prodFile, tempDir + vxfFileNamePosted);
 					logger.info("vxffilepath saved to = " + vxffilepath);
 					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/"
 							+ prod.getUuid() + "/" + vxfFileNamePosted);
@@ -795,7 +798,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								String imageFileNamePosted = vnfd.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile(vnfExtract.getIconfilePath(),
+									String imgfile = AttachmentUtil.saveFile(vnfExtract.getIconfilePath(),
 											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
 									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
@@ -834,7 +837,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								String imageFileNamePosted = ns.getLogo();
 								logger.info("image = " + imageFileNamePosted);
 								if (!imageFileNamePosted.equals("")) {
-									String imgfile = saveFile(nsExtract.getIconfilePath(),
+									String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
 											tempDir + imageFileNamePosted);
 									logger.info("imgfile saved to = " + imgfile);
 									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
@@ -851,12 +854,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			String screenshotsFilenames = "";
 			int i = 1;
 			for (Attachment shot : ss) {
-				String shotFileNamePosted = getFileName(shot.getHeaders());
+				String shotFileNamePosted = AttachmentUtil.getFileName(shot.getHeaders());
 				logger.info("Found screenshot image shotFileNamePosted = " + shotFileNamePosted);
 				logger.info("shotFileNamePosted = " + shotFileNamePosted);
 				if (!shotFileNamePosted.equals("")) {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
-					String shotfilepath = saveFile(shot, tempDir + shotFileNamePosted);
+					String shotfilepath = AttachmentUtil.saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
 					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
 							+ shotFileNamePosted;
@@ -1438,13 +1441,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		String emsg = "";
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("exprm", ats));
+			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("exprm", ats));
 			experiment = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for experiment : " + experiment.getName());
 			// ExperimentMetadata sm = new ExperimentMetadata();
-			experiment = (ExperimentMetadata) addNewProductData(experiment, getAttachmentByName("prodIcon", ats),
-					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+			experiment = (ExperimentMetadata) addNewProductData(experiment, AttachmentUtil.getAttachmentByName("prodIcon", ats),
+					AttachmentUtil.getAttachmentByName("prodFile", ats), AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
 
 		}catch (JsonProcessingException e) {
 			experiment = null;
@@ -1482,15 +1485,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
-			JsonParser parser = factory.createJsonParser(getAttachmentStringValue("exprm", ats));
+			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("exprm", ats));
 			appmeta = parser.readValueAs(ExperimentMetadata.class);
 
 			logger.info("Received @POST for experiment : " + appmeta.getName());
 			// logger.info("Received @POST for app.containers : " +
 			// appmeta.getContainers().size());
 
-			appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, getAttachmentByName("prodIcon", ats),
-					getAttachmentByName("prodFile", ats), getListOfAttachmentsByName("screenshots", ats));
+			appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, AttachmentUtil.getAttachmentByName("prodIcon", ats),
+					AttachmentUtil.getAttachmentByName("prodFile", ats), AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
 
 		} catch (JsonProcessingException e) {
 			appmeta = null;
@@ -1624,107 +1627,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		return getCategoryById(catid);
 	}
 
-	// Attachment utils ///////////////////////
-	private String saveFile(Attachment att, String filePath) {
-		DataHandler handler = att.getDataHandler();
-		try {
-			InputStream stream = handler.getInputStream();
-			MultivaluedMap map = att.getHeaders();
-			File f = new File(filePath);
-			OutputStream out = new FileOutputStream(f);
+	
 
-			int read = 0;
-			byte[] bytes = new byte[1024];
-			while ((read = stream.read(bytes)) != -1) {
-				out.write(bytes, 0, read);
-			}
-			stream.close();
-			out.flush();
-			out.close();
-			return f.getAbsolutePath();
+	
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	// Attachment utils ///////////////////////
-	private String saveFile(ByteArrayOutputStream att, String filePath) throws IOException {
-
-		File f = new File(filePath);
-		FileOutputStream fos;
-		try {
-			fos = new FileOutputStream(f);
-			att.writeTo(fos);
-			fos.close();
-			return f.getAbsolutePath();
-		} catch (IOException ioe) {
-			// Handle exception here
-			ioe.printStackTrace();
-		} finally {
-		}
-
-		return null;
-
-	}
-
-	private String getFileName(MultivaluedMap<String, String> header) {
-		String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
-		for (String filename : contentDisposition) {
-			if ((filename.trim().startsWith("filename"))) {
-				String[] name = filename.split("=");
-				String exactFileName = name[1].trim().replaceAll("\"", "");
-				return exactFileName;
-			}
-		}
-		return "unknown";
-	}
-
-	public String getAttachmentStringValue(String name, List<Attachment> attachments) {
-
-		Attachment att = getAttachmentByName(name, attachments);
-		if (att != null) {
-			return att.getObject(String.class);
-		}
-		return null;
-	}
-
-	public Attachment getAttachmentByName(String name, List<Attachment> attachments) {
-
-		for (Attachment attachment : attachments) {
-			String s = getAttachmentName(attachment.getHeaders());
-			if ((s != null) && (s.equals(name)))
-				return attachment;
-		}
-
-		return null;
-	}
-
-	private List<Attachment> getListOfAttachmentsByName(String name, List<Attachment> attachments) {
-
-		List<Attachment> la = new ArrayList<Attachment>();
-		for (Attachment attachment : attachments) {
-			if (getAttachmentName(attachment.getHeaders()).equals(name))
-				la.add(attachment);
-		}
-		return la;
-	}
-
-	private String getAttachmentName(MultivaluedMap<String, String> header) {
-
-		if (header.getFirst("Content-Disposition") != null) {
-			String[] contentDisposition = header.getFirst("Content-Disposition").split(";");
-			for (String filename : contentDisposition) {
-				if ((filename.trim().startsWith("name"))) {
-					String[] name = filename.split("=");
-					String exactFileName = name[1].trim().replaceAll("\"", "");
-					return exactFileName;
-				}
-			}
-		}
-		return null;
-	}
+	
 
 	@GET
 	@Path("/admin/properties/")
@@ -2667,76 +2574,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	
 	
 	
-	
-	/**
-	 * 
-	 * Image object API
-	 */
-
-	@GET
-	@Path("/admin/images/")
-	@Produces("application/json")
-	public Response getAdminImages() {
-		return Response.ok().entity(portalRepositoryRef.getImages()).build();
-	}
-
-	@POST
-	@Path("/admin/images/")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response addImage( Image c) {
-		Image u = portalRepositoryRef.addImage(c);
-
-		if (u != null) {
-			return Response.ok().entity(u).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Image with name=" + c.getName() + " cannot be created");
-			throw new WebApplicationException(builder.build());
-		}
-	}
-
-	@PUT
-	@Path("/admin/images/{infraid}")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response updateImage(@PathParam("infraid") int infraid, Image c) {
-		Image previousCategory = portalRepositoryRef.getImageByID(infraid);
-
-		Image u = portalRepositoryRef.updateImageInfo(c);
-
-		if (u != null) {
-			return Response.ok().entity(u).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Image with name=" + c.getName() + " cannot be updated");
-			throw new WebApplicationException(builder.build());
-		}
-
-	}
-
-	@DELETE
-	@Path("/admin/images/{infraid}")
-	public Response deleteImage(@PathParam("infraid") int infraid) {
-		portalRepositoryRef.deleteImage(infraid);
-		return Response.ok().build();
-
-	}
-
-	@GET
-	@Path("/admin/images/{infraid}")
-	@Produces("application/json")
-	public Response getImageById(@PathParam("infraid") int infraid) {
-		Image sm = portalRepositoryRef.getImageByID(infraid);
-
-		if (sm != null) {
-			return Response.ok().entity(sm).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Image " + infraid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
-		}
-	}
 	
 	
 	

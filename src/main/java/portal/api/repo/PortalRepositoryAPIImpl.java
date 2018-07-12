@@ -100,6 +100,7 @@ import pt.it.av.atnog.requirements.VNFRequirements;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.descriptor.ConstituentVnfd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
+import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.descriptor.Vdu;
 
 //CORS support
 //@CrossOriginResourceSharing(
@@ -260,7 +261,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			u.setOrganization(u.getOrganization().substring(0, u.getOrganization().indexOf("^^")));
 			u.setActive(true);
 		}
-		u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+		u = portalRepositoryRef.updateUserInfo(  u);
 		// AttachmentUtil.getAttachmentStringValue("username", ats)
 
 		if (u != null) {
@@ -287,7 +288,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			user.getProducts().addAll(previousProducts);
 		}
 
-		PortalUser u = portalRepositoryRef.updateUserInfo(userid, user);
+		PortalUser u = portalRepositoryRef.updateUserInfo( user);
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -457,6 +458,27 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							prod.setVendor(vnfd.getVendor());
 							prod.setShortDescription(vnfd.getName());
 							prod.setLongDescription(vnfd.getDescription());
+							
+							for (Vdu vdu : vnfd.getVdu()) {
+								String imageName = vdu.getImage();
+								if ( ( imageName != null) && (!imageName.equals("")) ){
+									VFImage sm = portalRepositoryRef.getVFImageByName( imageName );
+									if ( sm == null ){
+										sm = new VFImage();
+										sm.setName( imageName );
+										PortalUser vfImagewner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
+										sm.setOwner( vfImagewner );
+										sm.setShortDescription( "Automatically created during vxf " + prod.getName() + " submission. Owner must update." );
+										String uuidVFImage = UUID.randomUUID().toString();
+										sm.setUuid( uuidVFImage );
+										sm.setDateCreated(new Date());
+										sm = portalRepositoryRef.saveVFImage( sm );
+									}
+									((VxFMetadata) prod).getVfimagesVDU().add( sm );
+									
+								}
+							}
+							
 							VNFRequirements vr = new VNFRequirements(vnfd);
 							prod.setDescriptorHTML(vr.toHTML());
 							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
@@ -559,7 +581,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		vxfOwner.addProduct(prod);
 		prod.setOwner(vxfOwner); // replace given owner with the one from our DB
 
-		PortalUser owner = portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), vxfOwner);
+		PortalUser owner = portalRepositoryRef.updateUserInfo(  vxfOwner);
 		Product registeredProd = portalRepositoryRef.getProductByUUID(uuid);
 
 		// now fix category references
@@ -567,6 +589,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
 			catToUpdate.addProduct(registeredProd);
 			portalRepositoryRef.updateCategoryInfo(catToUpdate);
+		}
+		
+		//if it's a VxF we need also to update the images that this VxF will use
+		if (prod instanceof VxFMetadata) {
+			VxFMetadata vxfm = (VxFMetadata) prod;
+			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
+				vfimg.getUsedByVxFs().add(vxfm);
+				portalRepositoryRef.updateVFImageInfo(vfimg);
+			}
 		}
 
 		return registeredProd;
@@ -887,7 +918,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (vxfOwner.getProductById(prod.getId()) == null)
 			vxfOwner.addProduct(prod);
-		portalRepositoryRef.updateUserInfo(prod.getOwner().getId(), vxfOwner);
+		portalRepositoryRef.updateUserInfo( vxfOwner);
 		return prod;
 	}
 
@@ -1103,7 +1134,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				logger.info(" currentUser = " + currentUser.toString());
 				logger.info("User [" + currentUser.getPrincipal() + "] logged in successfully.");
 
-				portalRepositoryRef.updateUserInfo(portalUser.getId(), portalUser);
+				portalRepositoryRef.updateUserInfo(  portalUser);
 
 				return Response.ok().entity(userSession).build();
 			} catch (AuthenticationException ae) {
@@ -1226,7 +1257,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			sm.setOwner(u);
 
 			u.getSubscribedResources().add(sm);
-			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+			u = portalRepositoryRef.updateUserInfo(  u);
 
 			return Response.ok().entity(sm).build();
 		} else {
@@ -1736,7 +1767,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			deployment.setExperiment(baseApplication); // reattach from the
 														// DB model
 
-			u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+			u = portalRepositoryRef.updateUserInfo(  u);
 						
 			deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
 			
@@ -1866,7 +1897,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				sm.setOwner(u);
 				sm.setActive(false);
 				u.getSubscribedResources().add(sm);
-				u = portalRepositoryRef.updateUserInfo(u.getId(), u);
+				u = portalRepositoryRef.updateUserInfo(  u);
 				return Response.ok().entity(sm).build();
 			} else {
 				checkSM.setURL(sm.getURL());// update URL if changed

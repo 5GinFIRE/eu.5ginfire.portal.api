@@ -33,12 +33,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author ctranoris
  *
  */
 @Entity(name = "VFImage")
+@JsonIgnoreProperties(value = { "usedByVxFs" })
 public class VFImage {
 
 	@Id
@@ -53,9 +57,13 @@ public class VFImage {
 	
 	@Basic()
 	private String shortDescription = null;
-	
+
 	@Basic()
 	private String packageLocation = null;
+	
+
+	@Basic()
+	private String publicURL = null;
 	
 	@Basic()
 	private Date dateCreated;
@@ -63,6 +71,9 @@ public class VFImage {
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
 	private List<VxFMetadata> usedByVxFs = new ArrayList<>();
+	
+	@Transient
+	private List<RefVxF> refVxFs = new ArrayList<>();
 	
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
@@ -237,9 +248,78 @@ public class VFImage {
 	public void setDeployedInfrastructures(List<Infrastructure> deployedInfrastructures) {
 		this.deployedInfrastructures = deployedInfrastructures;
 	}
+
+
+	/**
+	 * @return the publicURL
+	 */
+	public String getPublicURL() {
+		return publicURL;
+	}
+
+
+	/**
+	 * @param publicURL the publicURL to set
+	 */
+	public void setPublicURL(String publicURL) {
+		this.publicURL = publicURL;
+	}
+
+
+	/**
+	 * @return the refVxFs
+	 */
+	public List<RefVxF> getRefVxFs() {
+		refVxFs.clear();
+		for (VxFMetadata vxf : usedByVxFs) {
+			RefVxF ref = new RefVxF( vxf.getId(), vxf.getName());
+			refVxFs.add( ref );
+		}
+		return refVxFs;
+	}
 	
 	
-	
+	private class RefVxF {
+
+		private long id;
+		private String name;
+		
+		public RefVxF(long id2, String name2) {
+			id = id2;
+			name = name2;
+					
+		}
+
+		/**
+		 * @return the id
+		 */
+		public long getId() {
+			return id;
+		}
+
+		/**
+		 * @param id the id to set
+		 */
+		public void setId(long id) {
+			this.id = id;
+		}
+
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * @param name the name to set
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+		
+		
+	}
 	
 	
 }

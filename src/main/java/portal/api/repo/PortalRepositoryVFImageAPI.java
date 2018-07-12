@@ -80,8 +80,6 @@ public class PortalRepositoryVFImageAPI {
 	@Path("/admin/vfimages/")
 	@Produces("application/json")
 	public Response getAdminVFImages() {
-		
-		
 		return Response.ok().entity(portalRepositoryRef.getVFImages()).build();
 	}
 
@@ -108,7 +106,10 @@ public class PortalRepositoryVFImageAPI {
 			vfimg = parser.readValueAs( VFImage.class );
 
 			logger.info("Received @POST for VFImage : " + vfimg.getName());
-
+			
+			String uuid = UUID.randomUUID().toString();
+			vfimg.setUuid(uuid);
+			vfimg.setDateCreated(new Date());
 			
 			vfimg = addNewVFImage(vfimg,					
 					AttachmentUtil.getAttachmentByName("prodFile", ats));
@@ -147,40 +148,28 @@ public class PortalRepositoryVFImageAPI {
 	 * @throws IOException
 	 */
 	private VFImage addNewVFImage(VFImage vfimg, Attachment vfimagefile) throws IOException {
-		
-		String uuid = UUID.randomUUID().toString();
 
 		logger.info("image name = " + vfimg.getName());
 		logger.info("shortDescription = " +vfimg.getShortDescription());
 
-		vfimg.setUuid(uuid);
-		vfimg.setDateCreated(new Date());
-		
-
 		URI endpointUrl = uri.getBaseUri();
-		String tempDir = VFIMAGESDIR + uuid + File.separator;
-		Files.createDirectories(Paths.get(tempDir));
+		String tempDir = VFIMAGESDIR + vfimg.getUuid() + File.separator;
 	
 		if (vfimagefile != null) {
 			String imageFileNamePosted = AttachmentUtil.getFileName(vfimagefile.getHeaders());
 			logger.info("vfimagefile = " + imageFileNamePosted);
-			if (!imageFileNamePosted.equals("")) {
+			if (!imageFileNamePosted.equals("") && !imageFileNamePosted.equals("unknown")) {
+				Files.createDirectories(Paths.get(tempDir));
 				String imgfile = AttachmentUtil.saveFile( vfimagefile, tempDir + imageFileNamePosted);
 				logger.info("vfimagefile saved to = " + imgfile);
 				
-				vfimg.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/vfimages/image/" + uuid + "/"
+				vfimg.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/vfimages/image/" + vfimg.getUuid() + "/"
 						+ imageFileNamePosted);
 			}
 		}
 		
+		VFImage registeredvfimg =  portalRepositoryRef.saveVFImage( vfimg ); 
 		
-		// Save now vxf for User
-		PortalUser vxfOwner = portalRepositoryRef.getUserByID( vfimg.getOwner().getId() );
-		vxfOwner.addVFImage( vfimg );
-		vfimg.setOwner(vxfOwner); // replace given owner with the one from our DB
-
-		PortalUser owner = portalRepositoryRef.updateUserInfo( vfimg.getOwner().getId(), vxfOwner);
-		VFImage registeredvfimg = portalRepositoryRef.getVFImageByUUID(uuid);
 				
 		return registeredvfimg;
 	}
@@ -204,12 +193,15 @@ public class PortalRepositoryVFImageAPI {
 		response.header("Content-Disposition", "attachment; filename=" + file.getName());
 		return response.build();
 	}
+	
+	
+	
 
 	@PUT
-	@Path("/admin/vfimages/{infraid}")
+	@Path("/admin/vfimages/{uuid}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateVFImage(@PathParam("infraid") int infraid, VFImage c) {
+	public Response updateVFImage(@PathParam("uuid") int infraid, VFImage c) {
 		VFImage previousCategory = portalRepositoryRef.getVFImageByID(infraid);
 
 		VFImage u = portalRepositoryRef.updateVFImageInfo(c);
@@ -218,31 +210,46 @@ public class PortalRepositoryVFImageAPI {
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested Image with name=" + c.getName() + " cannot be updated");
+			builder.entity( new ErrorMsg( "Requested Image with name=" + c.getName() + " cannot be updated") );
 			throw new WebApplicationException(builder.build());
 		}
 
 	}
 
 	@DELETE
-	@Path("/admin/vfimages/{infraid}")
-	public Response deleteVFImage(@PathParam("infraid") int infraid) {
-		portalRepositoryRef.deleteVFImage(infraid);
+	@Path("/admin/vfimages/{id}")
+	public Response deleteVFImage(@PathParam("id") int id) {
+		portalRepositoryRef.deleteVFImage(id);
 		return Response.ok().build();
 
 	}
 
 	@GET
-	@Path("/admin/vfimages/{infraid}")
+	@Path("/admin/vfimages/{id}")
 	@Produces("application/json")
-	public Response getVFImageById(@PathParam("infraid") int infraid) {
-		VFImage sm = portalRepositoryRef.getVFImageByID(infraid);
+	public Response getVFImageById(@PathParam("id") int id) {
+		VFImage sm = portalRepositoryRef.getVFImageByID(id);
 
 		if (sm != null) {
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("Image " + infraid + " not found in portal registry");
+			builder.entity( new ErrorMsg( "Image id = " + id + " not found in portal registry") );
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
+	@GET
+	@Path("/admin/vfimages/name/{imagename}")
+	@Produces("application/json")
+	public Response getVFImageByName(@PathParam("imagename") String imagename) {
+		VFImage sm = portalRepositoryRef.getVFImageByName( imagename );
+
+		if (sm != null) {
+			return Response.ok().entity(sm).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity( new ErrorMsg( "Image " + imagename + " not found in portal registry") );
 			throw new WebApplicationException(builder.build());
 		}
 	}

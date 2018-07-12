@@ -81,7 +81,7 @@ public class PortalRepository {
 		return ls;
 	}
 	
-	public PortalUser updateUserInfo(int userid, PortalUser user) {
+	public PortalUser updateUserInfo( PortalUser user) {
 		PortalUser bm = portalJpaController.updatePortalUser(user);
 		return bm;
 	}
@@ -524,7 +524,24 @@ public class PortalRepository {
 
 
 	public VFImage getVFImageByUUID(String uuid) {
-		return portalJpaController.readVFImageByUUID( uuid);
+		return portalJpaController.readVFImageByUUID( uuid );
+	}
+
+
+	public VFImage getVFImageByName(String imagename) {
+		return portalJpaController.readVFImageByName( imagename );
+	}
+
+
+	public VFImage saveVFImage(VFImage vfimg) {
+		// Save now vxf for User
+		PortalUser vxfOwner = this.getUserByID( vfimg.getOwner().getId() );
+		vxfOwner.addVFImage( vfimg );
+		vfimg.setOwner(vxfOwner); // replace given owner with the one from our DB
+
+		PortalUser owner = this.updateUserInfo(  vxfOwner );
+		VFImage registeredvfimg = this.getVFImageByUUID( vfimg.getUuid() );
+		return registeredvfimg;
 	}
 
 	

@@ -66,6 +66,10 @@ public class VxFMetadata extends Product{
 	@JoinTable()
 	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
 	
+	@OneToMany(cascade = { CascadeType.ALL })
+	@JoinTable()
+	private List<VFImage> vfimagesVDU = new ArrayList<>();
+	
 	
 	/**
 	 * @return
@@ -152,6 +156,20 @@ public class VxFMetadata extends Product{
 	 */
 	public void setValidationStatus(ValidationStatus validationStatus) {
 		this.validationStatus = validationStatus;
+	}
+
+	/**
+	 * @return the vfimagesVDU
+	 */
+	public List<VFImage> getVfimagesVDU() {
+		return vfimagesVDU;
+	}
+
+	/**
+	 * @param vfimagesVDU the vfimagesVDU to set
+	 */
+	public void setVfimagesVDU(List<VFImage> vfimagesVDU) {
+		this.vfimagesVDU = vfimagesVDU;
 	}
 
 	

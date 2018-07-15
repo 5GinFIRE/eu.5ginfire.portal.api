@@ -1240,21 +1240,6 @@ public class PortalJpaController {
 		return q.getResultList();
 	}
 
-	/**
-	 * @param c
-	 */
-	public void saveVFImage( VFImage c ) {
-		logger.info("Will save VFImage = " + c.getName() );
-
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-		entityTransaction.begin();
-		entityManager.persist( c );
-		entityManager.flush();
-		entityTransaction.commit();
-		
-	}
 
 	/**
 	 * @param infraid
@@ -1265,21 +1250,7 @@ public class PortalJpaController {
 		return entityManager.find( VFImage.class, infraid);
 	}
 
-	/**
-	 * @param c
-	 * @return
-	 */
-	public VFImage updateVFImage( VFImage c ) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-		EntityTransaction entityTransaction = entityManager.getTransaction();
-
-		entityTransaction.begin();
-		VFImage resis = entityManager.merge(c);
-		entityTransaction.commit();
-
-		return resis;
-	}
+	
 
 	/**
 	 * @param infraid

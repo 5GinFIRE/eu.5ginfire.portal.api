@@ -459,6 +459,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							prod.setShortDescription(vnfd.getName());
 							prod.setLongDescription(vnfd.getDescription());
 							
+							((VxFMetadata) prod).getVfimagesVDU().clear();//clear previous referenced images
 							for (Vdu vdu : vnfd.getVdu()) {
 								String imageName = vdu.getImage();
 								if ( ( imageName != null) && (!imageName.equals("")) ){
@@ -576,6 +577,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		}
 
+		//if it's a VxF we need also to update the images that this VxF will use
+		if (prod instanceof VxFMetadata) {
+			VxFMetadata vxfm = (VxFMetadata) prod;
+			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
+				vfimg.getUsedByVxFs().add(vxfm);
+				portalRepositoryRef.updateVFImageInfo(vfimg);
+			}
+		}
+
+		
 		// Save now vxf for User
 		PortalUser vxfOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
 		vxfOwner.addProduct(prod);
@@ -591,14 +602,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			portalRepositoryRef.updateCategoryInfo(catToUpdate);
 		}
 		
-		//if it's a VxF we need also to update the images that this VxF will use
-		if (prod instanceof VxFMetadata) {
-			VxFMetadata vxfm = (VxFMetadata) prod;
-			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
-				vfimg.getUsedByVxFs().add(vxfm);
-				portalRepositoryRef.updateVFImageInfo(vfimg);
-			}
-		}
 
 		return registeredProd;
 	}
@@ -711,8 +714,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("vxf", ats));
 			vxf = parser.readValueAs(VxFMetadata.class);
 
-			logger.info("Received @POST for vxf : " + vxf.getName());
-			logger.info("Received @POST for vxf.extensions : " + vxf.getExtensions());
+			logger.info("Received @PUT for vxf : " + vxf.getName());
+			logger.info("Received @PUT for vxf.extensions : " + vxf.getExtensions());
 
 			vxf = (VxFMetadata) updateProductMetadata(vxf, AttachmentUtil.getAttachmentByName("prodIcon", ats),
 					AttachmentUtil.getAttachmentByName("prodFile", ats), AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
@@ -736,6 +739,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				vxFOnBoardedDescriptor.setVxf(vxf);
 			}
 			BusController.getInstance().updatedVxF(vxf);
+			BusController.getInstance().validationUpdateVxF(vxf); 
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -815,11 +819,48 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						VNFExtractor vnfExtract = new VNFExtractor(f);
 						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
 						if (vnfd != null) {
+							//on update we need to check if name and version are the same. Only then we will accept it
+							if ( !prod.getName().equals( vnfd.getId()) ||  !prod.getVersion().equals( vnfd.getVersion() )  ){
+								throw new IOException( "Product name or version are not equal to this descriptor. No updates were performed." );
+							}
+							
+							((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
+							((VxFMetadata) prod).setValidationStatus( ValidationStatus.NOT_STARTED );
+							
 							prod.setName(vnfd.getId());
 							prod.setVersion(vnfd.getVersion());
 							prod.setVendor(vnfd.getVendor());
 							prod.setShortDescription(vnfd.getName());
 							prod.setLongDescription(vnfd.getDescription());
+							((VxFMetadata) prod).getVfimagesVDU().clear();//clear previous referenced images							
+							for (Vdu vdu : vnfd.getVdu()) {
+								String imageName = vdu.getImage();
+								if ( ( imageName != null) && (!imageName.equals("")) ){
+									VFImage sm = portalRepositoryRef.getVFImageByName( imageName );
+									if ( sm == null ){
+										sm = new VFImage();
+										sm.setName( imageName );
+										PortalUser vfImagewner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
+										sm.setOwner( vfImagewner );
+										sm.setShortDescription( "Automatically created during vxf " + prod.getName() + " submission. Owner must update." );
+										String uuidVFImage = UUID.randomUUID().toString();
+										sm.setUuid( uuidVFImage );
+										sm.setDateCreated(new Date());
+										sm = portalRepositoryRef.saveVFImage( sm );
+									}
+									
+									if ( !((VxFMetadata) prod).getVfimagesVDU().contains(sm) ){
+										((VxFMetadata) prod).getVfimagesVDU().add( sm );
+										
+									}
+									
+									
+								}
+							}
+							
+							
+							
+							
 							VNFRequirements vr = new VNFRequirements(vnfd);
 							prod.setDescriptorHTML(vr.toHTML());
 							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
@@ -903,7 +944,39 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			prod.setScreenshots(screenshotsFilenames);
 
+//		//if it's a VxF we need also to update the images that this VxF will use
+//		if (prod instanceof VxFMetadata) {
+//			VxFMetadata vxfm = (VxFMetadata) prod;
+//			boolean imageexists = false;
+//			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
+//				vfimg = portalRepositoryRef.getVFImageByID( vfimg.getId() );//reattach from model
+//				if ( !vfimg.getUsedByVxFs().contains( vxfm )){
+//					vfimg.getUsedByVxFs().add(vxfm);
+//					portalRepositoryRef.updateVFImageInfo(vfimg);
+//				}
+//			}
+//		}
 		
+		//if it's a VxF we need also to update the images that this VxF will use
+				if (prod instanceof VxFMetadata) {
+					VxFMetadata vxfm = (VxFMetadata) prod;
+					for (VFImage vfimg : vxfm.getVfimagesVDU()) {				
+
+						boolean refexists = false;
+						for (VxFMetadata refVxF : vfimg.getUsedByVxFs() ) {
+							if ( refVxF.getName().equals(vxfm.getName()) ){
+								refexists = true; 
+								break;
+							}
+						}
+						if (!refexists){
+							vfimg.getUsedByVxFs().add(vxfm);
+							portalRepositoryRef.updateVFImageInfo(vfimg);
+							
+						}
+					}
+					
+				}
 
 		// save product
 		prod = portalRepositoryRef.updateProductInfo(prod);
@@ -915,6 +988,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			c.addProduct(p);
 			portalRepositoryRef.updateCategoryInfo(c);
 		}
+		
 
 		if (vxfOwner.getProductById(prod.getId()) == null)
 			vxfOwner.addProduct(prod);
@@ -1544,7 +1618,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
 				veDescriptor.setExperiment(appmeta);
 			}
-
+			BusController.getInstance().updateNSD(appmeta);	
+			BusController.getInstance().validationUpdateNSD(appmeta);
 			return Response.ok().entity(appmeta).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

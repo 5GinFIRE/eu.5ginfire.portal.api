@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 import portal.api.bugzilla.model.ErrorMsg;
 import portal.api.bus.BusController;
+import portal.api.model.Infrastructure;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
 import portal.api.model.VFImage;
@@ -173,6 +174,52 @@ public class PortalRepositoryVFImageAPI {
 				
 		return registeredvfimg;
 	}
+	
+	
+	/**
+	 * @param vfimg
+	 * @param vfimagefile
+	 * @return
+	 * @throws IOException
+	 */
+	private VFImage updateVFImage(VFImage vfimg, Attachment vfimagefile) throws IOException {
+
+		logger.info("image name = " + vfimg.getName());
+		logger.info("shortDescription = " +vfimg.getShortDescription());
+
+		URI endpointUrl = uri.getBaseUri();
+		String tempDir = VFIMAGESDIR + vfimg.getUuid() + File.separator;
+		
+		VFImage prevfImage = portalRepositoryRef.getVFImageByID( vfimg.getId() );
+		
+		//reattach usedVxF to the instance
+		for (VxFMetadata vxf : prevfImage.getUsedByVxFs()) {			
+			vfimg.getUsedByVxFs().add(vxf);
+		}
+		
+		//reattach getDeployedInfrastructures to the instance
+		for (Infrastructure i : prevfImage.getDeployedInfrastructures()) {			
+			vfimg.getDeployedInfrastructures().add(i); 
+		}
+	
+		if (vfimagefile != null) {
+			String imageFileNamePosted = AttachmentUtil.getFileName(vfimagefile.getHeaders());
+			logger.info("vfimagefile = " + imageFileNamePosted);
+			if (!imageFileNamePosted.equals("") && !imageFileNamePosted.equals("unknown")) {
+				Files.createDirectories(Paths.get(tempDir));
+				String imgfile = AttachmentUtil.saveFile( vfimagefile, tempDir + imageFileNamePosted);
+				logger.info("vfimagefile saved to = " + imgfile);
+				
+				vfimg.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/vfimages/image/" + vfimg.getUuid() + "/"
+						+ imageFileNamePosted);
+			}
+		}
+		
+		VFImage registeredvfimg =  portalRepositoryRef.updateVFImageInfo( vfimg ); 
+		
+				
+		return registeredvfimg;
+	}
 
 	
 	@GET
@@ -198,20 +245,47 @@ public class PortalRepositoryVFImageAPI {
 	
 
 	@PUT
-	@Path("/admin/vfimages/{uuid}")
+	@Path("/admin/vfimages/")	
+	@Consumes("multipart/form-data")
 	@Produces("application/json")
-	@Consumes("application/json")
-	public Response updateVFImage(@PathParam("uuid") int infraid, VFImage c) {
-		VFImage previousCategory = portalRepositoryRef.getVFImageByID(infraid);
+	public Response updateVFImage(@PathParam("uuid") int infraid, List<Attachment> ats) {
+		
+		VFImage vfimg = null;
+		
+		String emsg = "";
 
-		VFImage u = portalRepositoryRef.updateVFImageInfo(c);
+		try {
+			MappingJsonFactory factory = new MappingJsonFactory();
+			JsonParser parser = factory.createJsonParser( AttachmentUtil.getAttachmentStringValue("vfimage", ats));
+			vfimg = parser.readValueAs( VFImage.class );
 
-		if (u != null) {
-			return Response.ok().entity(u).build();
+			logger.info("Received @PUT for VFImage : " + vfimg.getName());
+			
+			vfimg = updateVFImage(vfimg,					
+					AttachmentUtil.getAttachmentByName("prodFile", ats));
+
+		} catch (JsonProcessingException e) {
+			vfimg = null;
+			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
+		} catch (IOException e) {
+			vfimg = null;
+			e.printStackTrace();
+			logger.error( e.getMessage() );
+			emsg =  e.getMessage();
+		}
+
+
+		if (vfimg != null) {
+
+			BusController.getInstance().aVFImageUpdated( vfimg );		
+			return Response.ok().entity(vfimg).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity( new ErrorMsg( "Requested Image with name=" + c.getName() + " cannot be updated") );
+			builder.entity( new ErrorMsg( "Requested Image cannot be installed. " + emsg )  );						
 			throw new WebApplicationException(builder.build());
+			
 		}
 
 	}

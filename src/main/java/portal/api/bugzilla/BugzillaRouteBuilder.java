@@ -25,13 +25,17 @@ import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
+import javax.ws.rs.core.Context;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.Message;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http4.HttpClientConfigurer;
@@ -258,10 +262,19 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Create VxF Validation Update Route
 		 */
-		from("seda:vxf.validate.update?multipleConsumers=true")
+		from("seda:vxf.validate.update?multipleConsumers=true")		
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
-		.process( BugHeaderExtractProcessor )
-		.to("direct:bugzilla.updateIssue");
+		.choice()
+			.when( issueExists )
+				.log( "Update ISSUE for validating ${body.alias} !" )		
+				.process( BugHeaderExtractProcessor )
+				.to("direct:bugzilla.updateIssue")
+				.endChoice()
+			.otherwise()
+				.log( "New ISSUE for validating ${body.alias} !" )	
+				.to("direct:bugzilla.newIssue")
+				.endChoice();
+		
 		
 		/**
 		 * Create NSD Validate New Route
@@ -276,8 +289,22 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */
 		from("seda:nsd.validate.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformNSDValidation2BugBody")
-		.process( BugHeaderExtractProcessor )
-		.to("direct:bugzilla.updateIssue");
+		.choice()
+		.when( issueExists )
+			.log( "Update ISSUE for validating ${body.alias} !" )		
+			.process( BugHeaderExtractProcessor )
+			.to("direct:bugzilla.updateIssue")
+			.endChoice()
+		.otherwise()
+			.log( "New ISSUE for validating ${body.alias} !" )	
+			.to("direct:bugzilla.newIssue")
+			.endChoice();
+		
+
+	    
+		from("direct:issue.get")
+		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.GET))
+		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.uuid}?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true");
 		
 		
 		/**
@@ -290,7 +317,32 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		
 	}
 
-	
+	Predicate issueExists = new Predicate() {
+		
+		@Override
+		public boolean matches(Exchange exchange) {
+			
+			Bug aBug = exchange.getIn().getBody( Bug.class );
+			Object m = null;
+			try{
+				FluentProducerTemplate template = exchange.getContext().createFluentProducerTemplate()
+					.withHeader("uuid", aBug.getAliasFirst()  )
+					.to( "direct:issue.get");
+				m = template.request();
+			}catch( CamelExecutionException e){
+				
+			}
+			
+			if ( m != null )	
+			{
+				return true;
+			}
+			else {
+				return false;
+			}
+			
+		}
+	};
 
 	Processor BugHeaderExtractProcessor = new Processor() {
 		

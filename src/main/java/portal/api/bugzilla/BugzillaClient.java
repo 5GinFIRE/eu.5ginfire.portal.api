@@ -23,6 +23,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
 
@@ -58,6 +59,7 @@ import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
+import portal.api.model.VFImage;
 import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.repo.PortalRepository;
@@ -217,7 +219,7 @@ public class BugzillaClient {
 		User u = new User();
 		u.setEmail( portalUser.getEmail()  );
 		u.setFullName( portalUser.getName() );
-		//u.setPassword( portalUser.getPassword() ); //no password. The user needs to reset it in the other system (e.g. Bugzilla)
+		u.setPassword( UUID.randomUUID().toString() ); //no password. The user needs to reset it in the other system (e.g. Bugzilla)
 		return u;
 		
 	}
@@ -241,9 +243,14 @@ public class BugzillaClient {
 		description.append( "\n Archive: " + vxf.getPackageLocation() );
 		description.append( "\n UUID: " + vxf.getUuid()  );
 		description.append( "\n ID: " + vxf.getId()   );
-		description.append( "\n Certified by: " + vxf.getCertifiedBy() );
-		
+		description.append( "\n Date Created: " + vxf.getDateCreated().toString()   );
+		description.append( "\n Date Updated: " + vxf.getDateUpdated().toString()   );
 
+		description.append( "\n VDU Images: "    );
+		for (VFImage img : vxf.getVfimagesVDU() ) {
+			description.append( "\n\t Image: " + img.getName() + ", " + BASE_SERVICE_URL + "/#!/vfimage_view/" + img.getId()    );
+			
+		}
 		 
 		description.append( "\n\n*************************************************\n");
 		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit//" + vxf.getId() ); 
@@ -285,6 +292,8 @@ public class BugzillaClient {
 		description.append( "\n Archive: " + nsd.getPackageLocation() );
 		description.append( "\n UUID: " + nsd.getUuid()  );
 		description.append( "\n ID: " + nsd.getId()   );
+		description.append( "\n Date Created: " + nsd.getDateCreated().toString() );
+		description.append( "\n Date Updated: " + nsd.getDateUpdated().toString() );
 		
 
 		 

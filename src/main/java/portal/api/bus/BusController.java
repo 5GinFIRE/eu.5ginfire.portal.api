@@ -256,5 +256,11 @@ public class BusController {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	public void aVFImageUpdated(VFImage vfimg) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

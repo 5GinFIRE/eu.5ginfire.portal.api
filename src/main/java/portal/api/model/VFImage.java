@@ -42,7 +42,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @Entity(name = "VFImage")
-@JsonIgnoreProperties(value = { "usedByVxFs" })
+@JsonIgnoreProperties(value = { "usedByVxFs"  })
 public class VFImage {
 
 	@Id
@@ -67,6 +67,10 @@ public class VFImage {
 	
 	@Basic()
 	private Date dateCreated;
+	
+
+	@Basic()
+	private Date dateUpdated;
 	
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
@@ -279,10 +283,41 @@ public class VFImage {
 	}
 	
 	
-	private class RefVxF {
+	/**
+	 * @param refVxFs the refVxFs to set
+	 */
+	public void setRefVxFs(List<RefVxF> refVxFs) {
+		this.refVxFs = refVxFs;
+	}
+
+
+	/**
+	 * @return the dateUpdated
+	 */
+	public Date getDateUpdated() {
+		return dateUpdated;
+	}
+
+
+	/**
+	 * @param dateUpdated the dateUpdated to set
+	 */
+	public void setDateUpdated(Date dateUpdated) {
+		this.dateUpdated = dateUpdated;
+	}
+
+
+
+
+
+	static class RefVxF {
 
 		private long id;
 		private String name;
+		
+		public RefVxF() {
+					
+		}
 		
 		public RefVxF(long id2, String name2) {
 			id = id2;

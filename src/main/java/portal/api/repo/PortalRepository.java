@@ -16,6 +16,7 @@
 package portal.api.repo;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -500,20 +501,30 @@ public class PortalRepository {
 	}
 
 
-	public VFImage addVFImage(VFImage c) {
-		portalJpaController.saveVFImage(c);
-		return c;
-	}
-
 
 	public VFImage getVFImageByID(int infraid) {
 		return portalJpaController.readVFImageById( infraid );
 	}
 
 
-	public VFImage updateVFImageInfo(VFImage c) {
-		VFImage bmr = portalJpaController.updateVFImage(c);
-		return bmr;
+	/**
+	 * @param vfimg
+	 * @return
+	 */
+	public VFImage updateVFImageInfo(VFImage vfimg) {
+
+		vfimg.setDateUpdated(new Date());
+		
+		// Save now vxf for User
+		PortalUser vxfOwner = this.getUserByID( vfimg.getOwner().getId() );
+		vxfOwner.addVFImage( vfimg );
+		vfimg.setOwner(vxfOwner); // replace given owner with the one from our DB
+
+		PortalUser owner = this.updateUserInfo(  vxfOwner );
+		VFImage registeredvfimg = this.getVFImageByUUID( vfimg.getUuid() );
+		return registeredvfimg;
+		
+		
 	}
 
 

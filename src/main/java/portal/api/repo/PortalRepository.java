@@ -555,6 +555,13 @@ public class PortalRepository {
 		return registeredvfimg;
 	}
 
+
+	public List<VFImage> getVFImagesByUserID(long ownerid) {
+
+		List<VFImage> ls = portalJpaController.readVFImagesForOwnerID( ownerid, 0, 100000);	
+		return ls;
+	}
+
 	
 
 

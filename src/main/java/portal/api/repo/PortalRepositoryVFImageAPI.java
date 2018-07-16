@@ -36,6 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -54,6 +55,7 @@ import portal.api.bus.BusController;
 import portal.api.model.Infrastructure;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
+import portal.api.model.UserRoleType;
 import portal.api.model.VFImage;
 import portal.api.model.VxFMetadata;
 import portal.api.util.AttachmentUtil;
@@ -72,6 +74,10 @@ public class PortalRepositoryVFImageAPI {
 
 	@Context
 	MessageContext ws;
+	
+
+	@Context
+	protected SecurityContext sc;
 
 	@Context
 	private PortalRepository portalRepositoryRef;
@@ -96,7 +102,26 @@ public class PortalRepositoryVFImageAPI {
 	@Path("/admin/vfimages/")
 	@Produces("application/json")
 	public Response getAdminVFImages() {
-		return Response.ok().entity(portalRepositoryRef.getVFImages()).build();
+		
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		
+		if (u != null) {
+			List<VFImage> vfimagess;
+
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getRoles().contains(UserRoleType.TESTBED_PROVIDER)) {
+				vfimagess = portalRepositoryRef.getVFImages();
+			} else {
+				vfimagess = portalRepositoryRef.getVFImagesByUserID((long) u.getId());
+			}
+
+			return Response.ok().entity( vfimagess ).build();
+
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("User not found in portal registry or not logged in");
+			throw new WebApplicationException(builder.build());
+		}
+		
 	}
 
 	@POST
@@ -249,8 +274,6 @@ public class PortalRepositoryVFImageAPI {
 		logger.info("VxF RESOURCE FILE: " + vxfAbsfile);
 		File file = new File(vxfAbsfile);
 
-		
-
 		ResponseBuilder response = Response.ok((Object) file);
 		response.header("Content-Disposition", "attachment; filename=" + file.getName());
 		return response.build();
@@ -273,6 +296,10 @@ public class PortalRepositoryVFImageAPI {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser( AttachmentUtil.getAttachmentStringValue("vfimage", ats));
 			vfimg = parser.readValueAs( VFImage.class );
+			
+			if ( !checkUserIDorIsAdmin( vfimg.getOwner().getId() ) ){
+				 return Response.status(Status.FORBIDDEN ).build();
+			}
 
 			logger.info("Received @PUT for VFImage : " + vfimg.getName());
 			
@@ -308,6 +335,13 @@ public class PortalRepositoryVFImageAPI {
 	@DELETE
 	@Path("/admin/vfimages/{id}")
 	public Response deleteVFImage(@PathParam("id") int id) {
+		
+		VFImage sm = portalRepositoryRef.getVFImageByID(id);
+		
+		if ( !checkUserIDorIsAdmin( sm.getOwner().getId() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+
 		portalRepositoryRef.deleteVFImage(id);
 		return Response.ok().build();
 
@@ -320,6 +354,11 @@ public class PortalRepositoryVFImageAPI {
 		VFImage sm = portalRepositoryRef.getVFImageByID(id);
 
 		if (sm != null) {
+			
+			if ( !checkUserIDorIsAdmin( sm.getOwner().getId() ) ){
+				 return Response.status(Status.FORBIDDEN ).build();
+			}
+			
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -335,6 +374,9 @@ public class PortalRepositoryVFImageAPI {
 		VFImage sm = portalRepositoryRef.getVFImageByName( imagename );
 
 		if (sm != null) {
+			if ( !checkUserIDorIsAdmin( sm.getOwner().getId() ) ){
+				 return Response.status(Status.FORBIDDEN ).build();
+			}
 			return Response.ok().entity(sm).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -343,4 +385,18 @@ public class PortalRepositoryVFImageAPI {
 		}
 	}
 
+	/**
+	 * @param userID
+	 * @return true if user logged is equal to the requested id of owner, or is PORTALADMIN
+	 */
+	private boolean checkUserIDorIsAdmin(int userID){
+		if ( sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return true;
+		}
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		if ( u.getId() == userID ){
+			return true;
+		}
+		return false;
+	}
 }

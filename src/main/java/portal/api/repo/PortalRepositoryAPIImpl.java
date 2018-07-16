@@ -123,7 +123,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	MessageContext ws;
 
 	@Context
-	protected SecurityContext securityContext;
+	protected SecurityContext sc;
 
 	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
@@ -146,12 +146,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// http://pic.dhe.ibm.com/infocenter/radhelp/v9/index.jsp?topic=%2Fcom.ibm.javaee.doc%2Ftopics%2Ftsecuringejee.html
 	public Response getUsers() {
 
-		if (securityContext != null) {
-			if (securityContext.getUserPrincipal() != null)
-				logger.info(" securityContext.getUserPrincipal().toString() >"
-						+ securityContext.getUserPrincipal().getName() + "<");
-
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
 		}
+//		if (sc != null) {
+//			if (sc.getUserPrincipal() != null)
+//				logger.info(" securityContext.getUserPrincipal().toString() >"
+//						+ sc.getUserPrincipal().getName() + "<");
+//
+//		}
 
 		return Response.ok().entity(portalRepositoryRef.getUserValues()).build();
 	}
@@ -160,8 +163,17 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/users/{userid}")
 	@Produces("application/json")
 	public Response getUserById(@PathParam("userid") int userid) {
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
 
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
+		
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -189,6 +201,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			ResponseBuilder builder = Response.status(Status.BAD_REQUEST);
 			builder.entity("New user with username=" + user.getUsername() + " cannot be registered");
 			logger.info("New user with username=" + user.getUsername() + " cannot be registered BAD_REQUEST.");
+			throw new WebApplicationException(builder.build());
+		}
+		
+		if ( user.getActive() ) {
+			ResponseBuilder builder = Response.status(Status.BAD_REQUEST);
+			builder.entity("New user with username=" + user.getUsername() + " cannot be registered, seems ACTIVE already");
+			logger.info("New user with username=" + user.getUsername() + " cannot be registered BAD_REQUEST, seems ACTIVE already");
 			throw new WebApplicationException(builder.build());
 		}
 
@@ -279,6 +298,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response updateUserInfo(@PathParam("userid") int userid, PortalUser user) {
 		logger.info("Received PUT for user: " + user.getUsername());
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
 
 		PortalUser previousUser = portalRepositoryRef.getUserByID(userid);
 
@@ -304,17 +327,40 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response deleteUser(@PathParam("userid") int userid) {
 		logger.info("Received DELETE for userid: " + userid);
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
 
 		portalRepositoryRef.deleteUser(userid);
 
 		return Response.ok().build();
 	}
+	
+	/**
+	 * @param userID
+	 * @return true if user logged is equal to the requested id of owner, or is PORTALADMIN
+	 */
+	private boolean checkUserIDorIsAdmin(int userID){
+		if ( sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return true;
+		}
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		if ( (u !=null )  && (u.getId() == userID) ){
+			return true;
+		}
+		return false;
+	}
 
 	@GET
-	@Path("/users/{userid}/vxfs")
+	@Path("/admin/users/{userid}/vxfs")
 	@Produces("application/json")
 	public Response getAllVxFsofUser(@PathParam("userid") int userid) {
 		logger.info("getAllVxFsofUser for userid: " + userid);
+		
+		if ( !checkUserIDorIsAdmin( userid ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
@@ -334,10 +380,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/experiments")
+	@Path("/admin/users/{userid}/experiments")
 	@Produces("application/json")
 	public Response getAllAppsofUser(@PathParam("userid") int userid) {
 		logger.info("getAllAppsofUser for userid: " + userid);
+		
+		if ( !checkUserIDorIsAdmin( userid ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+
+		
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
@@ -357,10 +409,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/vxfs/{vxfid}")
+	@Path("/admin/users/{userid}/vxfs/{vxfid}")
 	@Produces("application/json")
 	public Response getVxFofUser(@PathParam("userid") int userid, @PathParam("vxfid") int vxfid) {
 		logger.info("getVxFofUser for userid: " + userid + ", vxfid=" + vxfid);
+
+		if ( !checkUserIDorIsAdmin( userid ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+
+		
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
@@ -374,10 +432,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/users/{userid}/experiments/{appid}")
+	@Path("/admin/users/{userid}/experiments/{appid}")
 	@Produces("application/json")
 	public Response getAppofUser(@PathParam("userid") int userid, @PathParam("appid") int appid) {
 		logger.info("getAppofUser for userid: " + userid + ", appid=" + appid);
+		if ( !checkUserIDorIsAdmin( userid ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+		
 		PortalUser u = portalRepositoryRef.getUserByID(userid);
 
 		if (u != null) {
@@ -720,6 +782,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfs/{bid}")
 	@Consumes("multipart/form-data")
 	public Response updateVxFMetadata(@PathParam("bid") int bid, List<Attachment> ats) {
+		
+		
 
 		VxFMetadata vxf = null;
 		String emsg = "";
@@ -728,6 +792,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("vxf", ats));
 			vxf = parser.readValueAs(VxFMetadata.class);
+			
+			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+				 return Response.status(Status.FORBIDDEN ).build();
+			}
 
 			logger.info("Received @PUT for vxf : " + vxf.getName());
 			logger.info("Received @PUT for vxf.extensions : " + vxf.getExtensions());
@@ -1045,6 +1113,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("TEST LOCAL RESOURCE FILE: " + res);
 			file = new File(res.getFile());
 		}
+		if ( !portalRepositoryRef.getProductByUUID(uuid).isPublished()){
+			return Response.status(Status.FORBIDDEN ).build();
+		}
+	
 
 		ResponseBuilder response = Response.ok((Object) file);
 		response.header("Content-Disposition", "attachment; filename=" + file.getName());
@@ -1055,8 +1127,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfs/{vxfid}")
 	public void deleteVxF(@PathParam("vxfid") int vxfid) {
 		
-
+		
 		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
+		
+		if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+			throw new WebApplicationException( Response.status(Status.FORBIDDEN ).build() );
+		}
 		
 		if ( ! vxf.isCertified()  ) {
 			portalRepositoryRef.deleteProduct(vxfid);
@@ -1078,6 +1154,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
 
 		if (vxf != null) {
+			
+			if ( !vxf.isPublished() ){
+				Response.status(Status.FORBIDDEN ).build() ;
+			}
+			
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1091,7 +1172,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getAdminVxFMetadataByID(@PathParam("vxfid") int vxfid) {
 
-		return getVxFMetadataByID(vxfid);
+		logger.info("getAdminVxFMetadataByID  vxfid=" + vxfid);
+		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
+
+		if (vxf != null) {
+			
+			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
+			
+			
+			return Response.ok().entity(vxf).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
 	}
 
 	@GET
@@ -1141,6 +1237,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		if (vxf != null) {
+			
+			if ( ! vxf.isPublished() ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
+			
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1194,10 +1295,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// logger.info("DANGER, REMOVE Received POST addUserSession password: "
 		// + userSession.getPassword());
 
-		if (securityContext != null) {
-			if (securityContext.getUserPrincipal() != null)
+		if (sc != null) {
+			if (sc.getUserPrincipal() != null)
 				logger.info(" securityContext.getUserPrincipal().toString() >"
-						+ securityContext.getUserPrincipal().toString() + "<");
+						+ sc.getUserPrincipal().toString() + "<");
 
 		}
 
@@ -1240,10 +1341,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		logger.info("Received logoutUser ");
 
-		if (securityContext != null) {
-			if (securityContext.getUserPrincipal() != null)
+		if (sc != null) {
+			if (sc.getUserPrincipal() != null)
 				logger.info(" securityContext.getUserPrincipal().toString() >"
-						+ securityContext.getUserPrincipal().toString() + "<");
+						+ sc.getUserPrincipal().toString() + "<");
 
 			SecurityUtils.getSubject().logout();
 		}
@@ -1260,10 +1361,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		logger.info("Received GET addUserSession usergetUsername: ");
 		logger.info("Received GET addUserSession password: ");
 
-		if (securityContext != null) {
-			if (securityContext.getUserPrincipal() != null)
+		if (sc != null) {
+			if (sc.getUserPrincipal() != null)
 				logger.info(" securityContext.getUserPrincipal().toString() >"
-						+ securityContext.getUserPrincipal().toString() + "<");
+						+ sc.getUserPrincipal().toString() + "<");
 
 		}
 
@@ -1286,125 +1387,125 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	// Subscribed resources related API
 
-	@GET
-	@Path("/admin/subscribedresources/")
-	@Produces("application/json")
-	public Response getSubscribedResources() {
-
-		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
-
-		if (u != null) {
-
-			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
-				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return
-																												// all
-			} else
-				return Response.ok().entity(u.getSubscribedResources()).build();
-
-		}
-
-		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("User not found in portal registry or not logged in");
-		throw new WebApplicationException(builder.build());
-
-	}
-
-	@GET
-	@Path("/admin/subscribedresources/{smId}")
-	@Produces("application/json")
-	public Response getSubscribedResourceById(@PathParam("smId") int smId) {
-
-		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
-
-		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
-
-		if ((sm != null) && (u != null)) {
-
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId()))
-				return Response.ok().entity(sm).build();
-
-		}
-
-		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-		builder.entity("SubscribedResource" + smId + " not found in portal registry");
-		throw new WebApplicationException(builder.build());
-
-	}
-
-	@POST
-	@Path("/admin/subscribedresources/")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response addSubscribedResource(SubscribedResource sm) {
-
-		PortalUser u = sm.getOwner();
-		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
-
-		if (u != null) {
-			sm.setOwner(u);
-
-			u.getSubscribedResources().add(sm);
-			u = portalRepositoryRef.updateUserInfo(  u);
-
-			return Response.ok().entity(sm).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
-					+ " cannot be registered under not found user");
-			throw new WebApplicationException(builder.build());
-		}
-	}
-
-	@PUT
-	@Path("/admin/subscribedresources/{smId}")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response updateSubscribedResource(@PathParam("smId") int smId, SubscribedResource sm) {
-		logger.info("Received SubscribedResource for user: " + sm.getURL());
-
-		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
-
-		PortalUser reattachedUser = portalRepositoryRef.getUserByID(sm.getOwner().getId());
-		sm.setOwner(reattachedUser);
-
-		if (u != null) {
-
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
-
-				SubscribedResource sr = portalRepositoryRef.updateSubscribedResourceInfo(smId, sm);
-				return Response.ok().entity(u).build();
-			}
-
-		}
-
-		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-		builder.entity("Requested SubscribedResource with url=" + sm.getURL() + " cannot be updated");
-		throw new WebApplicationException(builder.build());
-
-	}
-
-	@DELETE
-	@Path("/admin/subscribedresources/{smId}")
-	@Produces("application/json")
-	public Response deleteSubscribedResource(@PathParam("smId") int smId) {
-		logger.info("Received SubscribedResource for userid: " + smId);
-
-		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
-
-		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
-		if (u != null) {
-
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
-				portalRepositoryRef.deleteSubscribedResource(smId);
-				return Response.ok().build();
-
-			}
-		}
-
-		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-		builder.entity("Requested SubscribedResource with id=" + smId + " cannot be deleted");
-		throw new WebApplicationException(builder.build());
-	}
+//	@GET
+//	@Path("/admin/subscribedresources/")
+//	@Produces("application/json")
+//	public Response getSubscribedResources() {
+//
+//		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+//
+//		if (u != null) {
+//
+//			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
+//				return Response.ok().entity(portalRepositoryRef.getSubscribedResourcesAsCollection()).build(); // return
+//																												// all
+//			} else
+//				return Response.ok().entity(u.getSubscribedResources()).build();
+//
+//		}
+//
+//		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+//		builder.entity("User not found in portal registry or not logged in");
+//		throw new WebApplicationException(builder.build());
+//
+//	}
+//
+//	@GET
+//	@Path("/admin/subscribedresources/{smId}")
+//	@Produces("application/json")
+//	public Response getSubscribedResourceById(@PathParam("smId") int smId) {
+//
+//		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+//
+//		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
+//
+//		if ((sm != null) && (u != null)) {
+//
+//			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId()))
+//				return Response.ok().entity(sm).build();
+//
+//		}
+//
+//		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+//		builder.entity("SubscribedResource" + smId + " not found in portal registry");
+//		throw new WebApplicationException(builder.build());
+//
+//	}
+//
+//	@POST
+//	@Path("/admin/subscribedresources/")
+//	@Produces("application/json")
+//	@Consumes("application/json")
+//	public Response addSubscribedResource(SubscribedResource sm) {
+//
+//		PortalUser u = sm.getOwner();
+//		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
+//
+//		if (u != null) {
+//			sm.setOwner(u);
+//
+//			u.getSubscribedResources().add(sm);
+//			u = portalRepositoryRef.updateUserInfo(  u);
+//
+//			return Response.ok().entity(sm).build();
+//		} else {
+//			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+//			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
+//					+ " cannot be registered under not found user");
+//			throw new WebApplicationException(builder.build());
+//		}
+//	}
+//
+//	@PUT
+//	@Path("/admin/subscribedresources/{smId}")
+//	@Produces("application/json")
+//	@Consumes("application/json")
+//	public Response updateSubscribedResource(@PathParam("smId") int smId, SubscribedResource sm) {
+//		logger.info("Received SubscribedResource for user: " + sm.getURL());
+//
+//		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+//
+//		PortalUser reattachedUser = portalRepositoryRef.getUserByID(sm.getOwner().getId());
+//		sm.setOwner(reattachedUser);
+//
+//		if (u != null) {
+//
+//			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
+//
+//				SubscribedResource sr = portalRepositoryRef.updateSubscribedResourceInfo(smId, sm);
+//				return Response.ok().entity(u).build();
+//			}
+//
+//		}
+//
+//		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+//		builder.entity("Requested SubscribedResource with url=" + sm.getURL() + " cannot be updated");
+//		throw new WebApplicationException(builder.build());
+//
+//	}
+//
+//	@DELETE
+//	@Path("/admin/subscribedresources/{smId}")
+//	@Produces("application/json")
+//	public Response deleteSubscribedResource(@PathParam("smId") int smId) {
+//		logger.info("Received SubscribedResource for userid: " + smId);
+//
+//		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+//
+//		SubscribedResource sm = portalRepositoryRef.getSubscribedResourceByID(smId);
+//		if (u != null) {
+//
+//			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (sm.getOwner().getId() == u.getId())) {
+//				portalRepositoryRef.deleteSubscribedResource(smId);
+//				return Response.ok().build();
+//
+//			}
+//		}
+//
+//		ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+//		builder.entity("Requested SubscribedResource with id=" + smId + " cannot be deleted");
+//		throw new WebApplicationException(builder.build());
+//	}
 
 	// Applications related API
 
@@ -1445,7 +1546,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	
 	
 	/**
-	 * @return all User's Valid experiments as well as allo Public and Valid experiments 
+	 * @return all User's Valid experiments as well as all Public and Valid experiments 
 	 */
 	@GET
 	@Path("/admin/experiments/deployable")
@@ -1505,8 +1606,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getAppMetadataByID(@PathParam("appid") int appid) {
 		logger.info("getAppMetadataByID  appid=" + appid);
 		ExperimentMetadata app = (ExperimentMetadata) portalRepositoryRef.getProductByID(appid);
+		
 
 		if (app != null) {
+			if ( !app.isPublished() ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
 			return Response.ok().entity(app).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1519,7 +1624,23 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experiments/{appid}")
 	@Produces("application/json")
 	public Response getAdminAppMetadataByID(@PathParam("appid") int appid) {
-		return getAppMetadataByID(appid);
+		
+		logger.info("getAppMetadataByID  appid=" + appid);
+		ExperimentMetadata app = (ExperimentMetadata) portalRepositoryRef.getProductByID(appid);
+		
+
+		if (app != null) {
+
+			if ( !checkUserIDorIsAdmin( app.getOwner().getId() ) ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
+			
+			return Response.ok().entity(app).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("App with id=" + appid + " not found in portal registry");
+			throw new WebApplicationException(builder.build());
+		}
 	}
 
 	@GET
@@ -1532,6 +1653,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		app = (ExperimentMetadata) portalRepositoryRef.getProductByUUID(uuid);
 
 		if (app != null) {
+			if ( !app.isPublished() ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
 			return Response.ok().entity(app).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -1553,6 +1677,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			builder.entity("User not found in portal registry or not logged in ");
 			throw new WebApplicationException(builder.build());
 		}
+		
+		
 
 		ExperimentMetadata experiment = new ExperimentMetadata();
 
@@ -1561,6 +1687,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("exprm", ats));
 			experiment = parser.readValueAs(ExperimentMetadata.class);
+			
 
 			logger.info("Received @POST for experiment : " + experiment.getName());
 			// ExperimentMetadata sm = new ExperimentMetadata();
@@ -1597,43 +1724,47 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("multipart/form-data")
 	public Response updateExperimentMetadata(@PathParam("aid") int aid, List<Attachment> ats) {
 
-		ExperimentMetadata appmeta = null;
+		ExperimentMetadata expmeta = null;
 		
 		String emsg= "";
 
 		try {
 			MappingJsonFactory factory = new MappingJsonFactory();
 			JsonParser parser = factory.createJsonParser(AttachmentUtil.getAttachmentStringValue("exprm", ats));
-			appmeta = parser.readValueAs(ExperimentMetadata.class);
+			expmeta = parser.readValueAs(ExperimentMetadata.class);
 
-			logger.info("Received @POST for experiment : " + appmeta.getName());
+			if ( !checkUserIDorIsAdmin( expmeta.getOwner().getId() ) ){
+				return Response.status(Status.FORBIDDEN ).build() ;
+			}
+			
+			logger.info("Received @POST for experiment : " + expmeta.getName());
 			// logger.info("Received @POST for app.containers : " +
 			// appmeta.getContainers().size());
 
-			appmeta = (ExperimentMetadata) updateProductMetadata(appmeta, AttachmentUtil.getAttachmentByName("prodIcon", ats),
+			expmeta = (ExperimentMetadata) updateProductMetadata(expmeta, AttachmentUtil.getAttachmentByName("prodIcon", ats),
 					AttachmentUtil.getAttachmentByName("prodFile", ats), AttachmentUtil.getListOfAttachmentsByName("screenshots", ats));
 
 		} catch (JsonProcessingException e) {
-			appmeta = null;
+			expmeta = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		} catch (IOException e) {
-			appmeta = null;
+			expmeta = null;
 			e.printStackTrace();
 			logger.error( e.getMessage() );
 			emsg =  e.getMessage();
 		}
 		
 		
-		if ( appmeta != null) { 
+		if ( expmeta != null) { 
 
-			for (ExperimentOnBoardDescriptor veDescriptor : appmeta.getExperimentOnBoardDescriptors()) {
-				veDescriptor.setExperiment(appmeta);
+			for (ExperimentOnBoardDescriptor veDescriptor : expmeta.getExperimentOnBoardDescriptors()) {
+				veDescriptor.setExperiment(expmeta);
 			}
-			BusController.getInstance().updateNSD(appmeta);	
-			BusController.getInstance().validationUpdateNSD(appmeta);
-			return Response.ok().entity(appmeta).build();
+			BusController.getInstance().updateNSD(expmeta);	
+			BusController.getInstance().validationUpdateNSD(expmeta);
+			return Response.ok().entity(expmeta).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );	
@@ -1650,6 +1781,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		ExperimentMetadata nsd = (ExperimentMetadata) portalRepositoryRef.getProductByID( appid );
 		
 		if ( ! nsd.isValid()   ) {
+			if ( !checkUserIDorIsAdmin( nsd.getOwner().getId() ) ){
+				throw new WebApplicationException( Response.status(Status.FORBIDDEN ).build() );
+			}
 			portalRepositoryRef.deleteProduct(appid);
 			BusController.getInstance().deletedExperiment( nsd );			
 		} else {
@@ -1672,6 +1806,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/categories/")
 	@Produces("application/json")
 	public Response getAdminCategories() {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		return Response.ok().entity(portalRepositoryRef.getCategories()).build();
 	}
 
@@ -1680,6 +1817,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addCategory(Category c) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		Category u = portalRepositoryRef.addCategory(c);
 
 		if (u != null) {
@@ -1696,6 +1837,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateCategory(@PathParam("catid") int catid, Category c) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
+		
 		Category previousCategory = portalRepositoryRef.getCategoryByID(catid);
 
 		Category u = portalRepositoryRef.updateCategoryInfo(c);
@@ -1713,6 +1859,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@DELETE
 	@Path("/admin/categories/{catid}")
 	public Response deleteCategory(@PathParam("catid") int catid) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
+		
 		Category category = portalRepositoryRef.getCategoryByID(catid);
 		if ((category.getProducts().size() > 0)) {
 			ResponseBuilder builder = Response.status(Status.METHOD_NOT_ALLOWED);
@@ -1743,6 +1894,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/categories/{catid}")
 	@Produces("application/json")
 	public Response getAdminCategoryById(@PathParam("catid") int catid) {
+		
 		return getCategoryById(catid);
 	}
 
@@ -1756,6 +1908,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/properties/")
 	@Produces("application/json")
 	public Response getProperties() {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
+		
 		List<PortalProperty> props = portalRepositoryRef.getProperties();
 		for (PortalProperty portalProperty : props) {
 			if (portalProperty.getName().equals("mailpassword")) {
@@ -1770,6 +1927,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateProperty(@PathParam("catid") int propid, PortalProperty p) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
+		
 		PortalProperty previousProperty = portalRepositoryRef.getPropertyByID(propid);
 
 		PortalProperty u = portalRepositoryRef.updateProperty(p);
@@ -1787,6 +1949,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/properties/{propid}")
 	@Produces("application/json")
 	public Response getPropertyById(@PathParam("propid") int propid) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		PortalProperty sm = portalRepositoryRef.getPropertyByID(propid);
 
 		if (sm.getName().equals("mailpassword")) {
@@ -1965,42 +2131,42 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	}
 
-	@POST
-	@Path("/registerresource/")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public Response addANewAnauthSubscribedResource(SubscribedResource sm) {
-
-		logger.info("Received SubscribedResource for client: " + sm.getUuid() + ", URLs:" + sm.getURL() + ", OwnerID:"
-				+ sm.getOwner().getId());
-
-		PortalUser u = sm.getOwner();
-		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
-
-		if ((u != null) && (sm.getUuid() != null)) {
-
-			SubscribedResource checkSM = portalRepositoryRef.getSubscribedResourceByUUID(sm.getUuid());
-
-			if (checkSM == null) {
-				sm.setOwner(u);
-				sm.setActive(false);
-				u.getSubscribedResources().add(sm);
-				u = portalRepositoryRef.updateUserInfo(  u);
-				return Response.ok().entity(sm).build();
-			} else {
-				checkSM.setURL(sm.getURL());// update URL if changed
-				// u = portalRepositoryRef.updateUserInfo( u.getId(), u);
-				checkSM = portalRepositoryRef.updateSubscribedResourceInfo(checkSM.getId(), checkSM);
-				return Response.ok().entity(checkSM).build();
-			}
-
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
-					+ " cannot be registered under not found user");
-			throw new WebApplicationException(builder.build());
-		}
-	}
+//	@POST
+//	@Path("/registerresource/")
+//	@Produces("application/json")
+//	@Consumes("application/json")
+//	public Response addANewAnauthSubscribedResource(SubscribedResource sm) {
+//
+//		logger.info("Received SubscribedResource for client: " + sm.getUuid() + ", URLs:" + sm.getURL() + ", OwnerID:"
+//				+ sm.getOwner().getId());
+//
+//		PortalUser u = sm.getOwner();
+//		u = portalRepositoryRef.getUserByID(sm.getOwner().getId());
+//
+//		if ((u != null) && (sm.getUuid() != null)) {
+//
+//			SubscribedResource checkSM = portalRepositoryRef.getSubscribedResourceByUUID(sm.getUuid());
+//
+//			if (checkSM == null) {
+//				sm.setOwner(u);
+//				sm.setActive(false);
+//				u.getSubscribedResources().add(sm);
+//				u = portalRepositoryRef.updateUserInfo(  u);
+//				return Response.ok().entity(sm).build();
+//			} else {
+//				checkSM.setURL(sm.getURL());// update URL if changed
+//				// u = portalRepositoryRef.updateUserInfo( u.getId(), u);
+//				checkSM = portalRepositoryRef.updateSubscribedResourceInfo(checkSM.getId(), checkSM);
+//				return Response.ok().entity(checkSM).build();
+//			}
+//
+//		} else {
+//			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+//			builder.entity("Requested SubscribedResource with rls=" + sm.getURL()
+//					+ " cannot be registered under not found user");
+//			throw new WebApplicationException(builder.build());
+//		}
+//	}
 
 	/********************************************************************************
 	 * 
@@ -2019,6 +2185,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/manoplatforms/")
 	@Produces("application/json")
 	public Response getAdminMANOplatforms() {
+
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		return Response.ok().entity(portalRepositoryRef.getMANOplatforms()).build();
 	}
 
@@ -2027,6 +2198,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addMANOplatform(MANOplatform c) {
+
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
+		
 		MANOplatform u = portalRepositoryRef.addMANOplatform(c);
 
 		if (u != null) {
@@ -2043,6 +2220,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateMANOplatform(@PathParam("mpid") int mpid, MANOplatform c) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOplatform previousMP = portalRepositoryRef.getMANOplatformByID(mpid);
 
 		MANOplatform u = portalRepositoryRef.updateMANOplatformInfo(c);
@@ -2060,6 +2241,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@DELETE
 	@Path("/admin/manoplatforms/{mpid}")
 	public Response deleteMANOplatform(@PathParam("mpid") int mpid) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOplatform category = portalRepositoryRef.getMANOplatformByID(mpid);
 
 		portalRepositoryRef.deleteMANOplatform(mpid);
@@ -2071,6 +2256,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/manoplatforms/{mpid}")
 	@Produces("application/json")
 	public Response getMANOplatformById(@PathParam("mpid") int mpid) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOplatform sm = portalRepositoryRef.getMANOplatformByID(mpid);
 
 		if (sm != null) {
@@ -2102,6 +2291,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/manoproviders/")
 	@Produces("application/json")
 	public Response getAdminMANOproviders() {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		return Response.ok().entity(portalRepositoryRef.getMANOproviders()).build();
 	}
 
@@ -2110,6 +2303,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addMANOprovider(MANOprovider c) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider u = portalRepositoryRef.addMANOprovider(c);
 
 		if (u != null) {
@@ -2127,6 +2324,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response updateMANOprovider(@PathParam("mpid") int mpid, MANOprovider c) {
 
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider u = portalRepositoryRef.updateMANOproviderInfo(c);
 
 		if (u != null) {
@@ -2143,6 +2344,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/manoproviders/{mpid}")
 	public Response deleteMANOprovider(@PathParam("mpid") int mpid) {
 
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		portalRepositoryRef.deleteMANOprovider(mpid);
 		return Response.ok().build();
 
@@ -2152,6 +2357,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/manoproviders/{mpid}")
 	@Produces("application/json")
 	public Response getAdminMANOproviderById(@PathParam("mpid") int mpid) {
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(mpid);
 
 		if (sm != null) {
@@ -2168,6 +2377,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getOSMVNFMetadataByKOSMMANOID(@PathParam("mpid") int manoprovid, @PathParam("vxfid") String vxfid) {
 		logger.info("getOSMVNFMetadataByID  vxfid=" + vxfid);
+		
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
@@ -2183,10 +2396,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/manoprovider/{mpid}/vnfds/")
+	@Path("/admin/manoprovider/{mpid}/vnfds/")
 	@Produces("application/json")
 	public Response getOSMVNFMetadata(@PathParam("mpid") int manoprovid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
 		List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
@@ -2201,12 +2417,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/manoprovider/{mpid}/nsds/{nsdid}")
+	@Path("/admin/manoprovider/{mpid}/nsds/{nsdid}")
 	@Produces("application/json")
 	public Response getOSM_NSD_MetadataByKOSMMANOID(@PathParam("mpid") int manoprovid,
 			@PathParam("vxfid") String nsdid) {
 		logger.info("getOSMVNFMetadataByID  nsdid=" + nsdid);
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
 		Nsd nsd = OSMClient.getInstance(sm).getNSDbyID(nsdid);
@@ -2221,10 +2440,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 
 	@GET
-	@Path("/manoprovider/{mpid}/nsds/")
+	@Path("/admin/manoprovider/{mpid}/nsds/")
 	@Produces("application/json")
 	public Response getOSM_NSD_Metadata(@PathParam("mpid") int manoprovid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
 		List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
@@ -2256,6 +2478,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		VxFOnBoardedDescriptor u = portalRepositoryRef.addVxFOnBoardedDescriptor(c);
 
 		if (u != null) {
@@ -2273,6 +2499,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response updateVxFOnBoardedDescriptor(@PathParam("mpid") int mpid, VxFOnBoardedDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		if (u != null) {
@@ -2289,6 +2518,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}")
 	public Response deleteVxFOnBoardedDescriptor(@PathParam("mpid") int mpid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		portalRepositoryRef.deleteVxFOnBoardedDescriptor(mpid);
 		return Response.ok().build();
 
@@ -2298,6 +2530,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}")
 	@Produces("application/json")
 	public Response getVxFOnBoardedDescriptorById(@PathParam("mpid") int mpid) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
 
 		if (sm != null) {
@@ -2315,6 +2550,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getVxFOnBoardedDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
 
 		if (sm == null) {
@@ -2355,6 +2593,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response onBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		c.setDeployId(UUID.randomUUID().toString());
 		VxFMetadata vxf = c.getVxf();
@@ -2415,6 +2656,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 		// TODO: Implement this towards MANO
@@ -2440,6 +2684,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/")
 	@Produces("application/json")
 	public Response getExperimentOnBoardDescriptors() {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		return Response.ok().entity(portalRepositoryRef.getExperimentOnBoardDescriptors()).build();
 	}
 
@@ -2448,6 +2695,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.addExperimentOnBoardDescriptor(c);
 
 		if (u != null) {
@@ -2465,6 +2715,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response updateExperimentOnBoardDescriptor(@PathParam("mpid") int mpid, ExperimentOnBoardDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
 		if (u != null) {
@@ -2481,6 +2734,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/{mpid}")
 	public Response deleteExperimentOnBoardDescriptor(@PathParam("mpid") int mpid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		portalRepositoryRef.deleteExperimentOnBoardDescriptor(mpid);
 		return Response.ok().build();
 
@@ -2490,6 +2746,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/{mpid}")
 	@Produces("application/json")
 	public Response getExperimentOnBoardDescriptorById(@PathParam("mpid") int mpid) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		ExperimentOnBoardDescriptor sm = portalRepositoryRef.getExperimentOnBoardDescriptorByID(mpid);
 
 		if (sm != null) {
@@ -2507,6 +2766,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	public Response getExperimentOnBoardDescriptorByIdCheckMANOProvider(@PathParam("mpid") int mpid) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		ExperimentOnBoardDescriptor sm = portalRepositoryRef.getExperimentOnBoardDescriptorByID(mpid);
 
 		if (sm == null) {
@@ -2549,6 +2811,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response onExperimentBoardDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		c.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		c.setDeployId(UUID.randomUUID().toString());
 		ExperimentMetadata em = c.getExperiment();
@@ -2605,6 +2870,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Consumes("application/json")
 	public Response offBoardExperimentDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor c) {
 
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 		// TODO: Implement this towards MANO
@@ -2629,6 +2897,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/infrastructures/")
 	@Produces("application/json")
 	public Response getAdminInfrastructures() {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		return Response.ok().entity(portalRepositoryRef.getInfrastructures()).build();
 	}
 
@@ -2637,6 +2908,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response addInfrastructure(Infrastructure c) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		Infrastructure u = portalRepositoryRef.addInfrastructure(c);
 
 		if (u != null) {
@@ -2653,6 +2927,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateInfrastructure(@PathParam("infraid") int infraid, Infrastructure c) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		Infrastructure previousCategory = portalRepositoryRef.getInfrastructureByID(infraid);
 
 		Infrastructure u = portalRepositoryRef.updateInfrastructureInfo(c);
@@ -2670,6 +2947,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@DELETE
 	@Path("/admin/infrastructures/{infraid}")
 	public Response deleteInfrastructure(@PathParam("infraid") int infraid) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		portalRepositoryRef.deleteInfrastructure(infraid);
 		return Response.ok().build();
 
@@ -2679,6 +2959,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/infrastructures/{infraid}")
 	@Produces("application/json")
 	public Response getInfrastructureById(@PathParam("infraid") int infraid) {
+		if ( !checkUserIDorIsAdmin( -1 ) ){
+			return Response.status(Status.FORBIDDEN ).build() ;
+		}
 		Infrastructure sm = portalRepositoryRef.getInfrastructureByID(infraid);
 
 		if (sm != null) {

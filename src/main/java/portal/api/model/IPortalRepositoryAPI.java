@@ -58,12 +58,12 @@ public interface IPortalRepositoryAPI {
 	Response addVxFMetadata(List<Attachment> attachements);
 	void deleteVxF( int vxfid);
 	
-	//Subscribed resources
-	Response getSubscribedResources();
-	Response getSubscribedResourceById(int smId);
-	Response addSubscribedResource(SubscribedResource sm);
-	Response updateSubscribedResource(int smId, SubscribedResource sm);
-	Response deleteSubscribedResource(int smId);
+//	//Subscribed resources
+//	Response getSubscribedResources();
+//	Response getSubscribedResourceById(int smId);
+//	Response addSubscribedResource(SubscribedResource sm);
+//	Response updateSubscribedResource(int smId, SubscribedResource sm);
+//	Response deleteSubscribedResource(int smId);
 	
 	//experiments Related API methods
 	Response getApps(Long categoryid);

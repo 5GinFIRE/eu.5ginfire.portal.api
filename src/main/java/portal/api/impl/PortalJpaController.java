@@ -1287,4 +1287,20 @@ public class PortalJpaController {
 	}
 
 
+	public List<VFImage> readVFImagesForOwnerID( Long ownerid, int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q;
+
+		if ((ownerid != null) && (ownerid >= 0))
+			q = entityManager.createQuery("SELECT a FROM VFImage a WHERE a.owner.id=" + ownerid + " ORDER BY a.id");
+		else
+			q = entityManager.createQuery("SELECT a FROM VFImage a ORDER BY a.id");
+
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
+
 }

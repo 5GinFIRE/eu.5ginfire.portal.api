@@ -453,6 +453,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						VNFExtractor vnfExtract = new VNFExtractor(f);
 						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
 						if (vnfd != null) {
+							
+							Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
+							if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
+								if ( vnfd.getVersion().equals( existingvmf.getVersion() ) ) {
+									throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
+								}
+							}
+							
+							
 							prod.setName(vnfd.getId());
 							prod.setVersion(vnfd.getVersion());
 							prod.setVendor(vnfd.getVendor());
@@ -504,6 +513,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						NSExtractor nsExtract = new NSExtractor(f);
 						Nsd ns = nsExtract.extractNsDescriptor();
 						if (ns != null) {
+
+							Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
+							if ( ( existingmff != null  ) && ( existingmff instanceof  VxFMetadata )) {
+								if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
+									throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
+								}
+							}
 							prod.setName(ns.getId());
 							prod.setVersion(ns.getVersion());
 							prod.setVendor(ns.getVendor());
@@ -582,7 +598,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			VxFMetadata vxfm = (VxFMetadata) prod;
 			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
 				vfimg.getUsedByVxFs().add(vxfm);
-				portalRepositoryRef.updateVFImageInfo(vfimg);
 			}
 		}
 
@@ -821,7 +836,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						if (vnfd != null) {
 							//on update we need to check if name and version are the same. Only then we will accept it
 							if ( !prod.getName().equals( vnfd.getId()) ||  !prod.getVersion().equals( vnfd.getVersion() )  ){
-								throw new IOException( "Product name or version are not equal to this descriptor. No updates were performed." );
+								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
 							}
 							
 							((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
@@ -958,25 +973,23 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //		}
 		
 		//if it's a VxF we need also to update the images that this VxF will use
-				if (prod instanceof VxFMetadata) {
-					VxFMetadata vxfm = (VxFMetadata) prod;
-					for (VFImage vfimg : vxfm.getVfimagesVDU()) {				
+		if (prod instanceof VxFMetadata) {
+			VxFMetadata vxfm = (VxFMetadata) prod;
+			for (VFImage vfimg : vxfm.getVfimagesVDU()) {				
 
-						boolean refexists = false;
-						for (VxFMetadata refVxF : vfimg.getUsedByVxFs() ) {
-							if ( refVxF.getName().equals(vxfm.getName()) ){
-								refexists = true; 
-								break;
-							}
-						}
-						if (!refexists){
-							vfimg.getUsedByVxFs().add(vxfm);
-							portalRepositoryRef.updateVFImageInfo(vfimg);
-							
-						}
+				boolean refexists = false;
+				for (VxFMetadata refVxF : vfimg.getUsedByVxFs() ) {
+					if ( refVxF.getName().equals(vxfm.getName()) ){
+						refexists = true; 
+						break;
 					}
-					
 				}
+				if (!refexists){
+					vfimg.getUsedByVxFs().add(vxfm);							
+				}
+			}
+			
+		}
 
 		// save product
 		prod = portalRepositoryRef.updateProductInfo(prod);

@@ -104,6 +104,8 @@ public class PortalRepositoryVFImageAPI {
 	public Response getAdminVFImages() {
 		
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+		logger.info( ws.getHttpHeaders().toString() );
+		
 		
 		if (u != null) {
 			List<VFImage> vfimagess;

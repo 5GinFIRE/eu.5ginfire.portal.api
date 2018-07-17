@@ -67,7 +67,7 @@ public interface IPortalRepositoryAPI {
 	
 	//experiments Related API methods
 	Response getApps(Long categoryid);
-	Response getAppMetadataByID(int appid);
+	Response getExperimentMetadataByID(int appid);
 	Response getAppMetadataByUUID(String uuid);		
 	Response getAppofUser( int userid, int appid);
 	Response updateExperimentMetadata(int aid, List<Attachment> attachements);

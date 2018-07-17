@@ -141,7 +141,11 @@ public class PortalRepository {
 
 	public PortalUser getUserByEmail(String email) {
 		return portalJpaController.readPortalUserByEmail(email);
-		}
+	}
+	
+	public PortalUser getUserByAPIKEY(String apikey) {
+		return portalJpaController.readPortalUserByAPIKEY( apikey );
+	}
 
 	
 
@@ -561,6 +565,9 @@ public class PortalRepository {
 		List<VFImage> ls = portalJpaController.readVFImagesForOwnerID( ownerid, 0, 100000);	
 		return ls;
 	}
+
+
+	
 
 	
 

@@ -71,6 +71,7 @@
 		class="portal.api.util.ShiroBasicAuthInterceptor"> <property name="validator" 
 		ref="utValidator" /> </bean> -->
 	<bean class="portal.api.util.AjaxUserFilter" id="ajaxUserFilter">
+		<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 	</bean>
 
 	<bean id="securityManagerBean" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">

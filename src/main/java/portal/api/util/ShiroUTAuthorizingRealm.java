@@ -85,33 +85,24 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		//logger.info("tokengetPassword at=" + String.valueOf(token.getPassword()));
 		//logger.info("tokengetPrincipal at=" + token.getPrincipal());
 		
-		
-		PortalUser bu = portalRepositoryRef.getUserByUsername(token.getUsername());
-		if (bu == null ){
-			throw new AuthenticationException("Sorry! No login for you.");			
+		if (token.getUsername().equals("X-APIKEY") ){
+			
+		}else {
+			PortalUser bu = portalRepositoryRef.getUserByUsername(token.getUsername());
+			if (bu == null ){
+				throw new AuthenticationException("Sorry! No login for you.");			
+			}
+			String originalPass = bu.getPassword();
+			String suppliedPass = EncryptionUtil.hash(   String.valueOf(token.getPassword())  );
+			logger.info("originalPass =" + originalPass );
+			logger.info("suppliedPass =" + suppliedPass );
+			if  (originalPass.equals( suppliedPass   )) {
+				logger.info("======= USER is AUTHENTICATED OK =======");
+			} else {
+				throw new AuthenticationException("Sorry! No login for you.");
+			}
+			
 		}
-
-		String originalPass = bu.getPassword();
-		String suppliedPass = EncryptionUtil.hash(   String.valueOf(token.getPassword())  );
-		logger.info("originalPass =" + originalPass );
-		logger.info("suppliedPass =" + suppliedPass );
-		if  (originalPass.equals( suppliedPass   )) {
-			logger.info("======= USER is AUTHENTICATED OK =======");
-		} else {
-			throw new AuthenticationException("Sorry! No login for you.");
-		}
-
-		// try {
-		// currentUser.login(token);
-		// } catch (AuthenticationException ex) {
-		// logger.info(ex.getMessage(), ex);
-		// throw new AuthenticationException("Sorry! No login for you.");
-		// }
-		// // Perform authorization check
-		// if (!requiredRoles.isEmpty() && !currentUser.hasAllRoles(requiredRoles)) {
-		// logger.info("Authorization failed for authenticated user");
-		// throw new AuthenticationException("Sorry! No login for you.");
-		// }
 
 		SimpleAuthenticationInfo sa = new SimpleAuthenticationInfo();
 		sa.setCredentials(token.getCredentials());

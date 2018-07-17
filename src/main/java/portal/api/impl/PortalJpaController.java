@@ -298,6 +298,12 @@ public class PortalJpaController {
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.email='" + email + "'");
 		return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
 	}
+	
+	public PortalUser readPortalUserByAPIKEY(String apikey) {
+			EntityManager entityManager = entityManagerFactory.createEntityManager();
+			Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.apikey='" + apikey + "'");
+			return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
+	}
 
 	public PortalUser readPortalUserById(int userid) {
 
@@ -1301,6 +1307,9 @@ public class PortalJpaController {
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
+
+
+	
 
 
 }

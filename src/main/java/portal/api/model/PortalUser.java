@@ -61,6 +61,8 @@ public class PortalUser {
 	private Boolean active = false;
 	@Basic()
 	private String currentSessionID = null;
+	@Basic()
+	private String apikey = null;
 	
 	/**
 	 * 
@@ -299,4 +301,20 @@ public class PortalUser {
 			this.vfimages.remove(prod);
 		}
 	}
+
+	/**
+	 * @return the apikey
+	 */
+	public String getApikey() {
+		return apikey;
+	}
+
+	/**
+	 * @param apikey the apikey to set
+	 */
+	public void setApikey(String apikey) {
+		this.apikey = apikey;
+	}
+	
+	
 }

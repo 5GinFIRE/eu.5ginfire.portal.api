@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -91,6 +92,7 @@ import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
+import portal.api.util.AjaxUserFilter;
 import portal.api.util.AttachmentUtil;
 import portal.api.util.EmailUtil;
 import pt.it.av.atnog.extractors.NSExtractor;
@@ -124,6 +126,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 	@Context
 	protected SecurityContext sc;
+	
+
+	@Context
+	AjaxUserFilter ajf;
 
 	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
@@ -221,6 +227,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.status(Status.BAD_REQUEST).entity("Email exists").build();
 		}
 
+		user.setApikey( UUID.randomUUID().toString() );
 		u = portalRepositoryRef.addPortalUserToUsers(user);
 
 		if (u != null) {
@@ -342,12 +349,23 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	 * @return true if user logged is equal to the requested id of owner, or is PORTALADMIN
 	 */
 	private boolean checkUserIDorIsAdmin(int userID){
-		if ( sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
-			 return true;
-		}
+		
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 		if ( (u !=null )  && (u.getId() == userID) ){
 			return true;
+		} 
+		if ( (u !=null )  && u.getRoles().contains(UserRoleType.PORTALADMIN) ){//sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return true;
+		}
+		
+		if ( (u ==null) && (ws.getHttpHeaders().getHeaderString( "X-APIKEY")!=null) ){
+			//retry again in case where there is no user found but still there is APIKEY
+			if ( AjaxUserFilter.xapiKeyAuth( ws.getHttpServletRequest(), portalRepositoryRef) ){
+				PortalUser u2 = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+				if ( u2!=null){
+					return checkUserIDorIsAdmin( u2.getId() );
+				}				
+			}			
 		}
 		return false;
 	}
@@ -1115,8 +1133,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("TEST LOCAL RESOURCE FILE: " + res);
 			file = new File(res.getFile());
 		}
+		
+		
+		
 		if ( !portalRepositoryRef.getProductByUUID(uuid).isPublished()){
-			return Response.status(Status.FORBIDDEN ).build();
+			VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID( uuid );
+			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+				return Response.status(Status.FORBIDDEN ).build();
+			}
 		}
 	
 
@@ -1158,7 +1182,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (vxf != null) {
 			
 			if ( !vxf.isPublished() ){
-				Response.status(Status.FORBIDDEN ).build() ;
+				return Response.status(Status.FORBIDDEN ).build() ;
 			}
 			
 			return Response.ok().entity(vxf).build();
@@ -1605,7 +1629,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@GET
 	@Path("/experiments/{appid}")
 	@Produces("application/json")
-	public Response getAppMetadataByID(@PathParam("appid") int appid) {
+	public Response getExperimentMetadataByID(@PathParam("appid") int appid) {
 		logger.info("getAppMetadataByID  appid=" + appid);
 		ExperimentMetadata app = (ExperimentMetadata) portalRepositoryRef.getProductByID(appid);
 		
@@ -1625,7 +1649,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@GET
 	@Path("/admin/experiments/{appid}")
 	@Produces("application/json")
-	public Response getAdminAppMetadataByID(@PathParam("appid") int appid) {
+	public Response getAdminExperimentMetadataByID(@PathParam("appid") int appid) {
 		
 		logger.info("getAppMetadataByID  appid=" + appid);
 		ExperimentMetadata app = (ExperimentMetadata) portalRepositoryRef.getProductByID(appid);

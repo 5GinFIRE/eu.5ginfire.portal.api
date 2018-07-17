@@ -822,7 +822,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				vxFOnBoardedDescriptor.setVxf(vxf);
 			}
 			BusController.getInstance().updatedVxF(vxf);
-			BusController.getInstance().validationUpdateVxF(vxf); 
+			//notify only if validation changed
+			//BusController.getInstance().validationUpdateVxF(vxf); 
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -907,7 +908,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
 							}
 							
-							((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
+							//we must change this only if a descriptor was uploaded
+							//((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
 							((VxFMetadata) prod).setValidationStatus( ValidationStatus.NOT_STARTED );
 							
 							prod.setName(vnfd.getId());

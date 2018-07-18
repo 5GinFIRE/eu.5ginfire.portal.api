@@ -443,6 +443,8 @@ public class OSMClient {
 
 		String response = getOSMResponse(BASE_SERVICE_URL + "/vnfd-catalog/vnfd");
 
+		logger.info( "getVNFDs response = " + response );
+		
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
 		try {

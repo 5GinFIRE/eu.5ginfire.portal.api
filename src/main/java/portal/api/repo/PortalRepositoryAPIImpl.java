@@ -841,7 +841,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 			BusController.getInstance().updatedVxF(vxf);
 			//notify only if validation changed
-			//BusController.getInstance().validationUpdateVxF(vxf); 
+
+			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must retrigger validation
+				BusController.getInstance().validationUpdateVxF(vxf);
+			}
+			 
 			return Response.ok().entity(vxf).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -927,7 +931,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							}
 							
 							//we must change this only if a descriptor was uploaded
-							//((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
+							((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
 							((VxFMetadata) prod).setValidationStatus( ValidationStatus.NOT_STARTED );
 							
 							prod.setName(vnfd.getId());
@@ -1135,13 +1139,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		
 		
-		
-		if ( !portalRepositoryRef.getProductByUUID(uuid).isPublished()){
-			VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID( uuid );
-			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
-				return Response.status(Status.FORBIDDEN ).build();
-			}
-		}
+		//we allow everyone to download it since we have OSM onboarding 
+//		if ( !portalRepositoryRef.getProductByUUID(uuid).isPublished()){
+//			VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByUUID( uuid );
+//			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+//				return Response.status(Status.FORBIDDEN ).build();
+//			}
+//		}
 	
 
 		ResponseBuilder response = Response.ok((Object) file);

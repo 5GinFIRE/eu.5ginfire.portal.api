@@ -36,7 +36,7 @@ public class KeystoneClient {
 		
 		
 		OSClientV3 os = OSFactory.builderV3().endpoint("http://150.140.184.235:5000/v3").
-				credentials("ctranoris", "ctranoris", domainIdentifier).authenticate();
+				credentials("ctranoris", "", domainIdentifier).authenticate();
 
 
 		System.out.println(" user = " + os.identity().roles());

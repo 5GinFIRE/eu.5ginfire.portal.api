@@ -814,6 +814,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
 				 return Response.status(Status.FORBIDDEN ).build();
 			}
+			
 
 			logger.info("Received @PUT for vxf : " + vxf.getName());
 			logger.info("Received @PUT for vxf.extensions : " + vxf.getExtensions());
@@ -842,8 +843,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			BusController.getInstance().updatedVxF(vxf);
 			//notify only if validation changed
 
-			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must retrigger validation
-				BusController.getInstance().validationUpdateVxF(vxf);
+			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must re-trigger validation
+				Attachment prodFile =  AttachmentUtil.getAttachmentByName("prodFile", ats);
+				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
+				if ( !vxfFileNamePosted.equals("unknown") ){
+
+					BusController.getInstance().validationUpdateVxF(vxf);
+				}
 			}
 			 
 			return Response.ok().entity(vxf).build();
@@ -928,6 +934,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							//on update we need to check if name and version are the same. Only then we will accept it
 							if ( !prod.getName().equals( vnfd.getId()) ||  !prod.getVersion().equals( vnfd.getVersion() )  ){
 								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
+							}							
+							if ( ( (VxFMetadata)prod).isCertified()  ) {
+								throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
 							}
 							
 							//we must change this only if a descriptor was uploaded
@@ -989,6 +998,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						NSExtractor nsExtract = new NSExtractor(f);
 						Nsd ns = nsExtract.extractNsDescriptor();
 						if (ns != null) {
+							//on update we need to check if name and version are the same. Only then we will accept it
+							if ( !prod.getName().equals( ns.getId()) ||  !prod.getVersion().equals( ns.getVersion() )  ){
+								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
+							}							
+							if ( ( (ExperimentMetadata)prod).isValid()  ) {
+								throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
+							}
 							prod.setName(ns.getId());
 							prod.setVersion(ns.getVersion());
 							prod.setVendor(ns.getVendor());
@@ -1793,7 +1809,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				veDescriptor.setExperiment(expmeta);
 			}
 			BusController.getInstance().updateNSD(expmeta);	
-			BusController.getInstance().validationUpdateNSD(expmeta);
+			
+			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must re-trigger validation
+				Attachment prodFile =  AttachmentUtil.getAttachmentByName("prodFile", ats);
+				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
+				if ( !vxfFileNamePosted.equals("unknown") ){
+					BusController.getInstance().validationUpdateNSD(expmeta);
+				}
+			}
+			
+			
+			
+			
+			
 			return Response.ok().entity(expmeta).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

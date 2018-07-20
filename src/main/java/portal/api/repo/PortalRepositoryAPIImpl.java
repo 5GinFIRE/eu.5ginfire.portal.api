@@ -2954,10 +2954,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@GET
 	@Path("/admin/infrastructures/")
 	@Produces("application/json")
-	public Response getAdminInfrastructures() {
-		if ( !checkUserIDorIsAdmin( -1 ) ){
-			return Response.status(Status.FORBIDDEN ).build() ;
-		}
+	public Response getAdminInfrastructures() {		
 		return Response.ok().entity(portalRepositoryRef.getInfrastructures()).build();
 	}
 

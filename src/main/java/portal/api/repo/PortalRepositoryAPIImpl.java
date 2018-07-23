@@ -2167,7 +2167,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
-				deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
+				deployment = portalRepositoryRef.getDeploymentByID( deployment.getId() );//reattach from model
 				
 				logger.info("updateDeployment for id: " + deployment.getId());
 				

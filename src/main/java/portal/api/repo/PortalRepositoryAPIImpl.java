@@ -2158,14 +2158,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			{
 				PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
 				d.setOwner(deploymentOwner); // reattach from the DB model
+				List<DeploymentDescriptor> deployments = u.getDeployments();
 
 				ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
 						.getProductByID(d.getExperiment().getId());
 				d.setExperiment(baseApplication); // reattach from the DB model
+				
 
 				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
 
-				logger.info("updateDeployment for id: " + d.getId());
+				deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
+				
+				logger.info("updateDeployment for id: " + deployment.getId());
 				
 				BusController.getInstance().updateDeploymentRequest( deployment );
 				

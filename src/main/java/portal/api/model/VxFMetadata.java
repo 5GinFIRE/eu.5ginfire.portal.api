@@ -21,6 +21,7 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
@@ -55,18 +56,18 @@ public class VxFMetadata extends Product{
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinTable()
 	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
 
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
 	@JoinTable()
 	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
 	
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY)
 	@JoinTable()
 	private List<VFImage> vfimagesVDU = new ArrayList<>();
 	

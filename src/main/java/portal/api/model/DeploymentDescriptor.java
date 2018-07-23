@@ -95,7 +95,7 @@ public class DeploymentDescriptor {
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 	
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<DeploymentDescriptorVxFPlacement> vxfPlacements = new ArrayList<DeploymentDescriptorVxFPlacement>();
 	

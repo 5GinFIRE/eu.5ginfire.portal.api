@@ -515,19 +515,11 @@ public class PortalRepository {
 	 * @param vfimg
 	 * @return
 	 */
-	public VFImage updateVFImageInfo(VFImage vfimg) {
+	public VFImage updateVFImageInfo(VFImage vfimg) 
+	{
 
-		vfimg.setDateUpdated(new Date());
-		
-		// Save now vxf for User
-		PortalUser vxfOwner = this.getUserByID( vfimg.getOwner().getId() );
-		vxfOwner.addVFImage( vfimg );
-		vfimg.setOwner(vxfOwner); // replace given owner with the one from our DB
-
-		PortalUser owner = this.updateUserInfo(  vxfOwner );
-		VFImage registeredvfimg = this.getVFImageByUUID( vfimg.getUuid() );
-		return registeredvfimg;
-		
+		VFImage bm = portalJpaController.updateVFImage( vfimg );
+		return bm;
 		
 	}
 

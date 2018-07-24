@@ -219,30 +219,21 @@ public class PortalRepositoryVFImageAPI {
 	
 	
 	/**
-	 * @param vfimg
+	 * @param vfimgnew
 	 * @param vfimagefile
 	 * @return
 	 * @throws IOException
 	 */
-	private VFImage updateVFImage(VFImage vfimg, Attachment vfimagefile) throws IOException {
+	private VFImage updateVFImage(VFImage vfimgnew, Attachment vfimagefile) throws IOException {
 
-		logger.info("image name = " + vfimg.getName());
-		logger.info("shortDescription = " +vfimg.getShortDescription());
+		logger.info("image name = " + vfimgnew.getName());
+		logger.info("shortDescription = " +vfimgnew.getShortDescription());
 
 		URI endpointUrl = uri.getBaseUri();
-		String tempDir = VFIMAGESDIR + vfimg.getUuid() + File.separator;
+		String tempDir = VFIMAGESDIR + vfimgnew.getUuid() + File.separator;
 		
-		VFImage prevfImage = portalRepositoryRef.getVFImageByID( vfimg.getId() );
+		VFImage prevfImage = portalRepositoryRef.getVFImageByID( vfimgnew.getId() );
 		
-		//reattach usedVxF to the instance
-		for (VxFMetadata vxf : prevfImage.getUsedByVxFs()) {			
-			vfimg.getUsedByVxFs().add(vxf);
-		}
-		
-		//reattach getDeployedInfrastructures to the instance
-		for (Infrastructure i : prevfImage.getDeployedInfrastructures()) {			
-			vfimg.getDeployedInfrastructures().add(i); 
-		}
 	
 		if (vfimagefile != null) {
 			String imageFileNamePosted = AttachmentUtil.getFileName(vfimagefile.getHeaders());
@@ -252,12 +243,18 @@ public class PortalRepositoryVFImageAPI {
 				String imgfile = AttachmentUtil.saveFile( vfimagefile, tempDir + imageFileNamePosted);
 				logger.info("vfimagefile saved to = " + imgfile);
 				
-				vfimg.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/vfimages/image/" + vfimg.getUuid() + "/"
+				prevfImage.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/vfimages/image/" + prevfImage.getUuid() + "/"
 						+ imageFileNamePosted);
 			}
 		}
 		
-		VFImage registeredvfimg =  portalRepositoryRef.updateVFImageInfo( vfimg ); 
+		prevfImage.setShortDescription( vfimgnew.getShortDescription() );
+		prevfImage.setDateUpdated( new Date() );
+		prevfImage.setPublicURL( vfimgnew.getPublicURL());
+		prevfImage.setPublished( vfimgnew.isPublished()  );
+		prevfImage.setTermsOfUse( vfimgnew.getTermsOfUse() );
+		
+		VFImage registeredvfimg =  portalRepositoryRef.updateVFImageInfo( prevfImage ); 
 		
 				
 		return registeredvfimg;

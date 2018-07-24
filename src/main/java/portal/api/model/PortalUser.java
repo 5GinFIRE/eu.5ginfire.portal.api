@@ -25,6 +25,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -74,7 +75,7 @@ public class PortalUser {
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<Product> products = new ArrayList<Product>();
 	
@@ -82,7 +83,7 @@ public class PortalUser {
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<VFImage> vfimages = new ArrayList<VFImage>();
 	
@@ -91,11 +92,11 @@ public class PortalUser {
 		return roles;
 	}
 
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<DeploymentDescriptor> deployments = new ArrayList<DeploymentDescriptor>();
 	
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<SubscribedResource> subscribedResources = new ArrayList<SubscribedResource>();
 	

@@ -72,7 +72,7 @@ public class VFImage {
 	@Basic()
 	private Date dateUpdated;
 	
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER )
 	@JoinTable()
 	private List<VxFMetadata> usedByVxFs = new ArrayList<>();
 	

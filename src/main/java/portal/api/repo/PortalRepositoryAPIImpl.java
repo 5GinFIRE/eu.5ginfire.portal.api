@@ -312,13 +312,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		PortalUser previousUser = portalRepositoryRef.getUserByID(userid);
 
-		List<Product> previousProducts = previousUser.getProducts();
-
-		if (user.getProducts().size() == 0) {
-			user.getProducts().addAll(previousProducts);
-		}
-
-		PortalUser u = portalRepositoryRef.updateUserInfo( user);
+//		List<Product> previousProducts = previousUser.getProducts();
+//
+//		if (user.getProducts().size() == 0) {
+//			user.getProducts().addAll(previousProducts);
+//		}
+//
+		previousUser.setActive( user.getActive() );
+		previousUser.setApikey( user.getApikey() );
+		previousUser.setEmail( user.getEmail() );
+		previousUser.setName( user.getName());
+		previousUser.setOrganization( user.getOrganization() );
+		previousUser.setPassword( user.getPassword() );		
+		
+		PortalUser u = portalRepositoryRef.updateUserInfo( previousUser );
+		
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -875,21 +883,25 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		logger.info("shortDescription = " + prod.getShortDescription());
 		logger.info("longDescription = " + prod.getLongDescription());
 
+		
+		
 		// get User
-		PortalUser vxfOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
-		prod.setOwner(vxfOwner); // replace given owner with the one from our DB
+//		PortalUser vxfOwner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
+//		prod.setOwner(vxfOwner); // replace given owner with the one from our DB
 
-		prod.setDateUpdated(new Date());
 
 		// first remove all references of the product from the previous
 		// categories
-		Product prodPreUpdate = (Product) portalRepositoryRef.getProductByID(prod.getId());
-		for (Category c : prodPreUpdate.getCategories()) {
+		Product prevProduct = (Product) portalRepositoryRef.getProductByID(prod.getId());
+		prevProduct.setDateUpdated(new Date());
+		
+		for (Category c : prevProduct.getCategories()) {
 			// logger.info("Will remove product "+prodPreUpdate.getName()+ ",
 			// from Previous Category "+c.getName() );
-			c.removeProduct(prodPreUpdate);
+			c.removeProduct(prevProduct);
 			portalRepositoryRef.updateCategoryInfo(c);
 		}
+		prevProduct.getCategories().clear();
 
 		// we must replace API given product categories with the ones from our
 		// DB
@@ -897,153 +909,187 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			Category catToUpdate = portalRepositoryRef.getCategoryByID(c.getId());
 			// logger.info("BEFORE PROD SAVE, category "+catToUpdate.getName()+"
 			// contains Products: "+ catToUpdate.getProducts().size() );
-			prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
+			//prod.getCategories().set(prod.getCategories().indexOf(c), catToUpdate);
+			prevProduct.getCategories().add(catToUpdate);
 		}
 
 		URI endpointUrl = uri.getBaseUri();
 
-		String tempDir = METADATADIR + prod.getUuid() + File.separator;
+		String tempDir = METADATADIR + prevProduct.getUuid() + File.separator;
 
-			Files.createDirectories(Paths.get(tempDir));
+		Files.createDirectories(Paths.get(tempDir));
 
-			if (image != null) {
-				String imageFileNamePosted = AttachmentUtil.getFileName(image.getHeaders());
-				logger.info("image = " + imageFileNamePosted);
-				if (!imageFileNamePosted.equals("unknown")) {
-					String imgfile = AttachmentUtil.saveFile(image, tempDir + imageFileNamePosted);
-					logger.info("imgfile saved to = " + imgfile);
-					prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
-							+ imageFileNamePosted);
-				}
+		if (image != null) {
+			String imageFileNamePosted = AttachmentUtil.getFileName(image.getHeaders());
+			logger.info("image = " + imageFileNamePosted);
+			if (!imageFileNamePosted.equals("unknown")) {
+				String imgfile = AttachmentUtil.saveFile(image, tempDir + imageFileNamePosted);
+				logger.info("imgfile saved to = " + imgfile);
+				prevProduct.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + prevProduct.getUuid() + "/"
+						+ imageFileNamePosted);
 			}
+		}
+		
+		
+		if ( prevProduct instanceof VxFMetadata) 
+		{
+			((VxFMetadata) prevProduct).setPackagingFormat( ((VxFMetadata) prod).getPackagingFormat() );
+			prevProduct.setTermsOfUse( prod.getTermsOfUse() );
+			prevProduct.setPublished( prod.isPublished() );
+			((VxFMetadata) prevProduct).setCertifiedBy( ((VxFMetadata) prod).getCertifiedBy() );
+			((VxFMetadata) prevProduct).getSupportedMANOPlatforms().clear();
+			for (MANOplatform mp : ((VxFMetadata) prod).getSupportedMANOPlatforms()) {
+				MANOplatform mpdb = portalRepositoryRef.getMANOplatformByID( mp.getId());
+				((VxFMetadata) prevProduct).getSupportedMANOPlatforms().add( mpdb );
+			}
+			if ( !((VxFMetadata) prevProduct).isCertified() ){
+				((VxFMetadata) prevProduct).setCertified( ((VxFMetadata) prod).isCertified() );
+			}
+			((VxFMetadata) prevProduct).setCertifiedBy(((VxFMetadata) prod).getCertifiedBy() );
+			
+		} else if ( prevProduct instanceof ExperimentMetadata) {
 
-			if (prodFile != null) {
-				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
-				logger.info("vxfFile = " + vxfFileNamePosted);
-				if (!vxfFileNamePosted.equals("unknown")) {
-					String vxffilepath = AttachmentUtil.saveFile(prodFile, tempDir + vxfFileNamePosted);
-					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/"
-							+ prod.getUuid() + "/" + vxfFileNamePosted);
+			prevProduct.setTermsOfUse( prod.getTermsOfUse() );
+			prevProduct.setPublished( prod.isPublished() );
+			if ( !((ExperimentMetadata) prevProduct).isValid() ){
+				((ExperimentMetadata) prevProduct).setValid( ((ExperimentMetadata) prod).isValid() );
+			}
+			((ExperimentMetadata) prevProduct).setPackagingFormat( ((ExperimentMetadata) prod).getPackagingFormat() );
+		}
 
-					File f = new File(vxffilepath);
-					if (prod instanceof VxFMetadata) {
-						VNFExtractor vnfExtract = new VNFExtractor(f);
-						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
-						if (vnfd != null) {
-							//on update we need to check if name and version are the same. Only then we will accept it
-							if ( !prod.getName().equals( vnfd.getId()) ||  !prod.getVersion().equals( vnfd.getVersion() )  ){
-								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
-							}							
-							if ( ( (VxFMetadata)prod).isCertified()  ) {
-								throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
-							}
-							
-							//we must change this only if a descriptor was uploaded
-							((VxFMetadata) prod).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!
-							((VxFMetadata) prod).setValidationStatus( ValidationStatus.NOT_STARTED );
-							
-							prod.setName(vnfd.getId());
-							prod.setVersion(vnfd.getVersion());
-							prod.setVendor(vnfd.getVendor());
-							prod.setShortDescription(vnfd.getName());
-							prod.setLongDescription(vnfd.getDescription());
-							((VxFMetadata) prod).getVfimagesVDU().clear();//clear previous referenced images							
-							for (Vdu vdu : vnfd.getVdu()) {
-								String imageName = vdu.getImage();
-								if ( ( imageName != null) && (!imageName.equals("")) ){
-									VFImage sm = portalRepositoryRef.getVFImageByName( imageName );
-									if ( sm == null ){
-										sm = new VFImage();
-										sm.setName( imageName );
-										PortalUser vfImagewner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
-										sm.setOwner( vfImagewner );
-										sm.setShortDescription( "Automatically created during vxf " + prod.getName() + " submission. Owner must update." );
-										String uuidVFImage = UUID.randomUUID().toString();
-										sm.setUuid( uuidVFImage );
-										sm.setDateCreated(new Date());
-										sm = portalRepositoryRef.saveVFImage( sm );
-									}
-									
-									if ( !((VxFMetadata) prod).getVfimagesVDU().contains(sm) ){
-										((VxFMetadata) prod).getVfimagesVDU().add( sm );
-										
-									}
-									
+		if (prodFile != null) {
+			String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
+			logger.info("vxfFile = " + vxfFileNamePosted);
+			if (!vxfFileNamePosted.equals("unknown")) {
+				String vxffilepath = AttachmentUtil.saveFile(prodFile, tempDir + vxfFileNamePosted);
+				logger.info("vxffilepath saved to = " + vxffilepath);
+				prevProduct.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/"
+						+ prevProduct.getUuid() + "/" + vxfFileNamePosted);
+
+				File f = new File(vxffilepath);
+				if ( prevProduct instanceof VxFMetadata) {
+					VNFExtractor vnfExtract = new VNFExtractor(f);
+					Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
+					if (vnfd != null) {
+						//on update we need to check if name and version are the same. Only then we will accept it
+						if ( !prevProduct.getName().equals( vnfd.getId()) ||  !prevProduct.getVersion().equals( vnfd.getVersion() )  ){
+							throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
+						}							
+						if ( ( (VxFMetadata) prevProduct).isCertified()  ) {
+							throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
+						}
+						
+						//we must change this only if a descriptor was uploaded
+						prevProduct.setName(vnfd.getId());
+						prevProduct.setVersion(vnfd.getVersion());
+						prevProduct.setVendor(vnfd.getVendor());
+						prevProduct.setShortDescription(vnfd.getName());
+						prevProduct.setLongDescription(vnfd.getDescription());
+						//((VxFMetadata) prevProduct).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!..Normally we will never get here due to previous Exception
+						//((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.NOT_STARTED );
+						
+						
+						for (VFImage img : ((VxFMetadata) prevProduct).getVfimagesVDU()) {
+							logger.info("img.getUsedByVxFs().remove(prevProduct) = " + img.getUsedByVxFs().remove(prevProduct));
+							portalRepositoryRef.updateVFImageInfo(img);
+						}
+						((VxFMetadata) prevProduct).getVfimagesVDU().clear();//clear previous referenced images							
+						for (Vdu vdu : vnfd.getVdu()) {
+							String imageName = vdu.getImage();
+							if ( ( imageName != null) && (!imageName.equals("")) ){
+								VFImage sm = portalRepositoryRef.getVFImageByName( imageName );
+								if ( sm == null ){
+									sm = new VFImage();
+									sm.setName( imageName );
+									PortalUser vfImagewner = portalRepositoryRef.getUserByID( prevProduct.getOwner().getId());
+									sm.setOwner( vfImagewner );
+									sm.setShortDescription( "Automatically created during vxf " + prevProduct.getName() + " submission. Owner must update." );
+									String uuidVFImage = UUID.randomUUID().toString();
+									sm.setUuid( uuidVFImage );
+									sm.setDateCreated(new Date());
+									sm = portalRepositoryRef.saveVFImage( sm );
+								}
+								
+								if ( !((VxFMetadata) prevProduct).getVfimagesVDU().contains(sm) ){
+									((VxFMetadata) prevProduct).getVfimagesVDU().add( sm );
+									sm.getUsedByVxFs().add( ((VxFMetadata) prevProduct) );
+									portalRepositoryRef.updateVFImageInfo( sm );
 									
 								}
 							}
-							
-							
-							
-							
-							VNFRequirements vr = new VNFRequirements(vnfd);
-							prod.setDescriptorHTML(vr.toHTML());
-							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
+						}						
+						
+						VNFRequirements vr = new VNFRequirements(vnfd);
+						prevProduct.setDescriptorHTML(vr.toHTML());
+						prevProduct.setDescriptor(vnfExtract.getDescriptorYAMLfile());
 
-							if (vnfExtract.getIconfilePath() != null) {
+						if (vnfExtract.getIconfilePath() != null) {
 
-								String imageFileNamePosted = vnfd.getLogo();
-								logger.info("image = " + imageFileNamePosted);
-								if (!imageFileNamePosted.equals("")) {
-									String imgfile = AttachmentUtil.saveFile(vnfExtract.getIconfilePath(),
-											tempDir + imageFileNamePosted);
-									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
-											+ prod.getUuid() + "/" + imageFileNamePosted);
-								}
+							String imageFileNamePosted = vnfd.getLogo();
+							logger.info("image = " + imageFileNamePosted);
+							if (!imageFileNamePosted.equals("")) {
+								String imgfile = AttachmentUtil.saveFile(vnfExtract.getIconfilePath(),
+										tempDir + imageFileNamePosted);
+								logger.info("imgfile saved to = " + imgfile);
+								prevProduct.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
+										+ prevProduct.getUuid() + "/" + imageFileNamePosted);
 							}
 						}
-					} else if (prod instanceof ExperimentMetadata) {
-						NSExtractor nsExtract = new NSExtractor(f);
-						Nsd ns = nsExtract.extractNsDescriptor();
-						if (ns != null) {
-							//on update we need to check if name and version are the same. Only then we will accept it
-							if ( !prod.getName().equals( ns.getId()) ||  !prod.getVersion().equals( ns.getVersion() )  ){
-								throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
-							}							
-							if ( ( (ExperimentMetadata)prod).isValid()  ) {
-								throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
-							}
-							prod.setName(ns.getId());
-							prod.setVersion(ns.getVersion());
-							prod.setVendor(ns.getVendor());
-							prod.setShortDescription(ns.getName());
-							prod.setLongDescription(ns.getDescription());
-							NSRequirements vr = new NSRequirements(ns);
-							prod.setDescriptorHTML(vr.toHTML());
-							prod.setDescriptor(nsExtract.getDescriptorYAMLfile());
-							((ExperimentMetadata) prod).getConstituentVxF().clear();
-							for (ConstituentVnfd v : ns.getConstituentVnfd()) {
-								ConstituentVxF cvxf = new ConstituentVxF();
-								cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
-																							// this
-								cvxf.setVnfdidRef(v.getVnfdIdRef());
+						
+						
+					}
+				} else if ( prevProduct instanceof ExperimentMetadata) {
+					NSExtractor nsExtract = new NSExtractor(f);
+					Nsd ns = nsExtract.extractNsDescriptor();
+					if (ns != null) {
+						//on update we need to check if name and version are the same. Only then we will accept it
+						if ( !prevProduct.getName().equals( ns.getId()) ||  !prevProduct.getVersion().equals( ns.getVersion() )  ){
+							throw new IOException( "Name and version are not equal to existing descriptor. No updates were performed." );
+						}							
+						if ( ( (ExperimentMetadata) prevProduct).isValid()  ) {
+							throw new IOException( "Descriptor is already Validated and cannot change! No updates were performed." );								
+						}
+						prevProduct.setName(ns.getId());
+						prevProduct.setVersion(ns.getVersion());
+						prevProduct.setVendor(ns.getVendor());
+						prevProduct.setShortDescription(ns.getName());
+						prevProduct.setLongDescription(ns.getDescription());
+						
+						NSRequirements vr = new NSRequirements(ns);
+						prevProduct.setDescriptorHTML(vr.toHTML());
+						prevProduct.setDescriptor(nsExtract.getDescriptorYAMLfile());
+						
+						((ExperimentMetadata) prevProduct).getConstituentVxF().clear();
+						for (ConstituentVnfd v : ns.getConstituentVnfd()) {
+							ConstituentVxF cvxf = new ConstituentVxF();
+							cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
+																						// this
+							cvxf.setVnfdidRef(v.getVnfdIdRef());
 
-								VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
+							VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
 
-								cvxf.setVxfref(vxf);
+							cvxf.setVxfref(vxf);
 
-								((ExperimentMetadata) prod).getConstituentVxF().add(cvxf);
-							}
+							((ExperimentMetadata) prevProduct).getConstituentVxF().add(cvxf);
+						}
 
-							if (nsExtract.getIconfilePath() != null) {
+						if (nsExtract.getIconfilePath() != null) {
 
-								String imageFileNamePosted = ns.getLogo();
-								logger.info("image = " + imageFileNamePosted);
-								if (!imageFileNamePosted.equals("")) {
-									String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
-											tempDir + imageFileNamePosted);
-									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
-											+ prod.getUuid() + "/" + imageFileNamePosted);
-								}
+							String imageFileNamePosted = ns.getLogo();
+							logger.info("image = " + imageFileNamePosted);
+							if (!imageFileNamePosted.equals("")) {
+								String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
+										tempDir + imageFileNamePosted);
+								logger.info("imgfile saved to = " + imgfile);
+								prevProduct.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/"
+										+ prevProduct.getUuid() + "/" + imageFileNamePosted);
 							}
 						}
 					}
-
 				}
+
 			}
+		}
 
 			List<Attachment> ss = screenshots;
 			String screenshotsFilenames = "";
@@ -1056,7 +1102,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					shotFileNamePosted = "shot" + i + "_" + shotFileNamePosted;
 					String shotfilepath = AttachmentUtil.saveFile(shot, tempDir + shotFileNamePosted);
 					logger.info("shotfilepath saved to = " + shotfilepath);
-					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prod.getUuid() + "/"
+					shotfilepath = endpointUrl.toString().replace("http:", "") + "repo/images/" + prevProduct.getUuid() + "/"
 							+ shotFileNamePosted;
 					screenshotsFilenames += shotfilepath + ",";
 					i++;
@@ -1065,56 +1111,26 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if (screenshotsFilenames.length() > 0)
 				screenshotsFilenames = screenshotsFilenames.substring(0, screenshotsFilenames.length() - 1);
 
-			prod.setScreenshots(screenshotsFilenames);
+			prevProduct.setScreenshots(screenshotsFilenames);
 
-//		//if it's a VxF we need also to update the images that this VxF will use
-//		if (prod instanceof VxFMetadata) {
-//			VxFMetadata vxfm = (VxFMetadata) prod;
-//			boolean imageexists = false;
-//			for (VFImage vfimg : vxfm.getVfimagesVDU()) {
-//				vfimg = portalRepositoryRef.getVFImageByID( vfimg.getId() );//reattach from model
-//				if ( !vfimg.getUsedByVxFs().contains( vxfm )){
-//					vfimg.getUsedByVxFs().add(vxfm);
-//					portalRepositoryRef.updateVFImageInfo(vfimg);
-//				}
-//			}
-//		}
 		
-		//if it's a VxF we need also to update the images that this VxF will use
-		if (prod instanceof VxFMetadata) {
-			VxFMetadata vxfm = (VxFMetadata) prod;
-			for (VFImage vfimg : vxfm.getVfimagesVDU()) {				
-
-				boolean refexists = false;
-				for (VxFMetadata refVxF : vfimg.getUsedByVxFs() ) {
-					if ( refVxF.getName().equals(vxfm.getName()) ){
-						refexists = true; 
-						break;
-					}
-				}
-				if (!refexists){
-					vfimg.getUsedByVxFs().add(vxfm);							
-				}
-			}
-			
-		}
 
 		// save product
-		prod = portalRepositoryRef.updateProductInfo(prod);
+		prevProduct = portalRepositoryRef.updateProductInfo( prevProduct );
 
 		// now fix category product references
-		for (Category catToUpdate : prod.getCategories()) {
-			Product p = portalRepositoryRef.getProductByID(prod.getId());
+		for (Category catToUpdate : prevProduct.getCategories()) {
+			//Product p = portalRepositoryRef.getProductByID(prod.getId());
 			Category c = portalRepositoryRef.getCategoryByID( catToUpdate.getId() );
-			c.addProduct(p);
+			c.addProduct( prevProduct );
 			portalRepositoryRef.updateCategoryInfo(c);
 		}
 		
 
-		if (vxfOwner.getProductById(prod.getId()) == null)
-			vxfOwner.addProduct(prod);
-		portalRepositoryRef.updateUserInfo( vxfOwner);
-		return prod;
+//		if (vxfOwner.getProductById(prod.getId()) == null)
+//			vxfOwner.addProduct(prod);
+//		portalRepositoryRef.updateUserInfo( vxfOwner);
+		return prevProduct;
 	}
 
 	@GET
@@ -1902,7 +1918,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		Category previousCategory = portalRepositoryRef.getCategoryByID(catid);
 
-		Category u = portalRepositoryRef.updateCategoryInfo(c);
+		previousCategory.setName( c.getName() );
+		
+		Category u = portalRepositoryRef.updateCategoryInfo( previousCategory );
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -2156,40 +2174,46 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			if ((u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
 			{
-				PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
-				d.setOwner(deploymentOwner); // reattach from the DB model
-				
+				DeploymentDescriptor prevDeployment = portalRepositoryRef.getDeploymentByID( d.getId() );
+												
+				//PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
+				//d.setOwner(deploymentOwner); // reattach from the DB model
 
-				ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
-						.getProductByID(d.getExperiment().getId());
-				d.setExperiment(baseApplication); // reattach from the DB model
-
-				//DeploymentDescriptor deployment = portalRepositoryRef.getDeploymentByID( deployment.getId() );//reattach from model
+//				ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
+//						.getProductByID(d.getExperiment().getId());
+//				d.setExperiment(baseApplication); // reattach from the DB model
+//
+//				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
+//				List<DeploymentDescriptor> deployments = deploymentOwner.getDeployments();
+//				for (DeploymentDescriptor deploymentDescriptor : deployments) {
+//					logger.info("Deployment id = " + deploymentDescriptor.getId() );
+//				}
+//				if ( ! deployments.contains(deployment) ) {
+//					deploymentOwner.getDeployments().add(deployment);
+//					deploymentOwner = portalRepositoryRef.updateUserInfo(  u);					 
+//				}
 				
-
-				DeploymentDescriptor deployment = portalRepositoryRef.updateDeploymentDescriptor(d);
-				List<DeploymentDescriptor> deployments = deploymentOwner.getDeployments();
-				for (DeploymentDescriptor deploymentDescriptor : deployments) {
-					logger.info("Deployment id = " + deploymentDescriptor.getId() );
-				}
-				if ( ! deployments.contains(deployment) ) {
-					deploymentOwner.getDeployments().add(deployment);
-					deploymentOwner = portalRepositoryRef.updateUserInfo(  u);					 
-				}
+				prevDeployment.setName( d.getName() );
+				prevDeployment.setEndDate( d.getEndDate() );
+				prevDeployment.setFeedback( d.getFeedback() );
+				prevDeployment.setStartDate( d.getStartDate());
+				prevDeployment.setStatus( d.getStatus() );
+								
+				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
 				
-				logger.info("updateDeployment for id: " + deployment.getId());
+				logger.info("updateDeployment for id: " + prevDeployment.getId());
 				
-				BusController.getInstance().updateDeploymentRequest( deployment );
+				BusController.getInstance().updateDeploymentRequest( prevDeployment );
 				
 				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 				if ((adminemail != null) && (!adminemail.equals(""))) {
 					String subj = "[5GinFIREPortal] Deployment Request";
-					EmailUtil.SendRegistrationActivationEmail(deploymentOwner.getEmail(),
-							"5GinFIREPortal Deployment Request for experiment: " + d.getName() + "\n<br/>Status: " + d.getStatus().name()+ "\n<br/>Feedback: " + d.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
+					EmailUtil.SendRegistrationActivationEmail(prevDeployment.getOwner().getEmail(),
+							"5GinFIREPortal Deployment Request for experiment: " + prevDeployment.getName() + "\n<br/>Status: " + prevDeployment.getStatus().name()+ "\n<br/>Feedback: " + prevDeployment.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
 							subj);
 				}
 
-				return Response.ok().entity(deployment).build();
+				return Response.ok().entity( prevDeployment ).build();
 
 			}
 
@@ -2295,8 +2319,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
 		MANOplatform previousMP = portalRepositoryRef.getMANOplatformByID(mpid);
+		
+		previousMP.setDescription( c.getDescription() );
+		previousMP.setName( c.getName() );
+		previousMP.setVersion( c.getVersion() );
 
-		MANOplatform u = portalRepositoryRef.updateMANOplatformInfo(c);
+		MANOplatform u = portalRepositoryRef.updateMANOplatformInfo( previousMP );
 
 		if (u != null) {
 			return Response.ok().entity(u).build();
@@ -2398,6 +2426,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
+		
+		MANOprovider prev = portalRepositoryRef.getMANOproviderByID(c.getId());
+		prev.setApiEndpoint( c.getApiEndpoint());
+		prev.setAuthorizationBasicHeader( c.getAuthorizationBasicHeader());
+		prev.setDescription( c.getDescription());
+		prev.setName(c.getName());
+		prev.setSupportedMANOplatform( c.getSupportedMANOplatform() );
+		
 		MANOprovider u = portalRepositoryRef.updateMANOproviderInfo(c);
 
 		if (u != null) {
@@ -2997,9 +3033,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		Infrastructure previousCategory = portalRepositoryRef.getInfrastructureByID(infraid);
+		Infrastructure infrastructure = portalRepositoryRef.getInfrastructureByID(infraid);
+		
+		infrastructure.setDatacentername( c.getDatacentername());
+		infrastructure.setEmail( c.getEmail());
+		infrastructure.setName( c.getName());
+		infrastructure.setOrganization(c.getOrganization());
 
-		Infrastructure u = portalRepositoryRef.updateInfrastructureInfo(c);
+		Infrastructure u = portalRepositoryRef.updateInfrastructureInfo( infrastructure );
 
 		if (u != null) {
 			return Response.ok().entity(u).build();

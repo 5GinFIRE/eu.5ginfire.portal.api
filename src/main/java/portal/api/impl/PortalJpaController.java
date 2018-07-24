@@ -1317,6 +1317,23 @@ public class PortalJpaController {
 	}
 
 
+	/**
+	 * @param vfimg
+	 * @return
+	 */
+	public VFImage updateVFImage(VFImage vfimg) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		EntityTransaction entityTransaction = entityManager.getTransaction();
+
+		entityTransaction.begin();
+		VFImage bp = entityManager.merge( vfimg );
+		entityTransaction.commit();
+
+		return bp;
+	}
+
+
 	
 
 

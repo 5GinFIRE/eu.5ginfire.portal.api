@@ -72,7 +72,7 @@ public class AjaxUserFilter extends UserFilter {
     public static boolean xapiKeyAuth( HttpServletRequest h, PortalRepository portalRepRef ) {
     	Subject currentUser = SecurityUtils.getSubject();
     	if (currentUser != null) {
-			AuthenticationToken token = new UsernamePasswordToken("X-APIKEY", h.getHeader("X-APIKEY") );
+			AuthenticationToken token = new UsernamePasswordToken("X-APIKEY_" + h.getHeader("X-APIKEY"), h.getHeader("X-APIKEY") );
 			try {
 				currentUser.login(token);
 				PortalUser portalUser = portalRepRef.getUserByAPIKEY( h.getHeader("X-APIKEY") );

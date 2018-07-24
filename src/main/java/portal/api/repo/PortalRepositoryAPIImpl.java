@@ -78,6 +78,7 @@ import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
 import portal.api.model.VFImage;
+import portal.api.model.ValidationJob;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -95,6 +96,7 @@ import portal.api.osm.client.OSMClient;
 import portal.api.util.AjaxUserFilter;
 import portal.api.util.AttachmentUtil;
 import portal.api.util.EmailUtil;
+import portal.api.validation.ci.ValidationJobResult;
 import pt.it.av.atnog.extractors.NSExtractor;
 import pt.it.av.atnog.extractors.VNFExtractor;
 import pt.it.av.atnog.requirements.NSRequirements;
@@ -792,7 +794,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (vxf != null) {
 
-			BusController.getInstance().newVxFAdded( vxf );		
+			BusController.getInstance().newVxFAdded( vxf );	
 			BusController.getInstance().validateVxF(vxf);
 			return Response.ok().entity(vxf).build();
 		} else {
@@ -855,8 +857,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				Attachment prodFile =  AttachmentUtil.getAttachmentByName("prodFile", ats);
 				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
 				if ( !vxfFileNamePosted.equals("unknown") ){
-
-					BusController.getInstance().validationUpdateVxF(vxf);
+					
+					BusController.getInstance().validateVxF(vxf);
 				}
 			}
 			 
@@ -985,6 +987,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						prevProduct.setVendor(vnfd.getVendor());
 						prevProduct.setShortDescription(vnfd.getName());
 						prevProduct.setLongDescription(vnfd.getDescription());
+						((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.NOT_STARTED );
 						//((VxFMetadata) prevProduct).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!..Normally we will never get here due to previous Exception
 						//((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.NOT_STARTED );
 						
@@ -3082,6 +3085,51 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 	
 	
+	/**
+	 * Validation Result
+	 */
+	
+	
+	@PUT
+	@Path("/admin/validationjobs/{vxf_id}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response updateUvalidationjob(@PathParam("vxf_id") int vxfid, ValidationJobResult vresult) {
+		logger.info("Received PUT ValidationJobResult for vxfid: " + vresult.getVxfid() );
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+
+		Product prod = portalRepositoryRef.getProductByID( vxfid) ;
+		
+		if ((prod == null) || (! (prod instanceof VxFMetadata) ) )
+		{
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		
+		VxFMetadata vxf = (VxFMetadata) prod;
+		
+		if ( vresult.getValidationStatus() ) {
+			vxf.setCertified( true );
+			vxf.setCertifiedBy( "5GinFIRE " );			
+		}
+		vxf.setValidationStatus( ValidationStatus.COMPLETED );
+		
+		ValidationJob validationJob = new ValidationJob();
+		validationJob.setDateCreated( new Date() );
+		validationJob.setJobid( "0000" );
+		validationJob.setOutputLog( vresult.getOutputLog() );
+		validationJob.setValidationStatus(vresult.getValidationStatus() );
+		validationJob.setVxfid(vxfid); 
+		vxf.getValidationJobs().add( validationJob );
+
+		// save product
+		vxf = (VxFMetadata) portalRepositoryRef.updateProductInfo( vxf );
+		BusController.getInstance().updatedVxF( vxf );		
+		BusController.getInstance().updatedValidationJob( vxf );		
+		return Response.ok().entity( vxf ).build();
+	}
 	
 	
 	

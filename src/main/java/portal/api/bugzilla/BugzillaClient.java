@@ -15,61 +15,32 @@
 
 package portal.api.bugzilla;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.net.ssl.SSLContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.ssl.SSLContextBuilder;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import portal.api.bugzilla.model.Bug;
-import portal.api.bugzilla.model.Bugs;
 import portal.api.bugzilla.model.Comment;
 import portal.api.bugzilla.model.User;
-import portal.api.bugzilla.model.Users;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.PortalUser;
 import portal.api.model.VFImage;
+import portal.api.model.ValidationJob;
 import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.repo.PortalRepository;
+import portal.api.validation.ci.ValidationJobResult;
 
 public class BugzillaClient {
 
 	private static final transient Log logger = LogFactory.getLog(BugzillaClient.class.getName());
 
-	/** */
-	private static BugzillaClient instance;
 
 
 	/** */
@@ -81,17 +52,7 @@ public class BugzillaClient {
 											+ "*************************************************\n";
 
 
-	public static BugzillaClient getInstance() {
-		if (instance == null) {
-			instance = new BugzillaClient();
-			
-			if (PortalRepository.getPropertyByName("maindomain").getValue() != null) {
-				BASE_SERVICE_URL = PortalRepository.getPropertyByName("maindomain").getValue();
-			}
-		}
-		return instance;
-	}
-	
+		
 	
 		
 	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
@@ -107,6 +68,7 @@ public class BugzillaClient {
 		String resolution = null;
 		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.SCHEDULED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
 			status = "IN_PROGRESS";
+			component = "NSD Deployment Request" ;
 		} else  if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
 			status = "RESOLVED";
 			resolution = "FIXED";
@@ -233,8 +195,6 @@ public class BugzillaClient {
 		String alias = vxf.getUuid() ;
 		
 		StringBuilder description =  new StringBuilder( BUGHEADER );
-		description.append( "\n Validation Status: " + vxf.getValidationStatus()  );
-		description.append( "\n Certified: " + String.valueOf( vxf.isCertified() ).toUpperCase() );
 		
 		description.append( "\n\n VxF: " + vxf.getName());
 		description.append( "\n Owner: " +  vxf.getOwner().getUsername() );
@@ -251,9 +211,18 @@ public class BugzillaClient {
 			description.append( "\n\t Image: " + img.getName() + ", " + BASE_SERVICE_URL + "/#!/vfimage_view/" + img.getId()    );
 			
 		}
+
+		description.append( "\n"    );
+		description.append( "\n Validation Status: " + vxf.getValidationStatus()  );
+		description.append( "\n Certified: " + String.valueOf( vxf.isCertified() ).toUpperCase() );
+		
+		description.append( "\n Validation jobs: "    );
+		for (ValidationJob j : vxf.getValidationJobs()) {
+			description.append( "\n\t" + j.getDateCreated().toString() + ", id:" + j.getJobid() + ", Status:" + j.getValidationStatus() +  ", Output:" + j.getOutputLog()   );
+		}
 		 
 		description.append( "\n\n*************************************************\n");
-		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit//" + vxf.getId() ); 
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit/" + vxf.getId() ); 
 		
 		String status= "CONFIRMED";
 		String resolution = null;
@@ -273,6 +242,8 @@ public class BugzillaClient {
 		return b;
 	}
 	
+	
+		
 	
 	public static Bug transformNSDValidation2BugBody(ExperimentMetadata nsd) {
 
@@ -298,7 +269,7 @@ public class BugzillaClient {
 
 		 
 		description.append( "\n\n*************************************************\n");
-		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit//" + nsd.getId() ); 
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/experiment_edit/" + nsd.getId() ); 
 		
 		String status= "CONFIRMED";
 		String resolution = null;

@@ -19,13 +19,10 @@ package portal.api.bugzilla;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
-import javax.ws.rs.core.Context;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.camel.component.ActiveMQComponent;
@@ -34,14 +31,12 @@ import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.LoggingLevel;
-import org.apache.camel.Message;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http4.HttpClientConfigurer;
 import org.apache.camel.component.http4.HttpComponent;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -51,21 +46,13 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.springframework.beans.factory.annotation.Value;
 
 import portal.api.bugzilla.model.Bug;
-import portal.api.model.DeploymentDescriptor;
-import portal.api.model.DeploymentDescriptorStatus;
-import portal.api.model.ExperimentMetadata;
-import portal.api.model.PortalUser;
 import portal.api.repo.PortalRepository;
-import portal.api.routes.MyRouteBuilder.ABug;
 
 /**
- * A simple example router from a file system to an ActiveMQ queue and then to a
- * file system
+ * @author ctranoris
  *
- * @version
  */
 public class BugzillaRouteBuilder extends RouteBuilder {
 
@@ -254,26 +241,25 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Create VxF Validate New Route
 		 */
-		from("seda:vxf.validate.new?multipleConsumers=true")
-		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
-		.to("direct:bugzilla.newIssue");
-		
-
-		/**
-		 * Create VxF Validation Update Route
-		 */
-		from("seda:vxf.validate.update?multipleConsumers=true")		
+		from("seda:vxf.new.validation?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
 		.choice()
-			.when( issueExists )
-				.log( "Update ISSUE for validating ${body.alias} !" )		
-				.process( BugHeaderExtractProcessor )
-				.to("direct:bugzilla.updateIssue")
-				.endChoice()
-			.otherwise()
-				.log( "New ISSUE for validating ${body.alias} !" )	
-				.to("direct:bugzilla.newIssue")
-				.endChoice();
+		.when( issueExists )
+			.log( "Update ISSUE for validating ${body.alias} !" )		
+			.process( BugHeaderExtractProcessor )
+			.to("direct:bugzilla.updateIssue")
+			.endChoice()
+		.otherwise()
+			.log( "New ISSUE for validating ${body.alias} !" )	
+			.to("direct:bugzilla.newIssue")
+			.endChoice();
+		
+		
+		/**
+		 * Update Validation Route
+		 */
+		from("seda:vxf.update.validation?multipleConsumers=true")
+		.to("seda:vxf.new.validation?multipleConsumers=true");
 		
 		
 		/**

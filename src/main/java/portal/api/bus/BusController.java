@@ -25,6 +25,7 @@ import portal.api.model.PortalUser;
 import portal.api.model.VFImage;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
+import portal.api.validation.ci.ValidationJobResult;
 
 /**
  * Exposes messages to Bus. Usually they should be aynchronous.
@@ -112,7 +113,7 @@ public class BusController {
 	public void newVxFAdded(VxFMetadata vxf) {
 
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.create?multipleConsumers=true");
-		template.withBody( vxf ).asyncSend();
+		template.withBody( vxf ).asyncSend();		
 		
 	}
 
@@ -139,7 +140,7 @@ public class BusController {
 
 	/**
 	 * Asynchronously sends to the routing bus (seda:nsd.update?multipleConsumers=true) that a  NSD experiment is updated
-	 * @param deployment a {@link ExperimentMetadata}
+	 * @param experiment a {@link ExperimentMetadata}
 	 */
 	public void updateNSD(ExperimentMetadata experiment) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.update?multipleConsumers=true");
@@ -148,12 +149,23 @@ public class BusController {
 
 	
 	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.validate.new?multipleConsumers=true)to trigger VxF validation
-	 * @param deployment a {@link VxFMetadata}
+	 * Asynchronously sends to the routing bus (seda:vxf.new.validation?multipleConsumers=true)to trigger VxF validation
+	 * @param vxf a {@link VxFMetadata}
 	 */
 	public void validateVxF(VxFMetadata vxf) {
 
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.validate.new?multipleConsumers=true");
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.new.validation?multipleConsumers=true");
+		template.withBody( vxf ).asyncSend();
+		
+	}
+		
+	/**
+	 * Asynchronously sends to the routing bus (seda:vxf.update.validation?multipleConsumers=true)to trigger update VxF validation
+	 * @param vresult  a {@link ValidationJobResult}
+	 */
+	public void updatedValidationJob(VxFMetadata vxf) {
+
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.update.validation?multipleConsumers=true");
 		template.withBody( vxf ).asyncSend();
 		
 	}
@@ -168,17 +180,6 @@ public class BusController {
 	}
 	
 	
-	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.validate.update?multipleConsumers=true)to trigger VxF validation
-	 * @param deployment a {@link VxFMetadata}
-	 */
-	public void validationUpdateVxF(VxFMetadata vxf) {
-
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.validate.update?multipleConsumers=true");
-		template.withBody( vxf ).asyncSend();
-		
-	}
-
 	/**
 	 * Asynchronously sends to the routing bus (seda:nsd.validate.update?multipleConsumers=true) to trigger NSD validation
 	 * @param deployment a {@link ExperimentMetadata}
@@ -262,5 +263,6 @@ public class BusController {
 		// TODO Auto-generated method stub
 		
 	}
+
 	
 }

@@ -83,12 +83,18 @@ public class Product {
 	@Basic()
 	private Date dateUpdated;
 
-	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	private List<Category> categories = new ArrayList<Category>();
 
 	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
 	private List<ProductExtensionItem> extensions = new ArrayList<ProductExtensionItem>();
+	
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@JoinTable()
+	private List<ValidationJob> validationJobs = new ArrayList<ValidationJob>();
+	
+	
 	
 	
 	@Basic() 
@@ -324,5 +330,21 @@ public class Product {
 	public void setDescriptorHTML(String descriptorHTML) {
 		this.descriptorHTML = descriptorHTML;
 	}
+
+	/**
+	 * @return the validationJobs
+	 */
+	public List<ValidationJob> getValidationJobs() {
+		return validationJobs;
+	}
+
+	/**
+	 * @param validationJobs the validationJobs to set
+	 */
+	public void setValidationJobs(List<ValidationJob> validationJobs) {
+		this.validationJobs = validationJobs;
+	}
+	
+	
 
 }

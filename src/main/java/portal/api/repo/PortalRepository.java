@@ -153,6 +153,8 @@ public class PortalRepository {
 		return (Product) portalJpaController.readProductByID(vxfid);
 	}
 	
+	
+	
 	public Product getProductByUUID(String uuid) {
 		return (Product) portalJpaController.readProductByUUID(uuid);
 	}

@@ -55,8 +55,15 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		logger.info("doGetAuthorizationInfo PrincipalCollection=" + arg0.toString());
 
 		SimpleAuthorizationInfo ai = new SimpleAuthorizationInfo();
-
-		PortalUser bu = portalRepositoryRef.getUserByUsername( arg0.toString() );
+		
+		PortalUser bu;
+		if ( arg0.toString().contains("X-APIKEY") ) {
+			String[] s = arg0.toString().split("_");
+			bu = portalRepositoryRef.getUserByAPIKEY( s[1] );
+			
+		}else {
+			bu = portalRepositoryRef.getUserByUsername( arg0.toString() );
+		}
 		if (bu!=null){
 
 			
@@ -85,7 +92,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		//logger.info("tokengetPassword at=" + String.valueOf(token.getPassword()));
 		//logger.info("tokengetPrincipal at=" + token.getPrincipal());
 		
-		if (token.getUsername().equals("X-APIKEY") ){
+		if (token.getUsername().contains("X-APIKEY") ){
 			
 		}else {
 			PortalUser bu = portalRepositoryRef.getUserByUsername(token.getUsername());

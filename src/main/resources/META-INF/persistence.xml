@@ -34,6 +34,7 @@
 		<class>portal.api.model.ConstituentVxF</class>
 		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
 		<class>portal.api.model.VFImage</class>
+		<class>portal.api.model.ValidationJob</class>
 		
 		
 
@@ -88,6 +89,7 @@
 		<class>portal.api.model.ConstituentVxF</class>
 		<class>portal.api.model.DeploymentDescriptorVxFPlacement</class>
 		<class>portal.api.model.VFImage</class>
+		<class>portal.api.model.ValidationJob</class>
 
 
 

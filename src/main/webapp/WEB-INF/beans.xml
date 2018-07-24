@@ -25,6 +25,9 @@
 	</bean>
 
 	<jaxrs:server id="services" address="/api/">
+		<jaxrs:properties>
+            <entry key="attachment-max-size" value="5000000000" />
+        </jaxrs:properties>
 		<jaxrs:serviceBeans>
 
 			<bean class="portal.api.repo.PortalRepositoryAPIImpl">

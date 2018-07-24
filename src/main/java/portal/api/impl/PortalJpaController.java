@@ -118,7 +118,15 @@ public class PortalJpaController {
 			saveProperty(p);
 		}
 		if (readPropertyByName("bugzillakey") == null){
-			PortalProperty p = new PortalProperty("bugzillakey", "VH2Vw0iI5aYgALFFzVDWqhACwt6Hu3bXla9kSC1Z");
+			PortalProperty p = new PortalProperty("bugzillakey", "");
+			saveProperty(p);
+		}
+		if (readPropertyByName("jenkinsciurl") == null){
+			PortalProperty p = new PortalProperty("jenkinsciurl", "ci.5ginfire.eu");
+			saveProperty(p);
+		}
+		if (readPropertyByName("jenkinscikey") == null){
+			PortalProperty p = new PortalProperty("jenkinscikey", "");
 			saveProperty(p);
 		}
 	}

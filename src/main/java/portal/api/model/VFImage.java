@@ -31,6 +31,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
@@ -79,7 +80,7 @@ public class VFImage {
 	@Transient
 	private List<RefVxF> refVxFs = new ArrayList<>();
 	
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 	
@@ -90,7 +91,7 @@ public class VFImage {
 	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
 	private String termsOfUse;	
 	
-	@OneToMany(cascade = { CascadeType.ALL })
+	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<Infrastructure> deployedInfrastructures = new ArrayList<>();
 
@@ -310,6 +311,11 @@ public class VFImage {
 
 
 
+	/**
+	 * Locally used to report back objects, otherwise the response would be recursive
+	 * @author ctranoris
+	 *
+	 */
 	static class RefVxF {
 
 		private long id;
@@ -354,6 +360,21 @@ public class VFImage {
 		}
 		
 		
+	}
+
+
+	/**
+	 * @param id2
+	 * @return
+	 */
+	public Infrastructure getDeployedInfrastructureById(int id2) {
+		
+		for (Infrastructure infrastructure : deployedInfrastructures) {
+			if ( infrastructure.getId() == id2 ){
+				return infrastructure;
+			}
+		}
+		return null;
 	}
 	
 	

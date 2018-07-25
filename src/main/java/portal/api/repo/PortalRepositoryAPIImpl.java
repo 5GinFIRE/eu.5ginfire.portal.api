@@ -321,11 +321,24 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //		}
 //
 		previousUser.setActive( user.getActive() );
-		previousUser.setApikey( user.getApikey() );
 		previousUser.setEmail( user.getEmail() );
 		previousUser.setName( user.getName());
 		previousUser.setOrganization( user.getOrganization() );
-		previousUser.setPassword( user.getPassword() );		
+		if ( (user.getPassword()!=null) && (!user.getPassword().equals(""))){//else will not change it
+			previousUser.setPasswordUnencrypted( user.getPassword() ); 	//the unmarshaled object user has already called setPassword, so getPassword provides the encrypted password
+		}
+		
+		previousUser.getRoles().clear();
+		for (UserRoleType rt : user.getRoles()) {
+			previousUser.getRoles().add(rt);
+		}
+		
+		if ( (user.getApikey()!=null) && ( !user.getApikey().equals("")) ){
+			previousUser.setApikey( user.getApikey() );			
+		} else {
+			previousUser.setApikey( UUID.randomUUID().toString() );			
+		}
+
 		
 		PortalUser u = portalRepositoryRef.updateUserInfo( previousUser );
 		
@@ -735,7 +748,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			List<VxFMetadata> vxfs;
 
-			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getRoles().contains(UserRoleType.TESTBED_PROVIDER)) {
 				vxfs = portalRepositoryRef.getVxFs(categoryid, false);
 			} else {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
@@ -1241,8 +1254,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
 
 		if (vxf != null) {
-			
-			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
+
+			PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+			if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() )  &&! u.getRoles().contains(UserRoleType.TESTBED_PROVIDER) ){
 				return Response.status(Status.FORBIDDEN ).build() ;
 			}
 			
@@ -3085,6 +3099,39 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	}
 	
 	
+	@POST
+	@Path("/admin/infrastructures/{infraid}/images/{vfimageid}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public Response addImageToInfrastructure(@PathParam("infraid") int infraid, @PathParam("vfimageid") int vfimageid) {
+		
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) && !sc.isUserInRole(UserRoleType.TESTBED_PROVIDER.name() ) ){
+			 return Response.status(Status.FORBIDDEN ).build();
+		}
+		
+		Infrastructure infrs = portalRepositoryRef.getInfrastructureByID(infraid);
+		VFImage vfimg = portalRepositoryRef.getVFImageByID(vfimageid);
+
+		if ( (infrs != null) && (vfimg != null)) {
+			
+			if ( vfimg.getDeployedInfrastructureById(infrs.getId() ) ==null ){
+				vfimg.getDeployedInfrastructures().add(infrs);
+			}
+			if ( infrs.getSupportedImageById( vfimg.getId() ) == null ){
+				infrs.getSupportedImages().add(vfimg);
+			}
+			
+			portalRepositoryRef.updateVFImageInfo(vfimg);
+			portalRepositoryRef.updateInfrastructureInfo(infrs);
+			return Response.ok().entity( infrs ).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.BAD_REQUEST );
+			builder.entity("Requested Image cannot added to Infrastructure");
+			throw new WebApplicationException(builder.build());
+		}
+	}
+	
 	/**
 	 * Validation Result
 	 */
@@ -3097,7 +3144,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response updateUvalidationjob(@PathParam("vxf_id") int vxfid, ValidationJobResult vresult) {
 		logger.info("Received PUT ValidationJobResult for vxfid: " + vresult.getVxfid() );
 		
-		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) ){
+
+		
+		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) && !sc.isUserInRole(UserRoleType.TESTBED_PROVIDER.name() ) ){
 			 return Response.status(Status.FORBIDDEN ).build();
 		}
 

@@ -473,12 +473,12 @@ public class OSMClient {
 
 	public List<Nsd> getNSDs() {
 
-		String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd");
-
-		logger.info( "getNSDs response = " + response );
-		
-		ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 		try {
+			String response = getOSMResponse(BASE_SERVICE_URL + "/nsd-catalog/nsd");
+	
+			logger.info( "getNSDs response = " + response );
+			
+			ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 
 			JsonNode tr = mapper.readTree(response).findValue("nsd:nsd");
 			if (tr == null) {

@@ -860,9 +860,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if (vxf != null) { 
 
-			for (VxFOnBoardedDescriptor vxFOnBoardedDescriptor : vxf.getVxfOnBoardedDescriptors()) {
-				vxFOnBoardedDescriptor.setVxf(vxf);
-			}
+			
 			BusController.getInstance().updatedVxF(vxf);
 			//notify only if validation changed
 
@@ -961,6 +959,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				((VxFMetadata) prevProduct).setCertified( ((VxFMetadata) prod).isCertified() );
 			}
 			((VxFMetadata) prevProduct).setCertifiedBy(((VxFMetadata) prod).getCertifiedBy() );
+						
+			
 			
 		} else if ( prevProduct instanceof ExperimentMetadata) {
 
@@ -1129,6 +1129,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			prevProduct.setScreenshots(screenshotsFilenames);
 
+		
+			
 		
 
 		// save product
@@ -2600,18 +2602,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response addVxFOnBoardedDescriptor(VxFOnBoardedDescriptor c) {
+	public Response addVxFOnBoardedDescriptor( VxFMetadata aVxF ) {
 
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		VxFOnBoardedDescriptor u = portalRepositoryRef.addVxFOnBoardedDescriptor(c);
+		
+		if ( aVxF != null ) {
+		
+			VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( aVxF.getId() );
+			VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
+			obd.setVxf( refVxF );
+			refVxF.getVxfOnBoardedDescriptors().add( obd ) ;
+			
+			// save product
+			refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );
+			
 
-		if (u != null) {
-			return Response.ok().entity(u).build();
+			if (refVxF != null) {
+				return Response.ok().entity( refVxF ).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+				builder.entity("Requested VxFOnBoardedDescriptor with name=" + aVxF.getId() + " cannot be installed");
+				throw new WebApplicationException(builder.build());
+			}
+			
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with name=" + c.getId() + " cannot be installed");
+			builder.entity("Requested VxFOnBoardedDescriptor with name=" + aVxF.getId() + " cannot be installed");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -2817,19 +2835,39 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response addExperimentOnBoardDescriptor(ExperimentOnBoardDescriptor c) {
+	public Response addExperimentOnBoardDescriptor( ExperimentMetadata exp) {
+		
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		ExperimentOnBoardDescriptor u = portalRepositoryRef.addExperimentOnBoardDescriptor(c);
+		
+		
+		if ( exp != null ) {
+			
+			ExperimentMetadata refExp =  ( ExperimentMetadata ) portalRepositoryRef.getProductByID( exp.getId() );
+			ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor();
+			obd.setExperiment( refExp );
+			refExp.getExperimentOnBoardDescriptors().add( obd ) ;
+			
+			// save product
+			refExp = (ExperimentMetadata) portalRepositoryRef.updateProductInfo( refExp );
+			
 
-		if (u != null) {
-			return Response.ok().entity(u).build();
+			if (refExp != null) {
+				return Response.ok().entity( refExp ).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+				builder.entity("Requested VxFOnBoardedDescriptor with name=" + exp.getId() + " cannot be installed");
+				throw new WebApplicationException(builder.build());
+			}
+			
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested ExperimentOnBoardDescriptor with name=" + c.getId() + " cannot be installed");
+			builder.entity("Requested VxFOnBoardedDescriptor with name=" + exp.getId() + " cannot be installed");
 			throw new WebApplicationException(builder.build());
 		}
+		
+		
 	}
 
 	@PUT

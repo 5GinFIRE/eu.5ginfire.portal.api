@@ -618,7 +618,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						if (ns != null) {
 
 							Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
-							if ( ( existingmff != null  ) && ( existingmff instanceof  VxFMetadata )) {
+							if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
 								if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
 									throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
 								}

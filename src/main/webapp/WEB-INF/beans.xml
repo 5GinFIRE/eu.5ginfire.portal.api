@@ -213,6 +213,9 @@
 
   <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
     <package>portal.api.bugzilla</package>    
+    <package>portal.api.validation.ci</package>    
+    
+    
   </camelContext>
   
   <bean id="busController" class="portal.api.bus.BusController">

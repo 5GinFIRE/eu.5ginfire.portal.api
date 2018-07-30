@@ -15,6 +15,8 @@
 
 package portal.api.validation.ci;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author ctranoris
  *
@@ -22,24 +24,30 @@ package portal.api.validation.ci;
 public class ValidationJobResult {
 
 	/** */
-	private String vxfid;
+	@JsonProperty("vnfd_id")
+	private int vxfid;
 	/** */
+	@JsonProperty("validation_status")
 	private Boolean validationStatus;
 	/** */
+	@JsonProperty("jenkins_output_log")
 	private String outputLog;
-	
+
+	/** */
+	@JsonProperty("build_id")
+	private int buildId;
 		
 	
 	/**
 	 * @return the vxfid
 	 */
-	public String getVxfid() {
+	public int getVxfid() {
 		return vxfid;
 	}
 	/**
 	 * @param vxfid the vxfid to set
 	 */
-	public void setVxfid(String vxfid) {
+	public void setVxfid(int vxfid) {
 		this.vxfid = vxfid;
 	}
 
@@ -67,6 +75,18 @@ public class ValidationJobResult {
 	 */
 	public void setOutputLog(String outputLog) {
 		this.outputLog = outputLog;
+	}
+	/**
+	 * @return the buildId
+	 */
+	public int getBuildId() {
+		return buildId;
+	}
+	/**
+	 * @param buildId the buildId to set
+	 */
+	public void setBuildId(int buildId) {
+		this.buildId = buildId;
 	}
 
 	

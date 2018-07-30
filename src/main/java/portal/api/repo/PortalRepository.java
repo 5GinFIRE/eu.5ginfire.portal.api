@@ -310,6 +310,11 @@ public class PortalRepository {
 		return ls;
 	}
 
+	
+	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByUser( Long ownerid ) {
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByUser( ownerid, 0, 100000);	
+		return ls;
+	}
 
 	public void deleteDeployment(int id) {
 		portalJpaController.deleteDeployment(id);

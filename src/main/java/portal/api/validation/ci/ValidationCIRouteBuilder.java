@@ -15,9 +15,17 @@
 
 package portal.api.validation.ci;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.builder.RouteBuilder;
+import java.util.Map;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.Processor;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.dataformat.JsonLibrary;
+
+import portal.api.bugzilla.BugzillaClient;
+import portal.api.bugzilla.model.Bug;
+import portal.api.model.VxFMetadata;
 import portal.api.repo.PortalRepository;
 
 /**
@@ -25,8 +33,9 @@ import portal.api.repo.PortalRepository;
  *
  */
 public class ValidationCIRouteBuilder extends RouteBuilder {
-	
-	private static String JENKINSCIKEY = "test";
+
+	private static String JENKINSCIKEY = "5ginfire@test";
+	private static String PIPELINE_TOKEN = "test";	 
 	private static String JENKINSCIURL = "localhost:13000";
 	
 	public void configure() {
@@ -36,6 +45,9 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 		}
 		if (PortalRepository.getPropertyByName("jenkinscikey").getValue() != null) {
 			JENKINSCIKEY = PortalRepository.getPropertyByName("jenkinscikey").getValue();
+		}
+		if (PortalRepository.getPropertyByName("pipelinetoken").getValue() != null) {
+			PIPELINE_TOKEN = PortalRepository.getPropertyByName("pipelinetoken").getValue();
 		}
 		
 		if ( ( JENKINSCIURL == null ) || JENKINSCIURL.equals( "" ) ){
@@ -50,13 +62,55 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 		 * Create VxF Validate New Route
 		 */
 		from("seda:vxf.new.validation?multipleConsumers=true")
+		.log( "Submit new validation request for VNF_ID=${body.getId}" )	
+		.errorHandler(deadLetterChannel("direct:dlq_validations")
+				.maximumRedeliveries( 3 ) //let's try 3 times to send it....
+				.redeliveryDelay( 30000 ).useOriginalMessage()
+				.deadLetterHandleNewException( false )
+				//.logExhaustedMessageHistory(false)
+				.logExhausted(true)
+				.logHandled(true)
+				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
+				.retryAttemptedLogLevel( LoggingLevel.WARN) )
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
-		.toD( "http4://" + JENKINSCIKEY + "@" + JENKINSCIURL + "/job/validation_pipeline&buildWithParameters?token=PIPELINE_TOKEN&VNF_ID=${body.id}")
+		.process( headerExtractProcessor )
+		.toD( "http4://" + JENKINSCIKEY + "@" + JENKINSCIURL + "/job/validation_pipeline&buildWithParameters?token=" + PIPELINE_TOKEN + "&VNF_ID=${header.id}")
+		.to("stream:out");
+				
+		
+		/**
+		 * dead Letter Queue Users if everything fails to connect
+		 */
+		from("direct:dlq_validations")
+		.setBody()
+		.body(String.class)
 		.to("stream:out");
 		
-		
-
-		
 	}
+	
+	
+	Processor headerExtractProcessor = new Processor() {
+		
+		@Override
+		public void process(Exchange exchange) throws Exception {
+
+			Map<String, Object> headers = exchange.getIn().getHeaders(); 
+			VxFMetadata m = exchange.getIn().getBody( VxFMetadata.class ); 
+		    headers.put("id", m.getId()  );
+		    exchange.getOut().setHeaders(headers);
+		    
+//		    //copy Description to Comment
+//		    aBug.setComment( BugzillaClient.createComment( aBug.getDescription() ) );
+//		    //delete Description
+//		    aBug.setDescription( null );
+//		    aBug.setAlias( null ); //dont put any Alias		
+//		    aBug.setCc( null );
+		    
+		    exchange.getOut().setBody( ""  );
+		    // copy attachements from IN to OUT to propagate them
+		    exchange.getOut().setAttachments(exchange.getIn().getAttachments());
+			
+		}
+	};
 
 }

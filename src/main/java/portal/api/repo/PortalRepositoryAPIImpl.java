@@ -888,10 +888,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			List<Attachment> screenshots) throws IOException {
 
 		logger.info("userid = " + prod.getOwner().getId());
-		logger.info("vxfname = " + prod.getName());
-		logger.info("vxfid = " + prod.getId());
+		logger.info("prodname = " + prod.getName());
+		logger.info("prodid = " + prod.getId());
 
-		logger.info("vxfuuid = " + prod.getUuid());
+		logger.info("produuid = " + prod.getUuid());
 		logger.info("version = " + prod.getVersion());
 		logger.info("shortDescription = " + prod.getShortDescription());
 		logger.info("longDescription = " + prod.getLongDescription());
@@ -955,9 +955,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				MANOplatform mpdb = portalRepositoryRef.getMANOplatformByID( mp.getId());
 				((VxFMetadata) prevProduct).getSupportedMANOPlatforms().add( mpdb );
 			}
-			if ( !((VxFMetadata) prevProduct).isCertified() ){
+			//if ( !((VxFMetadata) prevProduct).isCertified() ){ //allow for now to change state
 				((VxFMetadata) prevProduct).setCertified( ((VxFMetadata) prod).isCertified() );
-			}
+			//}
 			((VxFMetadata) prevProduct).setCertifiedBy(((VxFMetadata) prod).getCertifiedBy() );
 						
 			
@@ -966,9 +966,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			prevProduct.setTermsOfUse( prod.getTermsOfUse() );
 			prevProduct.setPublished( prod.isPublished() );
-			if ( !((ExperimentMetadata) prevProduct).isValid() ){
+			//if ( !((ExperimentMetadata) prevProduct).isValid() ){  //allow for now to change state
 				((ExperimentMetadata) prevProduct).setValid( ((ExperimentMetadata) prod).isValid() );
-			}
+			//}
 			((ExperimentMetadata) prevProduct).setPackagingFormat( ((ExperimentMetadata) prod).getPackagingFormat() );
 		}
 
@@ -1840,9 +1840,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if ( expmeta != null) { 
 
-			for (ExperimentOnBoardDescriptor veDescriptor : expmeta.getExperimentOnBoardDescriptors()) {
-				veDescriptor.setExperiment(expmeta);
-			}
 			BusController.getInstance().updateNSD(expmeta);	
 			
 			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must re-trigger validation
@@ -2076,7 +2073,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
 			} else {
-				deployments = u.getDeployments();
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
 			}
 
 			return Response.ok().entity(deployments).build();
@@ -3205,7 +3202,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		ValidationJob validationJob = new ValidationJob();
 		validationJob.setDateCreated( new Date() );
-		validationJob.setJobid( "0000" );
+		validationJob.setJobid( vresult.getBuildId() + "" );
 		validationJob.setOutputLog( vresult.getOutputLog() );
 		validationJob.setValidationStatus(vresult.getValidationStatus() );
 		validationJob.setVxfid(vxfid); 

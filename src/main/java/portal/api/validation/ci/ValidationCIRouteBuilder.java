@@ -15,6 +15,7 @@
 
 package portal.api.validation.ci;
 
+import java.util.Base64;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
@@ -74,7 +75,7 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 				.retryAttemptedLogLevel( LoggingLevel.WARN) )
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
 		.process( headerExtractProcessor )
-		.toD( "http4://" + JENKINSCIKEY + "@" + JENKINSCIURL + "/job/validation_pipeline&buildWithParameters?token=" + PIPELINE_TOKEN + "&VNF_ID=${header.id}")
+		.toD( "http4://" + JENKINSCIURL + "/job/validation_pipeline/buildWithParameters?token=" + PIPELINE_TOKEN + "&VNF_ID=${header.id}")
 		.to("stream:out");
 				
 		
@@ -97,6 +98,9 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 			Map<String, Object> headers = exchange.getIn().getHeaders(); 
 			VxFMetadata m = exchange.getIn().getBody( VxFMetadata.class ); 
 		    headers.put("id", m.getId()  );
+		    String encoding = Base64.getEncoder().encodeToString( (JENKINSCIKEY).getBytes() );
+		    headers.put("Authorization",  "Basic " + encoding  );
+		    
 		    exchange.getOut().setHeaders(headers);
 		    
 //		    //copy Description to Comment

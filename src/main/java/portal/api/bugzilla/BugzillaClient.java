@@ -227,7 +227,7 @@ public class BugzillaClient {
 		String status= "CONFIRMED";
 		String resolution = null;
 		if ( vxf.getValidationStatus().equals( ValidationStatus.UNDER_REVIEW ) )  {
-			status = "IN_PROGRESS";
+			status = "CONFIRMED";
 		} else  if ( vxf.isCertified()  &&  ( vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
 			status = "RESOLVED";
 			resolution = "FIXED";

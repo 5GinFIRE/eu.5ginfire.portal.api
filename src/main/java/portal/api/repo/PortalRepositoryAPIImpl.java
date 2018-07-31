@@ -735,12 +735,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs(categoryid, true);
 
-		/** cut fields to optimize response payload */
-		for (VxFMetadata vxFMetadata : vxfs) {
-			vxFMetadata.setDescriptorHTML( null );
-			vxFMetadata.setDescriptor( null );
-			vxFMetadata.setVxfOnBoardedDescriptors( null );
-		}
+//		/** cut fields to optimize response payload */
+//		for (VxFMetadata vxFMetadata : vxfs) {
+//			vxFMetadata.setDescriptorHTML( null );
+//			vxFMetadata.setDescriptor( null );
+//			vxFMetadata.setVxfOnBoardedDescriptors( null );
+//		}
 		Response res = Response.ok().entity(vxfs).build();
 		return res;
 
@@ -755,8 +755,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public Response getVxFs(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getVxFs categoryid=" + categoryid);
 		
-		long time0 = System.currentTimeMillis();
-		System.out.println(  "Time 0: "+ time0 );
+//		long time0 = System.currentTimeMillis();
+//		System.out.println(  "Time 0: "+ time0 );
 		
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
@@ -771,15 +771,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 
 
-			for (VxFMetadata vxFMetadata : vxfs) {
-				vxFMetadata.setDescriptorHTML( null );
-				vxFMetadata.setDescriptor( null );
-				vxFMetadata.setVxfOnBoardedDescriptors( null );
-			}
-			
-			System.out.println(  "Time 1: "+  (System.currentTimeMillis() - time0) );
+//			for (VxFMetadata vxFMetadata : vxfs) {
+//				vxFMetadata.setDescriptorHTML( null );
+//				vxFMetadata.setDescriptor( null );
+//				vxFMetadata.setVxfOnBoardedDescriptors( null );
+//			}
+//			
+//			System.out.println(  "Time 1: "+  (System.currentTimeMillis() - time0) );
 			Response res = Response.ok().entity(vxfs).build();
-			System.out.println(  "Time 2: "+  (System.currentTimeMillis() - time0) );
+//			System.out.println(  "Time 2: "+  (System.currentTimeMillis() - time0) );
 			
 			
 			return res;

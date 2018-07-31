@@ -730,18 +730,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/vxfs")
 	@Produces("application/json")
 	public Response getAllVxFs(@QueryParam("categoryid") Long categoryid) {
+		
 		logger.info("getVxFs categoryid=" + categoryid);
 
 		List<VxFMetadata> vxfs = portalRepositoryRef.getVxFs(categoryid, true);
-		return Response.ok().entity(vxfs).build();
+
+		/** cut fields to optimize response payload */
+		for (VxFMetadata vxFMetadata : vxfs) {
+			vxFMetadata.setDescriptorHTML( null );
+			vxFMetadata.setDescriptor( null );
+			vxFMetadata.setVxfOnBoardedDescriptors( null );
+		}
+		Response res = Response.ok().entity(vxfs).build();
+		return res;
 
 	}
+	
+	
+	
 
 	@GET
 	@Path("/admin/vxfs")
 	@Produces("application/json")
 	public Response getVxFs(@QueryParam("categoryid") Long categoryid) {
 		logger.info("getVxFs categoryid=" + categoryid);
+		
+		long time0 = System.currentTimeMillis();
+		System.out.println(  "Time 0: "+ time0 );
+		
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
@@ -754,7 +770,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());
 			}
 
-			return Response.ok().entity(vxfs).build();
+
+			for (VxFMetadata vxFMetadata : vxfs) {
+				vxFMetadata.setDescriptorHTML( null );
+				vxFMetadata.setDescriptor( null );
+				vxFMetadata.setVxfOnBoardedDescriptors( null );
+			}
+			
+			System.out.println(  "Time 1: "+  (System.currentTimeMillis() - time0) );
+			Response res = Response.ok().entity(vxfs).build();
+			System.out.println(  "Time 2: "+  (System.currentTimeMillis() - time0) );
+			
+			
+			return res;
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);

@@ -238,11 +238,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("stream:out");
 		
 		
-		/**
-		 * Create VxF Validate New Route
-		 */
-		from("seda:vxf.new.validation?multipleConsumers=true")
-		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		from("direct:bugzilla.bugmanage")
 		.choice()
 		.when( issueExists )
 			.log( "Update ISSUE for validating ${body.alias} !" )		
@@ -256,10 +252,19 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		
 		
 		/**
+		 * Create VxF Validate New Route
+		 */
+		from("seda:vxf.new.validation?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		.to("direct:bugzilla.bugmanage");
+		
+		
+		/**
 		 * Update Validation Route
 		 */
-		from("seda:vxf.update.validation?multipleConsumers=true")
-		.to("seda:vxf.new.validation?multipleConsumers=true");
+		from("seda:vxf.validationresult.update?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+		.to("direct:bugzilla.bugmanage");
 		
 		
 		/**

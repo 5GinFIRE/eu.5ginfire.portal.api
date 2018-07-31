@@ -570,7 +570,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							prod.setVendor(vnfd.getVendor());
 							prod.setShortDescription(vnfd.getName());
 							prod.setLongDescription(vnfd.getDescription());
-							
+							((VxFMetadata) prod).setValidationStatus( ValidationStatus.UNDER_REVIEW  );
 							((VxFMetadata) prod).getVfimagesVDU().clear();//clear previous referenced images
 							for (Vdu vdu : vnfd.getVdu()) {
 								String imageName = vdu.getImage();
@@ -1000,9 +1000,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						prevProduct.setVendor(vnfd.getVendor());
 						prevProduct.setShortDescription(vnfd.getName());
 						prevProduct.setLongDescription(vnfd.getDescription());
-						((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.NOT_STARTED );
+						((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.UNDER_REVIEW );
 						//((VxFMetadata) prevProduct).setCertified( false ); //we need to Certify/Validate again this VxF since the descriptor is changed!..Normally we will never get here due to previous Exception
-						//((VxFMetadata) prevProduct).setValidationStatus( ValidationStatus.NOT_STARTED );
+						
 						
 						
 						for (VFImage img : ((VxFMetadata) prevProduct).getVfimagesVDU()) {

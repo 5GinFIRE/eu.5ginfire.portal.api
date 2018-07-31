@@ -160,12 +160,12 @@ public class BusController {
 	}
 		
 	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.update.validation?multipleConsumers=true)to trigger update VxF validation
+	 * Asynchronously sends to the routing bus (seda:vxf.validationresult.update?multipleConsumers=true)to trigger update VxF validation
 	 * @param vresult  a {@link ValidationJobResult}
 	 */
 	public void updatedValidationJob(VxFMetadata vxf) {
 
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.update.validation?multipleConsumers=true");
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.validationresult.update?multipleConsumers=true");
 		template.withBody( vxf ).asyncSend();
 		
 	}

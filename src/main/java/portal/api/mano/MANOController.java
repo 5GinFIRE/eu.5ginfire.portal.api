@@ -4,6 +4,10 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 
+/**
+ * @author ctranoris
+ *
+ */
 public class MANOController {
 	
 	
@@ -35,6 +39,16 @@ public class MANOController {
 		
 		OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
 				vxfobds.getDeployId());
+		
+	}
+
+	/**
+	 * offBoard a VNF to MANO Provider, as described by this descriptor
+	 * 
+	 * @param c
+	 */
+	public void offBoardVxF(VxFOnBoardedDescriptor c) {
+		// TODO Auto-generated method stub
 		
 	}
 

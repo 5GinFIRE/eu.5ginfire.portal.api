@@ -31,7 +31,7 @@ import portal.api.validation.ci.ValidationJobResult;
  * Exposes messages to Bus. Usually they should be aynchronous.
  * Consult http://camel.apache.org/uris.html for URIs
  * sendmessage(direct:mplampla) is Synchronous in same Context
- * sendmessage(seda:mplampla) is sSynchronous in same Context
+ * sendmessage(seda:mplampla) is aSynchronous in same Context
  *  * 
  * @author ctranoris
  * 
@@ -191,7 +191,8 @@ public class BusController {
 
 
 	/**
-	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to trigger new VXF onboarding 
+	 * Asynchronously sends to the routing bus (seda:vxf.onboard?multipleConsumers=true) to trigger new VXF onboarding to target MANOs that
+	 * can support this VNF OSM version
 	 * @param deployment a {@link VxFOnBoardedDescriptor}
 	 */
 	public void onBoardVxF(VxFOnBoardedDescriptor vxfobds) {

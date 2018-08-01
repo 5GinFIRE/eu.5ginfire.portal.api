@@ -93,6 +93,11 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-test</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring</artifactId>
 			<version>${camel.version}</version>
 		</dependency>

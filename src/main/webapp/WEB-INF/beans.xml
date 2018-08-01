@@ -214,7 +214,7 @@
   <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
     <package>portal.api.bugzilla</package>    
     <package>portal.api.validation.ci</package>    
-    
+    <package>portal.api.mano</package>    
     
   </camelContext>
   

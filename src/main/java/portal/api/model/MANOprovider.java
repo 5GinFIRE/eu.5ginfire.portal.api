@@ -52,13 +52,30 @@ public class MANOprovider implements IMANOprovider {
 	private String apiEndpoint = null;
 	
 	
-
-	
 	/**
 	 * base64-encoding of username:password
 	 */
 	@Basic()
 	private String authorizationBasicHeader = null;
+	
+	
+	/**
+	 * username to connect
+	 */
+	@Basic()
+	private String username = null;
+	
+	/**
+	 * password to connect
+	 */
+	@Basic()
+	private String password = null;
+	
+	/**
+	 * password to connect
+	 */
+	@Basic()
+	private Boolean enabledForONBOARDING = null;
 
 
 	public String getAuthorizationBasicHeader() {
@@ -118,6 +135,54 @@ public class MANOprovider implements IMANOprovider {
 
 	public void setSupportedMANOplatform(MANOplatform supportedMANOplatform) {
 		this.supportedMANOplatform = supportedMANOplatform;
+	}
+
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+
+	/**
+	 * @param username the username to set
+	 */
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+
+	/**
+	 * @param password the password to set
+	 */
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	/**
+	 * @return the enabledForONBOARDING
+	 */
+	public Boolean getEnabledForONBOARDING() {
+		return enabledForONBOARDING;
+	}
+
+
+	/**
+	 * @param enabledForONBOARDING the enabledForONBOARDING to set
+	 */
+	public void setEnabledForONBOARDING( Boolean enabledForONBOARDING) {
+		this.enabledForONBOARDING = enabledForONBOARDING;
 	}
 	
 	

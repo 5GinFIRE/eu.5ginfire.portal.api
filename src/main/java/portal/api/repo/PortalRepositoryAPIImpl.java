@@ -69,6 +69,7 @@ import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 import portal.api.bugzilla.model.ErrorMsg;
 import portal.api.bus.BusController;
+import portal.api.mano.MANOController;
 import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
@@ -2719,37 +2720,42 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		VxFOnBoardedDescriptor sm = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
+		VxFOnBoardedDescriptor obds = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
 
-		if (sm == null) {
+		if (obds == null) {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("VxFOnBoardedDescriptor " + mpid + " not found in portal registry");
 			return builder.build();
 		}
+		
+		
+		/**
+		 * the following polling will be performed automatically by CAMEL with a timer
+		 */
 
-		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
+		if (obds.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
 
 			Vnfd vnfd = null;
-			List<Vnfd> vnfds = OSMClient.getInstance(sm.getObMANOprovider()).getVNFDs();
+			List<Vnfd> vnfds = OSMClient.getInstance(obds.getObMANOprovider()).getVNFDs();
 			for (Vnfd v : vnfds) {
-				if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
-						|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
+				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID())
+						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
 					vnfd = v;
 					break;
 				}
 			}
 
 			if (vnfd == null) {
-				sm.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+				obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
 			} else {
-				sm.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+				obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
 			}
 
-			sm = portalRepositoryRef.updateVxFOnBoardedDescriptor(sm);
+			obds = portalRepositoryRef.updateVxFOnBoardedDescriptor(obds);
 
 		}
 
-		return Response.ok().entity(sm).build();
+		return Response.ok().entity(obds).build();
 
 	}
 
@@ -2794,19 +2800,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		VxFOnBoardedDescriptor vxfobds = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 
 		logger.info("VxF Package Location: " + vxf.getPackageLocation());
-		
 
-		
-		String pLocation = vxf.getPackageLocation();
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
-		}
-		
-		OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
-				c.getDeployId());
 
 		if (vxfobds != null) {
-			BusController.getInstance().onBoardVxF( vxfobds );
+			MANOController.getInstance().onBoardVxFToMANOProvider( vxfobds );
+			/** 
+			 * When OSM FOUR is also ready, we need to delete the lines above OSMClient.getInstance( ... and go only through Bus
+			 * */
+			//BusController.getInstance().onBoardVxF( vxfobds );
+			
+			
 			return Response.ok().entity(vxfobds).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -2830,6 +2833,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// TODO: Implement this towards MANO
 
 		if (u != null) {
+			MANOController.getInstance().offBoardVxF( c );
 			BusController.getInstance().offBoardVxF( u );
 			return Response.ok().entity(u).build();
 		} else {

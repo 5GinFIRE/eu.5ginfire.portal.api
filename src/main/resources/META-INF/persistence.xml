@@ -54,7 +54,7 @@
 		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
 			<property name="openjpa.ConnectionURL"
-				value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE" />
+				value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE;CACHE_SIZE=8192" />
 			<property name="openjpa.ConnectionUserName" value="portaldb" />
 			<property name="openjpa.ConnectionPassword" value="filepwd portaldb" />
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />

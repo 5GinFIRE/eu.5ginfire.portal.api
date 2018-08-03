@@ -14,6 +14,10 @@
 	
 	<bean id="portalRepositoryBean" class="portal.api.repo.PortalRepository">
 		<property name="portalJpaController" ref="portalJpaControllerRef" />
+	</bean>	
+	
+	<bean id="aMANOControllerBean" class="portal.api.mano.MANOController">
+		<property name="portalRepositoryRef" ref="portalRepositoryBean" />
 	</bean>
 
 	<!-- CXF Swagger2Feature -->
@@ -32,6 +36,8 @@
 
 			<bean class="portal.api.repo.PortalRepositoryAPIImpl">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />
+				<property name="aMANOController" ref="aMANOControllerBean" />
+				
 			</bean>
 			<bean class="portal.api.repo.PortalRepositoryVFImageAPI">
 				<property name="portalRepositoryRef" ref="portalRepositoryBean" />

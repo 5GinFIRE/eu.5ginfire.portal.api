@@ -445,28 +445,33 @@ public class OSMClient {
 
 		logger.info( "getVNFDs response = " + response );
 		
-		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		if ( response != null)
+		{
+			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-		try {
+			try {
 
-			JsonNode tr = mapper.readTree(response).findValue("vnfd:vnfd");
-			if (tr == null) {
-				tr = mapper.readTree(response).findValue("vnfd");
+				JsonNode tr = mapper.readTree(response).findValue("vnfd:vnfd");
+				if (tr == null) {
+					tr = mapper.readTree(response).findValue("vnfd");
+				}
+
+				ArrayList<Vnfd> vnfds = new ArrayList<>();
+
+				for (JsonNode jsonNode : tr) {
+					Vnfd vnfd = mapper.readValue(jsonNode.toString(), Vnfd.class);
+					vnfds.add(vnfd);
+				}
+
+				return vnfds;
+
+			} catch (IllegalStateException | IOException e) {
+				logger.error(e.getMessage() );
+				e.printStackTrace();
 			}
-
-			ArrayList<Vnfd> vnfds = new ArrayList<>();
-
-			for (JsonNode jsonNode : tr) {
-				Vnfd vnfd = mapper.readValue(jsonNode.toString(), Vnfd.class);
-				vnfds.add(vnfd);
-			}
-
-			return vnfds;
-
-		} catch (IllegalStateException | IOException e) {
-			logger.error(e.getMessage() );
-			e.printStackTrace();
 		}
+		
+		
 
 		return null;
 	}

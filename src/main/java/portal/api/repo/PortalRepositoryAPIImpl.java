@@ -15,12 +15,8 @@
 
 package portal.api.repo;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -31,9 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import javax.activation.DataHandler;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -46,7 +39,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -74,12 +66,9 @@ import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
-import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.IPortalRepositoryAPI;
-import portal.api.model.VFImage;
-import portal.api.model.ValidationJob;
 import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
@@ -87,9 +76,10 @@ import portal.api.model.OnBoardingStatus;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
-import portal.api.model.SubscribedResource;
 import portal.api.model.UserRoleType;
 import portal.api.model.UserSession;
+import portal.api.model.VFImage;
+import portal.api.model.ValidationJob;
 import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
@@ -130,17 +120,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Context
 	protected SecurityContext sc;
 	
-
 	@Context
 	AjaxUserFilter ajf;
+	
+	private PortalRepository portalRepositoryRef;
 
+	/** */
+	private MANOController aMANOController;
+	
+	
 	private static final transient Log logger = LogFactory.getLog(PortalRepositoryAPIImpl.class.getName());
 
 	private static final String METADATADIR = System.getProperty("user.home") + File.separator + ".portal"
 			+ File.separator + "metadata" + File.separator;
-
-	private PortalRepository portalRepositoryRef;
-	
 	
 
 
@@ -1368,6 +1360,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
 		this.portalRepositoryRef = portalRepositoryRef;
 	}
+	
+	
+
+	/**
+	 * @return the aMANOController
+	 */
+	public MANOController getaMANOController() {
+		return aMANOController;
+	}
+
+	/**
+	 * @param aMANOController the aMANOController to set
+	 */
+	public void setaMANOController(MANOController aMANOController) {
+		this.aMANOController = aMANOController;
+	}
 
 	// Sessions related API
 
@@ -1394,6 +1402,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	// return Response.ok().build();
 	// }
 	// }
+
 
 	@POST
 	@Path("/sessions/")
@@ -2729,31 +2738,31 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		
 		
-		/**
-		 * the following polling will be performed automatically by CAMEL with a timer
-		 */
-
-		if (obds.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
-
-			Vnfd vnfd = null;
-			List<Vnfd> vnfds = OSMClient.getInstance(obds.getObMANOprovider()).getVNFDs();
-			for (Vnfd v : vnfds) {
-				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID())
-						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
-					vnfd = v;
-					break;
-				}
-			}
-
-			if (vnfd == null) {
-				obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-			} else {
-				obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-			}
-
-			obds = portalRepositoryRef.updateVxFOnBoardedDescriptor(obds);
-
-		}
+//		/**
+//		 * the following polling will be performed automatically by CAMEL with a timer
+//		 */
+//
+//		if (obds.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
+//
+//			Vnfd vnfd = null;
+//			List<Vnfd> vnfds = OSMClient.getInstance(obds.getObMANOprovider()).getVNFDs();
+//			for (Vnfd v : vnfds) {
+//				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID())
+//						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
+//					vnfd = v;
+//					break;
+//				}
+//			}
+//
+//			if (vnfd == null) {
+//				obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+//			} else {
+//				obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+//			}
+//
+//			obds = portalRepositoryRef.updateVxFOnBoardedDescriptor(obds);
+//
+//		}
 
 		return Response.ok().entity(obds).build();
 
@@ -2775,23 +2784,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByID(c.getVxfid());
 		}
 
-		/**
-		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage
-		 * we just get a response something like response = {"output":
-		 * {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}} which does not
-		 * provide any information. The OSM RIFTIO API says that we could get
-		 * information about onboarding (create or update) jobs see
-		 * https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
-		 * with /api/operational/download-jobs, but this does not return pending jobs.
-		 * So the only solution is to ask again OSM if something is installed or not, so
-		 * for now the client (the portal ) must check via the
-		 * getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM. OSM
-		 * uses the ID of the yaml description Thus we asume that the vxf name can be
-		 * equal to the VNF ID in the portal, and we use it for now as the OSM ID. Later
-		 * in future, either OSM API provide more usefull response or we extract info
-		 * from the VNFD package
-		 * 
-		 */
+
 
 		c.setVxfMANOProviderID(vxf.getName());
 
@@ -2803,18 +2796,19 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 
 		if (vxfobds != null) {
-			MANOController.getInstance().onBoardVxFToMANOProvider( vxfobds );
-			/** 
-			 * When OSM FOUR is also ready, we need to delete the lines above OSMClient.getInstance( ... and go only through Bus
-			 * */
-			//BusController.getInstance().onBoardVxF( vxfobds );
 			
+			try {
+
+				aMANOController.onBoardVxFToMANOProvider( vxfobds );
+			} catch (Exception e) {				
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
+			}			
 			
 			return Response.ok().entity(vxfobds).build();
+			
 		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
-			return builder.build();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
 		}
 
 	}
@@ -2833,7 +2827,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// TODO: Implement this towards MANO
 
 		if (u != null) {
-			MANOController.getInstance().offBoardVxF( c );
+			aMANOController.offBoardVxF( c );
 			BusController.getInstance().offBoardVxF( u );
 			return Response.ok().entity(u).build();
 		} else {

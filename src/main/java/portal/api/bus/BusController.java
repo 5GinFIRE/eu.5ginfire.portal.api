@@ -190,43 +190,6 @@ public class BusController {
 	}
 
 
-	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.onboard?multipleConsumers=true) to trigger new VXF onboarding to target MANOs that
-	 * can support this VNF OSM version
-	 * @param deployment a {@link VxFOnBoardedDescriptor}
-	 */
-	public void onBoardVxF(VxFOnBoardedDescriptor vxfobds) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboard?multipleConsumers=true");
-		template.withBody( vxfobds ).asyncSend();
-	}
-
-	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.offboard?multipleConsumers=true) to trigger new VXF offboarding 
-	 * @param deployment a {@link VxFOnBoardedDescriptor}
-	 */
-	public void offBoardVxF(VxFOnBoardedDescriptor vxfobds) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.offboard?multipleConsumers=true");
-		template.withBody( vxfobds ).asyncSend();
-		
-	}
-
-	/**
-	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to trigger new NSD onboarding 
-	 * @param deployment a {@link ExperimentOnBoardDescriptor}
-	 */
-	public void onBoardNSD(ExperimentOnBoardDescriptor uexpobd) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard?multipleConsumers=true");
-		template.withBody( uexpobd ).asyncSend();		
-	}
-
-	/**
-	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to trigger new NSD offboarding 
-	 * @param deployment a {@link ExperimentOnBoardDescriptor}
-	 */
-	public void offBoardNSD(ExperimentOnBoardDescriptor uexpobd) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.offboard?multipleConsumers=true");
-		template.withBody( uexpobd ).asyncSend();		
-	}
 
 	/**
 	 * Asynchronously sends to the routing bus (seda:vxf.deleted?multipleConsumers=true) that a vxf is deleted
@@ -265,5 +228,46 @@ public class BusController {
 		
 	}
 
+	
+	
+	
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:mano.onboard.vxf?multipleConsumers=true) to trigger new VXF onboarding to target MANOs that
+	 * can support this VNF OSM version
+	 * @param deployment a {@link VxFOnBoardedDescriptor}
+	 */
+	public void onBoardVxF(VxFOnBoardedDescriptor vxfobds) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:mano.onboard.vxf?multipleConsumers=true");
+		template.withBody( vxfobds ).asyncSend();
+	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:vxf.offboard?multipleConsumers=true) to trigger new VXF offboarding 
+	 * @param deployment a {@link VxFOnBoardedDescriptor}
+	 */
+	public void offBoardVxF(VxFOnBoardedDescriptor vxfobds) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.offboard?multipleConsumers=true");
+		template.withBody( vxfobds ).asyncSend();
+		
+	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to trigger new NSD onboarding 
+	 * @param deployment a {@link ExperimentOnBoardDescriptor}
+	 */
+	public void onBoardNSD(ExperimentOnBoardDescriptor uexpobd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard?multipleConsumers=true");
+		template.withBody( uexpobd ).asyncSend();		
+	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to trigger new NSD offboarding 
+	 * @param deployment a {@link ExperimentOnBoardDescriptor}
+	 */
+	public void offBoardNSD(ExperimentOnBoardDescriptor uexpobd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.offboard?multipleConsumers=true");
+		template.withBody( uexpobd ).asyncSend();		
+	}
 	
 }

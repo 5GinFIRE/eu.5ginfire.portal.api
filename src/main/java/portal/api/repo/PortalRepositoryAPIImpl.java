@@ -2961,29 +2961,30 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return builder.build();
 		}
 
-		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
-
-			Nsd nsd = null;
-			List<Nsd> nsds = OSMClient.getInstance(sm.getObMANOprovider()).getNSDs();
-			if ( nsds != null ) {
-				for (Nsd v : nsds) {
-					if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
-							|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
-						nsd = v;
-						break;
-					}
-				}
-			}
-
-			if (nsd == null) {
-				sm.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-			} else {
-				sm.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-			}
-
-			sm = portalRepositoryRef.updateExperimentOnBoardDescriptor(sm);
-
-		}
+//		
+//		if (sm.getOnBoardingStatus().equals(OnBoardingStatus.ONBOARDING)) {
+//
+//			Nsd nsd = null;
+//			List<Nsd> nsds = OSMClient.getInstance(sm.getObMANOprovider()).getNSDs();
+//			if ( nsds != null ) {
+//				for (Nsd v : nsds) {
+//					if (v.getId().equalsIgnoreCase(sm.getVxfMANOProviderID())
+//							|| v.getName().equalsIgnoreCase(sm.getVxfMANOProviderID())) {
+//						nsd = v;
+//						break;
+//					}
+//				}
+//			}
+//
+//			if (nsd == null) {
+//				sm.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+//			} else {
+//				sm.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+//			}
+//
+//			sm = portalRepositoryRef.updateExperimentOnBoardDescriptor(sm);
+//
+//		}
 
 		return Response.ok().entity(sm).build();
 
@@ -3029,16 +3030,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
-		String pLocation = em.getPackageLocation();
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
-		}
 		
-		logger.info("Experiment Package Location: " + em.getPackageLocation());
-		OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage( pLocation , c.getDeployId());
-
 		if (uexpobd != null) {
-			BusController.getInstance().onBoardNSD( uexpobd );
+			try {
+
+				aMANOController.onBoardNSDToMANOProvider( uexpobd );
+			} catch (Exception e) {				
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
+			}	
+			
 			return Response.ok().entity(uexpobd).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

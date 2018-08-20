@@ -3244,9 +3244,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		// save product
 		vxf = (VxFMetadata) portalRepositoryRef.updateProductInfo( vxf );
+		
+		
 		BusController.getInstance().updatedVxF( vxf );		
 		BusController.getInstance().updatedValidationJob( vxf );		
-		return Response.ok().entity( vxf ).build();
+		
+		VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxfid) ; //rereading this, seems to keep the DB connection
+		return Response.ok().entity( vxfr ).build();
 	}
 	
 	

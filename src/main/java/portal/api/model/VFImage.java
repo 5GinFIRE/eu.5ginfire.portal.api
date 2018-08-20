@@ -73,7 +73,7 @@ public class VFImage {
 	@Basic()
 	private Date dateUpdated;
 	
-	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER )
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER )
 	@JoinTable()
 	private List<VxFMetadata> usedByVxFs = new ArrayList<>();
 	
@@ -91,7 +91,7 @@ public class VFImage {
 	@Column(name = "TERMS", columnDefinition = "LONGTEXT")
 	private String termsOfUse;	
 	
-	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<Infrastructure> deployedInfrastructures = new ArrayList<>();
 

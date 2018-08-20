@@ -355,9 +355,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			 return Response.status(Status.FORBIDDEN ).build();
 		}
 
-		portalRepositoryRef.deleteUser(userid);
 
-		return Response.ok().build();
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		
+		/**
+		 * do not allow for now to delete users!
+		 */
+				
+//		portalRepositoryRef.deleteUser(userid);
+//		return Response.ok().build();
+		
 	}
 	
 	/**

@@ -90,7 +90,7 @@ public class Product {
 	@JoinTable()
 	private List<ProductExtensionItem> extensions = new ArrayList<ProductExtensionItem>();
 	
-	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<ValidationJob> validationJobs = new ArrayList<ValidationJob>();
 	

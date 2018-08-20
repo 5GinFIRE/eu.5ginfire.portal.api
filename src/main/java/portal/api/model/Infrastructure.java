@@ -57,7 +57,7 @@ public class Infrastructure {
 	private String datacentername = null;
 	
 
-	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<VFImage> supportedImages = new ArrayList<>();
 	

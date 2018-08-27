@@ -36,6 +36,7 @@ import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.repo.PortalRepository;
 import portal.api.repo.PortalRepositoryAPIImpl;
+import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 /**
@@ -185,7 +186,7 @@ public class MANOController {
 			RouteBuilder rb = new RouteBuilder() {
 	            @Override
 	            public void configure() throws Exception {
-	                from( "timer://getVNFRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true"  )
+	                from( "timer://getNSDRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true"  )
 	        		.log( "Will check NSD repo")
 	        		.setBody().constant( obd )
 	        		.bean( mcontroller  , "getNSDStatusFromOSM2Client");
@@ -203,19 +204,19 @@ public class MANOController {
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client( ExperimentOnBoardDescriptor obds ) {
 
 
-		Vnfd vnfd = null;
-		List<Vnfd> vnfds = OSMClient.getInstance(obds.getObMANOprovider()).getVNFDs();
-		if ( vnfds != null ) {
-			for (Vnfd v : vnfds) {
-				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID())
+		Nsd nsd = null;
+		List<Nsd> nsds = OSMClient.getInstance(obds.getObMANOprovider()).getNSDs(); 
+		if ( nsds != null ) {
+			for (Nsd v : nsds) {
+				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID() )
 						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
-					vnfd = v;
+					nsd = v;
 					break;
 				}
 			}			
 		}
 
-		if (vnfd == null) {
+		if (nsd == null) {
 			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
 		} else {
 			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);

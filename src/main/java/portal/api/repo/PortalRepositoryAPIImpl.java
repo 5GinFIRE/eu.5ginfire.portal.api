@@ -2264,7 +2264,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				logger.info("updateDeployment for id: " + prevDeployment.getId());
 				
-				BusController.getInstance().updateDeploymentRequest( prevDeployment );
 				
 				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 				if ((adminemail != null) && (!adminemail.equals(""))) {
@@ -2274,7 +2273,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							subj);
 				}
 
-				return Response.ok().entity( prevDeployment ).build();
+				DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( d.getId() );  //rereading this, seems to keep the DB connection
+				BusController.getInstance().updateDeploymentRequest( dd );
+				return Response.ok().entity( dd ).build();
 
 			}
 

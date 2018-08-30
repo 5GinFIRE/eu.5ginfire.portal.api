@@ -837,7 +837,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			BusController.getInstance().newVxFAdded( vxf );	
 			BusController.getInstance().validateVxF(vxf);
-			return Response.ok().entity(vxf).build();
+
+			VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxf.getId()) ; //rereading this, seems to keep the DB connection
+			return Response.ok().entity(vxfr).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );						
@@ -1836,7 +1838,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 			BusController.getInstance().newNSDAdded( experiment );		
 			BusController.getInstance().validateNSD( experiment );
-			return Response.ok().entity(experiment).build();
+			ExperimentMetadata experimentr = (ExperimentMetadata) portalRepositoryRef.getProductByID( experiment.getId()) ; //rereading this, seems to keep the DB connection
+			return Response.ok().entity(experimentr).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );	

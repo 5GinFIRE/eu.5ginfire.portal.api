@@ -134,7 +134,7 @@ public class MANOController {
 			RouteBuilder rb = new RouteBuilder() {
 	            @Override
 	            public void configure() throws Exception {
-	                from( "timer://getVNFRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true"  )
+	                from( "timer://getVNFRepoTimer?delay=2000&period=3000&repeatCount=6&daemon=true"  )
 	        		.log( "Will check VNF repo")
 	        		.setBody().constant( obd )
 	        		.bean( mcontroller  , "getVxFStatusFromOSM2Client");

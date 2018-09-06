@@ -559,9 +559,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							
 							Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
 							if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
-								if ( vnfd.getVersion().equals( existingvmf.getVersion() ) ) {
-									throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-								}
+									throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );	
 							}
 							
 							
@@ -619,9 +617,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 							Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
 							if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-								if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
-									throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-								}
+									throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
 							}
 							prod.setName(ns.getId());
 							prod.setVersion(ns.getVersion());

@@ -551,7 +551,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 		}
 
-<<<<<<< HEAD
 		if (submittedFile != null) {
 			// Get the filename
 			String aFileNamePosted = AttachmentUtil.getFileName(submittedFile.getHeaders());
@@ -580,119 +579,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						{
 							logger.info("VxF OSMvFOUR route");	
 							this.loadVxfMetadataFromOSMvFOURVxFDescriptorFile(prod, descriptorFile);
-=======
-			if (submittedFile != null) {
-				String aFileNamePosted = AttachmentUtil.getFileName(submittedFile.getHeaders());
-				logger.info("vxfFile = " + aFileNamePosted);
-				if (!aFileNamePosted.equals("")) {
-					String vxffilepath = AttachmentUtil.saveFile(submittedFile, tempDir + aFileNamePosted);
-					logger.info("vxffilepath saved to = " + vxffilepath);
-					prod.setPackageLocation(endpointUrl.toString().replace("http:", "") + "repo/packages/" + uuid + "/"
-							+ aFileNamePosted);
-					File f = new File(vxffilepath);
-					if (prod instanceof VxFMetadata) {
-						VNFExtractor vnfExtract = new VNFExtractor(f);
-						Vnfd vnfd = vnfExtract.extractVnfdDescriptor();
-						if (vnfd != null) {
-							
-							Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
-							if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
-									throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );	
-							}
-							
-							
-							prod.setName(vnfd.getId());
-							prod.setVersion(vnfd.getVersion());
-							prod.setVendor(vnfd.getVendor());
-							prod.setShortDescription(vnfd.getName());
-							prod.setLongDescription(vnfd.getDescription());
-							((VxFMetadata) prod).setValidationStatus( ValidationStatus.UNDER_REVIEW  );
-							((VxFMetadata) prod).getVfimagesVDU().clear();//clear previous referenced images
-							for (Vdu vdu : vnfd.getVdu()) {
-								String imageName = vdu.getImage();
-								if ( ( imageName != null) && (!imageName.equals("")) ){
-									VFImage sm = portalRepositoryRef.getVFImageByName( imageName );
-									if ( sm == null ){
-										sm = new VFImage();
-										sm.setName( imageName );
-										PortalUser vfImagewner = portalRepositoryRef.getUserByID(prod.getOwner().getId());
-										sm.setOwner( vfImagewner );
-										sm.setShortDescription( "Automatically created during vxf " + prod.getName() + " submission. Owner must update." );
-										String uuidVFImage = UUID.randomUUID().toString();
-										sm.setUuid( uuidVFImage );
-										sm.setDateCreated(new Date());
-										sm = portalRepositoryRef.saveVFImage( sm );
-									}
-									((VxFMetadata) prod).getVfimagesVDU().add( sm );
-									
-								}
-							}
-							
-							VNFRequirements vr = new VNFRequirements(vnfd);
-							prod.setDescriptorHTML(vr.toHTML());
-							prod.setDescriptor(vnfExtract.getDescriptorYAMLfile());
-
-							if (vnfExtract.getIconfilePath() != null) {
-
-								String imageFileNamePosted = vnfd.getLogo();
-								logger.info("image = " + imageFileNamePosted);
-								if (!imageFileNamePosted.equals("")) {
-									String imgfile = AttachmentUtil.saveFile(vnfExtract.getIconfilePath(),
-											tempDir + imageFileNamePosted);
-									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
-											+ "/" + imageFileNamePosted);
-								}
-							}
-
-						} else {
-							return null;
-						}
-					} else if (prod instanceof ExperimentMetadata) {
-						NSExtractor nsExtract = new NSExtractor(f);
-						Nsd ns = nsExtract.extractNsDescriptor();
-						if (ns != null) {
-
-							Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
-							if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-									throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
-							}
-							prod.setName(ns.getId());
-							prod.setVersion(ns.getVersion());
-							prod.setVendor(ns.getVendor());
-							prod.setShortDescription(ns.getName());
-							prod.setLongDescription(ns.getDescription());
-							NSRequirements vr = new NSRequirements(ns);
-							prod.setDescriptorHTML(vr.toHTML());
-							prod.setDescriptor(nsExtract.getDescriptorYAMLfile());
-
-							for (ConstituentVnfd v : ns.getConstituentVnfd()) {
-								ConstituentVxF cvxf = new ConstituentVxF();
-								cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
-																							// this
-								cvxf.setVnfdidRef(v.getVnfdIdRef());
-
-								VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
-
-								cvxf.setVxfref(vxf);
-
-								((ExperimentMetadata) prod).getConstituentVxF().add(cvxf);
-							}
-							if (nsExtract.getIconfilePath() != null) {
-
-								String imageFileNamePosted = ns.getLogo();
-								logger.info("image = " + imageFileNamePosted);
-								if (!imageFileNamePosted.equals("")) {
-									String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
-											tempDir + imageFileNamePosted);
-									logger.info("imgfile saved to = " + imgfile);
-									prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
-											+ "/" + imageFileNamePosted);
-								}
-							}
-						} else {
-							return null;
->>>>>>> branch 'master' of https://github.com/5GinFIRE/eu.5ginfire.portal.api.git
 						}
 					}
 					catch (NullPointerException e)
@@ -718,54 +604,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					catch (NullPointerException e)
 					{
 						return null;
-					}
-					
-//					NSExtractor nsExtract = new NSExtractor(descriptorFile);
-//					Nsd ns = nsExtract.extractNsDescriptor();
-//					if (ns != null) {
-//
-//						Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
-//						if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-//							if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
-//								throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-//							}
-//						}
-//						prod.setName(ns.getId());
-//						prod.setVersion(ns.getVersion());
-//						prod.setVendor(ns.getVendor());
-//						prod.setShortDescription(ns.getName());
-//						prod.setLongDescription(ns.getDescription());
-//						NSRequirements vr = new NSRequirements(ns);
-//						prod.setDescriptorHTML(vr.toHTML());
-//						prod.setDescriptor(nsExtract.getDescriptorYAMLfile());
-//
-//						for (ConstituentVnfd v : ns.getConstituentVnfd()) {
-//							ConstituentVxF cvxf = new ConstituentVxF();
-//							cvxf.setMembervnfIndex(v.getMemberVnfIndex().intValue()); // ok we will survive with
-//																						// this
-//							cvxf.setVnfdidRef(v.getVnfdIdRef());
-//
-//							VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByName(v.getVnfdIdRef());
-//
-//							cvxf.setVxfref(vxf);
-//
-//							((ExperimentMetadata) prod).getConstituentVxF().add(cvxf);
-//						}
-//						if (nsExtract.getIconfilePath() != null) {
-//
-//							String imageFileNamePosted = ns.getLogo();
-//							logger.info("image = " + imageFileNamePosted);
-//							if (!imageFileNamePosted.equals("")) {
-//								String imgfile = AttachmentUtil.saveFile(nsExtract.getIconfilePath(),
-//										tempDir + imageFileNamePosted);
-//								logger.info("imgfile saved to = " + imgfile);
-//								prod.setIconsrc(endpointUrl.toString().replace("http:", "") + "repo/images/" + uuid
-//										+ "/" + imageFileNamePosted);
-//							}
-//						}
-//					} else {
-//						return null;
-//					}
+					}					
 				}
 			}
 		}
@@ -839,9 +678,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Check if a vnfd with this id already exists in the DB
 			Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
 			if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
-				if ( vnfd.getVersion().equals( existingvmf.getVersion() ) ) {
-					throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-				}
+				throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );				
 			}
 			// Get the name for the db							
 			prod.setName(vnfd.getId());
@@ -910,9 +747,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Check if a vnfd with this id already exists in the DB
 			Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
 			if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-				if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
-					throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-				}
+				throw new IOException( "Descriptor with same name already exists. No updates were performed." );			
 			}
 			prod.setName(ns.getId());
 			prod.setVersion(ns.getVersion());
@@ -970,9 +805,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Check if a vnfd with this id already exists in the DB
 			Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
 			if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-				if ( ns.getVersion().equals( existingmff.getVersion() ) ) {
-					throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-				}
+				throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
 			}
 			prod.setName(ns.getAddedId());
 			prod.setVersion(ns.getVersion());
@@ -1030,9 +863,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Check if a vnfd with this id already exists in the DB
 			Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
 			if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
-				if ( vnfd.getVersion().equals( existingvmf.getVersion() ) ) {
-					throw new IOException( "Descriptor with same name and version already exists. No updates were performed." );									
-				}
+				throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );				
 			}
 			// Get the name for the db							
 			prod.setName(vnfd.getAddedId());
@@ -1208,7 +1039,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );						
-			throw new WebApplicationException(builder.build());			
+			throw new WebApplicationException(builder.build());
+			
 		}
 
 	}

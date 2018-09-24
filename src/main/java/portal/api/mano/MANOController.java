@@ -30,7 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import OSM4NBIClient.OSM4Client;
-import ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd;
 import portal.api.bugzilla.BugzillaClient;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
@@ -40,8 +39,8 @@ import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.repo.PortalRepository;
 import portal.api.repo.PortalRepositoryAPIImpl;
-import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
+import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 
 /**
  * @author ctranoris
@@ -87,7 +86,7 @@ public class MANOController {
 				}
 			});
 		}
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM4")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			OSM4Client osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(),vxfobds.getObMANOprovider().getUsername(),vxfobds.getObMANOprovider().getPassword(),"admin");			
 			String vnfd_id = osm4Client.onBoardVNFD(pLocation);		
 			if(vnfd_id == null)
@@ -333,7 +332,7 @@ public class MANOController {
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client(ExperimentOnBoardDescriptor obds) {
 
 		Nsd nsd = null;
-		List<Nsd> nsds = OSMClient.getInstance(obds.getObMANOprovider()).getNSDs(); 
+		List<urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd> nsds = OSMClient.getInstance(obds.getObMANOprovider()).getNSDs(); 
 		if ( nsds != null ) {
 			for (Nsd v : nsds) {
 				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID() )
@@ -356,11 +355,11 @@ public class MANOController {
 	}
 
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM4Client(ExperimentOnBoardDescriptor obds) {
-		Nsd nsd = null;
+		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd nsd = null;
 		OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),obds.getObMANOprovider().getUsername(),obds.getObMANOprovider().getPassword(),"admin");
-		Nsd[] nsds = osm4Client.getNSDs();
+		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
 		if (nsds != null) {
-			for (Nsd v : nsds) {
+			for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
 				if (v.getId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
 						|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
 					nsd = v;

@@ -69,11 +69,11 @@ public class MANOController {
 		VxFMetadata vxf = vxfobds.getVxf();
 		String pLocation = vxf.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "https:" + pLocation;
+			pLocation = "http:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");
 		}
 
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
 					vxfobds.getDeployId());
 			// run in a thread the GET polling for a VNF onboarding status
@@ -86,7 +86,7 @@ public class MANOController {
 				}
 			});
 		}
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM4")) {
 			OSM4Client osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(),vxfobds.getObMANOprovider().getUsername(),vxfobds.getObMANOprovider().getPassword(),"admin");			
 			String vnfd_id = osm4Client.onBoardVNFD(pLocation);		
 			if(vnfd_id == null)
@@ -122,7 +122,7 @@ public class MANOController {
 		ExperimentMetadata em = uexpobd.getExperiment();
 		String pLocation = em.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "https:" + pLocation;
+			pLocation = "http:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");			
 		}
 

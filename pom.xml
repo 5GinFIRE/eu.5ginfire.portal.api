@@ -264,6 +264,12 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<version>1.5.2</version>
 		</dependency>
 		<dependency>
+			<groupId>eu.5ginfire.nbi.osm4java</groupId>
+			<artifactId>eu.5ginfire.nbi.osm4java</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>eu.5ginFIRE.riftioyangschema2java</groupId>
 			<artifactId>eu.5ginFIRE.riftioyangschema2java</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
@@ -284,7 +290,7 @@ To properly run it make sure that in your environment the artifact eu.5ginFIRE.r
 			<groupId>pt.it.av.atnog</groupId>
 			<artifactId>NFVRequirementsExtractor</artifactId>
 			<version>1.0.3</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>

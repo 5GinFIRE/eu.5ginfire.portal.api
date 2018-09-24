@@ -3,6 +3,7 @@
 	<name>eu.5ginfire.portal.api</name>
 	<comment></comment>
 	<projects>
+		<project>eu.5ginfire.nbi.osm4java</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

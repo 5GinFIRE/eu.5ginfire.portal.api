@@ -40,6 +40,7 @@ import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.repo.PortalRepository;
 import portal.api.repo.PortalRepositoryAPIImpl;
+import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 /**
@@ -47,18 +48,20 @@ import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
  *
  */
 public class MANOController {
-
+	
 	/** This is also binded by Bean */
 	private PortalRepository portalRepositoryRef;
 
 	/** */
 	private static final transient Log logger = LogFactory.getLog(MANOController.class.getName());
+	
+	
 
 	/**
 	 * onBoard a VNF to MANO Provider, as described by this descriptor
 	 * 
 	 * @param vxfobds
-	 * @throws Exception
+	 * @throws Exception 
 	 */
 	public void onBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
 
@@ -67,11 +70,11 @@ public class MANOController {
 		VxFMetadata vxf = vxfobds.getVxf();
 		String pLocation = vxf.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "http:" + pLocation;
+			pLocation = "https:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");
 		}
 
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
 					vxfobds.getDeployId());
 			// run in a thread the GET polling for a VNF onboarding status
@@ -115,83 +118,18 @@ public class MANOController {
 
 	}
 
-//	public void onBoardVxFToMANOProvider(final VxFOnBoardedDescriptor vxfobds) throws Exception {
-//				
-//		logger.info(portalRepositoryRef.toString() );		
-//		VxFMetadata vxf = vxfobds.getVxf();
-//		String pLocation = vxf.getPackageLocation();
-//		if ( !pLocation.contains( "http" )  ) {
-//			pLocation = "https:" + pLocation;
-//		}
-//		vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
-//				
-//		if (  vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2") ) {			
-//
-//			vxfobds.setDeployId(UUID.randomUUID().toString());			
-//
-//			vxfobds.setVxfMANOProviderID(vxf.getName());
-//
-//			vxfobds.setLastOnboarding(new Date());
-//
-//			VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-//			
-//			
-//			OSMClient.getInstance(vxfobds_final.getObMANOprovider()).createOnBoardVNFDPackage( pLocation,
-//					vxfobds_final.getDeployId());
-//			//run in a thread the GET polling for a VNF onboarding status
-//			ExecutorService executor = Executors.newSingleThreadExecutor();
-//			executor.submit(() -> {
-//				try {
-//					checkVxFStatus( vxfobds_final );
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			});
-//		}
-//		
-//		if (  vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM4") ) {
-//
-//
-//			final int OSMAPI_HTTPS_PORT = 9999;
-//			final String BASE_INIT_URL = "https://150.140.184.248:"+ OSMAPI_HTTPS_PORT;	
-//		    OSM4Client osm4Client = new OSM4Client(BASE_INIT_URL,"admin","admin","admin");	    	
-//			String vnfd_id = osm4Client.createVNFDInstance();
-//			vxfobds.setDeployId(vnfd_id);			
-//
-//			vxfobds.setVxfMANOProviderID(vxf.getName());
-//
-//			vxfobds.setLastOnboarding(new Date());
-//
-//			VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-//
-//			osm4Client.uploadVNFDZip(vnfd_id, pLocation);
-//
-//			//run in a thread the GET polling for a VNF onboarding status
-//			ExecutorService executor = Executors.newSingleThreadExecutor();
-//			executor.submit(() -> {
-//				try {
-//					checkVxFStatus( vxfobds );
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			});
-//		}		
-//		
-//		
-//	}
-
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{
 
 		ExperimentMetadata em = uexpobd.getExperiment();
 		String pLocation = em.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "http:" + pLocation;
+			pLocation = "https:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");			
 		}
 
 		logger.info("Experiment Package Location: " + em.getPackageLocation());
 		// Here we need to get a better solution for the OSM version names.
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage(pLocation,
 					uexpobd.getDeployId());
 			// run in a thread the GET polling for a NSD onboarding status
@@ -257,8 +195,9 @@ public class MANOController {
 			RouteBuilder rb = new RouteBuilder() {
 				@Override
 				public void configure() throws Exception {
-					from("timer://getVNFRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true")
-							.log("Will check VNF repo").setBody().constant(obd)
+					from("timer://getVNFRepoTimer?delay=2000&period=3000&repeatCount=6&daemon=true")
+							.log("Will check VNF repo")
+							.setBody().constant(obd)
 							.bean(mcontroller, "getVxFStatusFromOSM2Client");
 				}
 			};
@@ -279,8 +218,9 @@ public class MANOController {
 			RouteBuilder rb = new RouteBuilder() {
 				@Override
 				public void configure() throws Exception {
-					from("timer://getVNFRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true")
-							.log("Will check OSM version FOUR VNF repo").setBody().constant(obd)
+					from("timer://getVNFRepoTimer?delay=2000&period=4000&repeatCount=6&daemon=true")
+							.log("Will check OSM version FOUR VNF repo")
+							.setBody().constant(obd)
 							.bean(mcontroller, "getVxFStatusFromOSM4Client");
 				}
 			};
@@ -353,7 +293,8 @@ public class MANOController {
 				@Override
 				public void configure() throws Exception {
 					from("timer://getVNFRepoTimer?delay=2000&period=2000&repeatCount=3&daemon=true")
-							.log("Will check NSD repo").setBody().constant(obd)
+							.log("Will check NSD repo")
+							.setBody().constant(obd)
 							.bean(mcontroller, "getNSDStatusFromOSM2Client");
 				}
 			};
@@ -375,7 +316,8 @@ public class MANOController {
 				@Override
 				public void configure() throws Exception {
 					from("timer://getVNFRepoTimer?delay=10000&period=2000&repeatCount=3&daemon=true")
-							.log("Will check OSM version FOUR NSD repo").setBody().constant(obd)
+							.log("Will check OSM version FOUR NSD repo")
+							.setBody().constant(obd)
 							.bean(mcontroller, "getNSDStatusFromOSM4Client");
 				}
 			};
@@ -390,19 +332,19 @@ public class MANOController {
 
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client(ExperimentOnBoardDescriptor obds) {
 
-		Vnfd vnfd = null;
-		List<Vnfd> vnfds = OSMClient.getInstance(obds.getObMANOprovider()).getVNFDs();
-		if (vnfds != null) {
-			for (Vnfd v : vnfds) {
-				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID())
+		Nsd nsd = null;
+		List<Nsd> nsds = OSMClient.getInstance(obds.getObMANOprovider()).getNSDs(); 
+		if ( nsds != null ) {
+			for (Nsd v : nsds) {
+				if (v.getId().equalsIgnoreCase(obds.getVxfMANOProviderID() )
 						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
-					vnfd = v;
+					nsd = v;
 					break;
 				}
 			}
 		}
 
-		if (vnfd == null) {
+		if (nsd == null) {
 			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
 		} else {
 			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
@@ -437,6 +379,8 @@ public class MANOController {
 
 		return obds;
 	}
+	
+	
 
 	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
 		this.portalRepositoryRef = portalRepositoryRef;

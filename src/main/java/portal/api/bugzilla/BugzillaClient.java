@@ -124,7 +124,9 @@ public class BugzillaClient {
 
 		description.append( "\nConstituent VxF Placement " ) ;
 		for (DeploymentDescriptorVxFPlacement pl : descriptor.getVxfPlacements()) {
-			description.append( "\n  Constituent VxF: " + pl.getConstituentVxF().getVxfref().getName() + " - Infrastructure: " + pl.getInfrastructure().getName() );			
+			if (  ( pl.getConstituentVxF().getVxfref() != null ) && ( pl.getInfrastructure() != null )) {
+				description.append( "\n  Constituent VxF: " + pl.getConstituentVxF().getVxfref().getName() + " - Infrastructure: " + pl.getInfrastructure().getName() );
+			}
 		}
 		
 		

@@ -38,6 +38,9 @@ public class MANORouteBuilder  extends RouteBuilder{
             public void configure() throws Exception {
                 from( "timer://getVNFRepoTimer?period=2000&repeatCount=3&daemon=true"  )
         		.log( "Will check VNF repo");
+                
+                from( "timer://getNSDRepoTimer?period=2000&repeatCount=3&daemon=true"  )
+        		.log( "Will check NSD repo");
             }
         };
         tempcontext.addRoutes( rb);

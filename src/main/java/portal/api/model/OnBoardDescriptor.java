@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author ctranoris
- * maintains information and status of a VNF on which MANO providers is on-boarded
+ * maintains information and status of a VNF or NSD on which MANO providers is on-boarded
  * see https://github.com/5GinFIRE/eu.5ginfire.portal.api/issues/10 
  */
 @Entity(name = "OnBoardDescriptor")
@@ -53,6 +53,12 @@ public class OnBoardDescriptor {
 	
 	private String deployId = "(N/A)";
 
+	/**
+	 * The name is a little bit misleading. However,
+	 * this field keeps the ID of a VxF or NSD as it is on the OSM TWO. In future OSM versions this perhaps
+	 * will be replaced by an ID
+	 */
+	
 	private String vxfMANOProviderID;	
 	
 

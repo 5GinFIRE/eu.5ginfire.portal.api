@@ -69,11 +69,11 @@ public class MANOController {
 		VxFMetadata vxf = vxfobds.getVxf();
 		String pLocation = vxf.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "http:" + pLocation;
+			pLocation = "https:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");
 		}
 
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
 					vxfobds.getDeployId());
 			// run in a thread the GET polling for a VNF onboarding status
@@ -86,7 +86,7 @@ public class MANOController {
 				}
 			});
 		}
-		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM4")) {
+		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			OSM4Client osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(),vxfobds.getObMANOprovider().getUsername(),vxfobds.getObMANOprovider().getPassword(),"admin");			
 			String vnfd_id = osm4Client.onBoardVNFD(pLocation);		
 			if(vnfd_id == null)
@@ -128,7 +128,7 @@ public class MANOController {
 
 		logger.info("Experiment Package Location: " + em.getPackageLocation());
 		// Here we need to get a better solution for the OSM version names.
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
 			OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage(pLocation,
 					uexpobd.getDeployId());
 			// run in a thread the GET polling for a NSD onboarding status

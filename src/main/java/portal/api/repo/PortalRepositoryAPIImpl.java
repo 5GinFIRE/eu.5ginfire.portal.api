@@ -39,6 +39,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -54,11 +55,15 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
+import OSM4NBIClient.OSM4Client;
 import OSM4Util.OSM4ArchiveExtractor.OSM4NSExtractor;
 import OSM4Util.OSM4ArchiveExtractor.OSM4VNFDExtractor;
 import OSM4Util.OSM4NSReq.OSM4NSRequirements;
@@ -2747,16 +2752,32 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
-
-		Vnfd vnfd = OSMClient.getInstance(sm).getVNFDbyID(vxfid);
-
-		if (vnfd != null) {
-			return Response.ok().entity(vnfd).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("vxf with id=" + vxfid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
+		if(sm.getSupportedMANOplatform().getName().equals("OSM TWO"))
+		{
+			Vnfd vnfd = OSMClient.getInstance(sm).getVNFDbyID(vxfid);
+			if (vnfd != null) {
+				return Response.ok().entity(vnfd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("vxf with id=" + vxfid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
 		}
+		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+		{
+			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = osm4Client.getVNFDbyID(vxfid);
+			if (vnfd != null) {
+				return Response.ok().entity(vnfd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("vxf with id=" + vxfid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+		builder.entity("MANO does not belong to supported types");
+		throw new WebApplicationException(builder.build());
 	}
 
 	@GET
@@ -2769,15 +2790,33 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
-		List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
 
-		if (vnfd != null) {
-			return Response.ok().entity(vnfd).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
+		if(sm.getSupportedMANOplatform().getName().equals("OSM TWO"))
+		{
+			List<Vnfd> vnfd = OSMClient.getInstance(sm).getVNFDs();
+			if (vnfd != null) {
+				return Response.ok().entity(vnfd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
 		}
+		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+		{
+			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfd = osm4Client.getVNFDs();
+			if (vnfd != null) {
+				return Response.ok().entity(vnfd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+		builder.entity("manoprovid with id=" + manoprovid + " not of the supported types");
+		throw new WebApplicationException(builder.build());		
 	}
 
 	@GET
@@ -2792,15 +2831,33 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
-		Nsd nsd = OSMClient.getInstance(sm).getNSDbyID(nsdid);
-
-		if (nsd != null) {
-			return Response.ok().entity(nsd).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("nsdid with id=" + nsdid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
+		if(sm.getSupportedMANOplatform().getName().equals("OSM TWO"))
+		{
+			Nsd nsd = OSMClient.getInstance(sm).getNSDbyID(nsdid);
+	
+			if (nsd != null) {
+				return Response.ok().entity(nsd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("nsdid with id=" + nsdid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
 		}
+		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+		{
+			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = osm4Client.getVNFDbyID(nsdid);
+			if (vnfd != null) {
+				return Response.ok().entity(vnfd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("nsdid with id=" + nsdid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+		builder.entity("MANO does not belong to one of the supported types");
+		throw new WebApplicationException(builder.build());		
 	}
 
 	@GET
@@ -2813,15 +2870,33 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		MANOprovider sm = portalRepositoryRef.getMANOproviderByID(manoprovid);
 
-		List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
-
-		if (nsd != null) {
-			return Response.ok().entity(nsd).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
-			builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
-			throw new WebApplicationException(builder.build());
+		if(sm.getSupportedMANOplatform().getName().equals("OSM TWO"))
+		{
+			List<Nsd> nsd = OSMClient.getInstance(sm).getNSDs();
+	
+			if (nsd != null) {
+				return Response.ok().entity(nsd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
 		}
+		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+		{
+			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsd = osm4Client.getNSDs();
+			if (nsd != null) {
+				return Response.ok().entity(nsd).build();
+			} else {
+				ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+				builder.entity("manoprovid with id=" + manoprovid + " not found in portal registry");
+				throw new WebApplicationException(builder.build());
+			}
+		}
+		ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+		builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types");
+		throw new WebApplicationException(builder.build());		
 	}
 
 	/********************************************************************************
@@ -2868,7 +2943,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with name=" + aVxF.getId() + " cannot be installed");
+			builder.entity("Requested VxFOnBoardedDescriptor has NULL value.");
 			throw new WebApplicationException(builder.build());
 		}
 	}
@@ -3061,20 +3136,36 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		OnBoardingStatus previous_status = c.getOnBoardingStatus();
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
 		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
-		// TODO: Implement this towards MANO
 
-		if (u != null) {
-			aMANOController.offBoardVxF( c );
-			BusController.getInstance().offBoardVxF( u );
-			return Response.ok().entity(u).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded");
-			return builder.build();
+		ResponseEntity<String> response = null;
+		try {
+			response = aMANOController.offBoardVxFFromMANOProvider( c );
 		}
-
+		catch( HttpClientErrorException e)
+		{
+			c.setOnBoardingStatus(previous_status);
+			u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
+			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
+			return builder.build();
+		}        
+		
+		if (response == null) {
+			c.setOnBoardingStatus(previous_status);
+			u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
+			return builder.build();							
+		}
+		
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+		BusController.getInstance().offBoardVxF( u );
+		return Response.ok().entity(u).build();
+		
 	}
 
 	/********************************************************************************
@@ -3298,27 +3389,36 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		OnBoardingStatus previous_status = c.getOnBoardingStatus();
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
 		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
-		// TODO: Implement this towards MANO
-		
-		if (u != null) {
-			//**********************************************************************************
-			try {
-				aMANOController.offBoardNSDFromMANOProvider( u );
-			} catch (Exception e) {				
-				e.printStackTrace();
-				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
-			}	
-			//**********************************************************************************
-			BusController.getInstance().offBoardNSD( u );
-			return Response.ok().entity(u).build();
-		} else {
-			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested ExperimentOnBoardDescriptor with ID=" + c.getId() + " cannot be onboarded");
-			return builder.build();
-		}
 
+		ResponseEntity<String> response = null;
+		try {
+			response = aMANOController.offBoardNSDFromMANOProvider(c);
+		}
+		catch( HttpClientErrorException e)
+		{
+			c.setOnBoardingStatus(previous_status);
+			u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
+			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
+			return builder.build();
+		}        
+		
+		if (response == null) {
+			c.setOnBoardingStatus(previous_status);
+			u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+			builder.entity("Requested NSOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
+			return builder.build();							
+		}
+		
+		
+		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+		BusController.getInstance().offBoardNSD( u );
+		return Response.ok().entity(u).build();
 	}
 	
 	/**

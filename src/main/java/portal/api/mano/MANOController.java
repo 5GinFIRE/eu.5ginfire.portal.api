@@ -17,20 +17,18 @@ package portal.api.mano;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.ws.rs.core.Context;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import OSM4NBIClient.OSM4Client;
-import portal.api.bugzilla.BugzillaClient;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.OnBoardingStatus;
@@ -38,7 +36,6 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.repo.PortalRepository;
-import portal.api.repo.PortalRepositoryAPIImpl;
 import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
 
@@ -69,7 +66,7 @@ public class MANOController {
 		VxFMetadata vxf = vxfobds.getVxf();
 		String pLocation = vxf.getPackageLocation();
 		if (!pLocation.contains("http")) {
-			pLocation = "https:" + pLocation;
+			pLocation = "http:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");
 		}
 
@@ -95,6 +92,7 @@ public class MANOController {
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 				return;
 			}		
+			vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 			vxfobds.setDeployId(vnfd_id);
 			// What should be the vxf Name. Something like cirros_vnfd.
@@ -128,7 +126,7 @@ public class MANOController {
 
 		logger.info("Experiment Package Location: " + em.getPackageLocation());
 		// Here we need to get a better solution for the OSM version names.
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM2")) {
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage(pLocation,
 					uexpobd.getDeployId());
 			// run in a thread the GET polling for a NSD onboarding status
@@ -141,7 +139,7 @@ public class MANOController {
 				}
 			});
 		}		
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM4")) {
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),uexpobd.getObMANOprovider().getUsername(),uexpobd.getObMANOprovider().getPassword(),"admin");
 			String nsd_id = osm4Client.onBoardNSD(pLocation);		
 			if(nsd_id == null)
@@ -181,9 +179,15 @@ public class MANOController {
 	 * 
 	 * @param c
 	 */
-	public void offBoardVxF(VxFOnBoardedDescriptor obd) {
+	public ResponseEntity<String> offBoardVxFFromMANOProvider(VxFOnBoardedDescriptor obd) throws HttpClientErrorException {
 		// TODO Auto-generated method stub
-
+		ResponseEntity<String> response = null;
+		if (obd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+			String vnfd_id=obd.getDeployId();
+			OSM4Client osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(),obd.getObMANOprovider().getUsername(),obd.getObMANOprovider().getPassword(),"admin");			
+			response=osm4Client.deleteVNFDPackage(vnfd_id);
+		}		
+		return response;
 	}
 
 	private void checkVxFStatus(VxFOnBoardedDescriptor obd) throws Exception {
@@ -360,7 +364,8 @@ public class MANOController {
 		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
 		if (nsds != null) {
 			for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
-				if (v.getId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
+				//|| v.getAddedId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
+				if (v.getId().equalsIgnoreCase(obds.getDeployId()) 
 						|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
 					nsd = v;
 					break;
@@ -392,9 +397,15 @@ public class MANOController {
 		return portalRepositoryRef;
 	}
 
-	public void offBoardNSDFromMANOProvider(ExperimentOnBoardDescriptor uexpobd) {
+	public ResponseEntity<String> offBoardNSDFromMANOProvider(ExperimentOnBoardDescriptor uexpobd) {
 		// TODO Auto-generated method stub
-		
+		ResponseEntity<String> response = null;
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+			String nsd_id=uexpobd.getDeployId();
+			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),uexpobd.getObMANOprovider().getUsername(),uexpobd.getObMANOprovider().getPassword(),"admin");			
+			response=osm4Client.deleteNSDPackage(nsd_id);
+		}
+		return response;		
 	}
 
 }

@@ -118,6 +118,17 @@ public class BusController {
 	}
 
 	/**
+	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) to upload a new vxf
+	 * @param deployment a {@link VxFMetadata}
+	 */
+	public void onBoardVxFAdded(VxFMetadata vxf) {
+
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboard?multipleConsumers=true");
+		template.withBody( vxf ).asyncSend();		
+		
+	}
+	
+	/**
 	 * Asynchronously sends to the routing bus (seda:nsd.create?multipleConsumers=true) that a new NSD experiment is added
 	 * @param deployment a {@link ExperimentMetadata}
 	 */

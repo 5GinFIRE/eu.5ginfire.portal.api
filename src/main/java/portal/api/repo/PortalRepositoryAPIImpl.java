@@ -1036,7 +1036,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 
 		if (vxf != null) {
-			BusController.getInstance().newVxFAdded( vxf );	
+			BusController.getInstance().newVxFAdded( vxf );
+			// Need to select MANO Provider, convert vxfMetadata to VxFOnBoardedDescriptor and pass it as an input.
+			//BusController.getInstance().onBoardVxFAdded( vxf );
 			BusController.getInstance().validateVxF(vxf);
 
 			VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxf.getId()) ; //rereading this, seems to keep the DB connection

@@ -102,19 +102,44 @@ public class MANOController {
 			// Save the changes to vxfobds
 			VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 
-			// run in a thread the GET polling for a VNF onboarding status
-			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.submit(() -> {
-				try {
-					checkOSM4VxFStatus(vxfobds_final);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
+			//This is not necessary any more.
+			//// run in a thread the GET polling for a VNF onboarding status
+			//ExecutorService executor = Executors.newSingleThreadExecutor();
+			//executor.submit(() -> {
+			//	try {
+			//		checkOSM4VxFStatus(vxfobds_final);
+			//	} catch (Exception e) {
+			//		e.printStackTrace();
+			//	}
+			//});
 		}
 
 	}
 
+	private void onCatchBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
+
+		CamelContext tempcontext = new DefaultCamelContext();
+		MANOController mcontroller = this;
+		try {
+			RouteBuilder rb = new RouteBuilder() {
+				@Override
+				public void configure() throws Exception {
+					from("seda:vxf.create?multipleConsumers=true")
+							.log("Will OnBoard VNF package")
+							.setBody().constant(vxfobds)
+							.bean(mcontroller, "onBoardVxFToMANOProvider");
+				}
+			};
+			tempcontext.addRoutes(rb);
+			tempcontext.start();
+			Thread.sleep(30000);
+		} finally {
+			tempcontext.stop();
+		}
+
+	}
+	
+	
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{
 
 		ExperimentMetadata em = uexpobd.getExperiment();
@@ -161,15 +186,16 @@ public class MANOController {
 			// Save the changes to vxfobds
 			ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobd);
 
-			// run in a thread the GET polling for a VNF onboarding status
-			ExecutorService executor = Executors.newSingleThreadExecutor();
-			executor.submit(() -> {
-				try {
-					checkOSM4NSDStatus(uexpobd_final);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			});
+			//This is not necessary any more.
+			//// run in a thread the GET polling for a VNF onboarding status
+			//ExecutorService executor = Executors.newSingleThreadExecutor();
+			//executor.submit(() -> {
+			//	try {
+			//		checkOSM4NSDStatus(uexpobd_final);
+			//	} catch (Exception e) {
+			//		e.printStackTrace();
+			//	}
+			//});
 		}
 
 	}
@@ -263,26 +289,36 @@ public class MANOController {
 
 	public VxFOnBoardedDescriptor getVxFStatusFromOSM4Client(VxFOnBoardedDescriptor obds) {
 		ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = null;
-		OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),obds.getObMANOprovider().getUsername(),obds.getObMANOprovider().getPassword(),"admin");		
-		ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfds = osm4Client.getVNFDs();
-		if (vnfds != null) {
-			for (ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd v : vnfds) {
-				System.out.println(v.getId() + " vs " + obds.getDeployId());
-				if (v.getId().equalsIgnoreCase(obds.getDeployId())
-						|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
-					vnfd = v;
-					break;
+		try
+		{
+			OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),obds.getObMANOprovider().getUsername(),obds.getObMANOprovider().getPassword(),"admin");		
+			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfds = osm4Client.getVNFDs();
+			if (vnfds != null) {
+				for (ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd v : vnfds) {
+					System.out.println(v.getId() + " vs " + obds.getDeployId());
+					if (v.getId().equalsIgnoreCase(obds.getDeployId())
+							|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
+						vnfd = v;
+						break;
+					}
 				}
 			}
 		}
-
-		if (vnfd == null) {
-			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-		} else {
-			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+		catch(Exception e)
+		{
+			logger.error(e.getMessage());
+			System.out.println(e.getStackTrace());
+			logger.error(e.getStackTrace());
 		}
-
-		obds = this.getPortalRepositoryRef().updateVxFOnBoardedDescriptor(obds);
+		
+		//This is not necessary. We just want to be notified through logging that our Object Model did not parse successfully the VNFD.
+		//The Onboarding is verified by OSM4 NBI during Onboarding
+		//if (vnfd == null) {
+		//	obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+		//} else {
+		//	obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+		//}
+		//obds = this.getPortalRepositoryRef().updateVxFOnBoardedDescriptor(obds);
 
 		return obds;
 	}
@@ -360,26 +396,37 @@ public class MANOController {
 
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM4Client(ExperimentOnBoardDescriptor obds) {
 		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd nsd = null;
-		OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),obds.getObMANOprovider().getUsername(),obds.getObMANOprovider().getPassword(),"admin");
-		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
-		if (nsds != null) {
-			for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
-				//|| v.getAddedId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
-				if (v.getId().equalsIgnoreCase(obds.getDeployId()) 
-						|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
-					nsd = v;
-					break;
+
+		try {
+			OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),obds.getObMANOprovider().getUsername(),obds.getObMANOprovider().getPassword(),"admin");
+			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
+			if (nsds != null) {
+				for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
+					//|| v.getAddedId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
+					if (v.getId().equalsIgnoreCase(obds.getDeployId()) 
+							|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
+						nsd = v;
+						break;
+					}
 				}
 			}
 		}
-
-		if (nsd == null) {
-			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-		} else {
-			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+		catch(Exception e)
+		{
+			logger.error(e.getMessage());
+			System.out.println(e.getStackTrace());
+			logger.error(e.getStackTrace());
 		}
 
-		obds = this.getPortalRepositoryRef().updateExperimentOnBoardDescriptor(obds);
+		//This is not necessary. We just want to be notified through logging that our Object Model did not parse successfully the NSD.
+		//The Onboarding is verified by OSM4 NBI during Onboarding
+		//if (nsd == null) {
+		//	obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+		//} else {
+		//	obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+		//}
+		//
+		//obds = this.getPortalRepositoryRef().updateExperimentOnBoardDescriptor(obds);
 
 		return obds;
 	}

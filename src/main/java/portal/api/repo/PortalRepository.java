@@ -387,7 +387,11 @@ public class PortalRepository {
 		return portalJpaController.readMANOproviderById(catid);
 	}
 
-
+	public List<MANOprovider> getMANOprovidersEnabledForOnboarding()
+	{
+		return portalJpaController.getMANOprovidersEnabledForOnboarding();		
+	}
+	
 	public MANOprovider updateMANOproviderInfo(MANOprovider c) {
 		MANOprovider bmr = portalJpaController.updateMANOprovider(c);
 		return bmr;

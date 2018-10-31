@@ -183,10 +183,5 @@ public class MANOprovider implements IMANOprovider {
 	 */
 	public void setEnabledForONBOARDING( Boolean enabledForONBOARDING) {
 		this.enabledForONBOARDING = enabledForONBOARDING;
-	}
-	
-	
-	
-	
-	
+	}			
 }

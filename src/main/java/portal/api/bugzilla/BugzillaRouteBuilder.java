@@ -265,7 +265,22 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:vxf.validationresult.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
 		.to("direct:bugzilla.bugmanage");
-		
+
+		/**
+		 * Automatic OnBoarding Route Success
+		 */		
+		from("seda:vxf.onboardsuccess?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+
+		/**
+		 * Automatic OnBoarding Route Fail
+		 */		
+		from("seda:vxf.onboardfail?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");	
 		
 		/**
 		 * Create NSD Validate New Route
@@ -291,6 +306,21 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 			.to("direct:bugzilla.newIssue")
 			.endChoice();
 		
+		/**
+		 * Automatic OnBoarding Route Success
+		 */		
+		from("seda:nsd.onboardsuccess?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+
+		/**
+		 * Automatic OnBoarding Route Fail
+		 */		
+		from("seda:nsd.onboardfail?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");	
 
 	    
 		from("direct:issue.get")
@@ -321,7 +351,8 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 					.to( "direct:issue.get");
 				m = template.request();
 			}catch( CamelExecutionException e){
-				
+				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 			
 			if ( m != null )	

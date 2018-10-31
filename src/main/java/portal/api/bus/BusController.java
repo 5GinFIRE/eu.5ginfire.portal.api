@@ -110,6 +110,7 @@ public class BusController {
 	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) that a new vxf is added
 	 * @param deployment a {@link VxFMetadata}
 	 */
+	// NOT USED
 	public void newVxFAdded(VxFMetadata vxf) {
 
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.create?multipleConsumers=true");
@@ -121,13 +122,22 @@ public class BusController {
 	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) to upload a new vxf
 	 * @param deployment a {@link VxFMetadata}
 	 */
-	public void onBoardVxFAdded(VxFMetadata vxf) {
+	public void onBoardVxFAdded(VxFOnBoardedDescriptor obd) {
 
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboard?multipleConsumers=true");
-		template.withBody( vxf ).asyncSend();		
+		template.withBody( obd ).asyncSend();		
 		
 	}
-	
+
+	public void onBoardVxFFailed(VxFOnBoardedDescriptor obd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboardfail?multipleConsumers=true");
+		template.withBody( obd ).asyncSend();			
+	}
+
+	public void onBoardVxFSucceded(VxFOnBoardedDescriptor obd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboardsuccess?multipleConsumers=true");
+		template.withBody( obd ).asyncSend();				
+	}
 	/**
 	 * Asynchronously sends to the routing bus (seda:nsd.create?multipleConsumers=true) that a new NSD experiment is added
 	 * @param deployment a {@link ExperimentMetadata}
@@ -136,7 +146,27 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.create?multipleConsumers=true");
 		template.withBody( experiment ).asyncSend();		
 	}
+
+	/**
+	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) to upload a new vxf
+	 * @param deployment a {@link VxFMetadata}
+	 */
+	public void onBoardNSDAdded(ExperimentOnBoardDescriptor uexpobd) {
+
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard?multipleConsumers=true");
+		template.withBody( uexpobd ).asyncSend();		
+		
+	}
 	
+	public void onBoardNSDFailed(ExperimentOnBoardDescriptor uexpobd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboardfail?multipleConsumers=true");
+		template.withBody( uexpobd ).asyncSend();			
+	}
+
+	public void onBoardNSDSucceded(ExperimentOnBoardDescriptor uexpobd) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboardsuccess?multipleConsumers=true");
+		template.withBody( uexpobd ).asyncSend();				
+	}
 	
 	/**
 	 * Asynchronously sends to the routing bus (seda:vxf.update?multipleConsumers=true) that a vxf is updated

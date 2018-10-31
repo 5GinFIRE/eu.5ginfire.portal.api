@@ -17,6 +17,7 @@ package portal.api.mano;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
 import OSM4NBIClient.OSM4Client;
+import portal.api.bus.BusController;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.OnBoardingStatus;
@@ -51,7 +53,10 @@ public class MANOController {
 	/** */
 	private static final transient Log logger = LogFactory.getLog(MANOController.class.getName());
 	
-	
+	public MANOController()
+	{
+		this.portalRepositoryRef=new PortalRepository();
+	}
 
 	/**
 	 * onBoard a VNF to MANO Provider, as described by this descriptor
@@ -59,12 +64,31 @@ public class MANOController {
 	 * @param vxfobds
 	 * @throws Exception 
 	 */
-	public void onBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
+	public void onBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobd) throws Exception {
 
+		//PortalRepository portalRepositoryRef = new PortalRepository();
+		
+		vxfobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		//This is the Deployment ID for the portal
+		vxfobd.setDeployId(UUID.randomUUID().toString());
+		VxFMetadata vxf = vxfobd.getVxf();
+		if (vxf == null) {
+			vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfobd.getVxfid());
+		}
+		//Set MANO Provider VxF ID 
+		vxfobd.setVxfMANOProviderID(vxf.getName());
+		//Set onBoarding Date
+		vxfobd.setLastOnboarding(new Date());
+
+		VxFOnBoardedDescriptor vxfobds = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd);
+		if (vxfobds == null) {
+			throw new Exception("Cannot load VxFOnBoardedDescriptor");
+		}			
+	
 		logger.info(portalRepositoryRef.toString());
 
-		VxFMetadata vxf = vxfobds.getVxf();
 		String pLocation = vxf.getPackageLocation();
+		logger.info("VxF Package Location: " + pLocation);
 		if (!pLocation.contains("http")) {
 			pLocation = "http:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");
@@ -90,6 +114,7 @@ public class MANOController {
 			{
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
+				BusController.getInstance().onBoardVxFFailed( vxfobds_final );
 				return;
 			}		
 			vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
@@ -101,7 +126,7 @@ public class MANOController {
 			vxfobds.setLastOnboarding(new Date());
 			// Save the changes to vxfobds
 			VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-
+			BusController.getInstance().onBoardVxFSucceded( vxfobds_final );
 			//This is not necessary any more.
 			//// run in a thread the GET polling for a VNF onboarding status
 			//ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -116,75 +141,113 @@ public class MANOController {
 
 	}
 
-	private void onCatchBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
-
-		CamelContext tempcontext = new DefaultCamelContext();
-		MANOController mcontroller = this;
-		try {
-			RouteBuilder rb = new RouteBuilder() {
-				@Override
-				public void configure() throws Exception {
-					from("seda:vxf.create?multipleConsumers=true")
-							.log("Will OnBoard VNF package")
-							.setBody().constant(vxfobds)
-							.bean(mcontroller, "onBoardVxFToMANOProvider");
-				}
-			};
-			tempcontext.addRoutes(rb);
-			tempcontext.start();
-			Thread.sleep(30000);
-		} finally {
-			tempcontext.stop();
-		}
-
-	}
+	//Catch an VxF Onboarding Message
+	// NOT USED
+//	private void onCatchBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
+//
+//		CamelContext tempcontext = new DefaultCamelContext();
+//		MANOController mcontroller = this;
+//		try {
+//			RouteBuilder rb = new RouteBuilder() {
+//				@Override
+//				public void configure() throws Exception {
+//					from("seda:vxf.create?multipleConsumers=true")
+//							.log("Will OnBoard VNF package")
+//							.setBody().constant(vxfobds)
+//							.bean(mcontroller, "onBoardVxFToMANOProvider");
+//				}
+//			};
+//			tempcontext.addRoutes(rb);
+//			tempcontext.start();
+//			Thread.sleep(30000);
+//		} finally {
+//			tempcontext.stop();
+//		}
+//
+//	}
 	
 	
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{
 
+		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		//This is the Deployment ID for the portal		
+		uexpobd.setDeployId(UUID.randomUUID().toString());
 		ExperimentMetadata em = uexpobd.getExperiment();
+		if (em == null) {
+			em = (ExperimentMetadata) portalRepositoryRef.getProductByID(uexpobd.getExperimentid());
+		}
+
+		/**
+		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage
+		 * we just get a response something like response = {"output":
+		 * {"transaction-id": "b2718ef9-4391-4a9e-97ad-826593d5d332"}} which does not
+		 * provide any information. The OSM RIFTIO API says that we could get
+		 * information about onboarding (create or update) jobs see
+		 * https://open.riftio.com/documentation/riftware/4.4/a/api/orchestration/pkt-mgmt/rw-pkg-mgmt-download-jobs.htm
+		 * with /api/operational/download-jobs, but this does not return pending jobs.
+		 * So the only solution is to ask again OSM if something is installed or not, so
+		 * for now the client (the portal ) must check via the
+		 * getVxFOnBoardedDescriptorByIdCheckMANOProvider giving the VNF ID in OSM. OSM
+		 * uses the ID of the yaml description Thus we asume that the vxf name can be
+		 * equal to the VNF ID in the portal, and we use it for now as the OSM ID. Later
+		 * in future, either OSM API provide more usefull response or we extract info
+		 * from the VNFD package
+		 * 
+		 */
+		
+		uexpobd.setVxfMANOProviderID(em.getName()); // Possible Error. This probably needs to be setExperimentMANOProviderID(em.getName())
+
+		uexpobd.setLastOnboarding(new Date());
+
+		ExperimentOnBoardDescriptor uexpobds = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobd);
+		if (uexpobds == null) {
+			throw new Exception("Cannot load NSDOnBoardedDescriptor");
+		}			
+						
 		String pLocation = em.getPackageLocation();
+		logger.info("NSD Package Location: " + pLocation);		
 		if (!pLocation.contains("http")) {
 			pLocation = "http:" + pLocation;
 			pLocation = pLocation.replace("\\", "/");			
 		}
 
-		logger.info("Experiment Package Location: " + em.getPackageLocation());
 		// Here we need to get a better solution for the OSM version names.
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
-			OSMClient.getInstance(uexpobd.getObMANOprovider()).createOnBoardNSDPackage(pLocation,
-					uexpobd.getDeployId());
+		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
+			OSMClient.getInstance(uexpobds.getObMANOprovider()).createOnBoardNSDPackage(pLocation,
+					uexpobds.getDeployId());
 			// run in a thread the GET polling for a NSD onboarding status
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			executor.submit(() -> {
 				try {
-					checkNSDStatus(uexpobd);
+					checkNSDStatus(uexpobds);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			});
 		}		
-		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),uexpobd.getObMANOprovider().getUsername(),uexpobd.getObMANOprovider().getPassword(),"admin");
+		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+			OSM4Client osm4Client = new OSM4Client(uexpobds.getObMANOprovider().getApiEndpoint(),uexpobds.getObMANOprovider().getUsername(),uexpobds.getObMANOprovider().getPassword(),"admin");
 			String nsd_id = osm4Client.onBoardNSD(pLocation);		
 			if(nsd_id == null)
 			{
-				uexpobd.setOnBoardingStatus(OnBoardingStatus.FAILED);
-				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobd);
+				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
+				BusController.getInstance().onBoardNSDFailed( uexpobd_final );				
 				return;
 			}		
 			else
 			{
-				uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+				uexpobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
 			}
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
-			uexpobd.setDeployId(nsd_id);
+			uexpobds.setDeployId(nsd_id);
 			// What should be the NSD Name. Something like cirros_nsd.
-			uexpobd.setExperimentMANOProviderID(em.getName());
+			uexpobds.setExperimentMANOProviderID(em.getName());
 			// Set Onboarding date
-			uexpobd.setLastOnboarding(new Date());
+			uexpobds.setLastOnboarding(new Date());
 			// Save the changes to vxfobds
-			ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobd);
+			ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
+			BusController.getInstance().onBoardNSDSucceded( uexpobd_final );
 
 			//This is not necessary any more.
 			//// run in a thread the GET polling for a VNF onboarding status

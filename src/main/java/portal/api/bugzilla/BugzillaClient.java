@@ -29,11 +29,14 @@ import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
+import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.OnBoardingStatus;
 import portal.api.model.PortalUser;
 import portal.api.model.VFImage;
 import portal.api.model.ValidationJob;
 import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
+import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.repo.PortalRepository;
 import portal.api.validation.ci.ValidationJobResult;
 
@@ -244,6 +247,57 @@ public class BugzillaClient {
 		return b;
 	}
 	
+	public static Bug transformVxFAutomaticOnBoarding2BugBody(VxFOnBoardedDescriptor vxfobd) {
+
+		String product = "5GinFIRE Operations";
+		String component = "Onboarding" ;
+		String summary = "[PORTAL] Validation Request for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
+		String alias = vxfobd.getVxf().getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " VxF ONBOARDING ACTION \n"
+				+ "**************************************************************\n");
+		
+		description.append( "\n\n VxF: " + vxfobd.getVxf().getName());
+		description.append( "\n Owner: " +  vxfobd.getVxf().getOwner().getUsername() );
+		description.append( "\n Vendor: " +  vxfobd.getVxf().getVendor() );
+		description.append( "\n Version: " + vxfobd.getVxf().getVersion() );
+		description.append( "\n Archive: " + vxfobd.getVxf().getPackageLocation() );
+		description.append( "\n UUID: " + vxfobd.getVxf().getUuid()  );
+		description.append( "\n ID: " + vxfobd.getVxf().getId()   );
+		description.append( "\n Date Created: " + vxfobd.getVxf().getDateCreated().toString()   );
+		description.append( "\n Date Updated: " + vxfobd.getVxf().getDateUpdated().toString()   );
+
+
+		description.append( "\n" );
+		description.append( "\n VxF OnBoarding Status: " + vxfobd.getOnBoardingStatus()  );
+		description.append( "\n Last Onboarding: " + vxfobd.getLastOnboarding());
+		description.append( "\n Last Onboarding Deploy ID: " + vxfobd.getDeployId());
+		description.append( "\n Onboarding MANO provider: " + vxfobd.getObMANOprovider().getName() );
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit/" + vxfobd.getVxf().getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.ONBOARDED ) )  {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}
+		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), vxfobd.getVxf().getOwner().getEmail(), status, resolution);
+//		b.setAssignedTo("ctranoris@ece.upatras.gr");
+//		List<String> list=new ArrayList<String>();
+//		list.add("ioannis.chatzis@upatras.gr");
+//		b.setCc(list);
+		return b;
+	}
 	
 		
 	
@@ -290,5 +344,54 @@ public class BugzillaClient {
 		
 		return b;
 	}
+	
+	public static Bug transformNSDAutomaticOnBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
+
+		String product = "5GinFIRE Operations";
+		String component = "Onboarding" ;
+		String summary = "[PORTAL] Validation Request for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
+		String alias = uexpobd.getExperiment().getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " VxF ONBOARDING ACTION \n"
+				+ "**************************************************************\n");
+		
+		description.append( "\n\n VxF: " + uexpobd.getExperiment().getName());
+		description.append( "\n Owner: " +  uexpobd.getExperiment().getOwner().getUsername() );
+		description.append( "\n Vendor: " +  uexpobd.getExperiment().getVendor() );
+		description.append( "\n Version: " + uexpobd.getExperiment().getVersion() );
+		description.append( "\n Archive: " + uexpobd.getExperiment().getPackageLocation() );
+		description.append( "\n UUID: " + uexpobd.getExperiment().getUuid()  );
+		description.append( "\n ID: " + uexpobd.getExperiment().getId()   );
+		description.append( "\n Date Created: " + uexpobd.getExperiment().getDateCreated().toString()   );
+		description.append( "\n Date Updated: " + uexpobd.getExperiment().getDateUpdated().toString()   );
+
+
+		description.append( "\n" );
+		description.append( "\n VxF OnBoarding Status: " + uexpobd.getOnBoardingStatus()  );
+		description.append( "\n Last Onboarding: " + uexpobd.getLastOnboarding());
+		description.append( "\n Last Onboarding Deploy ID: " + uexpobd.getDeployId());
+		description.append( "\n Onboarding MANO provider: " + uexpobd.getObMANOprovider().getName() );
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit/" + uexpobd.getExperiment().getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( uexpobd.getOnBoardingStatus().equals( OnBoardingStatus.ONBOARDED ) )  {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( uexpobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}
+		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), uexpobd.getExperiment().getOwner().getEmail(), status, resolution);
+		return b;
+	}
+	
 
 }

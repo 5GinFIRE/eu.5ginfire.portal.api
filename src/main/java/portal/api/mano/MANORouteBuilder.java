@@ -15,12 +15,7 @@
 
 package portal.api.mano;
 
-import javax.jms.ConnectionFactory;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
-import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
@@ -58,6 +53,34 @@ public class MANORouteBuilder  extends RouteBuilder{
 
 	public void configure() {
 		
+		/**
+		 * OnBoard New Added VxF
+		 */		
+		//We get the message here and we need to route it to the proper point.
+		//If onboarding is successfull we need to send a Bugzilla message
+		//If it is unsuccessful we need to send another Bugzilla message
+		from("seda:vxf.onboard?multipleConsumers=true")
+		.doTry()
+		.bean(new MANOController(),"onBoardVxFToMANOProvider") //returns exception or nothing
+		.log("VNFD Onboarded Successfully")
+//		.to("seda:vxf.onboardingresult.update?multipleConsumers=true")
+//		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
+//		.to("direct:bugzilla.bugmanage")
+//		.to("direct:bugzilla.updateIssue") // Successfully
+//		//"seda:deployments.update
+		//.to("stream:out");
+		.doCatch(Exception.class)
+		.log("VNFD Onboarding failed!");
+		//.to("stream:out");
+//		.to("direct:bugzilla.bugmanage")
+//		.to("direct:bugzilla.updateIssue"); // Failed
+
+		from("seda:nsd.onboard?multipleConsumers=true")
+		.doTry()
+		.bean(new MANOController(),"onBoardNSDToMANOProvider") //returns exception or nothing
+		.log("NSD Onboarded Successfully")
+		.doCatch(Exception.class)
+		.log("NSD Onboarding failed!");		
        
 	}
 

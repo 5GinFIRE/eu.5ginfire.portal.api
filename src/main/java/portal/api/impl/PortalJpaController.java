@@ -23,6 +23,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1078,6 +1079,13 @@ public class PortalJpaController {
 		return entityManager.find(MANOprovider.class, i);
 	}
 
+	public List<MANOprovider> getMANOprovidersEnabledForOnboarding() {
+		
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		TypedQuery<MANOprovider> query = entityManager.createQuery("SELECT mp FROM MANOprovider mp WHERE mp.enabledForONBOARDING = TRUE",MANOprovider.class);
+		return query.getResultList();
+		
+	}
 	
 	public List<VxFOnBoardedDescriptor> readVxFOnBoardedDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();

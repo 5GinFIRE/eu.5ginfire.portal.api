@@ -15,6 +15,7 @@
 
 package portal.api.mano;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,8 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import OSM4NBIClient.OSM4Client;
 import portal.api.bus.BusController;
+import portal.api.model.DeploymentDescriptor;
+import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.OnBoardingStatus;
@@ -113,11 +116,13 @@ public class MANOController {
 			if(vnfd_id == null)
 			{
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 				BusController.getInstance().onBoardVxFFailed( vxfobds_final );
 				return;
 			}		
 			vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+			vxfobds.getVxf().setCertified(true);
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 			vxfobds.setDeployId(vnfd_id);
 			// What should be the vxf Name. Something like cirros_vnfd.
@@ -231,6 +236,7 @@ public class MANOController {
 			if(nsd_id == null)
 			{
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
 				BusController.getInstance().onBoardNSDFailed( uexpobd_final );				
 				return;
@@ -238,6 +244,7 @@ public class MANOController {
 			else
 			{
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+				uexpobds.getExperiment().setValid(true);
 			}
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 			uexpobds.setDeployId(nsd_id);
@@ -431,7 +438,7 @@ public class MANOController {
 		}
 
 	}
-
+	
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client(ExperimentOnBoardDescriptor obds) {
 
 		Nsd nsd = null;
@@ -516,6 +523,6 @@ public class MANOController {
 			response=osm4Client.deleteNSDPackage(nsd_id);
 		}
 		return response;		
-	}
+	}		
 
 }

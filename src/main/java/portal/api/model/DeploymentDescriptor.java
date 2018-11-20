@@ -34,12 +34,16 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 /**
  * @author ctranoris
  *
  */
 @Entity(name = "DeploymentDescriptor")
+@JsonIgnoreProperties(value = { })
 public class DeploymentDescriptor {
 	
 
@@ -142,9 +146,14 @@ public class DeploymentDescriptor {
 	}
 
 	
-
+	
 	public PortalUser getOwner() {
-		return owner;
+
+		
+		
+		PortalUser p = owner.getSnippedDetails();
+		
+		return p;
 	}
 
 	public void setOwner(PortalUser owner) {
@@ -153,7 +162,7 @@ public class DeploymentDescriptor {
 
 	
 	public ExperimentMetadata getExperiment() {
-		return experiment;
+		return experiment.getSnippedDetails();
 	}
 
 	public void setExperiment(ExperimentMetadata e) {

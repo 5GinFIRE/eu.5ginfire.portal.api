@@ -2614,8 +2614,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
 			List<DeploymentDescriptor> deployments;
 
-			if (u.getRoles().contains(UserRoleType.PORTALADMIN)) {
+			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN))) {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
+			} else {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
+			}
+
+			return Response.ok().entity(deployments).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("User not found in portal registry or not logged in");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+	
+	@GET
+	@Path("/admin/deployments/scheduled")
+	@Produces("application/json")
+	public Response getAllScheduledDeploymentsofUser() {
+
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+
+		if (u != null) {
+			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
+			List<DeploymentDescriptor> deployments;
+
+			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN)) ||  (u.getRoles().contains(UserRoleType.TESTBED_PROVIDER )) ) {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsScheduled();
 			} else {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
 			}
@@ -2710,7 +2736,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("getDeploymentById for id: " + deploymentId);
 			DeploymentDescriptor deployment = portalRepositoryRef.getDeploymentByID(deploymentId);
 
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (deployment.getOwner().getId() == u.getId())) {
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (u.getRoles().contains(UserRoleType.TESTBED_PROVIDER )) || (deployment.getOwner().getId() == u.getId())) {
 				return Response.ok().entity(deployment).build();
 			}
 

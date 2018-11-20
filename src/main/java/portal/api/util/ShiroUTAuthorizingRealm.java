@@ -88,7 +88,7 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 		logger.info("AuthenticationToken at=" + at.toString());
 
 		UsernamePasswordToken token = (UsernamePasswordToken) at;
-		logger.info("tokengetUsername at=" + token.getUsername());
+		logger.debug("tokengetUsername at=" + token.getUsername());
 		//logger.info("tokengetPassword at=" + String.valueOf(token.getPassword()));
 		//logger.info("tokengetPrincipal at=" + token.getPrincipal());
 		
@@ -101,8 +101,8 @@ public class ShiroUTAuthorizingRealm extends AuthorizingRealm {
 			}
 			String originalPass = bu.getPassword();
 			String suppliedPass = EncryptionUtil.hash(   String.valueOf(token.getPassword())  );
-			logger.info("originalPass =" + originalPass );
-			logger.info("suppliedPass =" + suppliedPass );
+			logger.debug("originalPass =" + originalPass );
+			logger.debug("suppliedPass =" + suppliedPass );
 			if  (originalPass.equals( suppliedPass   )) {
 				logger.info("======= USER is AUTHENTICATED OK =======");
 			} else {

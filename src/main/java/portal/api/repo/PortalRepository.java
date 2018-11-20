@@ -315,6 +315,12 @@ public class PortalRepository {
 		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByUser( ownerid, 0, 100000);	
 		return ls;
 	}
+	
+
+	public List<DeploymentDescriptor> getAllDeploymentDescriptorsScheduled() {
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsScheduled( 0, 100000);	
+		return ls;
+	}
 
 	public void deleteDeployment(int id) {
 		portalJpaController.deleteDeployment(id);
@@ -568,6 +574,8 @@ public class PortalRepository {
 		List<VFImage> ls = portalJpaController.readVFImagesForOwnerID( ownerid, 0, 100000);	
 		return ls;
 	}
+
+
 
 
 	

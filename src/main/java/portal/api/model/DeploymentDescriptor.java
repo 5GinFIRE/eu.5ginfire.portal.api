@@ -222,9 +222,12 @@ public class DeploymentDescriptor {
 	}
 	
 	public String getScheduledStartDate() {
-		Instant instant= startDate.toInstant();
-		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
-		return ins3.toString();
+		if (startDate!=null ) {
+			Instant instant= startDate.toInstant();
+			Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
+			return ins3.toString();
+		}
+		return null;
 	}
 
 	public void setStartDate(Date startDate) {
@@ -237,9 +240,12 @@ public class DeploymentDescriptor {
 	
 
 	public String getScheduledEndDate() {
-		Instant instant= endDate.toInstant();
-		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(23).withMinute(59).withSecond(59) );
-		return ins3.toString();
+		if (endDate!=null ) {
+			Instant instant= endDate.toInstant();
+			Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(23).withMinute(59).withSecond(59) );
+			return ins3.toString();			
+		}
+		return null;
 	}
 
 	public void setEndDate(Date endDate) {

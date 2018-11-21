@@ -162,7 +162,12 @@ public class DeploymentDescriptor {
 
 	
 	public ExperimentMetadata getExperiment() {
-		return experiment.getSnippedDetails();
+		
+		if (experiment!=null) {
+			experiment.getSnippedDetails();
+		}
+		
+		return experiment;
 	}
 
 	public void setExperiment(ExperimentMetadata e) {

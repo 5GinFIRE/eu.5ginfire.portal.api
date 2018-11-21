@@ -238,7 +238,7 @@ public class DeploymentDescriptor {
 
 	public String getScheduledEndDate() {
 		Instant instant= endDate.toInstant();
-		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
+		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(23).withMinute(59).withSecond(59) );
 		return ins3.toString();
 	}
 

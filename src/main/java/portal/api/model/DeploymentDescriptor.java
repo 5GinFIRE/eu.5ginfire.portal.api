@@ -15,6 +15,8 @@
 
 package portal.api.model;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -218,6 +220,12 @@ public class DeploymentDescriptor {
 	public Date getStartDate() {
 		return startDate;
 	}
+	
+	public String getScheduledStartDate() {
+		Instant instant= startDate.toInstant();
+		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
+		return ins3.toString();
+	}
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
@@ -225,6 +233,13 @@ public class DeploymentDescriptor {
 
 	public Date getEndDate() {
 		return endDate;
+	}
+	
+
+	public String getScheduledEndDate() {
+		Instant instant= endDate.toInstant();
+		Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
+		return ins3.toString();
 	}
 
 	public void setEndDate(Date endDate) {

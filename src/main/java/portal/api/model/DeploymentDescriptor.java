@@ -164,7 +164,7 @@ public class DeploymentDescriptor {
 	public ExperimentMetadata getExperiment() {
 		
 		if (experiment!=null) {
-			experiment.getSnippedDetails();
+			return experiment.getSnippedDetails();
 		}
 		
 		return experiment;

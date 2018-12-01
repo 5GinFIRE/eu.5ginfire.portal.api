@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class CentralLogger {
 	
-	private static final Object COMPONENT_NAME = "PORTAL API";
 	/** the Camel Context configure via Spring. See bean.xml*/	
 	private static ModelCamelContext actx;
 	
@@ -47,7 +46,6 @@ public class CentralLogger {
 			map.put("time", Instant.now().toString());
 			map.put("clevel", cl.toString() );
 			map.put("message", amessage );
-			map.put("component", COMPONENT_NAME );
 			
 
 			String json;

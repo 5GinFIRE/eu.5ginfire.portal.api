@@ -17,7 +17,7 @@ package centralLog.api;
 
 public class CentralLogMessage {
 
-	CLevel cLevel;
+	CLevel clevel;
 	
 	String message;
 
@@ -34,7 +34,7 @@ public class CentralLogMessage {
 	 */
 	public CentralLogMessage(CLevel cLevel, String message) {
 		super();
-		this.cLevel = cLevel;
+		this.clevel = cLevel;
 		this.message = message;
 	}
 
@@ -42,15 +42,15 @@ public class CentralLogMessage {
 	/**
 	 * @return the cLevel
 	 */
-	public CLevel getcLevel() {
-		return cLevel;
+	public CLevel getclevel() {
+		return clevel;
 	}
 
 	/**
 	 * @param cLevel the cLevel to set
 	 */
-	public void setcLevel(CLevel cLevel) {
-		this.cLevel = cLevel;
+	public void setclevel(CLevel cLevel) {
+		this.clevel = cLevel;
 	}
 
 	/**

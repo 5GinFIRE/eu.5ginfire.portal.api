@@ -45,7 +45,7 @@ public class CentralLogger {
 	
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("time", Instant.now().toString());
-			map.put("cLevel", cl.toString() );
+			map.put("clevel", cl.toString() );
 			map.put("message", amessage );
 			map.put("component", COMPONENT_NAME );
 			

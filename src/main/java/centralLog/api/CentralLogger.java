@@ -43,7 +43,6 @@ public class CentralLogger {
 	public static void log(CLevel cl, String amessage){
 	
 			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("time", Instant.now().toString());
 			map.put("clevel", cl.toString() );
 			map.put("message", amessage );
 			

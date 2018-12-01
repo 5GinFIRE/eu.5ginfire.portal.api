@@ -134,6 +134,12 @@ public class PortalJpaController {
 			PortalProperty p = new PortalProperty("pipelinetoken", "");
 			saveProperty(p);
 		}
+		if (readPropertyByName("centrallogerurl") == null){
+			PortalProperty p = new PortalProperty("centrallogerurl", "");
+			saveProperty(p);
+		}
+		
+		
 	}
 
 	public long countInstalledVxFs() {

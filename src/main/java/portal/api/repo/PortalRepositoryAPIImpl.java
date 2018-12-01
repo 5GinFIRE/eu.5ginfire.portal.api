@@ -71,6 +71,8 @@ import OSM4Util.OSM4ArchiveExtractor.OSM4NSExtractor;
 import OSM4Util.OSM4ArchiveExtractor.OSM4VNFDExtractor;
 import OSM4Util.OSM4NSReq.OSM4NSRequirements;
 import OSM4Util.OSM4VNFReq.OSM4VNFRequirements;
+import centralLog.api.CLevel;
+import centralLog.api.CentralLogger;
 import portal.api.bugzilla.model.ErrorMsg;
 import portal.api.bus.BusController;
 import portal.api.mano.MANOController;
@@ -1900,7 +1902,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 				logger.info(" currentUser = " + currentUser.toString());
 				logger.info("User [" + currentUser.getPrincipal() + "] logged in successfully.");
-
+				CentralLogger.log( CLevel.INFO, "User [" + currentUser.getPrincipal().toString().substring(0, 1) + "xxx" + "] logged in");
 				portalRepositoryRef.updateUserInfo(  portalUser);
 
 				return Response.ok().entity(userSession).build();

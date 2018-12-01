@@ -175,18 +175,19 @@
 	</bean>
 
 	<!-- MYSQL -->
-	<!--bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
+	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter"> 
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.MySQLDictionary"/>
 		 <property name="showSql" value="false" /> 
 		 <property name="database" value="MYSQL"/> 
-		<property name="generateDdl" value="true" /> </bean --> 
+		<property name="generateDdl" value="true" /> 
+	</bean> 
 	<!-- H2 -->
-	<bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+	<!--bean id="jpaAdapter" class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
 		<property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
 		<property name="showSql" value="false" />
 		<property name="database" value="H2" />
 		<property name="generateDdl" value="true" />
-	</bean>
+	</bean -->
 
 	<!-- <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> 
 		<property name="entityManagerFactory" ref="entityManagerFactory" /> < property 
@@ -220,13 +221,18 @@
   <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring">
     <package>portal.api.bugzilla</package>    
     <package>portal.api.validation.ci</package>    
-    <package>portal.api.mano</package>    
+    <package>portal.api.mano</package>     
+    <package>centralLog.api</package>    
     
   </camelContext>
   
   <bean id="busController" class="portal.api.bus.BusController">
 	<property name="actx" ref="camelContext" />
 	</bean>
+   <bean id="centralLogger" class="centralLog.api.CentralLogger">
+	<property name="actx" ref="camelContext" />
+	</bean>
+	
 	
   <!-- lets configure the default ActiveMQ broker URL -->
   <bean id="jms" class="org.apache.camel.component.jms.JmsComponent">

@@ -1902,8 +1902,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 				logger.info(" currentUser = " + currentUser.toString());
 				logger.info("User [" + currentUser.getPrincipal() + "] logged in successfully.");
-				CentralLogger.log( CLevel.INFO, "User [" + currentUser.getPrincipal().toString().substring(0, 1) + "xxx" + "] logged in");
 				portalRepositoryRef.updateUserInfo(  portalUser);
+				if ( currentUser.getPrincipal().toString().length()>2 ){
+					CentralLogger.log( CLevel.INFO, "User [" + currentUser.getPrincipal().toString().substring(0, 3) + "xxx" + "] logged in");					
+				}
 
 				return Response.ok().entity(userSession).build();
 			} catch (AuthenticationException ae) {

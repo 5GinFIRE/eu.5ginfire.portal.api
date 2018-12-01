@@ -49,10 +49,11 @@ public class CentralLoggerRouteBuilder  extends RouteBuilder{
 			logger.info( "NO CENTRALLOGGERURL ROUTING. ELASTICURL = " + CENTRALLOGGERURL);
 			return; //no routing towards Bugzilla
 		}
+		logger.info( "ENABLED CENTRALLOGGERURL ROUTING. ELASTICURL = " + CENTRALLOGGERURL);
 		
 		
 	
-		String url = CENTRALLOGGERURL.replace( "https://", "https4://").replace( "http://", "http4://") + "/log";
+		String url = CENTRALLOGGERURL.replace( "https://", "https4://").replace( "http://", "http4://") ;
 
 		from("seda:centralLog")	
         .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))

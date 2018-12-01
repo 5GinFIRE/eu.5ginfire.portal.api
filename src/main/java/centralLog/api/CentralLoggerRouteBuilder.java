@@ -57,6 +57,7 @@ public class CentralLoggerRouteBuilder  extends RouteBuilder{
 
 		from("seda:centralLog")	
         .setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
+        .setHeader("Content-Type", constant("application/json"))
 		.toD(  url  );
 		
 	

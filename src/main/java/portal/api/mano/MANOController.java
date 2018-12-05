@@ -118,7 +118,7 @@ public class MANOController {
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
 				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-				BusController.getInstance().onBoardVxFFailed( vxfobds );
+				BusController.getInstance().onBoardVxFFailed( vxfobds_final );
 				return;
 			}		
 			vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
@@ -131,7 +131,7 @@ public class MANOController {
 			vxfobds.setLastOnboarding(new Date());
 			// Save the changes to vxfobds
 			VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-			BusController.getInstance().onBoardVxFSucceded( vxfobds);
+			BusController.getInstance().onBoardVxFSucceded( vxfobds_final );
 			//This is not necessary any more.
 			//// run in a thread the GET polling for a VNF onboarding status
 			//ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -238,7 +238,7 @@ public class MANOController {
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-				BusController.getInstance().onBoardNSDFailed( uexpobds );				
+				BusController.getInstance().onBoardNSDFailed( uexpobd_final );				
 				return;
 			}		
 			else
@@ -254,7 +254,7 @@ public class MANOController {
 			uexpobds.setLastOnboarding(new Date());
 			// Save the changes to vxfobds
 			ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-			BusController.getInstance().onBoardNSDSucceded( uexpobds );
+			BusController.getInstance().onBoardNSDSucceded( uexpobd_final );
 
 			//This is not necessary any more.
 			//// run in a thread the GET polling for a VNF onboarding status
@@ -332,9 +332,6 @@ public class MANOController {
 
 	}
 
-	private void checkOSM4NSOperationalStatus(String nsd_id) throws Exception {
-	}
-	
 	public VxFOnBoardedDescriptor getVxFStatusFromOSM2Client(VxFOnBoardedDescriptor obds) {
 
 		Vnfd vnfd = null;
@@ -441,29 +438,6 @@ public class MANOController {
 		}
 
 	}
-
-	public void scheduleOSM4NSDInstantiation(String delay, DeploymentDescriptor deploymentdescriptor) throws Exception {	
-		CamelContext tempcontext = new DefaultCamelContext();
-		try {
-			RouteBuilder rb = new RouteBuilder() {
-				@Override
-				public void configure() throws Exception {
-					from("quartz://NSDInstantiationTimer?cron=40+19+9+11+?+2018")
-					.doTry()
-					.setBody().constant(deploymentdescriptor)
-					.bean(new MANOController(),"deployNSDToMANOProvider") //returns exception or nothing
-					.log("NSD deployed Successfully")
-					.doCatch(Exception.class)
-					.log("NS deployment failed!");						}
-			};
-			tempcontext.addRoutes(rb);
-			tempcontext.start();
-			Thread.sleep(30000);
-		} finally {
-			tempcontext.stop();
-		}
-
-	}
 	
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client(ExperimentOnBoardDescriptor obds) {
 
@@ -549,82 +523,6 @@ public class MANOController {
 			response=osm4Client.deleteNSDPackage(nsd_id);
 		}
 		return response;		
-	}
-	
-	public void deployNSDToMANOProvider(DeploymentDescriptor deploymentdescriptor){
-		if (deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			//There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
-			// Get Experiment ID and VIM ID and create NS Instance.
-			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getDeployId());
-			// The NS Instance ID is set 
-			deploymentdescriptor.setInstanceId(nsd_instance_id);
-			
-			// NS instance creation
-			if(nsd_instance_id == null)
-			{
-				// NS instance creation failed
-				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REJECTED);
-				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().deploymentInstantiationFailed( deploymentdescriptor_final );				
-				return;
-			}		
-			else
-			{
-				// Instantiate NS Instance
-				String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id);
-				if(nsr_id == null)
-				{
-					// NS Instanciation failed
-					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REJECTED);
-					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-					BusController.getInstance().deploymentInstantiationFailed( deploymentdescriptor_final );				
-					return;					
-				}
-				else
-				{
-					// Check (POLL) by nsr_id for status of the deployment.
-					// We must change to Running only when the Deployment is actually RUNNING
-					//String operational_status = osm4Client.getNSInstanceOperationalStatus(nsd_instance_id);					
-					// If it is actually RUNNING
-					//{
-					// Stop it
-					// Initiate scheduled launch
-					//}
-					//else
-					//{
-					// REJECT it
-					//}
-					// NS Instanciation succeeded
-					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.RUNNING);
-				}
-			}
-			// Save the changes to vxfobds
-			DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-			BusController.getInstance().deploymentInstantiationSucceded( deploymentdescriptor_final );
-		}		
-	}
-	
-	public void terminateNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor){
-		if (deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			//There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
-			// Get Experiment ID and VIM ID and create NS Instance.
-			String return_id = osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId());
-			
-			// NS instance creation
-			if(return_id != null)
-			{
-				// NS Instanciation failed
-				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.COMPLETED);
-				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().terminateInstanceSucceded( deploymentdescriptor_final );				
-			}
-			else
-			{
-				BusController.getInstance().terminateInstanceFailed( deploymentdescriptor );				
-			}
-		}		
-	}
+	}		
 
 }

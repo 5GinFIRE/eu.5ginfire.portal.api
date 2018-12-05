@@ -215,7 +215,8 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:deployments.create?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
 		.to("direct:bugzilla.newIssue");
-				
+		
+		
 		/**
 		 * Update Deployment Route
 		 */
@@ -268,7 +269,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Automatic OnBoarding Route Success
 		 */		
-		from("seda:vxf.onboard.success?multipleConsumers=true")
+		from("seda:vxf.onboardsuccess?multipleConsumers=true")
 		.delay(5000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
@@ -276,15 +277,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Automatic OnBoarding Route Fail
 		 */		
-		from("seda:vxf.onboard.fail?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
-
-		/**
-		 * Automatic OnBoarding Route Result
-		 */		
-		from("seda:vxf.onboard.result?multipleConsumers=true")
+		from("seda:vxf.onboardfail?multipleConsumers=true")
 		.delay(5000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
@@ -316,68 +309,20 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Automatic OnBoarding Route Success
 		 */		
-		from("seda:nsd.onboard.success?multipleConsumers=true")
+		from("seda:nsd.onboardsuccess?multipleConsumers=true")
 		.delay(5000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
-		
 		/**
 		 * Automatic OnBoarding Route Fail
 		 */		
-		from("seda:nsd.onboard.fail?multipleConsumers=true")
+		from("seda:nsd.onboardfail?multipleConsumers=true")
 		.delay(5000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
-
-		/**
-		 * Automatic NS Instantiation Route Success
-		 */		
-		from("seda:nsd.deployment.instantiation.success?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
-		.to("direct:bugzilla.bugmanage");	
-
-		/**
-		 * NS Scheduling Route
-		 */		
-		from("seda:nsd.schedule?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
-		.to("direct:bugzilla.bugmanage");	
-		
-		/**
-		 * Automatic NS Instantiation Route Fail
-		 */		
-		from("seda:nsd.deployment.instantiation.fail?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
-		.to("direct:bugzilla.bugmanage");	
-				
-		/**
-		 * Automatic NS Termination Route Fail
-		 */		
-		from("seda:nsd.instance.termination.success?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
-		.to("direct:bugzilla.bugmanage");	
-
-		/**
-		 * Automatic NS Termination Route Fail
-		 */		
-		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSTermination2BugBodyFailed")
-		.to("direct:bugzilla.bugmanage");	
-		
-		/**
-		 * Reject Deployment Route Issue
-		 */
-		from("seda:nsd.deployment.reject?multipleConsumers=true")
-		.bean( BugzillaClient.class, "transformDeployment2BugBody")
-		.to("direct:bugzilla.bugmanage");		
-
+	    
 		from("direct:issue.get")
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.GET))
 		.toD( "https4://" + BUGZILLAURL + "/rest.cgi/bug/${header.uuid}?api_key="+ BUGZILLAKEY +"&throwExceptionOnFailure=true");

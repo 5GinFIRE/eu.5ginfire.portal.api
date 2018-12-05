@@ -57,87 +57,7 @@ public class BugzillaClient {
 
 		
 	
-	public static Bug transformNSInstantiation2BugBody(DeploymentDescriptor descriptor) {
-
-		String product = "5GinFIRE Operations";
-		String component = "Operations Support" ;
-		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
-		String alias = descriptor.getUuid() ;
-
-		String description = getDeploymentDescription( descriptor );		
 		
-		String status= "CONFIRMED";
-		String resolution = null;
-		
-		String assignee_email = null;
-
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
-			status = "RESOLVED";
-			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
-		}
-		
-		
-		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
-		// Create the email and assign it to the mentor.
-		b.setAssignedTo(descriptor.getMentor().getEmail());
-		return b;		
-	}
-
-	public static Bug transformNSTermination2BugBody(DeploymentDescriptor descriptor) {
-
-		String product = "5GinFIRE Operations";
-		String component = "Operations Support" ;
-		String summary = "[PORTAL] Completion Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
-		String alias = descriptor.getUuid() ;
-
-		String description = getDeploymentDescription( descriptor );		
-		
-		String status= "CONFIRMED";
-		String resolution = null;
-		
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
-			status = "RESOLVED";
-			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
-		}
-		
-		
-		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
-		return b;
-		
-	}
-	
-	public static Bug transformNSTermination2BugBodyFailed(DeploymentDescriptor descriptor) {
-
-		String product = "5GinFIRE Operations";
-		String component = "Operations Support" ;
-		String summary = "[PORTAL] Completion Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername() + "FAILED.";
-		String alias = descriptor.getUuid() ;
-
-		String description = getDeploymentDescription( descriptor );		
-		
-		String status= "CONFIRMED";
-		String resolution = null;
-		
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
-			status = "RESOLVED";
-			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
-		}
-		
-		
-		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
-		return b;
-		
-	}
-	
 	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
 
 		String product = "5GinFIRE Operations";
@@ -162,8 +82,7 @@ public class BugzillaClient {
 		
 		
 		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
-		// Create the email and assign it to the mentor.
-		b.setAssignedTo(descriptor.getMentor().getEmail());
+		
 		return b;
 	}
 	
@@ -436,10 +355,10 @@ public class BugzillaClient {
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " NSD ONBOARDING ACTION \n"
+				+ " VxF ONBOARDING ACTION \n"
 				+ "**************************************************************\n");
 		
-		description.append( "\n\n NSD: " + uexpobd.getExperiment().getName());
+		description.append( "\n\n VxF: " + uexpobd.getExperiment().getName());
 		description.append( "\n Owner: " +  uexpobd.getExperiment().getOwner().getUsername() );
 		description.append( "\n Vendor: " +  uexpobd.getExperiment().getVendor() );
 		description.append( "\n Version: " + uexpobd.getExperiment().getVersion() );
@@ -451,13 +370,13 @@ public class BugzillaClient {
 
 
 		description.append( "\n" );
-		description.append( "\n NSD OnBoarding Status: " + uexpobd.getOnBoardingStatus()  );
+		description.append( "\n VxF OnBoarding Status: " + uexpobd.getOnBoardingStatus()  );
 		description.append( "\n Last Onboarding: " + uexpobd.getLastOnboarding());
 		description.append( "\n Last Onboarding Deploy ID: " + uexpobd.getDeployId());
 		description.append( "\n Onboarding MANO provider: " + uexpobd.getObMANOprovider().getName() );
 		 
 		description.append( "\n\n*************************************************\n");
-		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/experiment_edit/" + uexpobd.getExperiment().getId() ); 
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit/" + uexpobd.getExperiment().getId() ); 
 		
 		String status= "CONFIRMED";
 		String resolution = null;

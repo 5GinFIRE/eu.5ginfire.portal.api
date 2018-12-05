@@ -24,6 +24,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity(name = "ExperimentMetadata")
 public class ExperimentMetadata extends Product{
@@ -133,6 +136,23 @@ public class ExperimentMetadata extends Product{
 	 */
 	public void setValidationStatus(ValidationStatus validationStatus) {
 		this.validationStatus = validationStatus;
+	}
+
+	@JsonIgnore
+	public ExperimentMetadata getSnippedDetails() {
+		@JsonIgnoreProperties(value = { "iconsrc", "owner", "dateUpdated", "packageLocation", "longDescription", "version", 
+				"experimentOnBoardDescriptors", "termsOfUse", "dateCreated", "shortDescription", "descriptor", "packagingFormat", 
+				"valid", "categories", "screenshots", "vendor", "published", "extensions", "validationJobs", "descriptorHTML", "validationStatus"} )
+		class SnipExperimentMetadata extends ExperimentMetadata{			
+		}		
+		
+		SnipExperimentMetadata p = new SnipExperimentMetadata();
+		p.setId( this.getId() );
+		p.setName( this.getName() );
+		p.setConstituentVxF( this.getConstituentVxF() );
+		p.setUuid( this.getUuid() );
+		
+		return p;
 	}
 	
 	

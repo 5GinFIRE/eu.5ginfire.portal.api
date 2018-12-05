@@ -2651,25 +2651,28 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			u = portalRepositoryRef.getUserByID(u.getId());
 			deployment.setOwner(u); // reattach from the DB model
 			u.getDeployments().add(deployment);
-
+			
+			// Get the Experiment Metadata from the id of the experiment from the deployment request
 			ExperimentMetadata baseApplication = (ExperimentMetadata) portalRepositoryRef
 					.getProductByID(deployment.getExperiment().getId());
-			deployment.setExperiment(baseApplication); // reattach from the
-														// DB model
+			deployment.setExperiment(baseApplication); // reattach from the DB model
 
-			u = portalRepositoryRef.updateUserInfo(  u);
-						
-			deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
+			
+			deployment = portalRepositoryRef.updateDeploymentDescriptor(deployment);
+
+//			u = portalRepositoryRef.updateUserInfo(u);
+			
+//			deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
 			
 			BusController.getInstance().newDeploymentRequest( deployment );	
 
-			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
-			if ((adminemail != null) && (!adminemail.equals(""))) {
-				String subj = "[5GinFIREPortal] New Deployment Request";
-				EmailUtil.SendRegistrationActivationEmail(adminemail,
-						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ "\n<br/> Status: " + deployment.getStatus().name()+ "\n<br/> Description: " + deployment.getDescription()   ,
-						subj);
-			}
+//			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+//			if ((adminemail != null) && (!adminemail.equals(""))) {
+//				String subj = "[5GinFIREPortal] New Deployment Request";
+//				EmailUtil.SendRegistrationActivationEmail(adminemail,
+//						"5GinFIREPortal New Deployment Request by user : " + u.getUsername() + ", " + u.getEmail()+ "\n<br/> Status: " + deployment.getStatus().name()+ "\n<br/> Description: " + deployment.getDescription()   ,
+//						subj);
+//			}
 
 			return Response.ok().entity(deployment).build();
 		} else {
@@ -2732,7 +2735,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if ((u != null)) {
 
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN))) // only admin can alter a deployment
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || u.getApikey().equals(d.getMentor().getApikey())) // only admin or Deployment Mentor can alter a deployment
 			{
 				DeploymentDescriptor prevDeployment = portalRepositoryRef.getDeploymentByID( d.getId() );
 												
@@ -2754,28 +2757,83 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //				}
 				
 				prevDeployment.setName( d.getName() );
-				prevDeployment.setEndDate( d.getEndDate() );
 				prevDeployment.setFeedback( d.getFeedback() );
 				prevDeployment.setStartDate( d.getStartDate());
+				prevDeployment.setEndDate( d.getEndDate() );
 				prevDeployment.setStatus( d.getStatus() );
 								
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
+				prevDeployment.getExperiment();
+				prevDeployment.getInfrastructureForAll();
 				
 				logger.info("updateDeployment for id: " + prevDeployment.getId());
 				
 				
-				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
-				if ((adminemail != null) && (!adminemail.equals(""))) {
-					String subj = "[5GinFIREPortal] Deployment Request";
-					EmailUtil.SendRegistrationActivationEmail(prevDeployment.getOwner().getEmail(),
-							"5GinFIREPortal Deployment Request for experiment: " + prevDeployment.getName() + "\n<br/>Status: " + prevDeployment.getStatus().name()+ "\n<br/>Feedback: " + prevDeployment.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
-							subj);
-				}
+//				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+//				if ((adminemail != null) && (!adminemail.equals(""))) {
+//					String subj = "[5GinFIREPortal] Deployment Request";
+//					EmailUtil.SendRegistrationActivationEmail(prevDeployment.getOwner().getEmail(),
+//							"5GinFIREPortal Deployment Request for experiment: " + prevDeployment.getName() + "\n<br/>Status: " + prevDeployment.getStatus().name()+ "\n<br/>Feedback: " + prevDeployment.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
+//							subj);
+//				}
 
 				DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( d.getId() );  //rereading this, seems to keep the DB connection
-				BusController.getInstance().updateDeploymentRequest( dd );
-				return Response.ok().entity( dd ).build();
 
+				// Send updated Deployment status email 
+				BusController.getInstance().updateDeploymentRequest( dd );
+				
+				if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED )
+				{
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					{
+						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						{
+							//Trigger Automatic Instantiation
+							//Initially we try synchronously
+							//aMANOController.deployNSDToMANOProvider(prevDeployment);
+							//Then try asynchronously
+							BusController.getInstance().deployExperiment( prevDeployment );	
+							//Then try job scheduling
+							//try {
+							//	aMANOController.scheduleOSM4NSDInstantiation("300",prevDeployment);
+							//} catch (Exception e) {
+							//	// TODO Auto-generated catch block
+							//	e.printStackTrace();
+							//}
+						}
+					}
+				}
+				if( d.getStatus() == DeploymentDescriptorStatus.RUNNING )
+				{
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					{
+						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						{
+							BusController.getInstance().deployExperiment( prevDeployment );	
+						}
+					}
+				}
+				if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED )
+				{
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					{
+						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						{
+							BusController.getInstance().completeExperiment( prevDeployment );	
+						}
+					}
+				}
+				if( d.getStatus() == DeploymentDescriptorStatus.REJECTED )
+				{
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					{
+						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						{
+							BusController.getInstance().rejectExperiment( prevDeployment );	
+						}
+					}
+				}
+				return Response.ok().entity( dd ).build();
 			}
 
 		}
@@ -3697,6 +3755,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		infrastructure.setDatacentername( c.getDatacentername());
 		infrastructure.setEmail( c.getEmail());
+		infrastructure.setVIMid( c.getVIMid());
 		infrastructure.setName( c.getName());
 		infrastructure.setOrganization(c.getOrganization());
 

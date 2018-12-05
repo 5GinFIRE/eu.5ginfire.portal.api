@@ -33,6 +33,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 
 /**
@@ -50,26 +51,28 @@ public class DeploymentDescriptor {
 
 	@Basic()
 	private String uuid = null;
-	
+
 	@Basic()
 	private String name = null;
 	
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@JoinColumns({ @JoinColumn() })
+	private PortalUser mentor = null;
 
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@JoinColumns({ @JoinColumn() })
+	private Infrastructure infrastructureForAll = null;
+	
 	@Lob
 	@Column(name = "LDESCRIPTION", columnDefinition = "LONGTEXT")
-	private String description = null;
-	
-
+	private String description = null;	
 
 	@Lob
 	@Column(name = "FEEDBACK", columnDefinition = "LONGTEXT")
 	private String feedback = null;
 
 	@Basic()
-	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.UNDER_REVIEW;
-	
-	
-	
+	private DeploymentDescriptorStatus status = DeploymentDescriptorStatus.UNDER_REVIEW;			
 
 	@Basic()
 	private Date dateCreated;
@@ -85,6 +88,8 @@ public class DeploymentDescriptor {
 	@Basic()	
 	private Date endDate;
 
+	@Basic()	
+	private String instanceId;
 
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
 	@JoinColumns({ @JoinColumn() })
@@ -224,4 +229,28 @@ public class DeploymentDescriptor {
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
 	}
+	
+	public PortalUser getMentor() {
+		return mentor;
+	}
+
+	public void setMentor(PortalUser mentor) {
+		this.mentor = mentor;
+	}
+
+	public Infrastructure getInfrastructureForAll() {
+		return infrastructureForAll;
+	}
+
+	public void setInfrastructureForAll(Infrastructure infrastructureForAll) {
+		this.infrastructureForAll = infrastructureForAll;
+	}
+	
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}	
 }

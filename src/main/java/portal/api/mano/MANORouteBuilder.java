@@ -81,7 +81,22 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.log("NSD Onboarded Successfully")
 		.doCatch(Exception.class)
 		.log("NSD Onboarding failed!");		
-       
+
+		
+		from("seda:nsd.deploy?multipleConsumers=true")
+		.doTry()
+		.bean(new MANOController(),"deployNSDToMANOProvider") //returns exception or nothing
+		.log("NS deployed Successfully")
+		.doCatch(Exception.class)
+		.log("NS deployment failed!");		
+
+		from("seda:nsd.deployment.complete?multipleConsumers=true")
+		.doTry()
+		.bean(new MANOController(),"terminateNSFromMANOProvider") //returns exception or nothing
+		.log("NS completed Successfully")
+		.doCatch(Exception.class)
+		.log("NS completion failed!");		
+		
 	}
 
 

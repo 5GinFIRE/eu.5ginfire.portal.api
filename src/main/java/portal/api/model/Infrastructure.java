@@ -56,6 +56,8 @@ public class Infrastructure {
 	@Basic()
 	private String datacentername = null;
 	
+	@Basic()
+	private String vimid = null;
 
 	@ManyToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinTable()
@@ -102,10 +104,19 @@ public class Infrastructure {
 		return email;
 	}
 
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	public String getVIMid() {
+		return vimid;
+	}
+
+	public void setVIMid(String vimid) {
+		this.vimid = vimid;
+	}
+	
 	/**
 	 * @return the supportedImages
 	 */

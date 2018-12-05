@@ -163,7 +163,9 @@ public class BugzillaClient {
 		
 		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
 		// Create the email and assign it to the mentor.
-		b.setAssignedTo(descriptor.getMentor().getEmail());
+		if ( descriptor.getMentor() != null) {
+			b.setAssignedTo(descriptor.getMentor().getEmail());
+		}
 		return b;
 	}
 	

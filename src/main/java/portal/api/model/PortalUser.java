@@ -328,7 +328,7 @@ public class PortalUser {
 		p.setName( this.getName() );
 		p.setUsername(  this.getUsername() );
 		p.setOrganization( this.getOrganization() );
-		
+		p.setEmail(this.getEmail());
 		return p;
 	}
 	

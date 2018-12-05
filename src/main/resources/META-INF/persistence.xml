@@ -39,19 +39,19 @@
 		
 
 
-		<properties>
+		<!--properties>
 			<property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver" />
 			<property name="openjpa.ConnectionURL"
-				value="jdbc:mysql://127.0.0.1:3307/portaldb2" />
+				value="jdbc:mysql://150.140.184.238/portaldb" />
 			<property name="openjpa.ConnectionUserName" value="root" />
-			<property name="openjpa.ConnectionPassword" value="4j3189p5" />
+			<property name="openjpa.ConnectionPassword" value="letmein" />
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=Trace" />
 
-		</properties>
+		</properties-->
 
 
-		<!-- properties>
+		<properties>
 			<property name="openjpa.ConnectionDriverName" value="org.h2.Driver" />
 			<property name="openjpa.ConnectionURL"
 				value="jdbc:h2:~/.portal/db/portaldb;CIPHER=AES;AUTO_SERVER=TRUE;CACHE_SIZE=8192" />
@@ -60,7 +60,7 @@
 			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
 			<property name="openjpa.jdbc.Schema" value="PUBLIC" />
 			<property name="openjpa.Log" value="none" />
-		</properties-->
+		</properties>
 
 	</persistence-unit>
 

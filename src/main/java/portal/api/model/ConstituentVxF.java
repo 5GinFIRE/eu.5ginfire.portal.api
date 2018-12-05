@@ -24,10 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @Entity(name = "ConstituentVxF")
-@JsonIgnoreProperties(value = { "vxfref"  })
 public class ConstituentVxF {
 
 	@Id

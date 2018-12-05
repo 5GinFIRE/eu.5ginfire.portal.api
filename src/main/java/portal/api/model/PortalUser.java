@@ -316,21 +316,6 @@ public class PortalUser {
 	public void setApikey(String apikey) {
 		this.apikey = apikey;
 	}
-
-	@JsonIgnore
-	public PortalUser getSnippedDetails() {
-		@JsonIgnoreProperties(value = { "products", "vfimages", "deployments", "subscribedResources", "apikey", "email", "roles", "currentSessionID", "active"})
-		class SnipPortalUser extends PortalUser{			
-		}		
-		
-		SnipPortalUser p = new SnipPortalUser();
-		p.setId( this.getId() );
-		p.setName( this.getName() );
-		p.setUsername(  this.getUsername() );
-		p.setOrganization( this.getOrganization() );
-		
-		return p;
-	}
 	
 	
 }

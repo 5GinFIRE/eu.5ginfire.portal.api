@@ -155,7 +155,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
-				.maximumRedeliveries( 120 ) //let's try for the next 120 mins to send it....
+				.maximumRedeliveries( 10 ) //let's try for the next 10 mins to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)
@@ -174,7 +174,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
-				.maximumRedeliveries( 120 ) //let's try for the next 120 minutess to send it....
+				.maximumRedeliveries( 10 ) //let's try for the next 10 minutess to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)
@@ -196,7 +196,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_users")
-				.maximumRedeliveries( 120 ) //let's try 10 times to send it....
+				.maximumRedeliveries( 10 ) //let's try 10 times to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)

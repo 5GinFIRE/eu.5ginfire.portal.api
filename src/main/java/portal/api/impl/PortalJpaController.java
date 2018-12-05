@@ -134,12 +134,6 @@ public class PortalJpaController {
 			PortalProperty p = new PortalProperty("pipelinetoken", "");
 			saveProperty(p);
 		}
-		if (readPropertyByName("centrallogerurl") == null){
-			PortalProperty p = new PortalProperty("centrallogerurl", "");
-			saveProperty(p);
-		}
-		
-		
 	}
 
 	public long countInstalledVxFs() {
@@ -874,16 +868,6 @@ public class PortalJpaController {
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
-	
-	
-	public List<DeploymentDescriptor> readDeploymentDescriptorsScheduled( int firstResult, int maxResults ) {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m  WHERE m.status=portal.api.model.DeploymentDescriptorStatus.SCHEDULED ORDER BY m.id");
-		q.setFirstResult(firstResult);
-		q.setMaxResults(maxResults);
-		return q.getResultList();
-	}
 
 	public void deleteDeployment(int id) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
@@ -1378,9 +1362,6 @@ public class PortalJpaController {
 
 		return bp;
 	}
-
-
-	
 
 
 

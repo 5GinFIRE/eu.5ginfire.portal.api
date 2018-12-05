@@ -15,8 +15,6 @@
 
 package portal.api.model;
 
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,16 +35,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 
 /**
  * @author ctranoris
  *
  */
 @Entity(name = "DeploymentDescriptor")
-@JsonIgnoreProperties(value = { })
 public class DeploymentDescriptor {
 	
 
@@ -153,14 +147,9 @@ public class DeploymentDescriptor {
 	}
 
 	
-	
-	public PortalUser getOwner() {
 
-		
-		
-		PortalUser p = owner.getSnippedDetails();
-		
-		return p;
+	public PortalUser getOwner() {
+		return owner;
 	}
 
 	public void setOwner(PortalUser owner) {
@@ -169,11 +158,6 @@ public class DeploymentDescriptor {
 
 	
 	public ExperimentMetadata getExperiment() {
-		
-		if (experiment!=null) {
-			return experiment.getSnippedDetails();
-		}
-		
 		return experiment;
 	}
 
@@ -225,15 +209,6 @@ public class DeploymentDescriptor {
 	public Date getStartDate() {
 		return startDate;
 	}
-	
-	public String getScheduledStartDate() {
-		if (startDate!=null ) {
-			Instant instant= startDate.toInstant();
-			Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(0).withMinute(0).withSecond(0) );
-			return ins3.toString();
-		}
-		return null;
-	}
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
@@ -241,16 +216,6 @@ public class DeploymentDescriptor {
 
 	public Date getEndDate() {
 		return endDate;
-	}
-	
-
-	public String getScheduledEndDate() {
-		if (endDate!=null ) {
-			Instant instant= endDate.toInstant();
-			Instant ins3 = Instant.from( instant.atOffset(ZoneOffset.UTC).withHour(23).withMinute(59).withSecond(59) );
-			return ins3.toString();			
-		}
-		return null;
 	}
 
 	public void setEndDate(Date endDate) {

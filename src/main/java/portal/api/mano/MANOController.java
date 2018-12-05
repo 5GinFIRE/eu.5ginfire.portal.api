@@ -92,9 +92,9 @@ public class MANOController {
 
 		String pLocation = vxf.getPackageLocation();
 		logger.info("VxF Package Location: " + pLocation);
-				
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
+		if (!pLocation.contains("http")) {
+			pLocation = "http:" + pLocation;
+			pLocation = pLocation.replace("\\", "/");
 		}
 
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
@@ -211,8 +211,9 @@ public class MANOController {
 						
 		String pLocation = em.getPackageLocation();
 		logger.info("NSD Package Location: " + pLocation);		
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
+		if (!pLocation.contains("http")) {
+			pLocation = "http:" + pLocation;
+			pLocation = pLocation.replace("\\", "/");			
 		}
 
 		// Here we need to get a better solution for the OSM version names.

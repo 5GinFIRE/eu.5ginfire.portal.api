@@ -150,7 +150,7 @@ public class Product {
 	}
 
 	public PortalUser getOwner() {
-		return owner.getSnippedDetails() ;
+		return owner;
 	}
 
 	public void setOwner(PortalUser newOwner) {

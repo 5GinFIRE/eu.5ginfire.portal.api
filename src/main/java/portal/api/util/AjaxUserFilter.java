@@ -48,7 +48,7 @@ public class AjaxUserFilter extends UserFilter {
 	
 	@Override
 	protected boolean isAccessAllowed(ServletRequest arg0, ServletResponse arg1, Object arg2) {
-    	logger.info("=======> AjaxUserFilter: isAccessAllowed <=============");
+    	logger.debug("=======> AjaxUserFilter: isAccessAllowed <=============");
     	
     	if ( arg0 instanceof HttpServletRequest  ){
     		HttpServletRequest h = (HttpServletRequest) arg0;
@@ -57,7 +57,7 @@ public class AjaxUserFilter extends UserFilter {
 //        	logger.info("List elements: "+ll);
         	
         	if ( ( h.getHeader("X-APIKEY") != null ) && ( !h.getHeader("X-APIKEY").equals("") )){
-            	logger.info("=======> AjaxUserFilter: X-APIKEY present. Will login user");
+            	logger.debug("=======> AjaxUserFilter: X-APIKEY present. Will login user");
             	
         		return xapiKeyAuth(h, portalRepositoryRef);       		
         	}           
@@ -65,7 +65,7 @@ public class AjaxUserFilter extends UserFilter {
     	
     	
     	Boolean b = super.isAccessAllowed(arg0, arg1, arg2);    	
-    	logger.info("=======> AjaxUserFilter: isAccessAllowed = "+b);
+    	logger.debug("=======> AjaxUserFilter: isAccessAllowed = "+b);
 		return b;
 	}
 	
@@ -87,8 +87,7 @@ public class AjaxUserFilter extends UserFilter {
 
 				portalUser.setCurrentSessionID( h.getSession().getId());
 
-				logger.info(" currentUser = " + currentUser.toString());
-				logger.info("User [" + currentUser.getPrincipal() + "] logged in successfully via X-APIKEY");
+				logger.info( "currentUser = " + currentUser.toString() +". User [" + currentUser.getPrincipal() + "] logged in successfully via X-APIKEY");
 
 				
 				portalRepRef.updateUserInfo(  portalUser);

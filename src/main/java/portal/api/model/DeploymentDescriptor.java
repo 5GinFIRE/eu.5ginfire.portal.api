@@ -46,7 +46,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @Entity(name = "DeploymentDescriptor")
-@JsonIgnoreProperties(value = { "scheduledStartDate", "scheduledEndDate" })
+@JsonIgnoreProperties(ignoreUnknown=true, value = {  })
 public class DeploymentDescriptor {
 	
 
@@ -226,6 +226,11 @@ public class DeploymentDescriptor {
 		return startDate;
 	}
 	
+	
+	public void setScheduledStartDate() {
+		
+	}
+	
 	public String getScheduledStartDate() {
 		if (startDate!=null ) {
 			Instant instant= startDate.toInstant();
@@ -243,7 +248,9 @@ public class DeploymentDescriptor {
 		return endDate;
 	}
 	
-
+	public void setScheduledEndDate() {
+		
+	}
 	public String getScheduledEndDate() {
 		if (endDate!=null ) {
 			Instant instant= endDate.toInstant();

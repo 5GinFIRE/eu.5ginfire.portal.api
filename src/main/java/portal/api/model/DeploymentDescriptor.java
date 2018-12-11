@@ -46,7 +46,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *
  */
 @Entity(name = "DeploymentDescriptor")
-@JsonIgnoreProperties(ignoreUnknown=true, value = {  })
+@JsonIgnoreProperties(ignoreUnknown=true, value = { "ExperimentFullDetails" })
 public class DeploymentDescriptor {
 	
 
@@ -167,6 +167,10 @@ public class DeploymentDescriptor {
 		this.owner = owner;
 	}
 
+	//@JsonIgnore
+	public ExperimentMetadata getExperimentFullDetails() {
+		return experiment;
+	}	
 	
 	public ExperimentMetadata getExperiment() {
 		

@@ -96,6 +96,10 @@ public class MANOController {
 		if ( !pLocation.contains( "http" )  ) {
 			pLocation = "https:" + pLocation;
 		}
+//		if (!pLocation.contains("http")) {
+//			pLocation = "http:" + pLocation;
+//			pLocation = pLocation.replace("\\", "/");
+//		}					
 
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
@@ -214,6 +218,10 @@ public class MANOController {
 		if ( !pLocation.contains( "http" )  ) {
 			pLocation = "https:" + pLocation;
 		}
+//		if (!pLocation.contains("http")) {
+//			pLocation = "http:" + pLocation;
+//			pLocation = pLocation.replace("\\", "/");
+//		}				
 
 		// Here we need to get a better solution for the OSM version names.
 		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
@@ -551,11 +559,11 @@ public class MANOController {
 	}
 	
 	public void deployNSDToMANOProvider(DeploymentDescriptor deploymentdescriptor){
-		if (deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			//There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
+			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
 			// Get Experiment ID and VIM ID and create NS Instance.
-			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getDeployId());
+			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
 			// The NS Instance ID is set 
 			deploymentdescriptor.setInstanceId(nsd_instance_id);
 			
@@ -605,9 +613,9 @@ public class MANOController {
 	}
 	
 	public void terminateNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor){
-		if (deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			//There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperiment().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
+			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
 			// Get Experiment ID and VIM ID and create NS Instance.
 			String return_id = osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId());
 			

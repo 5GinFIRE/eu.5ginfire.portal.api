@@ -2793,7 +2793,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				prevDeployment.setStatus( d.getStatus() );
 								
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
-				prevDeployment.getExperiment();
+				prevDeployment.getExperimentFullDetails();
 				prevDeployment.getInfrastructureForAll();
 				
 				logger.info("updateDeployment for id: " + prevDeployment.getId());
@@ -2814,7 +2814,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED )
 				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
 						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 						{
@@ -2835,7 +2835,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				if( d.getStatus() == DeploymentDescriptorStatus.RUNNING )
 				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
 						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 						{
@@ -2845,7 +2845,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED )
 				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
 						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 						{
@@ -2855,7 +2855,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				if( d.getStatus() == DeploymentDescriptorStatus.REJECTED )
 				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : d.getExperiment().getExperimentOnBoardDescriptors())
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
 						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 						{

@@ -176,6 +176,14 @@ public class MANOController {
 //	}
 	
 	
+	public void checkAndDeployExperimentToMANOProvider() {
+		logger.info("This will trigger the check and Deploy Experiments");
+	}
+
+	public void checkAndTerminateExperimentToMANOProvider() {
+		logger.info("This will trigger the check and Terminate Deployments");
+	}
+	
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{
 
 		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
@@ -563,7 +571,7 @@ public class MANOController {
 			//There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
 			// Get Experiment ID and VIM ID and create NS Instance.
-			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
+			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
 			// The NS Instance ID is set 
 			deploymentdescriptor.setInstanceId(nsd_instance_id);
 			
@@ -579,7 +587,7 @@ public class MANOController {
 			else
 			{
 				// Instantiate NS Instance
-				String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id);
+				String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id,deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
 				if(nsr_id == null)
 				{
 					// NS Instanciation failed

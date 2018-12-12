@@ -95,7 +95,10 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.bean(new MANOController(),"terminateNSFromMANOProvider") //returns exception or nothing
 		.log("NS completed Successfully")
 		.doCatch(Exception.class)
-		.log("NS completion failed!");		
+		.log("NS completion failed!");
+		
+		//from("timer://checkAndDeployTimer?period=1000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider");
+		//from("timer://checkAndTerminateTimer?period=1000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider");
 		
 	}
 

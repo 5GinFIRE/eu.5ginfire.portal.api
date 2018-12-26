@@ -177,11 +177,29 @@ public class MANOController {
 	
 	
 	public void checkAndDeployExperimentToMANOProvider() {
-		logger.info("This will trigger the check and Deploy Experiments");
+		logger.info("This will trigger the check and Deploy Experiments");		
+		// Check the database for a new deployment in the next minutes
+		// If there is a deployment to be made and the status is Scheduled
+		List<DeploymentDescriptor> DeploymentDescriptorsToRun = portalRepositoryRef.getDeploymentsToInstantiate();
+		// Foreach deployment
+		for(DeploymentDescriptor d : DeploymentDescriptorsToRun)
+		{
+			// Launch the deployment
+			BusController.getInstance().deployExperiment(d);						
+		}
 	}
 
 	public void checkAndTerminateExperimentToMANOProvider() {
 		logger.info("This will trigger the check and Terminate Deployments");
+		// Check the database for a deployment to be completed in the next minutes
+		// If there is a deployment to be made and the status is Scheduled
+		List<DeploymentDescriptor> DeploymentDescriptorsToComplete = portalRepositoryRef.getDeploymentsToBeCompleted();
+		// Foreach deployment
+		for(DeploymentDescriptor d : DeploymentDescriptorsToComplete)
+		{
+			// Terminate the deployment
+			BusController.getInstance().completeExperiment(d);						
+		}
 	}
 	
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{

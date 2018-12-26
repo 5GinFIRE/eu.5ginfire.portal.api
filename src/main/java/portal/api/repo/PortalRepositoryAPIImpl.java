@@ -2790,9 +2790,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				prevDeployment.setFeedback( d.getFeedback() );
 				prevDeployment.setStartDate( d.getStartDate());
 				prevDeployment.setEndDate( d.getEndDate() );
-				prevDeployment.setStatus( d.getStatus() );
+
+				logger.info("Previous Status is :"+prevDeployment.getStatus()+",New Status is:"+d.getStatus()+" and Instance Id is "+prevDeployment.getInstanceId());
 								
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
+				prevDeployment.setStatus( d.getStatus() );
 				prevDeployment.getExperimentFullDetails();
 				prevDeployment.getInfrastructureForAll();
 				
@@ -2811,8 +2813,17 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 				// Send updated Deployment status email 
 				BusController.getInstance().updateDeploymentRequest( dd );
-				
-				if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED )
+				if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED && prevDeployment.getInstanceId() == null)
+				{
+					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
+					{
+						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						{							
+							BusController.getInstance().scheduleExperiment( prevDeployment );								
+						}
+					}
+				}
+				else if( d.getStatus() == DeploymentDescriptorStatus.RUNNING && prevDeployment.getInstanceId() == null)
 				{
 					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
@@ -2822,28 +2833,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							//Initially we try synchronously
 							//aMANOController.deployNSDToMANOProvider(prevDeployment);
 							//Then try asynchronously
-							BusController.getInstance().deployExperiment( prevDeployment );	
-							//Then try job scheduling
-							//try {
-							//	aMANOController.scheduleOSM4NSDInstantiation("300",prevDeployment);
-							//} catch (Exception e) {
-							//	// TODO Auto-generated catch block
-							//	e.printStackTrace();
-							//}
-						}
-					}
-				}
-				if( d.getStatus() == DeploymentDescriptorStatus.RUNNING )
-				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
-					{
-						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
-						{
+
 							BusController.getInstance().deployExperiment( prevDeployment );	
 						}
 					}
 				}
-				if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED )
+				else if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED && prevDeployment.getInstanceId() != null)
 				{
 					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
@@ -2853,7 +2848,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						}
 					}
 				}
-				if( d.getStatus() == DeploymentDescriptorStatus.REJECTED )
+				else if( d.getStatus() == DeploymentDescriptorStatus.REJECTED && prevDeployment.getInstanceId() == null)
 				{
 					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 					{
@@ -2863,6 +2858,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						}
 					}
 				}
+				else
+				{
+					ResponseBuilder builder = Response.status(Status.NOT_ACCEPTABLE);
+					builder.entity("Inconsistent status change");
+					throw new WebApplicationException(builder.build());					
+				}
+				prevDeployment.setStatus( d.getStatus() );
+				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
 				return Response.ok().entity( dd ).build();
 			}
 

@@ -1271,6 +1271,17 @@ public class PortalJpaController {
 		return (q.getResultList().size() == 0) ? null : (DeploymentDescriptor) q.getSingleResult();
 	}
 	
+	public List<DeploymentDescriptor> readScheduledDeployments() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
+		return q.getResultList();		
+	}
+	
+	public List<DeploymentDescriptor> readRunningDeployments() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING");
+		return q.getResultList();		
+	}
 	
 	/**
 	 * 

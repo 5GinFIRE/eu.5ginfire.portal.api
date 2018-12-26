@@ -15,6 +15,7 @@
 
 package portal.api.repo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -509,7 +510,41 @@ public class PortalRepository {
 		return (DeploymentDescriptor) portalJpaController.readDeploymentByUUID( uuid );
 	}
 	
-	
+	public List<DeploymentDescriptor> getDeploymentsToInstantiate()
+	{
+		List<DeploymentDescriptor> DeploymentDescriptorsToRun = new ArrayList<>();
+		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readScheduledDeployments();
+		for(DeploymentDescriptor d : DeploymentDescriptor_list)
+		{
+			d.getExperimentFullDetails();
+			d.getInfrastructureForAll();			
+			//Date oneHourLaterFromNow = new Date(System.currentTimeMillis() + 3600 * 1000);
+			if(d.getStartReqDate().before(new Date(System.currentTimeMillis())))
+			{
+				logger.info("Deployment "+d.getName()+" is scheduled to run within one hour from now.");
+				DeploymentDescriptorsToRun.add(d);
+			}
+		}
+		return DeploymentDescriptorsToRun;
+	}
+
+	public List<DeploymentDescriptor> getDeploymentsToBeCompleted()
+	{		
+		List<DeploymentDescriptor> DeploymentDescriptorsToComplete = new ArrayList<>();
+		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningDeployments();
+		for(DeploymentDescriptor d : DeploymentDescriptor_list)
+		{
+			d.getExperimentFullDetails();
+			d.getInfrastructureForAll();			
+			//Date now = new Date(System.currentTimeMillis());
+			if(d.getEndReqDate().before(new Date(System.currentTimeMillis())))
+			{
+				logger.info("Deployment "+d.getName()+" is scheduled to be completed now.");
+				DeploymentDescriptorsToComplete.add(d);
+			}
+		}
+		return DeploymentDescriptorsToComplete;
+	}
 	
 	/**
 	 * 

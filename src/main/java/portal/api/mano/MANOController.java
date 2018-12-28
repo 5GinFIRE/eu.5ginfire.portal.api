@@ -22,11 +22,16 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -315,6 +320,9 @@ public class MANOController {
 			String vnfd_id=obd.getDeployId();
 			OSM4Client osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(),obd.getObMANOprovider().getUsername(),obd.getObMANOprovider().getPassword(),"admin");			
 			response=osm4Client.deleteVNFDPackage(vnfd_id);
+		}
+		if (obd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
+			response = new ResponseEntity<>("Not implemented for OSMvTWO", HttpStatus.CREATED);			
 		}		
 		return response;
 	}
@@ -578,10 +586,25 @@ public class MANOController {
 		ResponseEntity<String> response = null;
 		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			String nsd_id=uexpobd.getDeployId();
-			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),uexpobd.getObMANOprovider().getUsername(),uexpobd.getObMANOprovider().getPassword(),"admin");			
-			response=osm4Client.deleteNSDPackage(nsd_id);
+			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),uexpobd.getObMANOprovider().getUsername(),uexpobd.getObMANOprovider().getPassword(),"admin");
+			//// Get nsd list
+			//ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
+			//for(ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd tmp : nsds)
+			//{
+			//	// Check if nsd_id is available
+			//	if(tmp.getId().equals(nsd_id))
+			//	{
+			//		// If it is available, call offboarding
+					response=osm4Client.deleteNSDPackage(nsd_id);
+			//		return response;
+			//	}
+			//}
 		}
-		return response;		
+		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
+			response = new ResponseEntity<>("Not implemented for OSMvTWO", HttpStatus.CREATED);
+		}		
+		//return new ResponseEntity<>("Not found", HttpStatus.NOT_FOUND);
+		return response;
 	}
 	
 	public void deployNSDToMANOProvider(DeploymentDescriptor deploymentdescriptor){
@@ -643,18 +666,28 @@ public class MANOController {
 			//There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
 			// Get Experiment ID and VIM ID and create NS Instance.
-			String return_id = osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId());
-			
-			// NS instance creation
-			if(return_id != null)
+			// NS instance termination
+			if(osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId()) != null)
 			{
-				// NS Instanciation failed
+				// NS Termination succeded
+				logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() +" succeded");
 				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.COMPLETED);
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().terminateInstanceSucceded( deploymentdescriptor_final );				
+				BusController.getInstance().terminateInstanceSucceded( deploymentdescriptor_final );									
+				
+				if(osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null)
+				{
+					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() +" succeded");
+				}
+				else
+				{
+					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() +" failed");
+				}
 			}
 			else
 			{
+				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() +" failed");
+				// NS Termination failed
 				BusController.getInstance().terminateInstanceFailed( deploymentdescriptor );				
 			}
 		}		

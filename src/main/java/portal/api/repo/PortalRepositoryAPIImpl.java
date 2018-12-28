@@ -88,6 +88,7 @@ import portal.api.model.Infrastructure;
 import portal.api.model.MANOplatform;
 import portal.api.model.MANOprovider;
 import portal.api.model.OnBoardingStatus;
+import portal.api.model.PackagingFormat;
 import portal.api.model.PortalProperty;
 import portal.api.model.PortalUser;
 import portal.api.model.Product;
@@ -1212,7 +1213,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Get the MANO providers which are set for automatic onboarding
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
-			if(MANOprovidersEnabledForOnboarding.size()>0)
+			if(MANOprovidersEnabledForOnboarding.size()>0 && vxf.getPackagingFormat() == PackagingFormat.OSMvFOUR)
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -2298,7 +2299,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Get the MANO providers which are set for automatic onboarding
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
-			if(MANOprovidersEnabledForOnboarding.size()>0)
+			if(MANOprovidersEnabledForOnboarding.size()>0 && experiment.getPackagingFormat() == PackagingFormat.OSMvFOUR)
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{

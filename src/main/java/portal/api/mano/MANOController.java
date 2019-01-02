@@ -16,8 +16,11 @@
 package portal.api.mano;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,12 +38,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import OSM4NBIClient.OSM4Client;
 import portal.api.bus.BusController;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
+import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.NSCreateInstanceRequestPayload;
+import portal.api.model.NSInstantiateInstanceRequestPayload;
 import portal.api.model.OnBoardingStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
@@ -608,11 +618,16 @@ public class MANOController {
 	}
 	
 	public void deployNSDToMANOProvider(DeploymentDescriptor deploymentdescriptor){
+			
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			//There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = new OSM4Client(deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getApiEndpoint(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getUsername(),deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getPassword(),"admin");
-			// Get Experiment ID and VIM ID and create NS Instance.
-			String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
+
+			NSCreateInstanceRequestPayload nscreateinstancerequestpayload = new NSCreateInstanceRequestPayload(osm4Client, deploymentdescriptor);			
+			// Get Experiment ID and VIM ID and create NS Instance.			
+			//String nsd_instance_id = osm4Client.createNSInstance(deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
+			logger.info("NS Instance creation payload : " + nscreateinstancerequestpayload.toJSON());
+			String nsd_instance_id = osm4Client.createNSInstance(nscreateinstancerequestpayload.toJSON());
 			// The NS Instance ID is set 
 			deploymentdescriptor.setInstanceId(nsd_instance_id);
 			
@@ -623,12 +638,16 @@ public class MANOController {
 				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REJECTED);
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 				BusController.getInstance().deploymentInstantiationFailed( deploymentdescriptor_final );				
+				logger.info("NS Instanciation failed. NSD instance id is NULL");
 				return;
 			}		
 			else
 			{
-				// Instantiate NS Instance
-				String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id,deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
+				// Instantiate NS Instance			
+				NSInstantiateInstanceRequestPayload nsrequestpayload  = new NSInstantiateInstanceRequestPayload(osm4Client, deploymentdescriptor);
+				logger.info("NS Instanciation payload : " + nsrequestpayload.toJSON());
+				//String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id,deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(), deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
+				String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id, nsrequestpayload.toJSON());
 				if(nsr_id == null)
 				{
 					// NS Instanciation failed

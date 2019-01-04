@@ -362,8 +362,8 @@ public class PortalJpaController {
 	public List<PortalUser> readMentorUsers(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.roles IN portal.api.model.UserRoleType.MENTOR");
-		q.setParameter("1", "portal.api.model.UserRoleType.MENTOR");
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m INNER JOIN m.roles r WHERE r=portal.api.model.UserRoleType.MENTOR");
+		//q.setParameter("inclList", "" );
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();

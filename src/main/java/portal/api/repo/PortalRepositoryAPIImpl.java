@@ -2804,27 +2804,27 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				logger.info("Previous Status is :"+prevDeployment.getStatus()+",New Status is:"+d.getStatus()+" and Instance Id is "+prevDeployment.getInstanceId());
 								
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
-				prevDeployment.setStatus( d.getStatus() );
-				prevDeployment.getExperimentFullDetails();
-				prevDeployment.getInfrastructureForAll();
-				
-				logger.info("updateDeployment for id: " + prevDeployment.getId());
-				
-				
-//				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
-//				if ((adminemail != null) && (!adminemail.equals(""))) {
-//					String subj = "[5GinFIREPortal] Deployment Request";
-//					EmailUtil.SendRegistrationActivationEmail(prevDeployment.getOwner().getEmail(),
-//							"5GinFIREPortal Deployment Request for experiment: " + prevDeployment.getName() + "\n<br/>Status: " + prevDeployment.getStatus().name()+ "\n<br/>Feedback: " + prevDeployment.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
-//							subj);
-//				}
-
-				DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( d.getId() );  //rereading this, seems to keep the DB connection
-
-				// Send updated Deployment status email 
-				BusController.getInstance().updateDeploymentRequest( dd );
 				if( d.getStatus() != prevDeployment.getStatus() )
 				{
+					prevDeployment.setStatus( d.getStatus() );
+					prevDeployment.getExperimentFullDetails();
+					prevDeployment.getInfrastructureForAll();
+					
+					logger.info("updateDeployment for id: " + prevDeployment.getId());
+					
+					
+	//				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
+	//				if ((adminemail != null) && (!adminemail.equals(""))) {
+	//					String subj = "[5GinFIREPortal] Deployment Request";
+	//					EmailUtil.SendRegistrationActivationEmail(prevDeployment.getOwner().getEmail(),
+	//							"5GinFIREPortal Deployment Request for experiment: " + prevDeployment.getName() + "\n<br/>Status: " + prevDeployment.getStatus().name()+ "\n<br/>Feedback: " + prevDeployment.getFeedback() + "\n\n<br/><br/> The 5GinFIRE team" ,
+	//							subj);
+	//				}
+	
+					DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( d.getId() );  //rereading this, seems to keep the DB connection
+	
+					// Send updated Deployment status email 
+					BusController.getInstance().updateDeploymentRequest( dd );
 					if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED && prevDeployment.getInstanceId() == null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())

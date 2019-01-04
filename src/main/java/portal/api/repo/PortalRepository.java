@@ -83,6 +83,17 @@ public class PortalRepository {
 		return ls;
 	}
 	
+	
+	/**
+	 * @return
+	 */
+	public Collection<PortalUser> getUserMentorsValues() {
+
+		List<PortalUser> ls = portalJpaController.readMentorUsers(0, 100000);
+		
+		return ls;
+	}
+	
 	public PortalUser updateUserInfo( PortalUser user) {
 		PortalUser bm = portalJpaController.updatePortalUser(user);
 		return bm;
@@ -609,6 +620,9 @@ public class PortalRepository {
 		List<VFImage> ls = portalJpaController.readVFImagesForOwnerID( ownerid, 0, 100000);	
 		return ls;
 	}
+
+
+	
 
 
 

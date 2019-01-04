@@ -357,6 +357,18 @@ public class PortalJpaController {
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
+	
+	
+	public List<PortalUser> readMentorUsers(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.roles IN portal.api.model.UserRoleType.MENTOR");
+		q.setParameter("1", "portal.api.model.UserRoleType.MENTOR");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+
 
 	public long countUsers() {
 
@@ -1390,6 +1402,8 @@ public class PortalJpaController {
 		return bp;
 	}
 
+
+	
 
 	
 

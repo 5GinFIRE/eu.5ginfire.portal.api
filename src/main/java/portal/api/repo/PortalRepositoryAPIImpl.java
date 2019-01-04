@@ -175,6 +175,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return Response.ok().entity(portalRepositoryRef.getUserValues()).build();
 	}
+	
+	@GET
+	@Path("/admin/users/mentors")
+	@Produces("application/json")
+	public Response getMentors() {
+
+		
+		return Response.ok().entity(portalRepositoryRef.getUserMentorsValues()).build();
+	}
 
 	@GET
 	@Path("/admin/users/{userid}")

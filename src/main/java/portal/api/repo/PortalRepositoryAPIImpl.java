@@ -2879,7 +2879,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				prevDeployment.setStatus( d.getStatus() );
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
-				return Response.ok().entity( dd ).build();
+				return Response.ok().entity( prevDeployment ).build();
 			}
 
 		}

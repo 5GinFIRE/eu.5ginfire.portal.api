@@ -532,7 +532,7 @@ public class PortalRepository {
 			//Date oneHourLaterFromNow = new Date(System.currentTimeMillis() + 3600 * 1000);
 			if(d.getStartReqDate().before(new Date(System.currentTimeMillis())))
 			{
-				logger.info("Deployment "+d.getName()+" is scheduled to run within one hour from now.");
+				logger.info("Deployment "+d.getName()+" is scheduled to run now.");
 				DeploymentDescriptorsToRun.add(d);
 			}
 		}

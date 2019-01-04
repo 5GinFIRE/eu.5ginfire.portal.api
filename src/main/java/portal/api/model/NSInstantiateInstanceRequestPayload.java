@@ -76,22 +76,23 @@ public class NSInstantiateInstanceRequestPayload
 		// For each VLD add the related VIM network.
 		for(ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld currentVld : vld_list)
 		{
+			vld_tmp.name=currentVld.getName();
 			String vimNetworkName_tmp = "provider";
-			if(vld_tmp.name.contains("_mgmt"))
+			if(currentVld.getName().contains("_mgmt"))
 			{
 				vimNetworkName_tmp = "provider";
 			}
-			if(vld_tmp.name.contains("_data"))
+			if(currentVld.getName().contains("_data"))
 			{
 				vimNetworkName_tmp = "provider2";
 			}				
 //			
 //			try {
-//				if(vld_tmp.name.contains("_mgmt") || currentVld.isMgmtNetwork())
+//				if(currentVld.getName().contains("_mgmt") || currentVld.isMgmtNetwork())
 //				{
 //					vimNetworkName_tmp = "provider";
 //				}
-//				if(vld_tmp.name.contains("_data") || !currentVld.isMgmtNetwork())
+//				if(currentVld.getName().contains("_data") || !currentVld.isMgmtNetwork())
 //				{
 //					vimNetworkName_tmp = "provider2";
 //				}				

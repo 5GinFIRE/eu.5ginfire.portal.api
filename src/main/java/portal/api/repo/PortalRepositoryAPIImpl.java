@@ -2823,56 +2823,59 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 				// Send updated Deployment status email 
 				BusController.getInstance().updateDeploymentRequest( dd );
-				if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED && prevDeployment.getInstanceId() == null)
+				if( d.getStatus() != prevDeployment.getStatus() )
 				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
+					if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED && prevDeployment.getInstanceId() == null)
 					{
-						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
-						{							
-							BusController.getInstance().scheduleExperiment( prevDeployment );								
-						}
-					}
-				}
-				else if( d.getStatus() == DeploymentDescriptorStatus.RUNNING && prevDeployment.getInstanceId() == null)
-				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
-					{
-						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
-							//Trigger Automatic Instantiation
-							//Initially we try synchronously
-							//aMANOController.deployNSDToMANOProvider(prevDeployment);
-							//Then try asynchronously
-
-							BusController.getInstance().deployExperiment( prevDeployment );	
+							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+							{							
+								BusController.getInstance().scheduleExperiment( prevDeployment );								
+							}
 						}
 					}
-				}
-				else if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED && prevDeployment.getInstanceId() != null)
-				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
+					else if( d.getStatus() == DeploymentDescriptorStatus.RUNNING && d.getStatus() == DeploymentDescriptorStatus.RUNNING && prevDeployment.getInstanceId() == null)
 					{
-						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
-							BusController.getInstance().completeExperiment( prevDeployment );	
+							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+							{
+								//Trigger Automatic Instantiation
+								//Initially we try synchronously
+								//aMANOController.deployNSDToMANOProvider(prevDeployment);
+								//Then try asynchronously
+	
+								BusController.getInstance().deployExperiment( prevDeployment );	
+							}
 						}
 					}
-				}
-				else if( d.getStatus() == DeploymentDescriptorStatus.REJECTED && prevDeployment.getInstanceId() == null)
-				{
-					for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
+					else if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED && prevDeployment.getInstanceId() != null)
 					{
-						if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
-							BusController.getInstance().rejectExperiment( prevDeployment );	
+							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+							{
+								BusController.getInstance().completeExperiment( prevDeployment );	
+							}
 						}
 					}
-				}
-				else
-				{
-					ResponseBuilder builder = Response.status(Status.NOT_ACCEPTABLE);
-					builder.entity("Inconsistent status change");
-					throw new WebApplicationException(builder.build());					
+					else if( d.getStatus() == DeploymentDescriptorStatus.REJECTED && prevDeployment.getInstanceId() == null)
+					{
+						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
+						{
+							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
+							{
+								BusController.getInstance().rejectExperiment( prevDeployment );	
+							}
+						}
+					}
+					else
+					{
+						ResponseBuilder builder = Response.status(Status.NOT_ACCEPTABLE);
+						builder.entity("Inconsistent status change");
+						throw new WebApplicationException(builder.build());					
+					}
 				}
 				prevDeployment.setStatus( d.getStatus() );
 				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);

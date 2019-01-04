@@ -530,7 +530,7 @@ public class PortalRepository {
 			d.getExperimentFullDetails();
 			d.getInfrastructureForAll();			
 			//Date oneHourLaterFromNow = new Date(System.currentTimeMillis() + 3600 * 1000);
-			if(d.getStartReqDate().before(new Date(System.currentTimeMillis())))
+			if(d.getStartDate().before(new Date(System.currentTimeMillis())))
 			{
 				logger.info("Deployment "+d.getName()+" is scheduled to run now.");
 				DeploymentDescriptorsToRun.add(d);
@@ -548,7 +548,7 @@ public class PortalRepository {
 			d.getExperimentFullDetails();
 			d.getInfrastructureForAll();			
 			//Date now = new Date(System.currentTimeMillis());
-			if(d.getEndReqDate().before(new Date(System.currentTimeMillis())))
+			if(d.getEndDate().before(new Date(System.currentTimeMillis())))
 			{
 				logger.info("Deployment "+d.getName()+" is scheduled to be completed now.");
 				DeploymentDescriptorsToComplete.add(d);

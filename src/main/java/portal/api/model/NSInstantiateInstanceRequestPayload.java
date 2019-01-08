@@ -65,7 +65,6 @@ public class NSInstantiateInstanceRequestPayload
 			this.vnf.add(vnf_tmp);
 			count++;
 		}
-		Vld vld_tmp = new Vld();
 		// Here we need to define the VLDs. We need to get these from the NS Instance.
 		// Get the id of the NS.
 		//String nsd_instance_id = deploymentdescriptor.getInstanceId();
@@ -76,6 +75,7 @@ public class NSInstantiateInstanceRequestPayload
 		// For each VLD add the related VIM network.
 		for(ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld currentVld : vld_list)
 		{
+			Vld vld_tmp = new Vld();
 			vld_tmp.name=currentVld.getName();
 			String vimNetworkName_tmp = "provider";
 			if(currentVld.getName().contains("_mgmt"))

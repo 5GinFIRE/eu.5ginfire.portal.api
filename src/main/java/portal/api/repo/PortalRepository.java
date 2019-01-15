@@ -15,6 +15,9 @@
 
 package portal.api.repo;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -529,10 +532,11 @@ public class PortalRepository {
 		{
 			d.getExperimentFullDetails();
 			d.getInfrastructureForAll();			
-			//Date oneHourLaterFromNow = new Date(System.currentTimeMillis() + 3600 * 1000);
-			if(d.getStartDate().before(new Date(System.currentTimeMillis())))
+			//if(d.getStartDate().before(new Date(System.currentTimeMillis())))
+			OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
+			if(d.getStartDate().before(Date.from(utc.toInstant())))
 			{
-				logger.info("Deployment "+d.getName()+" is scheduled to run now.");
+				logger.info("Deployment "+d.getName()+" is scheduled to run at "+d.getStartDate()+". It will be Deployed now.");
 				DeploymentDescriptorsToRun.add(d);
 			}
 		}
@@ -547,8 +551,8 @@ public class PortalRepository {
 		{
 			d.getExperimentFullDetails();
 			d.getInfrastructureForAll();			
-			//Date now = new Date(System.currentTimeMillis());
-			if(d.getEndDate().before(new Date(System.currentTimeMillis())))
+			OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
+			if(d.getEndDate().before(Date.from(utc.toInstant())))
 			{
 				logger.info("Deployment "+d.getName()+" is scheduled to be completed now.");
 				DeploymentDescriptorsToComplete.add(d);

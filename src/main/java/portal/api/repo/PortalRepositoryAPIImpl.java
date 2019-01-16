@@ -2620,9 +2620,40 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 	}
+	
+	
 
 	@GET
 	@Path("/admin/deployments")
+	@Produces("application/json")
+	public Response getAllDeployments() {
+
+		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
+
+		if (u != null) {
+			logger.info("getAllDeployments for userid: " + u.getId());
+			List<DeploymentDescriptor> deployments;
+
+			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN))) {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
+			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId() );
+			} else {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
+			}
+
+			return Response.ok().entity(deployments).build();
+		} else {
+			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
+			builder.entity("User not found in portal registry or not logged in");
+			throw new WebApplicationException(builder.build());
+		}
+
+	}
+	
+	
+	@GET
+	@Path("/admin/deployments/user")
 	@Produces("application/json")
 	public Response getAllDeploymentsofUser() {
 
@@ -2631,12 +2662,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
 			List<DeploymentDescriptor> deployments;
-
-			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN))) {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
-			} else {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
-			}
+			deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
 
 			return Response.ok().entity(deployments).build();
 		} else {

@@ -331,6 +331,11 @@ public class PortalRepository {
 		return ls;
 	}
 	
+	
+	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByMentor( Long ownerid ) {
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByMentor( ownerid, 0, 100000);	
+		return ls;
+	}
 
 	public List<DeploymentDescriptor> getAllDeploymentDescriptorsScheduled() {
 		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsScheduled( 0, 100000);	

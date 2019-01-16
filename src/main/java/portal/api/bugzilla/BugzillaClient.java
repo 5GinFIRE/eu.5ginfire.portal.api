@@ -207,6 +207,11 @@ public class BugzillaClient {
 						+ "\nRequested Tentative End date: " + descriptor.getEndReqDate().toString() 
 						+ "\nExperiment (NSD) requested: " + descriptor.getExperiment().getName() );
 		
+		
+		if ( descriptor.getMentor() != null ) {
+			description.append( "\nMentor: " + descriptor.getMentor().getName() + ", " + descriptor.getMentor().getOrganization() ) ;
+		}
+		
 
 		description.append( "\nConstituent VxF Placement " ) ;
 		for (DeploymentDescriptorVxFPlacement pl : descriptor.getVxfPlacements()) {

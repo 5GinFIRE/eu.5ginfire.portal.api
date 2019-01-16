@@ -2786,7 +2786,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (deployment.getMentor().getId() == u.getId()) || (deployment.getOwner().getId() == u.getId())) {
 				return Response.ok().entity(deployment).build();
 			}
-
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);

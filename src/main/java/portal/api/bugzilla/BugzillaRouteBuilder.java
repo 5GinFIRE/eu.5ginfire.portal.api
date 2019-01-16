@@ -356,11 +356,19 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("direct:bugzilla.bugmanage");	
 				
 		/**
-		 * Automatic NS Termination Route Fail
+		 * Automatic NS Termination Route Success
 		 */		
 		from("seda:nsd.instance.termination.success?multipleConsumers=true")
 		.delay(5000)
 		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+
+		/**
+		 * Automatic NS Termination Route Fail
+		 */		
+		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSTermination2BugBodyFailed")
 		.to("direct:bugzilla.bugmanage");	
 
 		/**
@@ -375,6 +383,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Reject Deployment Route Issue
 		 */
 		from("seda:nsd.deployment.reject?multipleConsumers=true")
+		.delay(5000)
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
 		.to("direct:bugzilla.bugmanage");		
 

@@ -44,7 +44,7 @@ public class NSInstantiateInstanceRequestPayload
 		public LinkedHashMap<String,String> vimNetworkName = new LinkedHashMap<>();
 	}
 	public List<VnF> vnf = new ArrayList<>();
-	public List<Vld> vld = new ArrayList<>();
+	//public List<Vld> vld = new ArrayList<>();
 	
 	public NSInstantiateInstanceRequestPayload(OSM4Client osm4client, DeploymentDescriptor deploymentdescriptor)
 	{
@@ -65,50 +65,50 @@ public class NSInstantiateInstanceRequestPayload
 			this.vnf.add(vnf_tmp);
 			count++;
 		}
-		// Here we need to define the VLDs. We need to get these from the NS Instance.
-		// Get the id of the NS.
-		//String nsd_instance_id = deploymentdescriptor.getInstanceId();
-		// Load the NSD
-		Nsd nsd_descriptor = osm4client.getNSDbyID(this.nsdId);		
-		// Get the VLDs
-		List<ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld> vld_list = nsd_descriptor.getVld();
-		// For each VLD add the related VIM network.
-		for(ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld currentVld : vld_list)
-		{
-			Vld vld_tmp = new Vld();
-			vld_tmp.name=currentVld.getName();
-			String vimNetworkName_tmp = "provider";
-			if(currentVld.getName().contains("_mgmt"))
-			{
-				vimNetworkName_tmp = "provider";
-			}
-			if(currentVld.getName().contains("_data"))
-			{
-				vimNetworkName_tmp = "provider2";
-			}				
-//			
-//			try {
-//				if(currentVld.getName().contains("_mgmt") || currentVld.isMgmtNetwork())
-//				{
-//					vimNetworkName_tmp = "provider";
-//				}
-//				if(currentVld.getName().contains("_data") || !currentVld.isMgmtNetwork())
-//				{
-//					vimNetworkName_tmp = "provider2";
-//				}				
-//			}
-//			catch(Exception e)
+//		// Here we need to define the VLDs. We need to get these from the NS Instance.
+//		// Get the id of the NS.
+//		//String nsd_instance_id = deploymentdescriptor.getInstanceId();
+//		// Load the NSD
+//		Nsd nsd_descriptor = osm4client.getNSDbyID(this.nsdId);		
+//		// Get the VLDs
+//		List<ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld> vld_list = nsd_descriptor.getVld();
+//		// For each VLD add the related VIM network.
+//		for(ns.yang.nfvo.nsd.rev170228.nsd.vld.Vld currentVld : vld_list)
+//		{
+//			Vld vld_tmp = new Vld();
+//			vld_tmp.name=currentVld.getName();
+//			String vimNetworkName_tmp = "provider";
+//			if(currentVld.getName().contains("_mgmt"))
 //			{
-//				System.out.println("EXCEPTION"+e.getMessage());
+//				vimNetworkName_tmp = "provider";
 //			}
-			
-			for(DeploymentDescriptorVxFPlacement tmp : deploymentdescriptor.getVxfPlacements())
-			{				
-				vld_tmp.vimNetworkName.put(tmp.getInfrastructure().getVIMid(), vimNetworkName_tmp);
-				System.out.println("Current VLD name: "+currentVld.getName()+",VIM: "+tmp.getInfrastructure().getVIMid()+", VIM network: "+vimNetworkName_tmp);
-			}						
-			this.vld.add(vld_tmp);
-		}
+//			if(currentVld.getName().contains("_data"))
+//			{
+//				vimNetworkName_tmp = "provider2";
+//			}				
+////			
+////			try {
+////				if(currentVld.getName().contains("_mgmt") || currentVld.isMgmtNetwork())
+////				{
+////					vimNetworkName_tmp = "provider";
+////				}
+////				if(currentVld.getName().contains("_data") || !currentVld.isMgmtNetwork())
+////				{
+////					vimNetworkName_tmp = "provider2";
+////				}				
+////			}
+////			catch(Exception e)
+////			{
+////				System.out.println("EXCEPTION"+e.getMessage());
+////			}
+//			
+//			for(DeploymentDescriptorVxFPlacement tmp : deploymentdescriptor.getVxfPlacements())
+//			{				
+//				vld_tmp.vimNetworkName.put(tmp.getInfrastructure().getVIMid(), vimNetworkName_tmp);
+//				System.out.println("Current VLD name: "+currentVld.getName()+",VIM: "+tmp.getInfrastructure().getVIMid()+", VIM network: "+vimNetworkName_tmp);
+//			}						
+//			this.vld.add(vld_tmp);
+//		}
 	}
 	
 	public String toJSON()

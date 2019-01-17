@@ -2896,7 +2896,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{
-								BusController.getInstance().rejectExperiment( prevDeployment );	
+								BusController.getInstance().rejectExperiment( prevDeployment );
 							}
 						}
 					}

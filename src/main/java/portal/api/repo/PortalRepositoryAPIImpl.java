@@ -2783,10 +2783,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("getDeploymentById for id: " + deploymentId);
 			DeploymentDescriptor deployment = portalRepositoryRef.getDeploymentByID(deploymentId);
 
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (u.getRoles().contains(UserRoleType.TESTBED_PROVIDER )) || (deployment.getOwner().getId() == u.getId())) {
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || (deployment.getMentor().getId() == u.getId()) || (deployment.getOwner().getId() == u.getId())) {
 				return Response.ok().entity(deployment).build();
 			}
-
 		}
 
 		ResponseBuilder builder = Response.status(Status.NOT_FOUND);

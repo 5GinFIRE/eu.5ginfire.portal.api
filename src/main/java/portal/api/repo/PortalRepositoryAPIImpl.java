@@ -905,7 +905,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (ns != null) {
 			//*************LOAD THE Product Object from the NSD Descriptor START************************************
 			// Check if a vnfd with this id already exists in the DB
-			Product existingmff = portalRepositoryRef.getProductByName( ns.getId() );														
+			Product existingmff = portalRepositoryRef.getProductByName( ns.getAddedId() );														
 			if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
 				throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
 			}
@@ -962,7 +962,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (vnfd != null) {							
 			//*************LOAD THE Product Object from the VNFD Descriptor START************************************
 			// Check if a vnfd with this id already exists in the DB
-			Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getId() );														
+			Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getAddedId());														
 			if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
 				throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );				
 			}
@@ -1703,24 +1703,61 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@DELETE
 	@Path("/admin/vxfs/{vxfid}")
 	public void deleteVxF(@PathParam("vxfid") int vxfid) {
-		
-		
+				
 		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfid);
 		
 		if ( !checkUserIDorIsAdmin( vxf.getOwner().getId() ) ){
 			throw new WebApplicationException( Response.status(Status.FORBIDDEN ).build() );
 		}
-		
-		if ( ! vxf.isCertified()  ) {
-			portalRepositoryRef.deleteProduct(vxfid);
-			BusController.getInstance().deletedVxF( vxf );			
-		} else {
-			ResponseBuilder builder = Response.status(Status.FORBIDDEN );
-
+		// Get the OnBoarded Descriptors to OffBoard them
+		List<VxFOnBoardedDescriptor>  vxfobds = vxf.getVxfOnBoardedDescriptors();					
+		ResponseBuilder builder = Response.status(Status.FORBIDDEN );
+		if(vxf.isCertified())
+		{
 			builder.entity( new ErrorMsg( "vxf with id=" + vxfid + " is Certified and will not be deleted" )  );	
 			throw new WebApplicationException(builder.build());
 		}
-			
+		if(vxfobds.size()>0)
+		{
+			for(VxFOnBoardedDescriptor vxfobd_tmp : vxfobds)
+			{
+				if(vxfobd_tmp.getOnBoardingStatus()!=OnBoardingStatus.ONBOARDED)
+				{
+					continue;
+				}
+				OnBoardingStatus previous_status = vxfobd_tmp.getOnBoardingStatus();
+				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+				VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
+
+				ResponseEntity<String> response = null;
+				try {
+					response = aMANOController.offBoardVxFFromMANOProvider( vxfobd_tmp );
+				}
+				catch( HttpClientErrorException e)
+				{
+					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
+					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
+					builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
+					throw new WebApplicationException(builder.build());
+				}        
+				
+				if (response == null) {
+					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
+					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + vxfobd_tmp.getId() + " cannot be offboarded");
+					throw new WebApplicationException(builder.build());
+				}
+				// UnCertify Upon OffBoarding
+				vxfobd_tmp.getVxf().setCertified(false);
+				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
+				BusController.getInstance().offBoardVxF( u );
+			}
+		}
+		portalRepositoryRef.deleteProduct(vxfid);
+		BusController.getInstance().deletedVxF( vxf );											
 	}
 
 	@GET
@@ -2180,12 +2217,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 			}
 			
-			for (Iterator<ExperimentMetadata> iter = deplExps.listIterator(); iter.hasNext(); ) { //filter only valid
-				ExperimentMetadata a = iter.next();
-			    if ( !a.isValid() ) {
-			        iter.remove();
-			    }
-			}
+//			for (Iterator<ExperimentMetadata> iter = deplExps.listIterator(); iter.hasNext(); ) { //filter only valid
+//				ExperimentMetadata a = iter.next();
+//			    if ( !a.isValid() ) {
+//			        iter.remove();
+//			    }
+//			}
 			
 			
 			return Response.ok().entity( deplExps ).build();
@@ -2431,19 +2468,60 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	public void deleteExperiment(@PathParam("appid") int appid) {
 		
 		ExperimentMetadata nsd = (ExperimentMetadata) portalRepositoryRef.getProductByID( appid );
-		
-		if ( ! nsd.isValid()   ) {
-			if ( !checkUserIDorIsAdmin( nsd.getOwner().getId() ) ){
-				throw new WebApplicationException( Response.status(Status.FORBIDDEN ).build() );
-			}
-			portalRepositoryRef.deleteProduct(appid);
-			BusController.getInstance().deletedExperiment( nsd );			
-		} else {
-			ResponseBuilder builder = Response.status(Status.FORBIDDEN );
+
+		if ( !checkUserIDorIsAdmin( nsd.getOwner().getId() ) ){
+			throw new WebApplicationException( Response.status(Status.FORBIDDEN ).build() );
+		}
+		// Get the OnBoarded Descriptors to OffBoard them
+		List<ExperimentOnBoardDescriptor> expobds = nsd.getExperimentOnBoardDescriptors();
+		ResponseBuilder builder = Response.status(Status.FORBIDDEN );
+		if ( nsd.isValid()   ) 
+		{
 			builder.entity( new ErrorMsg( "ExperimentMetadata with id=" + appid + " is Validated and will not be deleted" )  );	
 			throw new WebApplicationException(builder.build());
 		}
+		if(expobds.size()>0)
+		{
+			for(ExperimentOnBoardDescriptor expobd_tmp : expobds)
+			{
+				if(expobd_tmp.getOnBoardingStatus()!=OnBoardingStatus.ONBOARDED)
+				{
+					continue;
+				}
+				OnBoardingStatus previous_status = expobd_tmp.getOnBoardingStatus();
+				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+				ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 
+				ResponseEntity<String> response = null;
+				try {
+					response = aMANOController.offBoardNSDFromMANOProvider( expobd_tmp );
+				}
+				catch( HttpClientErrorException e)
+				{
+					expobd_tmp.setOnBoardingStatus(previous_status);
+					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
+					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
+					builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
+					throw new WebApplicationException(builder.build());
+				}        
+				
+				if (response == null) {
+					expobd_tmp.setOnBoardingStatus(previous_status);
+					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
+					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
+					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + expobd_tmp.getId() + " cannot be offboarded");
+					throw new WebApplicationException(builder.build());
+				}
+				// UnCertify Upon OffBoarding
+				expobd_tmp.getExperiment().setValid(false);
+				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+				u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
+				BusController.getInstance().offBoardNSD(u);
+				
+			}
+		}
+		portalRepositoryRef.deleteProduct(appid);
+		BusController.getInstance().deletedExperiment(nsd);											
 	}
 
 	// categories API
@@ -3534,7 +3612,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
 			return builder.build();							
 		}
-		
+		// UnCertify Upon OffBoarding
+		c.getVxf().setCertified(false);
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
 		BusController.getInstance().offBoardVxF( u );
@@ -3780,8 +3859,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			builder.entity("Requested NSOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
 			return builder.build();							
 		}
-		
-		
+		// Set Valid to false if it is OffBoarded
+		c.getExperiment().setValid(false);
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 		BusController.getInstance().offBoardNSD( u );
@@ -3937,10 +4016,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		VxFMetadata vxf = (VxFMetadata) prod;
 		
-		if ( vresult.getValidationStatus() ) {
-			vxf.setCertified( true );
-			vxf.setCertifiedBy( "5GinFIRE " );			
-		}
+//		We select by desing not to certify upon Successful Validation. Thus we comment this.
+//		if ( vresult.getValidationStatus() ) {
+//			vxf.setCertified( true );
+//			vxf.setCertifiedBy( "5GinFIRE " );			
+//		}
 		vxf.setValidationStatus( ValidationStatus.COMPLETED );
 		
 		ValidationJob validationJob = new ValidationJob();

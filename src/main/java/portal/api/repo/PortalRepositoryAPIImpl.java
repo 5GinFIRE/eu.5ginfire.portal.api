@@ -2773,6 +2773,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("User not found in portal registry or not logged in");
 			throw new WebApplicationException(builder.build());
+			
 		}
 
 	}

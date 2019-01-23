@@ -2764,15 +2764,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								{
 									logger.error(e.getMessage());
 								}
-								updated_deployments.add(deployment_tmp);
 							}
 						}
 					}
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
-						updated_deployments.add(deployment_tmp);
 					}
+					updated_deployments.add(deployment_tmp);
 				}			
 			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId() );
@@ -2825,15 +2824,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								{
 									logger.error(e.getMessage());
 								}
-								updated_deployments.add(deployment_tmp);
+								//updated_deployments.add(deployment_tmp);
 							}
 						}
 					}
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
-						updated_deployments.add(deployment_tmp);
 					}
+					
+					
+					updated_deployments.add(deployment_tmp);
+					
 				}			
 			} else {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
@@ -2886,15 +2888,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								{
 									logger.error(e.getMessage());
 								}
-								updated_deployments.add(deployment_tmp);
 							}
 						}
 					}
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
-						updated_deployments.add(deployment_tmp);
 					}
+					updated_deployments.add(deployment_tmp);
 				}			
 			}
 

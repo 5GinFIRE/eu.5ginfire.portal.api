@@ -3141,15 +3141,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/deployments/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor d) {
+	public Response updateDeployment(@PathParam("id") int id, DeploymentDescriptor receivedDeployment) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
 		if ((u != null)) {
 
-			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || u.getApikey().equals(d.getMentor().getApikey())) // only admin or Deployment Mentor can alter a deployment
+			if ((u.getRoles().contains(UserRoleType.PORTALADMIN)) || u.getApikey().equals(receivedDeployment.getMentor().getApikey())) // only admin or Deployment Mentor can alter a deployment
 			{
-				DeploymentDescriptor prevDeployment = portalRepositoryRef.getDeploymentByID( d.getId() );
+				DeploymentDescriptor aDeployment = portalRepositoryRef.getDeploymentByID( receivedDeployment.getId() );
 												
 				//PortalUser deploymentOwner = portalRepositoryRef.getUserByID(d.getOwner().getId());
 				//d.setOwner(deploymentOwner); // reattach from the DB model
@@ -3168,21 +3168,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //					deploymentOwner = portalRepositoryRef.updateUserInfo(  u);					 
 //				}
 				
-				prevDeployment.setName( d.getName() );
-				prevDeployment.setFeedback( d.getFeedback() );
-				prevDeployment.setStartDate( d.getStartDate());
-				prevDeployment.setEndDate( d.getEndDate() );
+				aDeployment.setName( receivedDeployment.getName() );
+				aDeployment.setFeedback( receivedDeployment.getFeedback() );
+				aDeployment.setStartDate( receivedDeployment.getStartDate());
+				aDeployment.setEndDate( receivedDeployment.getEndDate() );
 
-				logger.info("Previous Status is :"+prevDeployment.getStatus()+",New Status is:"+d.getStatus()+" and Instance Id is "+prevDeployment.getInstanceId());
+				logger.info("Previous Status is :"+aDeployment.getStatus()+",New Status is:"+receivedDeployment.getStatus()+" and Instance Id is "+aDeployment.getInstanceId());
 								
-				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
-				if( d.getStatus() != prevDeployment.getStatus() )
+				//prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
+				if( receivedDeployment.getStatus() != aDeployment.getStatus() )
 				{
-					prevDeployment.setStatus( d.getStatus() );
-					prevDeployment.getExperimentFullDetails();
-					prevDeployment.getInfrastructureForAll();
+					aDeployment.setStatus( receivedDeployment.getStatus() );
+					aDeployment.getExperimentFullDetails();
+					aDeployment.getInfrastructureForAll();
 					
-					logger.info("updateDeployment for id: " + prevDeployment.getId());
+					logger.info("updateDeployment for id: " + aDeployment.getId());
 					
 					
 	//				String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
@@ -3193,21 +3193,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	//							subj);
 	//				}
 	
-					DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( d.getId() );  //rereading this, seems to keep the DB connection
+					DeploymentDescriptor dd = portalRepositoryRef.getDeploymentByID( receivedDeployment.getId() );  //rereading this, seems to keep the DB connection
 	
-					// Send updated Deployment status email 
-					BusController.getInstance().updateDeploymentRequest( dd );
-					if( d.getStatus() == DeploymentDescriptorStatus.SCHEDULED && prevDeployment.getInstanceId() == null)
+
+					if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.SCHEDULED && aDeployment.getInstanceId() == null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{							
-								BusController.getInstance().scheduleExperiment( prevDeployment );								
+								BusController.getInstance().scheduleExperiment( aDeployment );								
 							}
 						}
 					}
-					else if( d.getStatus() == DeploymentDescriptorStatus.RUNNING && d.getStatus() == DeploymentDescriptorStatus.RUNNING && prevDeployment.getInstanceId() == null)
+					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.RUNNING && receivedDeployment.getStatus() == DeploymentDescriptorStatus.RUNNING && aDeployment.getInstanceId() == null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
@@ -3218,27 +3217,27 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								//aMANOController.deployNSDToMANOProvider(prevDeployment);
 								//Then try asynchronously
 	
-								BusController.getInstance().deployExperiment( prevDeployment );	
+								BusController.getInstance().deployExperiment( aDeployment );	
 							}
 						}
 					}
-					else if( d.getStatus() == DeploymentDescriptorStatus.COMPLETED && prevDeployment.getInstanceId() != null)
+					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.COMPLETED && aDeployment.getInstanceId() != null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{
-								BusController.getInstance().completeExperiment( prevDeployment );	
+								BusController.getInstance().completeExperiment( aDeployment );	
 							}
 						}
 					}
-					else if( d.getStatus() == DeploymentDescriptorStatus.REJECTED && prevDeployment.getInstanceId() == null)
+					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.REJECTED && aDeployment.getInstanceId() == null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{
-								BusController.getInstance().rejectExperiment( prevDeployment );
+								BusController.getInstance().rejectExperiment( aDeployment );
 								logger.info("Deployment Rejected");
 							}
 						}
@@ -3250,9 +3249,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						throw new WebApplicationException(builder.build());					
 					}
 				}
-				prevDeployment.setStatus( d.getStatus() );
-				prevDeployment = portalRepositoryRef.updateDeploymentDescriptor(prevDeployment);
-				return Response.ok().entity( prevDeployment ).build();
+				aDeployment.setStatus( receivedDeployment.getStatus() );
+				aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+				return Response.ok().entity( aDeployment ).build();
 			}
 
 		}

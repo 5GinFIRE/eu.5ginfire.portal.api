@@ -2948,52 +2948,62 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			for (int i = 0; i < deployments.size(); i++)
 			{
 				DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(deployments.get(i).getId());
-				// Get the MANO Provider for each deployment
-				MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
-				if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+				try
 				{
-					if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
+					
+					// Get the MANO Provider for each deployment
+					MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
+					if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
 					{
-						osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
-					}
-					JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
-					if(ns_instance_info!=null)
-					{
-						try {
-							logger.info(ns_instance_info.toString());
-							deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
-							deployment_tmp.config_status=ns_instance_info.getString("config-status");
-							deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
-							deployment_tmp.constituent_vnfr_ref="";
-							for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
-							{
-								if(j>0)
+						if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
+						{
+							osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+						}
+						JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
+						if(ns_instance_info!=null)
+						{
+							try {
+								logger.info(ns_instance_info.toString());
+								deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
+								deployment_tmp.config_status=ns_instance_info.getString("config-status");
+								deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
+								deployment_tmp.constituent_vnfr_ref="";
+								for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
 								{
-									deployment_tmp.constituent_vnfr_ref+=", ";
-								}
-								//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
-								JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-								if(vnf_instance_info!=null)
-								{
-									try {
-										//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
-										//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
-										deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
-									}
-									catch(JSONException e)								
+									if(j>0)
 									{
-										logger.error(e.getMessage());
+										deployment_tmp.constituent_vnfr_ref+=", ";
+									}
+									//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
+									JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+									if(vnf_instance_info!=null)
+									{
+										try {
+											//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
+											//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
+											deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
+										}
+										catch(JSONException e)								
+										{
+											logger.error(e.getMessage());
+										}
 									}
 								}
 							}
+							catch(JSONException e)								
+							{
+								logger.error(e.getMessage());
+							}
 						}
-						catch(JSONException e)								
-						{
-							logger.error(e.getMessage());
-						}
-						updated_deployments.add(deployment_tmp);
-					}
-				}								
+					}	
+				}
+				catch(Exception e)
+				{
+					logger.error(e.getMessage());
+				}
+				
+
+				updated_deployments.add(deployment_tmp);
 			}
 			return Response.ok().entity(updated_deployments).build();
 		} else {

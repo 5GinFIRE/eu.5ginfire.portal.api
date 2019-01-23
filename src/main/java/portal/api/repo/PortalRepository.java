@@ -324,16 +324,26 @@ public class PortalRepository {
 		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptors( 0, 100000);	
 		return ls;
 	}
-
 	
-	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByUser( Long ownerid ) {
-		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByUser( ownerid, 0, 100000);	
+	
+	public List<DeploymentDescriptor> getAllCompletedDeploymentDescriptors() {
+		List<DeploymentDescriptor> ls = portalJpaController.readCompletedDeploymentDescriptors( 0, 100000);	
+		return ls;
+	}
+	
+	public List<DeploymentDescriptor> getAllRejectedDeploymentDescriptors() {
+		List<DeploymentDescriptor> ls = portalJpaController.readRejectedDeploymentDescriptors( 0, 100000);	
+		return ls;
+	}
+	
+	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByUser( Long ownerid, String status ) {
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByUser( ownerid, 0, 100000, status);	
 		return ls;
 	}
 	
 	
-	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByMentor( Long ownerid ) {
-		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByMentor( ownerid, 0, 100000);	
+	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByMentor( Long ownerid, String status ) {
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByMentor( ownerid, 0, 100000, status);	
 		return ls;
 	}
 

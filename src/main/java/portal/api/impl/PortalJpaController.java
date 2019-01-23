@@ -871,17 +871,57 @@ public class PortalJpaController {
 	public List<DeploymentDescriptor> readDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m  ORDER BY m.id");
+		Query q = entityManager.createQuery(
+				"SELECT m FROM DeploymentDescriptor m  WHERE "
+				+ "m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+				+ "AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+	
+	public List<DeploymentDescriptor> readCompletedDeploymentDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery(
+				"SELECT m FROM DeploymentDescriptor m  WHERE "
+				+ "m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id");
+		q.setFirstResult(firstResult);
+		q.setMaxResults(maxResults);
+		return q.getResultList();
+	}
+	
+	public List<DeploymentDescriptor> readRejectedDeploymentDescriptors(int firstResult, int maxResults) {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+		Query q = entityManager.createQuery(
+				"SELECT m FROM DeploymentDescriptor m  WHERE "
+				+ "m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
 	}
 	
 
-	public List<DeploymentDescriptor> readDeploymentDescriptorsByUser(Long ownerid, int firstResult, int maxResults) {
+	public List<DeploymentDescriptor> readDeploymentDescriptorsByUser(Long ownerid, int firstResult, int maxResults, String status) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid + " ORDER BY m.id");
+		String sql = "";
+		if ( (status!=null) && status.equals("COMPLETED") ){
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id";
+			
+		}else if ( (status!=null) && status.equals("REJECTED") ){
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
+			
+		}else {
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
+		}
+		
+		Query q = entityManager.createQuery( sql );
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -889,10 +929,25 @@ public class PortalJpaController {
 	
 	
 	
-	public List<DeploymentDescriptor> readDeploymentDescriptorsByMentor(Long ownerid, int firstResult, int maxResults) {
+	public List<DeploymentDescriptor> readDeploymentDescriptorsByMentor(Long ownerid, int firstResult, int maxResults, String status) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid + " ORDER BY m.id");
+		String sql = "";
+		if ( (status!=null) && status.equals("COMPLETED") ){
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id";
+			
+		}else if ( (status!=null) && status.equals("REJECTED") ){
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
+			
+		}else {
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
+		}
+		
+		Query q = entityManager.createQuery( sql);
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();

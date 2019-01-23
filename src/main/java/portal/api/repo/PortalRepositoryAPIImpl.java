@@ -2700,10 +2700,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 	}
 	
+
+	
 	@GET
 	@Path("/admin/deployments")
 	@Produces("application/json")
-	public Response getAllDeployments() {
+	public Response getAllDeployments( @QueryParam("status") String status ) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 		if (u != null) {
@@ -2714,7 +2716,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			List<DeploymentDescriptor> updated_deployments = new ArrayList<DeploymentDescriptor>();
 
 			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN)) ) {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptors();
+				if ( (status!=null) && status.equals( "COMPLETED" )){
+					deployments = portalRepositoryRef.getAllCompletedDeploymentDescriptors();
+				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
+					deployments = portalRepositoryRef.getAllRejectedDeploymentDescriptors();
+				} else {
+					deployments = portalRepositoryRef.getAllDeploymentDescriptors();
+				}
+				
 				//For each deployment get the status info and the IPs
 				for (int i = 0; i < deployments.size(); i++)
 				{
@@ -2774,7 +2783,16 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					updated_deployments.add(deployment_tmp);
 				}			
 			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId() );
+				
+				
+				if ( (status!=null) && status.equals( "COMPLETED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "COMPLETED" );
+				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "REJECTED" );
+				} else {
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), null );
+				}
+				
 				//For each deployment get the status info and the IPs
 				for (int i = 0; i < deployments.size(); i++)
 				{
@@ -2838,7 +2856,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					
 				}			
 			} else {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
+
+				if ( (status!=null) && status.equals( "COMPLETED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(),  "COMPLETED"  );
+				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
+				} else {
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
+				}
+				
 				//For each deployment get the status info and the IPs
 				for (int i = 0; i < deployments.size(); i++)
 				{
@@ -2934,7 +2960,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@GET
 	@Path("/admin/deployments/user")
 	@Produces("application/json")
-	public Response getAllDeploymentsofUser() {
+	public Response getAllDeploymentsofUser( @QueryParam("status") String status ) {
 
 		PortalUser u = portalRepositoryRef.getUserBySessionID(ws.getHttpServletRequest().getSession().getId());
 
@@ -2943,7 +2969,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			List<DeploymentDescriptor> deployments;
 			OSM4Client osm4Client = null;
 			List<DeploymentDescriptor> updated_deployments = new ArrayList<DeploymentDescriptor>();
-			deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
+			
+			if ( (status!=null) && status.equals( "COMPLETED" )){
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(),  "COMPLETED"  );
+			} else if (  (status!=null) &&  status.equals( "REJECTED" )){
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
+			} else {
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
+			}
+			
+			 
+			
+			
 			//For each deployment get the status info and the IPs
 			for (int i = 0; i < deployments.size(); i++)
 			{
@@ -3029,7 +3066,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN)) ||  (u.getRoles().contains(UserRoleType.TESTBED_PROVIDER )) ) {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsScheduled();
 			} else {
-				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId() ); 
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null ); 
 			}
 
 			return Response.ok().entity(deployments).build();
@@ -3223,24 +3260,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.COMPLETED && aDeployment.getInstanceId() != null)
 					{
-						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
-						{
-							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
-							{
-								BusController.getInstance().completeExperiment( aDeployment );	
-							}
-						}
+						BusController.getInstance().completeExperiment( aDeployment );						
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.REJECTED && aDeployment.getInstanceId() == null)
 					{
-						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
-						{
-							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
-							{
-								BusController.getInstance().rejectExperiment( aDeployment );
-								logger.info("Deployment Rejected");
-							}
-						}
+
+						BusController.getInstance().rejectExperiment( aDeployment );
+						logger.info("Deployment Rejected");
+					
+
 					}
 					else
 					{

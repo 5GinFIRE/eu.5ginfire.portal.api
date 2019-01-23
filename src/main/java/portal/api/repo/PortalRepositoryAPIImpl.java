@@ -2771,6 +2771,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
+						updated_deployments.add(deployment_tmp);
 					}
 				}			
 			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {
@@ -2831,6 +2832,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
+						updated_deployments.add(deployment_tmp);
 					}
 				}			
 			} else {
@@ -2891,6 +2893,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					catch(Exception e)
 					{
 						logger.error(e.getMessage());
+						updated_deployments.add(deployment_tmp);
 					}
 				}			
 			}

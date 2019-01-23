@@ -37,6 +37,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.json.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -109,6 +111,11 @@ public class DeploymentDescriptor {
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<DeploymentDescriptorVxFPlacement> vxfPlacements = new ArrayList<DeploymentDescriptorVxFPlacement>();
+
+	public String operational_status;
+	public String config_status;
+	public String detailed_status;
+	public String constituent_vnfr_ref;
 	
 	public DeploymentDescriptor() {
 	}
@@ -298,5 +305,5 @@ public class DeploymentDescriptor {
 
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
-	}	
+	}
 }

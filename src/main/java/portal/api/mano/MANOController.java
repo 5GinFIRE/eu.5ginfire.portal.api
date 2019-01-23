@@ -108,13 +108,13 @@ public class MANOController {
 		String pLocation = vxf.getPackageLocation();
 		logger.info("VxF Package Location: " + pLocation);
 				
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
-		}
-//		if (!pLocation.contains("http")) {
-//			pLocation = "http:" + pLocation;
-//			pLocation = pLocation.replace("\\", "/");
-//		}					
+//		if ( !pLocation.contains( "http" )  ) {
+//			pLocation = "https:" + pLocation;
+//		}
+		if (!pLocation.contains("http")) {
+			pLocation = "http:" + pLocation;
+			pLocation = pLocation.replace("\\", "/");
+		}					
 
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
@@ -135,13 +135,15 @@ public class MANOController {
 			if(vnfd_id == null)
 			{
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				// Uncertify if it failed OnBoarding.
 				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 				BusController.getInstance().onBoardVxFFailed( vxfobds );
 				return;
 			}		
 			vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-			vxfobds.getVxf().setCertified(true);
+			// We select by desing not to Certify upon OnBoarding but only on final version is determined.
+			//vxfobds.getVxf().setCertified(true);
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 			vxfobds.setDeployId(vnfd_id);
 			// What should be the vxf Name. Something like cirros_vnfd.
@@ -256,13 +258,13 @@ public class MANOController {
 						
 		String pLocation = em.getPackageLocation();
 		logger.info("NSD Package Location: " + pLocation);		
-		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
-		}
-//		if (!pLocation.contains("http")) {
-//			pLocation = "http:" + pLocation;
-//			pLocation = pLocation.replace("\\", "/");
-//		}				
+//		if ( !pLocation.contains( "http" )  ) {
+//			pLocation = "https:" + pLocation;
+//		}
+		if (!pLocation.contains("http")) {
+			pLocation = "http:" + pLocation;
+			pLocation = pLocation.replace("\\", "/");
+		}				
 
 		// Here we need to get a better solution for the OSM version names.
 		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
@@ -284,6 +286,7 @@ public class MANOController {
 			if(nsd_id == null)
 			{
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
 				BusController.getInstance().onBoardNSDFailed( uexpobds );				
@@ -292,7 +295,8 @@ public class MANOController {
 			else
 			{
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-				uexpobds.getExperiment().setValid(true);
+				// We decide to set valid when we have the final version. Thus we comment this.
+				// uexpobds.getExperiment().setValid(true);
 			}
 			// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 			uexpobds.setDeployId(nsd_id);

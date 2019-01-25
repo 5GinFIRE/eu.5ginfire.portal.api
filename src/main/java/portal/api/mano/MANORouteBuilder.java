@@ -99,6 +99,7 @@ public class MANORouteBuilder  extends RouteBuilder{
 		
 		from("timer://checkAndDeployTimer?period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider");
 		from("timer://checkAndTerminateTimer?period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider");
+		from("timer://checkAndTerminateTimer?period=30000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors");
 		
 	}
 

@@ -34,6 +34,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -49,6 +51,7 @@ import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
+import portal.api.model.MANOprovider;
 import portal.api.model.NSCreateInstanceRequestPayload;
 import portal.api.model.NSInstantiateInstanceRequestPayload;
 import portal.api.model.OnBoardingStatus;
@@ -108,13 +111,13 @@ public class MANOController {
 		String pLocation = vxf.getPackageLocation();
 		logger.info("VxF Package Location: " + pLocation);
 				
-//		if ( !pLocation.contains( "http" )  ) {
-//			pLocation = "https:" + pLocation;
-//		}
-		if (!pLocation.contains("http")) {
-			pLocation = "http:" + pLocation;
-			pLocation = pLocation.replace("\\", "/");
-		}					
+		if ( !pLocation.contains( "http" )  ) {
+			pLocation = "https:" + pLocation;
+		}
+//		if (!pLocation.contains("http")) {
+//			pLocation = "http:" + pLocation;
+//			pLocation = pLocation.replace("\\", "/");
+//		}					
 
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,
@@ -219,6 +222,72 @@ public class MANOController {
 		}
 	}
 	
+	public void checkAndUpdateRunningDeploymentDescriptors()
+	{
+		logger.info("Update Deployment Descriptors");
+		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningAndCompletedDeployments();
+		OSM4Client osm4Client = null;
+		//For each deployment get the status info and the IPs
+		for (int i = 0; i < runningDeploymentDescriptors.size(); i++)
+		{
+			DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(runningDeploymentDescriptors.get(i).getId());
+			try
+			{
+				// Get the MANO Provider for each deployment
+				MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
+				if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
+				{
+					if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
+					{
+						osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+					}
+					JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(runningDeploymentDescriptors.get(i).getInstanceId());
+					if(ns_instance_info!=null)
+					{
+						try {
+							logger.info(ns_instance_info.toString());
+							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
+							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
+							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status"));
+							deployment_tmp.setConstituentVnfrIps("");
+							for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
+							{
+								if(j>0)
+								{
+									deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
+								}
+								//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
+								JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+								if(vnf_instance_info!=null)
+								{
+									try {
+										//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
+										//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
+										deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + vnf_instance_info.getString("ip-address"));
+									}
+									catch(JSONException e)								
+									{
+										logger.error(e.getMessage());
+									}
+								}
+							}
+							deployment_tmp=portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+						}
+						catch(JSONException e)								
+						{
+							logger.error(e.getMessage());
+						}
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				logger.error(e.getMessage());
+			}
+		}			
+
+	}
+	
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception{
 
 		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
@@ -258,13 +327,13 @@ public class MANOController {
 						
 		String pLocation = em.getPackageLocation();
 		logger.info("NSD Package Location: " + pLocation);		
-//		if ( !pLocation.contains( "http" )  ) {
-//			pLocation = "https:" + pLocation;
-//		}
-		if (!pLocation.contains("http")) {
-			pLocation = "http:" + pLocation;
-			pLocation = pLocation.replace("\\", "/");
-		}				
+		if ( !pLocation.contains( "http" )  ) {
+			pLocation = "https:" + pLocation;
+		}
+//		if (!pLocation.contains("http")) {
+//			pLocation = "http:" + pLocation;
+//			pLocation = pLocation.replace("\\", "/");
+//		}				
 
 		// Here we need to get a better solution for the OSM version names.
 		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {

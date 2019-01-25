@@ -1360,6 +1360,12 @@ public class PortalJpaController {
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING");
 		return q.getResultList();		
 	}
+
+	public List<DeploymentDescriptor> readRunningAndCompletedDeployments() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.COMPLETED");
+		return q.getResultList();		
+	}
 	
 	/**
 	 * 

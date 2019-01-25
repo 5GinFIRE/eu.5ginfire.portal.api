@@ -575,7 +575,18 @@ public class PortalRepository {
 		}
 		return DeploymentDescriptorsToComplete;
 	}
-	
+
+	public List<DeploymentDescriptor> getRunningDeployments()
+	{		
+		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningDeployments();
+		return RunningDeploymentDescriptor_list;
+	}	
+
+	public List<DeploymentDescriptor> getRunningAndCompletedDeployments()
+	{		
+		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningAndCompletedDeployments();
+		return RunningDeploymentDescriptor_list;
+	}	
 	/**
 	 * 
 	 * VFImage objects

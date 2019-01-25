@@ -112,11 +112,48 @@ public class DeploymentDescriptor {
 	@JoinTable()
 	private List<DeploymentDescriptorVxFPlacement> vxfPlacements = new ArrayList<DeploymentDescriptorVxFPlacement>();
 
-	public String operational_status;
-	public String config_status;
-	public String detailed_status;
-	public String constituent_vnfr_ref;
+	@Basic()	
+	private String operationalStatus;
 	
+	public String getOperationalStatus() {
+		return operationalStatus;
+	}
+
+	public void setOperationalStatus(String operationalStatus) {
+		this.operationalStatus = operationalStatus;
+	}
+
+	@Basic()	
+	public String configStatus;
+	public String getConfigStatus() {
+		return configStatus;
+	}
+
+	public void setConfigStatus(String configStatus) {
+		this.configStatus = configStatus;
+	}
+
+	@Basic()	
+	public String detailedStatus;
+	public String getDetailedStatus() {
+		return detailedStatus;
+	}
+
+	public void setDetailedStatus(String detailedStatus) {
+		this.detailedStatus = detailedStatus;
+	}
+
+	@Basic()	
+	public String constituentVnfrIps;
+	
+	public String getConstituentVnfrIps() {
+		return constituentVnfrIps;
+	}
+
+	public void setConstituentVnfrIps(String constituentVnfrIps) {
+		this.constituentVnfrIps = constituentVnfrIps;
+	}
+
 	public DeploymentDescriptor() {
 	}
 

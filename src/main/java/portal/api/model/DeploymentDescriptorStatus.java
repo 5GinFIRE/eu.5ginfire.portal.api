@@ -22,6 +22,5 @@ public enum DeploymentDescriptorStatus {
 		REJECTED,
 		RUNNING,
 		COMPLETED
-		
 }
 

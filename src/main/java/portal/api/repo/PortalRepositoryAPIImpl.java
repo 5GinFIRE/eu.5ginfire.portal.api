@@ -2711,149 +2711,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			logger.info("getAllDeployments for userid: " + u.getId());
 			List<DeploymentDescriptor> deployments;
-
-			OSM4Client osm4Client = null;
-			List<DeploymentDescriptor> updated_deployments = new ArrayList<DeploymentDescriptor>();
-
 			if ( (u.getRoles().contains(UserRoleType.PORTALADMIN)) ) {
 				if ( (status!=null) && status.equals( "COMPLETED" )){
 					deployments = portalRepositoryRef.getAllCompletedDeploymentDescriptors();
 				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 					deployments = portalRepositoryRef.getAllRejectedDeploymentDescriptors();
 				} else {
-					deployments = portalRepositoryRef.getAllDeploymentDescriptors();
-				}
-				
-				//For each deployment get the status info and the IPs
-				for (int i = 0; i < deployments.size(); i++)
-				{
-					DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(deployments.get(i).getId());
-					try
-					{
-						// Get the MANO Provider for each deployment
-						MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
-						if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
-						{
-							if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
-							{
-								osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
-							}
-							JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
-							if(ns_instance_info!=null)
-							{
-								try {
-									logger.info(ns_instance_info.toString());
-									deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
-									deployment_tmp.config_status=ns_instance_info.getString("config-status");
-									deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
-									deployment_tmp.constituent_vnfr_ref="";
-									for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
-									{
-										if(j>0)
-										{
-											deployment_tmp.constituent_vnfr_ref+=", ";
-										}
-										//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
-										JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-										if(vnf_instance_info!=null)
-										{
-											try {
-												//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
-												//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
-												deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
-											}
-											catch(JSONException e)								
-											{
-												logger.error(e.getMessage());
-											}
-										}
-									}
-								}
-								catch(JSONException e)								
-								{
-									logger.error(e.getMessage());
-								}
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						logger.error(e.getMessage());
-					}
-					updated_deployments.add(deployment_tmp);
+					deployments = portalRepositoryRef.getAllDeploymentDescriptors();			
 				}			
-			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {
-				
-				
+			} else if ( (u.getRoles().contains(UserRoleType.MENTOR))) {							
 				if ( (status!=null) && status.equals( "COMPLETED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "COMPLETED" );
 				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "REJECTED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), null );
-				}
-				
-				//For each deployment get the status info and the IPs
-				for (int i = 0; i < deployments.size(); i++)
-				{
-					DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(deployments.get(i).getId());
-					try
-					{
-						// Get the MANO Provider for each deployment
-						MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
-						if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
-						{
-							if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
-							{
-								osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
-							}
-							JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
-							if(ns_instance_info!=null)
-							{
-								try {
-									logger.info(ns_instance_info.toString());
-									deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
-									deployment_tmp.config_status=ns_instance_info.getString("config-status");
-									deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
-									deployment_tmp.constituent_vnfr_ref="";
-									for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
-									{
-										if(j>0)
-										{
-											deployment_tmp.constituent_vnfr_ref+=", ";
-										}
-										//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
-										JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-										if(vnf_instance_info!=null)
-										{
-											try {
-												//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
-												//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
-												deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
-											}
-											catch(JSONException e)								
-											{
-												logger.error(e.getMessage());
-											}
-										}
-									}
-								}
-								catch(JSONException e)								
-								{
-									logger.error(e.getMessage());
-								}
-								//updated_deployments.add(deployment_tmp);
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						logger.error(e.getMessage());
-					}
-					
-					
-					updated_deployments.add(deployment_tmp);
-					
 				}			
 			} else {
 
@@ -2863,70 +2735,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
-				}
-				
-				//For each deployment get the status info and the IPs
-				for (int i = 0; i < deployments.size(); i++)
-				{
-					DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(deployments.get(i).getId());
-					try
-					{
-						// Get the MANO Provider for each deployment
-						MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
-						if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
-						{
-							if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
-							{
-								osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
-							}
-							JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
-							if(ns_instance_info!=null)
-							{
-								try {
-									logger.info(ns_instance_info.toString());
-									deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
-									deployment_tmp.config_status=ns_instance_info.getString("config-status");
-									deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
-									deployment_tmp.constituent_vnfr_ref="";
-									for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
-									{
-										if(j>0)
-										{
-											deployment_tmp.constituent_vnfr_ref+=", ";
-										}
-										//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
-										JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-										if(vnf_instance_info!=null)
-										{
-											try {
-												//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
-												//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
-												deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
-											}
-											catch(JSONException e)								
-											{
-												logger.error(e.getMessage());
-											}
-										}
-									}
-								}
-								catch(JSONException e)								
-								{
-									logger.error(e.getMessage());
-								}
-							}
-						}
-					}
-					catch(Exception e)
-					{
-						logger.error(e.getMessage());
-					}
-					updated_deployments.add(deployment_tmp);
 				}			
 			}
-
-			return Response.ok().entity(updated_deployments).build();
-//			return Response.ok().entity(deployments).build();
+			return Response.ok().entity(deployments).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("User not found in portal registry or not logged in");
@@ -2966,9 +2777,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (u != null) {
 			logger.info("getAllDeploymentsofUser for userid: " + u.getId());
-			List<DeploymentDescriptor> deployments;
-			OSM4Client osm4Client = null;
-			List<DeploymentDescriptor> updated_deployments = new ArrayList<DeploymentDescriptor>();
+			List<DeploymentDescriptor> deployments = new ArrayList<DeploymentDescriptor>();
 			
 			if ( (status!=null) && status.equals( "COMPLETED" )){
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(),  "COMPLETED"  );
@@ -2978,71 +2787,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
 			}
 			
-			 
-			
-			
-			//For each deployment get the status info and the IPs
-			for (int i = 0; i < deployments.size(); i++)
-			{
-				DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(deployments.get(i).getId());
-				try
-				{
-					
-					// Get the MANO Provider for each deployment
-					MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
-					if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
-					{
-						if(osm4Client==null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint()))
-						{
-							osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
-						}
-						JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(deployments.get(i).getInstanceId());
-						if(ns_instance_info!=null)
-						{
-							try {
-								logger.info(ns_instance_info.toString());
-								deployment_tmp.operational_status=ns_instance_info.getString("operational-status");
-								deployment_tmp.config_status=ns_instance_info.getString("config-status");
-								deployment_tmp.detailed_status=ns_instance_info.getString("detailed-status");
-								deployment_tmp.constituent_vnfr_ref="";
-								for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
-								{
-									if(j>0)
-									{
-										deployment_tmp.constituent_vnfr_ref+=", ";
-									}
-									//deployment_tmp.constituent_vnfr_ref+=ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString();							
-									JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-									if(vnf_instance_info!=null)
-									{
-										try {
-											//deployment_tmp.constituent_vnfr_ref+=vnf_instance_info.getString("vnfd-ref");
-											//deployment_tmp.constituent_vnfr_ref+=" : "+vnf_instance_info.getString("ip-address");
-											deployment_tmp.constituent_vnfr_ref += vnf_instance_info.getString("ip-address");
-										}
-										catch(JSONException e)								
-										{
-											logger.error(e.getMessage());
-										}
-									}
-								}
-							}
-							catch(JSONException e)								
-							{
-								logger.error(e.getMessage());
-							}
-						}
-					}	
-				}
-				catch(Exception e)
-				{
-					logger.error(e.getMessage());
-				}
-				
-
-				updated_deployments.add(deployment_tmp);
-			}
-			return Response.ok().entity(updated_deployments).build();
+			return Response.ok().entity(deployments).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
 			builder.entity("User not found in portal registry or not logged in");

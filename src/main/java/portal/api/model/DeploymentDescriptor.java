@@ -133,7 +133,8 @@ public class DeploymentDescriptor {
 		this.configStatus = configStatus;
 	}
 
-	@Basic()	
+	@Lob
+	@Column(name = "LDETAILEDSTATUS", columnDefinition = "LONGTEXT")	
 	public String detailedStatus;
 	public String getDetailedStatus() {
 		return detailedStatus;

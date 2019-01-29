@@ -130,7 +130,7 @@ public class BusController {
 	}
 
 	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) to upload a new vxf
+	 * Asynchronously sends to the routing bus (seda:vxf.onboard?multipleConsumers=true) to upload a new vxf
 	 * @param deployment a {@link VxFMetadata}
 	 */
 	public void onBoardVxFAdded(VxFOnBoardedDescriptor obd) {
@@ -160,7 +160,7 @@ public class BusController {
 	}
 
 	/**
-	 * Asynchronously sends to the routing bus (seda:vxf.create?multipleConsumers=true) to upload a new vxf
+	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to upload a new vxf
 	 * @param deployment a {@link VxFMetadata}
 	 */
 	public void onBoardNSDAdded(ExperimentOnBoardDescriptor uexpobd) {

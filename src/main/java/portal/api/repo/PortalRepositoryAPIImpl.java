@@ -1235,6 +1235,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
 					// Get the first one for now			
 					obd.setObMANOprovider(mp);
+					obd.setUuid( UUID.randomUUID().toString() );
 					VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( vxf.getId() );
 					// Fill the VxFMetadata of VxFOnBoardedDescriptor
 					obd.setVxf( refVxF );
@@ -2355,9 +2356,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
 					//Create NSDOnboardDescriptor
-					ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor();
+					ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
 					// Get the first one for now			
 					obd.setObMANOprovider(mp);
+					obd.setUuid( UUID.randomUUID().toString() ); 
 					ExperimentMetadata refNSD =  ( ExperimentMetadata )portalRepositoryRef.getProductByID( experiment.getId() );
 					// Fill the NSDMetadata of NSDOnBoardedDescriptor
 					obd.setExperiment( refNSD );
@@ -3474,6 +3476,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( aVxF.getId() );
 			VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
 			obd.setVxf( refVxF );
+			obd.setUuid( UUID.randomUUID().toString() );
 			//?????
 			refVxF.getVxfOnBoardedDescriptors().add( obd ) ;
 			
@@ -3620,41 +3623,41 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}/offboard")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
+	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor clobd) {
 
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		OnBoardingStatus previous_status = c.getOnBoardingStatus();
-		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
-		VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+		OnBoardingStatus previous_status = clobd.getOnBoardingStatus();
+		clobd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+		VxFOnBoardedDescriptor updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor(clobd);
 
 		ResponseEntity<String> response = null;
 		try {
-			response = aMANOController.offBoardVxFFromMANOProvider( c );
+			response = aMANOController.offBoardVxFFromMANOProvider( updatedObd );
 		}
 		catch( HttpClientErrorException e)
 		{
-			c.setOnBoardingStatus(previous_status);
-			u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+			updatedObd.setOnBoardingStatus(previous_status);
+			updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
 			return builder.build();
 		}        
 		
 		if (response == null) {
-			c.setOnBoardingStatus(previous_status);
-			u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
+			updatedObd.setOnBoardingStatus(previous_status);
+			updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
-			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
+			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + updatedObd.getId() + " cannot be offboarded");
 			return builder.build();							
 		}
 		// UnCertify Upon OffBoarding
-		c.getVxf().setCertified(false);
-		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
-		u = portalRepositoryRef.updateVxFOnBoardedDescriptor(c);
-		BusController.getInstance().offBoardVxF( u );
-		return Response.ok().entity(u).build();
+		updatedObd.getVxf().setCertified(false);
+		updatedObd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
+		BusController.getInstance().offBoardVxF( updatedObd );
+		return Response.ok().entity(updatedObd).build();
 		
 	}
 
@@ -3690,6 +3693,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			ExperimentMetadata refExp =  ( ExperimentMetadata ) portalRepositoryRef.getProductByID( exp.getId() );
 			ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor();
 			obd.setExperiment( refExp );
+			obd.setUuid( UUID.randomUUID().toString() );
 			refExp.getExperimentOnBoardDescriptors().add( obd ) ;
 			
 			// save product

@@ -155,7 +155,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
-				.maximumRedeliveries( 120 ) //let's try for the next 120 mins to send it....
+				.maximumRedeliveries( 4 ) //let's try for the next 120 mins to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)
@@ -174,7 +174,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_bugzilla")
-				.maximumRedeliveries( 120 ) //let's try for the next 120 minutess to send it....
+				.maximumRedeliveries( 4 ) //let's try for the next 120 minutess to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)
@@ -196,7 +196,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.marshal().json( JsonLibrary.Jackson, true)
 		.convertBodyTo( String.class ).to("stream:out")
 		.errorHandler(deadLetterChannel("direct:dlq_users")
-				.maximumRedeliveries( 120 ) //let's try 10 times to send it....
+				.maximumRedeliveries( 4 ) //let's try 10 times to send it....
 				.redeliveryDelay( 60000 ).useOriginalMessage()
 				.deadLetterHandleNewException( false )
 				//.logExhaustedMessageHistory(false)
@@ -240,12 +240,12 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("direct:bugzilla.bugmanage")
 		.choice()
 		.when( issueExists )
-			.log( "Update ISSUE for validating ${body.alias} !" )		
+			.log( "Update ISSUE for ${body.alias} !" )		
 			.process( BugHeaderExtractProcessor )
 			.to("direct:bugzilla.updateIssue")
 			.endChoice()
 		.otherwise()
-			.log( "New ISSUE for validating ${body.alias} !" )	
+			.log( "New ISSUE for ${body.alias} !" )	
 			.to("direct:bugzilla.newIssue")
 			.endChoice();
 		
@@ -264,12 +264,21 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:vxf.validationresult.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
 		.to("direct:bugzilla.bugmanage");
+		
+		
+		/**
+		 * Create VxF Validate New Route
+		 */
+		from("seda:vxf.onboard?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");
 
 		/**
 		 * Automatic OnBoarding Route Success
 		 */		
 		from("seda:vxf.onboard.success?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -277,7 +286,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Fail
 		 */		
 		from("seda:vxf.onboard.fail?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -285,7 +294,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Result
 		 */		
 		from("seda:vxf.onboard.result?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -313,11 +322,20 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 			.to("direct:bugzilla.newIssue")
 			.endChoice();
 		
+		
+		/**
+		 * Create NSD onboard New Route
+		 */
+		from("seda:nsd.onboard?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");
+		
 		/**
 		 * Automatic OnBoarding Route Success
 		 */		
 		from("seda:nsd.onboard.success?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -326,7 +344,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Fail
 		 */		
 		from("seda:nsd.onboard.fail?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -335,7 +353,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Instantiation Route Success
 		 */		
 		from("seda:nsd.deployment.instantiation.success?multipleConsumers=true")
-		.delay(5000)
+		.delay(10000)
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 

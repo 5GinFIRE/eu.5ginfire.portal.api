@@ -321,12 +321,9 @@ public class BugzillaClient {
 		String resolution = null;
 		if ( vxf.getValidationStatus().equals( ValidationStatus.UNDER_REVIEW ) )  {
 			status = "CONFIRMED";
-		} else  if ( vxf.isCertified()  &&  ( vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
+		} else  if (  vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) )  {
 			status = "RESOLVED";
 			resolution = "FIXED";
-		} else  if ( !vxf.isCertified()  &&  ( vxf.getValidationStatus().equals( ValidationStatus.COMPLETED ) ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
 		}
 		
 		
@@ -339,13 +336,13 @@ public class BugzillaClient {
 
 		String product = "5GinFIRE Operations";
 		String component = "Onboarding" ;
-		String summary = "[PORTAL] Validation Request for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
-		String alias = vxfobd.getVxf().getUuid() ;
+		String summary = "[PORTAL] OSM OnBoarding Action for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
+		String alias = vxfobd.getUuid() ;
 		
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " VxF ONBOARDING ACTION \n"
+				+ " VxF OSM ONBOARDING ACTION \n"
 				+ "**************************************************************\n");
 		
 		description.append( "\n\n VxF: " + vxfobd.getVxf().getName());
@@ -437,13 +434,13 @@ public class BugzillaClient {
 
 		String product = "5GinFIRE Operations";
 		String component = "Onboarding" ;
-		String summary = "[PORTAL] Validation Request for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
-		String alias = uexpobd.getExperiment().getUuid() ;
+		String summary = "[PORTAL] OSM OnBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
+		String alias = uexpobd.getUuid() ;
 		
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " NSD ONBOARDING ACTION \n"
+				+ " NSD OSM ONBOARDING ACTION \n"
 				+ "**************************************************************\n");
 		
 		description.append( "\n\n NSD: " + uexpobd.getExperiment().getName());

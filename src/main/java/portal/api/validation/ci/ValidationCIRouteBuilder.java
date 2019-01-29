@@ -16,6 +16,7 @@
 package portal.api.validation.ci;
 
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
@@ -26,6 +27,10 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 
 import portal.api.bugzilla.BugzillaClient;
 import portal.api.bugzilla.model.Bug;
+import portal.api.model.ExperimentMetadata;
+import portal.api.model.Product;
+import portal.api.model.ValidationJob;
+import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.repo.PortalRepository;
 
@@ -83,11 +88,45 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 		 * dead Letter Queue Users if everything fails to connect
 		 */
 		from("direct:dlq_validations")
-		.setBody()
-		.body(String.class)
+		//.setBody()
+		//.body(String.class)
+		.process( ErroneousValidationProcessor )
+		.to( "seda:vxf.validationresult.update?multipleConsumers=true")
 		.to("stream:out");
 		
 	}
+	
+	Processor ErroneousValidationProcessor = new Processor() {
+		
+		@Override
+		public void process(Exchange exchange) throws Exception {
+
+			Map<String, Object> headers = exchange.getIn().getHeaders(); 
+			Product aProd = exchange.getIn().getBody( Product.class ); 
+			
+		    		
+			if (aProd instanceof VxFMetadata) {
+				((VxFMetadata) aProd).setValidationStatus( ValidationStatus.COMPLETED );
+			} else if (aProd instanceof ExperimentMetadata) {
+				((ExperimentMetadata) aProd).setValidationStatus( ValidationStatus.COMPLETED );
+			}
+			
+			
+			if ( aProd.getValidationJobs() != null ) {
+				ValidationJob j = new ValidationJob();
+				j.setDateCreated( new Date() );
+				j.setJobid("ERROR");
+				j.setValidationStatus(false);
+				j.setOutputLog( "There is an error from the Validation Service" );
+				aProd.getValidationJobs().add(j);
+			}
+		    
+		    exchange.getOut().setBody( aProd  );
+		    // copy attachements from IN to OUT to propagate them
+		    exchange.getOut().setAttachments(exchange.getIn().getAttachments());
+			
+		}
+	};
 	
 	
 	Processor headerExtractProcessor = new Processor() {

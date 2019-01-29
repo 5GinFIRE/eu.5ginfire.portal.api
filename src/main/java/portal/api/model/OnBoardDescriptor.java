@@ -17,6 +17,7 @@ package portal.api.model;
 
 import java.util.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -52,6 +53,10 @@ public class OnBoardDescriptor {
 	private Date lastOnboarding;
 	
 	private String deployId = "(N/A)";
+	
+
+	@Basic()
+	private String uuid = null;
 
 	/**
 	 * The name is a little bit misleading. However,
@@ -64,6 +69,7 @@ public class OnBoardDescriptor {
 
 	public OnBoardDescriptor() {		
 	}
+	
 	
 	
 	public int getId() {
@@ -115,6 +121,14 @@ public class OnBoardDescriptor {
 
 	public void setVxfMANOProviderID(String vxfMANOProviderID) {
 		this.vxfMANOProviderID = vxfMANOProviderID;
+	}
+	
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 }

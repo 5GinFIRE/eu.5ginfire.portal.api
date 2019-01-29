@@ -124,7 +124,7 @@ public class DeploymentDescriptor {
 	}
 
 	@Basic()	
-	public String configStatus;
+	private String configStatus;
 	public String getConfigStatus() {
 		return configStatus;
 	}
@@ -135,7 +135,7 @@ public class DeploymentDescriptor {
 
 	@Lob
 	@Column(name = "LDETAILEDSTATUS", columnDefinition = "LONGTEXT")	
-	public String detailedStatus;
+	private String detailedStatus;
 	public String getDetailedStatus() {
 		return detailedStatus;
 	}
@@ -145,7 +145,7 @@ public class DeploymentDescriptor {
 	}
 
 	@Basic()	
-	public String constituentVnfrIps;
+	private String constituentVnfrIps;
 	
 	public String getConstituentVnfrIps() {
 		return constituentVnfrIps;

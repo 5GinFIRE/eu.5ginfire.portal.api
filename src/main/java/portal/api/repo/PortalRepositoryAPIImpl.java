@@ -3873,34 +3873,34 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		OnBoardingStatus previous_status = c.getOnBoardingStatus();
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
-		ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+		ExperimentOnBoardDescriptor uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
 		ResponseEntity<String> response = null;
 		try {
-			response = aMANOController.offBoardNSDFromMANOProvider(c);
+			response = aMANOController.offBoardNSDFromMANOProvider(uExper);
 		}
 		catch( HttpClientErrorException e)
 		{
-			c.setOnBoardingStatus(previous_status);
-			u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+			uExper.setOnBoardingStatus(previous_status);
+			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor(uExper);
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
 			return builder.build();
 		}        
 		
 		if (response == null) {
-			c.setOnBoardingStatus(previous_status);
-			u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
+			uExper.setOnBoardingStatus(previous_status);
+			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested NSOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
 			return builder.build();							
 		}
 		// Set Valid to false if it is OffBoarded
-		c.getExperiment().setValid(false);
-		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
-		u = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
-		BusController.getInstance().offBoardNSD( u );
-		return Response.ok().entity(u).build();
+		uExper.getExperiment().setValid(false);
+		uExper.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
+		BusController.getInstance().offBoardNSD( uExper );
+		return Response.ok().entity(uExper).build();
 	}
 	
 	/**

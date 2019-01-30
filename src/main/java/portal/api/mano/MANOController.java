@@ -241,7 +241,7 @@ public class MANOController {
 							logger.info(ns_instance_info.toString());
 							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
-							deployment_tmp.setDetailedStatus( ns_instance_info.getString("detailed-status").replaceAll("\n", " ").replaceAll( "\'", "'").replaceAll( "\\\\", "") );
+							deployment_tmp.setDetailedStatus( ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll( "\'", "'").replaceAll( "\\\\", "") );
 							deployment_tmp.setConstituentVnfrIps("");
 							for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
 							{

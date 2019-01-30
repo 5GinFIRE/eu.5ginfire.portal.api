@@ -1146,7 +1146,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (u != null) {
 			List<VxFMetadata> vxfs;
 
-			if (u.getRoles().contains(UserRoleType.PORTALADMIN) || u.getRoles().contains(UserRoleType.TESTBED_PROVIDER)) {
+			if (u.getRoles().contains(UserRoleType.PORTALADMIN) ) {
 				vxfs = portalRepositoryRef.getVxFs(categoryid, false);
 			} else {
 				vxfs = portalRepositoryRef.getVxFsByUserID((long) u.getId());

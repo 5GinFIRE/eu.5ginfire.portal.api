@@ -70,7 +70,7 @@ public class MANOController {
 
 	
 	public static void setHTTPSCHEME( String url ) {
-		HTTP_SCHEME = url + ":";
+		//HTTP_SCHEME = url + ":";
 	}
 	/**
 	 * onBoard a VNF to MANO Provider, as described by this descriptor
@@ -111,6 +111,7 @@ public class MANOController {
 //			pLocation = "http:" + pLocation;
 //			pLocation = pLocation.replace("\\", "/");
 //		}					
+		logger.info("PROPER VxF Package Location: " + pLocation);
 
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			OSMClient.getInstance(vxfobds.getObMANOprovider()).createOnBoardVNFDPackage(pLocation,

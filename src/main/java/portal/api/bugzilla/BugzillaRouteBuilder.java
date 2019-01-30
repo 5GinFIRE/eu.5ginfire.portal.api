@@ -38,6 +38,8 @@ import org.apache.camel.component.http4.HttpClientConfigurer;
 import org.apache.camel.component.http4.HttpComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -58,6 +60,10 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 
 	private static String BUGZILLAKEY = "";
 	private static String BUGZILLAURL = "portal.5ginfire.eu:443/bugzilla";
+	
+	
+
+	private static final transient Log logger = LogFactory.getLog( BugzillaRouteBuilder.class.getName() );
 	
 
 	//private static ModelCamelContext actx;
@@ -270,7 +276,6 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Create VxF Validate New Route
 		 */
 		from("seda:vxf.onboard?multipleConsumers=true")
-		.delay(5000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");
 
@@ -327,7 +332,6 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Create NSD onboard New Route
 		 */
 		from("seda:nsd.onboard?multipleConsumers=true")
-		.delay(5000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
@@ -433,8 +437,8 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 					.to( "direct:issue.get");
 				m = template.request();
 			}catch( CamelExecutionException e){
-				System.out.println(e.getMessage());
-				e.printStackTrace();
+				logger.error( "issueExists: " + e.getMessage() );
+				//e.printStackTrace();
 			}
 			
 			if ( m != null )	

@@ -1250,16 +1250,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					// save VxFonBoardedDescriptor or not ???
 					obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
 					
-	//				try
-	//				{
-	//					aMANOController.onBoardVxFToMANOProvider(obd);					
-	//				}
-	//				catch(Exception e)
-	//				{
-	//					System.out.println("OnBoarding Failed");					
-	//					System.out.println(e.getMessage());
-	//					e.printStackTrace();
-	//				}
+					//set proper scheme (http or https)
+					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme() ); 
 					// Send the message for automatic onboarding
 					BusController.getInstance().onBoardVxFAdded( obd );
 				}
@@ -2386,6 +2378,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	//				}
 					// Send the message for automatic onboarding
 					//BusController.getInstance().newNSDAdded( vxf );
+					
+					//set proper scheme (http or https)
+					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme() );
 					BusController.getInstance().onBoardNSDAdded( obd );
 				}
 			}

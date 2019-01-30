@@ -15,19 +15,11 @@
 
 package portal.api.mano;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
@@ -40,15 +32,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import OSM4NBIClient.OSM4Client;
 import portal.api.bus.BusController;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
-import portal.api.model.DeploymentDescriptorVxFPlacement;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
 import portal.api.model.MANOprovider;
@@ -59,8 +46,8 @@ import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.osm.client.OSMClient;
 import portal.api.repo.PortalRepository;
-import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 import urn.ietf.params.xml.ns.yang.nfvo.nsd.rev141027.nsd.catalog.Nsd;
+import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 
 /**
  * @author ctranoris
@@ -78,7 +65,13 @@ public class MANOController {
 	{
 		this.portalRepositoryRef=new PortalRepository();
 	}
+	
+	private static String HTTP_SCHEME ="https:";
 
+	
+	public static void setHTTPSCHEME( String url ) {
+		HTTP_SCHEME = url + ":";
+	}
 	/**
 	 * onBoard a VNF to MANO Provider, as described by this descriptor
 	 * 
@@ -112,7 +105,7 @@ public class MANOController {
 		logger.info("VxF Package Location: " + pLocation);
 				
 		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
+			pLocation = HTTP_SCHEME + pLocation;
 		}
 //		if (!pLocation.contains("http")) {
 //			pLocation = "http:" + pLocation;
@@ -248,7 +241,7 @@ public class MANOController {
 							logger.info(ns_instance_info.toString());
 							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
-							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status"));
+							deployment_tmp.setDetailedStatus( ns_instance_info.getString("detailed-status").replaceAll("\n", " ").replaceAll( "\'", "'").replaceAll( "\\\\", "") );
 							deployment_tmp.setConstituentVnfrIps("");
 							for(int j=0 ; j<ns_instance_info.getJSONArray("constituent-vnfr-ref").length(); j++)
 							{
@@ -328,7 +321,7 @@ public class MANOController {
 		String pLocation = em.getPackageLocation();
 		logger.info("NSD Package Location: " + pLocation);		
 		if ( !pLocation.contains( "http" )  ) {
-			pLocation = "https:" + pLocation;
+			pLocation = HTTP_SCHEME + pLocation;
 		}
 //		if (!pLocation.contains("http")) {
 //			pLocation = "http:" + pLocation;

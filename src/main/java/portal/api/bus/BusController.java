@@ -104,7 +104,7 @@ public class BusController {
 			}
 			
 			try {
-				//logger.info( "waitAndStopForTemplate: " + template.toString() + " [WAITING...]");
+				logger.info( "waitAndStopForTemplate: " + template.toString() + " [WAITING...]");
 				Thread.sleep( 5000 );
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block

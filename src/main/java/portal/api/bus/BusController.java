@@ -53,7 +53,7 @@ public class BusController {
 	private static ModelCamelContext actx;
 
 
-	private static final transient Log logger = LogFactory.getLog( BusController.class.getName());
+	private static final transient Log logger = LogFactory.getLog( MANOController.class.getName());
 
 
 	/**

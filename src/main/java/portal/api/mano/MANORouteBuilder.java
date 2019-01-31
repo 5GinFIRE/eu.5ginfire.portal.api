@@ -97,9 +97,9 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.doCatch(Exception.class)
 		.log("NS completion failed!").stop();
 		
-		from("timer://checkAndDeployTimer?period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
-		from("timer://checkAndTerminateTimer?period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
-		from("timer://checkAndUpdateRunningDeploymentDescriptors?period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
+		from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
+		from("timer://checkAndTerminateTimer?period=2m&120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
+		from("timer://checkAndUpdateRunningDeploymentDescriptors?2m&period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
 		
 		
 	}

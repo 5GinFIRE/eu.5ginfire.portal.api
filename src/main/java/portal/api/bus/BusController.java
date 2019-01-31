@@ -231,6 +231,9 @@ public class BusController {
 
 	public void deployExperiment(DeploymentDescriptor deploymentdescriptor) {
 		
+
+		logger.info( "deployExperiment: to(\"seda:nsd.deploy?multipleConsumers=true\")");
+		
 		FluentProducerTemplate	template = actx.createFluentProducerTemplate().to("seda:nsd.deploy?multipleConsumers=true");		
 		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
 		waitAndStopForTemplate( result, template );

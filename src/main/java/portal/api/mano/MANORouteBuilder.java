@@ -86,20 +86,21 @@ public class MANORouteBuilder  extends RouteBuilder{
 		from("seda:nsd.deploy?multipleConsumers=true")
 		.doTry()
 		.bean(new MANOController(),"deployNSDToMANOProvider") //returns exception or nothing
-		.log("NS deployed Successfully")
+		.log("NS deployed Successfully").stop()
 		.doCatch(Exception.class)
-		.log("NS deployment failed!");		
+		.log("NS deployment failed!").stop();		
 
 		from("seda:nsd.deployment.complete?multipleConsumers=true")
 		.doTry()
 		.bean(new MANOController(),"terminateNSFromMANOProvider") //returns exception or nothing
 		.log("NS completed Successfully")
 		.doCatch(Exception.class)
-		.log("NS completion failed!");
+		.log("NS completion failed!").stop();
 		
-		from("timer://checkAndDeployTimer?period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider");
-		from("timer://checkAndTerminateTimer?period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider");
-		from("timer://checkAndUpdateRunningDeploymentDescriptors?period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors");
+		from("timer://checkAndDeployTimer?period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
+		from("timer://checkAndTerminateTimer?period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
+		from("timer://checkAndUpdateRunningDeploymentDescriptors?period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
+		
 		
 	}
 

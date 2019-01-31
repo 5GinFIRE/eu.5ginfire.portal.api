@@ -15,9 +15,15 @@
 
 package portal.api.bus;
 
+import java.util.concurrent.Future;
+
+import org.apache.camel.Exchange;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.model.ModelCamelContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import portal.api.mano.MANOController;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
@@ -47,6 +53,8 @@ public class BusController {
 	private static ModelCamelContext actx;
 
 
+	private static final transient Log logger = LogFactory.getLog( BusController.class.getName());
+
 
 	/**
 	 * @return
@@ -73,6 +81,40 @@ public class BusController {
 		BusController.actx = actx;
 	}
 
+
+	/**
+	 * 
+	 * utility function to stop ProducerTemplate
+	 * @param result
+	 * @param template
+	 */
+	private void waitAndStopForTemplate(Future<Exchange> result, FluentProducerTemplate template) {
+		while (true) {			
+			if (result.isDone()) {
+				logger.info( "waitAndStopForTemplate: " + template.toString() + " [STOPPED]");
+				try {
+					template.stop();
+					template.clearAll();
+					template.cleanUp();
+					break;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			try {
+				//logger.info( "waitAndStopForTemplate: " + template.toString() + " [WAITING...]");
+				Thread.sleep( 5000 );
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		
+	}
+	
 	/**
 	 * Asynchronously sends to the routing bus (seda:users.create?multipleConsumers=true) that a new user is added
 	 * @param u a {@link PortalUser}
@@ -186,10 +228,16 @@ public class BusController {
 		template.withBody( deploymentdescriptor ).asyncSend();				
 	}
 	
+
 	public void deployExperiment(DeploymentDescriptor deploymentdescriptor) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deploy?multipleConsumers=true");
-		template.withBody( deploymentdescriptor ).asyncSend();				
+		
+		FluentProducerTemplate	template = actx.createFluentProducerTemplate().to("seda:nsd.deploy?multipleConsumers=true");		
+		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
+		waitAndStopForTemplate( result, template );
+		
 	}
+
+
 
 	public void deploymentInstantiationSucceded(DeploymentDescriptor deploymentdescriptor)
 	{
@@ -204,8 +252,11 @@ public class BusController {
 	}
 
 	public void completeExperiment(DeploymentDescriptor deploymentdescriptor) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete?multipleConsumers=true");
-		template.withBody( deploymentdescriptor ).asyncSend();				
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete");
+		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
+		waitAndStopForTemplate( result, template );
+
+		
 	}
 
 	public void rejectExperiment(DeploymentDescriptor deploymentdescriptor) {
@@ -213,10 +264,15 @@ public class BusController {
 		template.withBody( deploymentdescriptor ).asyncSend();				
 	}
 	
+	
+
+	private FluentProducerTemplate templateNSDInstTermSucc = null;
 	public void terminateInstanceSucceded(DeploymentDescriptor deploymentdescriptor)
 	{
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.instance.termination.success?multipleConsumers=true");
-		template.withBody( deploymentdescriptor ).asyncSend();						
+		if ( templateNSDInstTermSucc == null ) {
+			templateNSDInstTermSucc = actx.createFluentProducerTemplate().to("seda:nsd.instance.termination.success?multipleConsumers=true");
+		}
+		templateNSDInstTermSucc.withBody( deploymentdescriptor ).asyncSend();						
 	}
 	
 	public void terminateInstanceFailed(DeploymentDescriptor deploymentdescriptor)

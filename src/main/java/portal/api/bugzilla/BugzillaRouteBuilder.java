@@ -261,7 +261,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */
 		from("seda:vxf.new.validation?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
-		.to("direct:bugzilla.bugmanage");
+		.to("direct:bugzilla.newIssue");
 		
 		
 		/**
@@ -277,7 +277,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */
 		from("seda:vxf.onboard?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");
+		.to("direct:bugzilla.newIssue");
 
 		/**
 		 * Automatic OnBoarding Route Success
@@ -303,17 +303,18 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
+		
+		
+		
 		/**
-		 * Create NSD Validate New Route
-		 */
+		 * IMPORTANT NOTE: NSD ISSUE VALIDATION IS DISABLED FOR NOW
+		 * SINCE THERE IS NO nsd VALIDATION!
+		//Create NSD Validate New Route 
 		from("seda:nsd.validate.new?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformNSDValidation2BugBody")
 		.to("direct:bugzilla.newIssue");
-		
-
-		/**
-		 * Create NSD Validation Update Route
-		 */
+				
+		//Create NSD Validation Update Route		 
 		from("seda:nsd.validate.update?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformNSDValidation2BugBody")
 		.choice()
@@ -326,14 +327,15 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 			.log( "New ISSUE for validating ${body.alias} !" )	
 			.to("direct:bugzilla.newIssue")
 			.endChoice();
-		
+
+		 */
 		
 		/**
 		 * Create NSD onboard New Route
 		 */
 		from("seda:nsd.onboard?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");
+		.to("direct:bugzilla.newIssue");
 		
 		/**
 		 * Automatic OnBoarding Route Success

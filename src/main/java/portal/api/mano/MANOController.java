@@ -70,6 +70,10 @@ public class MANOController {
 
 	
 	public static void setHTTPSCHEME( String url ) {
+		logger.info("setHTTPSCHEME url = " + url);
+		if ( url.contains( "localhost") ) {
+			HTTP_SCHEME ="http:";
+		}
 		//HTTP_SCHEME = url + ":";
 	}
 	/**

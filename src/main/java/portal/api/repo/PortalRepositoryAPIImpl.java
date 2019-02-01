@@ -1246,12 +1246,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					obd.setVxf( refVxF );
 					
 					// save product
-					refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );
+					refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );					
+					
 					// save VxFonBoardedDescriptor or not ???
 					obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
 					
 					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme() ); 
+					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getRequestURL().toString()  );
+					
+					if ( obd.getVxf().getOwner() == null ) {
+						logger.error( " ========> obd.getVxf().getOwner() == null " );
+					}
+					
 					// Send the message for automatic onboarding
 					BusController.getInstance().onBoardVxFAdded( obd );
 				}

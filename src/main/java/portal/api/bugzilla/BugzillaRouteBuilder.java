@@ -285,7 +285,10 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:vxf.onboard.success?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		//.to("direct:bugzilla.bugmanage");
+		
 
 		/**
 		 * Automatic OnBoarding Route Fail
@@ -293,7 +296,9 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:vxf.onboard.fail?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		//.to("direct:bugzilla.bugmanage");	
 
 		/**
 		 * Automatic OnBoarding Route Result
@@ -301,7 +306,9 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:vxf.onboard.result?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
+		//.to("direct:bugzilla.bugmanage");	
 		
 		
 		
@@ -343,7 +350,8 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:nsd.onboard.success?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
 
 		
 		/**
@@ -352,7 +360,8 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:nsd.onboard.fail?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
-		.to("direct:bugzilla.bugmanage");	
+		.process( BugHeaderExtractProcessor )
+		.to("direct:bugzilla.updateIssue");
 
 
 		/**

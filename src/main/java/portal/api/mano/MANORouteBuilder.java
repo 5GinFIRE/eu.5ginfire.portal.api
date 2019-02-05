@@ -99,7 +99,7 @@ public class MANORouteBuilder  extends RouteBuilder{
 		
 		from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
 		from("timer://checkAndTerminateTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
-		from("timer://checkAndUpdateRunningDeploymentDescriptors?delay=2m&period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
+		from("timer://checkAndUpdateRunningDeploymentDescriptors?delay=2m&period=300000").bean(MANOController.class,"checkAndUpdateRunningDeploymentDescriptors").stop();
 		
 		
 	}

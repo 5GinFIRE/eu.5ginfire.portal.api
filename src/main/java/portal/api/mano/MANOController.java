@@ -56,14 +56,14 @@ import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 public class MANOController {
 	
 	/** This is also binded by Bean */
-	private PortalRepository portalRepositoryRef;
+	private static PortalRepository portalRepositoryRef;
 
 	/** */
 	private static final transient Log logger = LogFactory.getLog(MANOController.class.getName());
 	
 	public MANOController()
 	{
-		this.portalRepositoryRef=new PortalRepository();
+		
 	}
 	
 	private static String HTTP_SCHEME ="https:";
@@ -220,7 +220,7 @@ public class MANOController {
 		}
 	}
 	
-	public void checkAndUpdateRunningDeploymentDescriptors()
+	public static void checkAndUpdateRunningDeploymentDescriptors()
 	{
 		logger.info("Update Deployment Descriptors");
 		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningAndCompletedDeployments();

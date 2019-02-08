@@ -63,17 +63,8 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.doTry()
 		.bean(new MANOController(),"onBoardVxFToMANOProvider") //returns exception or nothing
 		.log("VNFD Onboarded Successfully")
-//		.to("seda:vxf.onboardingresult.update?multipleConsumers=true")
-//		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
-//		.to("direct:bugzilla.bugmanage")
-//		.to("direct:bugzilla.updateIssue") // Successfully
-//		//"seda:deployments.update
-		//.to("stream:out");
 		.doCatch(Exception.class)
 		.log("VNFD Onboarding failed!");
-		//.to("stream:out");
-//		.to("direct:bugzilla.bugmanage")
-//		.to("direct:bugzilla.updateIssue"); // Failed
 
 		from("seda:nsd.onboard?multipleConsumers=true")
 		.doTry()
@@ -97,9 +88,13 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.doCatch(Exception.class)
 		.log("NS completion failed!").stop();
 		
-		from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
-		from("timer://checkAndTerminateTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
-		from("timer://checkAndUpdateRunningDeploymentDescriptors?delay=2m&period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
+//		from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
+//		from("timer://checkAndTerminateTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
+//		from("timer://checkAndUpdateRunningDeploymentDescriptors?delay=2m&period=300000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
+
+//		from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
+//		from("timer://checkAndTerminateTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();
+		from("timer://checkAndUpdateRunningDeploymentDescriptors?delay=0m&period=120000").bean(new MANOController(),"checkAndUpdateRunningDeploymentDescriptors").stop();
 		
 		
 	}

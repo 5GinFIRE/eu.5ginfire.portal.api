@@ -21,6 +21,10 @@ public enum DeploymentDescriptorStatus {
 		SCHEDULED,
 		REJECTED,
 		RUNNING,
-		COMPLETED
+		COMPLETED,
+		INSTANTIATING,
+		FAILED,
+		TERMINATING,
+		TERMINATION_FAILED
 }
 

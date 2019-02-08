@@ -176,10 +176,8 @@ public class BusController {
 	 * @param deployment a {@link VxFMetadata}
 	 */
 	public void onBoardVxFAdded(VxFOnBoardedDescriptor obd) {
-
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:vxf.onboard?multipleConsumers=true");
-		template.withBody( obd ).asyncSend();		
-		
+		template.withBody( obd ).asyncSend();				
 	}
 
 	public void onBoardVxFFailed(VxFOnBoardedDescriptor obd) {
@@ -205,12 +203,12 @@ public class BusController {
 	 * Asynchronously sends to the routing bus (seda:nsd.onboard?multipleConsumers=true) to upload a new vxf
 	 * @param deployment a {@link VxFMetadata}
 	 */
-	public void onBoardNSDAdded(ExperimentOnBoardDescriptor uexpobd) {
-
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard?multipleConsumers=true");
-		template.withBody( uexpobd ).asyncSend();		
-		
-	}
+	//	public void onBoardNSDAdded(ExperimentOnBoardDescriptor uexpobd) {
+	//
+	//		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard?multipleConsumers=true");
+	//		template.withBody( uexpobd ).asyncSend();		
+	//		
+	//	}
 	
 	public void onBoardNSDFailed(ExperimentOnBoardDescriptor uexpobd) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.onboard.fail?multipleConsumers=true");
@@ -254,12 +252,22 @@ public class BusController {
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
 
+	public void deploymentTerminationSucceded(DeploymentDescriptor deploymentdescriptor)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.termination.success?multipleConsumers=true");
+		template.withBody( deploymentdescriptor ).asyncSend();						
+	}
+	
+	public void deploymentTerminationFailed(DeploymentDescriptor deploymentdescriptor)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.termination.fail?multipleConsumers=true");
+		template.withBody( deploymentdescriptor ).asyncSend();						
+	}
+	
 	public void completeExperiment(DeploymentDescriptor deploymentdescriptor) {
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete");
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete?multipleConsumers=true");
 		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
-		waitAndStopForTemplate( result, template );
-
-		
+		//waitAndStopForTemplate( result, template );		
 	}
 
 	public void rejectExperiment(DeploymentDescriptor deploymentdescriptor) {
@@ -280,7 +288,7 @@ public class BusController {
 	
 	public void terminateInstanceFailed(DeploymentDescriptor deploymentdescriptor)
 	{
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.instance.termination.failed?multipleConsumers=true");
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.instance.termination.fail?multipleConsumers=true");
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
 

@@ -74,7 +74,7 @@ public class BugzillaClient {
 		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
 			status = "RESOLVED";
 			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
+		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.FAILED )) {
 			status = "RESOLVED";
 			resolution = "INVALID";
 		}
@@ -101,7 +101,7 @@ public class BugzillaClient {
 		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
 			status = "RESOLVED";
 			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
+		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.TERMINATION_FAILED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.FAILED )) {
 			status = "RESOLVED";
 			resolution = "INVALID";
 		}
@@ -111,33 +111,7 @@ public class BugzillaClient {
 		return b;
 		
 	}
-	
-	public static Bug transformNSTermination2BugBodyFailed(DeploymentDescriptor descriptor) {
-
-		String product = "5GinFIRE Operations";
-		String component = "Operations Support" ;
-		String summary = "[PORTAL] Completion Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername() + "FAILED.";
-		String alias = descriptor.getUuid() ;
-
-		String description = getDeploymentDescription( descriptor );		
 		
-		String status= "CONFIRMED";
-		String resolution = null;
-		
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
-			status = "RESOLVED";
-			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
-		}
-		
-		
-		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
-		return b;
-		
-	}
-	
 	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
 
 		String product = "5GinFIRE Operations";
@@ -149,13 +123,13 @@ public class BugzillaClient {
 		
 		String status= "CONFIRMED";
 		String resolution = null;
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.SCHEDULED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
+		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.SCHEDULED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
 			status = "IN_PROGRESS";
 			component = "NSD Deployment Request" ;
 		} else  if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) ) {
 			status = "RESOLVED";
 			resolution = "FIXED";
-		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) ) {
+		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.FAILED )) {
 			status = "RESOLVED";
 			resolution = "INVALID";
 		}
@@ -478,5 +452,49 @@ public class BugzillaClient {
 		return b;
 	}
 	
+	public static Bug transformNSDAutomaticOffBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
+
+		String product = "5GinFIRE Operations";
+		String component = "Offboarding" ;
+		String summary = "[PORTAL] OSM OffBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
+		String alias = uexpobd.getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " NSD OSM OFFBOARDING ACTION \n"
+				+ "**************************************************************\n");
+		
+		description.append( "\n\n NSD: " + uexpobd.getExperiment().getName());
+		description.append( "\n Owner: " +  uexpobd.getExperiment().getOwner().getUsername() );
+		description.append( "\n Vendor: " +  uexpobd.getExperiment().getVendor() );
+		description.append( "\n Version: " + uexpobd.getExperiment().getVersion() );
+		description.append( "\n Archive: " + uexpobd.getExperiment().getPackageLocation() );
+		description.append( "\n UUID: " + uexpobd.getExperiment().getUuid()  );
+		description.append( "\n ID: " + uexpobd.getExperiment().getId()   );
+		description.append( "\n Date Created: " + uexpobd.getExperiment().getDateCreated().toString()   );
+		description.append( "\n Date Updated: " + uexpobd.getExperiment().getDateUpdated().toString()   );
+
+
+		description.append( "\n" );
+		description.append( "\n NSD OffBoarding Status: " + uexpobd.getOnBoardingStatus()  );
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/experiment_edit/" + uexpobd.getExperiment().getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( uexpobd.getOnBoardingStatus().equals( OnBoardingStatus.OFFBOARDED ) )  {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( uexpobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}
+		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), uexpobd.getExperiment().getOwner().getEmail(), status, resolution);
+		return b;
+	}
 
 }

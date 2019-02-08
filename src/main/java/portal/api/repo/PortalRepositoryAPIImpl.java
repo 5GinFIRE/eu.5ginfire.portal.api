@@ -2387,7 +2387,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					
 					//set proper scheme (http or https)
 					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme() );
-					BusController.getInstance().onBoardNSDAdded( obd );
+					BusController.getInstance().onBoardNSD( obd );
 				}
 			}
 			// AUTOMATIC ONBOARDING PROCESS -END
@@ -2991,7 +2991,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 							}
 						}
 					}
-					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.RUNNING && receivedDeployment.getStatus() == DeploymentDescriptorStatus.RUNNING && aDeployment.getInstanceId() == null)
+					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.RUNNING && aDeployment.getInstanceId() == null)
 					{
 						for (ExperimentOnBoardDescriptor tmpExperimentOnBoardDescriptor : dd.getExperimentFullDetails().getExperimentOnBoardDescriptors())
 						{

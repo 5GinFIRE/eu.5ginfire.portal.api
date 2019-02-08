@@ -343,6 +343,13 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		from("seda:nsd.onboard?multipleConsumers=true")
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.to("direct:bugzilla.newIssue");
+
+		/**
+		 * Create NSD offboard New Route
+		 */
+		from("seda:nsd.offboard?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformNSDAutomaticOffBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");
 		
 		/**
 		 * Automatic OnBoarding Route Success
@@ -368,6 +375,19 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Instantiation Route Success
 		 */		
 		from("seda:nsd.deployment.instantiation.success?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+
+		/**
+		 * Automatic NS Instantiation Route Success
+		 */		
+		from("seda:nsd.deployment.termination.success?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+
+		from("seda:nsd.deployment.termination.fail?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
@@ -401,17 +421,9 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 */		
 		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
 		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSTermination2BugBodyFailed")
+		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
-		/**
-		 * Automatic NS Termination Route Fail
-		 */		
-		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
-		.delay(5000)
-		.bean( BugzillaClient.class, "transformNSTermination2BugBodyFailed")
-		.to("direct:bugzilla.bugmanage");	
-		
 		/**
 		 * Reject Deployment Route Issue
 		 */

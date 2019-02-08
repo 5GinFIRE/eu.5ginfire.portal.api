@@ -56,14 +56,14 @@ import urn.ietf.params.xml.ns.yang.nfvo.vnfd.rev150910.vnfd.catalog.Vnfd;
 public class MANOController {
 	
 	/** This is also binded by Bean */
-	private PortalRepository portalRepositoryRef;
+	private static PortalRepository portalRepositoryRef;
 
 	/** */
 	private static final transient Log logger = LogFactory.getLog(MANOController.class.getName());
 	
 	public MANOController()
 	{
-		this.portalRepositoryRef=new PortalRepository();
+		
 	}
 	
 	private static String HTTP_SCHEME ="https:";
@@ -194,7 +194,7 @@ public class MANOController {
 //	}
 	
 	
-	public void checkAndDeployExperimentToMANOProvider() {
+	public static void checkAndDeployExperimentToMANOProvider() {
 		logger.info("This will trigger the check and Deploy Experiments");		
 		// Check the database for a new deployment in the next minutes
 		// If there is a deployment to be made and the status is Scheduled
@@ -207,7 +207,7 @@ public class MANOController {
 		}
 	}
 
-	public void checkAndTerminateExperimentToMANOProvider() {
+	public static void checkAndTerminateExperimentToMANOProvider() {
 		logger.info("This will trigger the check and Terminate Deployments");
 		// Check the database for a deployment to be completed in the next minutes
 		// If there is a deployment to be made and the status is Scheduled
@@ -223,7 +223,7 @@ public class MANOController {
 		}
 	}
 	
-	public void checkAndUpdateRunningDeploymentDescriptors()
+	public static void checkAndUpdateRunningDeploymentDescriptors()
 	{
 		logger.info("Update Deployment Descriptors");
 		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningAndCompletedDeployments();

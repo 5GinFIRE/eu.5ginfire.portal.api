@@ -254,6 +254,7 @@ public class BugzillaClient {
 
 	public static Bug transformVxFValidation2BugBody(VxFMetadata vxf) {
 
+		logger.info( "In transformVxFValidation2BugBody: alias = " + vxf.getUuid());
 		String product = "5GinFIRE Operations";
 		String component = "Validation" ;
 		String summary = "[PORTAL] Validation Request for VxF:" + vxf.getName() + ", Owner: " + vxf.getOwner().getUsername();
@@ -305,6 +306,8 @@ public class BugzillaClient {
 	}
 	
 	public static Bug transformVxFAutomaticOnBoarding2BugBody(VxFOnBoardedDescriptor vxfobd) {
+		
+		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
 
 		String product = "5GinFIRE Operations";
 		String component = "Onboarding" ;
@@ -356,6 +359,7 @@ public class BugzillaClient {
 		
 	
 	public static Bug transformNSDValidation2BugBody(ExperimentMetadata nsd) {
+		logger.info( "In transformNSDValidation2BugBody: alias = " + nsd.getUuid());
 
 		String product = "5GinFIRE Operations";
 		String component = "Validation" ;
@@ -401,6 +405,8 @@ public class BugzillaClient {
 	
 	public static Bug transformNSDAutomaticOnBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
 
+		logger.info( "In transformNSDAutomaticOnBoarding2BugBody: alias = " + uexpobd.getUuid());
+		
 		String product = "5GinFIRE Operations";
 		String component = "Onboarding" ;
 		String summary = "[PORTAL] OSM OnBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();

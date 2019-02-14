@@ -69,8 +69,6 @@ public class BugzillaClient {
 		String status= "CONFIRMED";
 		String resolution = null;
 		
-		String assignee_email = null;
-
 		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
 			status = "RESOLVED";
 			resolution = "FIXED";
@@ -164,7 +162,7 @@ public class BugzillaClient {
 		description.append( "\nSTATUS: " + descriptor.getStatus() + "\n");
 		if ( descriptor.getStartDate() != null ) {
 			description.append( "\nFeedback: " + descriptor.getFeedback() );
-			description.append( "\nScheduled Start Date: " + descriptor.getStartDate().toString() );
+			description.append("\nScheduled Start Date: " + descriptor.getStartDate().toString() );
 			description.append( "\nScheduled End Date: " + descriptor.getEndDate().toString() );
 		} else {
 			description.append( "\nNOT YET SCHEDULED \n");			
@@ -332,6 +330,7 @@ public class BugzillaClient {
 
 		description.append( "\n" );
 		description.append( "\n VxF OnBoarding Status: " + vxfobd.getOnBoardingStatus()  );
+		description.append( "\n VxF OnBoarding Feedback: " + vxfobd.getFeedbackMessage()  );
 		description.append( "\n Last Onboarding: " + vxfobd.getLastOnboarding());
 		description.append( "\n Last Onboarding Deploy ID: " + vxfobd.getDeployId());
 		description.append( "\n Onboarding MANO provider: " + vxfobd.getObMANOprovider().getName() );
@@ -345,16 +344,12 @@ public class BugzillaClient {
 			status = "RESOLVED";
 			resolution = "FIXED";
 		} else  if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
-			status = "RESOLVED";
-			resolution = "INVALID";
-		}
-		
+			status = "CONFIRMED";
+//			status = "RESOLVED";
+//			resolution = "INVALID";
+		}		
 		
 		Bug b = createBug(product, component, summary, alias, description.toString(), vxfobd.getVxf().getOwner().getEmail(), status, resolution);
-//		b.setAssignedTo("ctranoris@ece.upatras.gr");
-//		List<String> list=new ArrayList<String>();
-//		list.add("ioannis.chatzis@upatras.gr");
-//		b.setCc(list);
 		return b;
 	}
 	
@@ -430,6 +425,7 @@ public class BugzillaClient {
 
 		description.append( "\n" );
 		description.append( "\n NSD OnBoarding Status: " + uexpobd.getOnBoardingStatus()  );
+		description.append( "\n NSD OnBoarding Feedback: " + uexpobd.getFeedbackMessage()  );
 		description.append( "\n Last Onboarding: " + uexpobd.getLastOnboarding());
 		description.append( "\n Last Onboarding Deploy ID: " + uexpobd.getDeployId());
 		description.append( "\n Onboarding MANO provider: " + uexpobd.getObMANOprovider().getName() );
@@ -478,6 +474,7 @@ public class BugzillaClient {
 
 		description.append( "\n" );
 		description.append( "\n NSD OffBoarding Status: " + uexpobd.getOnBoardingStatus()  );
+		description.append( "\n NSD OffBoarding Feedback: " + uexpobd.getFeedbackMessage()  );
 		 
 		description.append( "\n\n*************************************************\n");
 		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/experiment_edit/" + uexpobd.getExperiment().getId() ); 

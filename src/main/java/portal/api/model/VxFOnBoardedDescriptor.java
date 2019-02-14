@@ -42,7 +42,7 @@ public class VxFOnBoardedDescriptor extends OnBoardDescriptor{
 		
 	
 	private String vxfMANOProviderID;	
-	
+		
 	private long tempvxfID;
 
 	public VxFOnBoardedDescriptor() {		
@@ -82,5 +82,4 @@ public class VxFOnBoardedDescriptor extends OnBoardDescriptor{
 	public void setVxfMANOProviderID(String vxfMANOProviderID) {
 		this.vxfMANOProviderID = vxfMANOProviderID;
 	}
-
 }

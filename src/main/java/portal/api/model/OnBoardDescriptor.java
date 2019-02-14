@@ -19,6 +19,7 @@ import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -26,6 +27,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -54,6 +56,9 @@ public class OnBoardDescriptor {
 	
 	private String deployId = "(N/A)";
 	
+	@Lob
+	@Column(name = "LDETAILEDSTATUS", columnDefinition = "LONGTEXT")	
+	private String feedbackMessage;
 
 	@Basic()
 	private String uuid = null;
@@ -131,4 +136,17 @@ public class OnBoardDescriptor {
 		this.uuid = uuid;
 	}
 
+	/**
+	 * @return the feedbackMessage
+	 */
+	public String getFeedbackMessage() {
+		return feedbackMessage;
+	}
+
+	/**
+	 * @param feedbackMessage the feedbackMessage to set
+	 */
+	public void setFeedbackMessage(String feedbackMessage) {
+		this.feedbackMessage = feedbackMessage;
+	}	
 }

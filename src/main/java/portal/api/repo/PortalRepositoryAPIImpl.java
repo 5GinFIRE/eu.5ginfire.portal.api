@@ -2386,7 +2386,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					//BusController.getInstance().newNSDAdded( vxf );
 					
 					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme() );
+					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
 					BusController.getInstance().onBoardNSD( obd );
 				}
 			}

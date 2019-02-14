@@ -44,7 +44,7 @@ public class ExperimentOnBoardDescriptor extends OnBoardDescriptor{
 	private String experimentMANOProviderID;	
 	
 	private long tempExperimentID;
-
+	
 	public ExperimentOnBoardDescriptor() {		
 	}
 	
@@ -82,6 +82,5 @@ public class ExperimentOnBoardDescriptor extends OnBoardDescriptor{
 	public void setExperimentMANOProviderID(String experimentMANOProviderID) {
 		this.experimentMANOProviderID = experimentMANOProviderID;
 	}
-
 
 }

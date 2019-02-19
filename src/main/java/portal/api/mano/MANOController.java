@@ -246,13 +246,11 @@ public class MANOController {
 
 	public static void checkAndUpdateRunningDeploymentDescriptors() {
 		logger.info("Update Deployment Descriptors");
-		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef
-				.getRunningAndCompletedDeployments();
+		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningAndCompletedDeployments();
 		OSM4Client osm4Client = null;
 		// For each deployment get the status info and the IPs
 		for (int i = 0; i < runningDeploymentDescriptors.size(); i++) {
-			DeploymentDescriptor deployment_tmp = portalRepositoryRef
-					.getDeploymentByID(runningDeploymentDescriptors.get(i).getId());
+			DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(runningDeploymentDescriptors.get(i).getId());
 			try {
 				// Get the MANO Provider for each deployment
 				MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails()
@@ -261,8 +259,7 @@ public class MANOController {
 					if (osm4Client == null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint())) {
 						osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
 					}
-					JSONObject ns_instance_info = osm4Client
-							.getNSInstanceInfo(runningDeploymentDescriptors.get(i).getInstanceId());
+					JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(runningDeploymentDescriptors.get(i).getInstanceId());
 					if (ns_instance_info != null) {
 						try {
 							logger.info(ns_instance_info.toString());
@@ -276,30 +273,50 @@ public class MANOController {
 									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp);
 								deployment_tmp.setConstituentVnfrIps("");
 								for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
-										.length(); j++) {
+										.length(); j++) 
+								{
 									if (j > 0) {
-										deployment_tmp
-												.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
+										deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
 									}
-									JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(
-											ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-									if (vnf_instance_info != null) {
+									ResponseEntity<String> vnf_instance_id_info_response = osm4Client.getVNFInstanceInfoNew(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+									if(!vnf_instance_id_info_response.getStatusCode().is4xxClientError() && !vnf_instance_id_info_response.getStatusCode().is5xxServerError() )
+									{
+										JSONObject vnf_instance_info = new JSONObject(vnf_instance_id_info_response.getBody());
 										try {
 											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
 													+ vnf_instance_info.getString("ip-address"));
 										} catch (JSONException e) {
 											logger.error(e.getMessage());
-										}
+										}																				
 									}
+									else
+									{
+										deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()	+ "Ν/Α");
+										logger.error("ERROR gettin constituent-vnfr-ref info. Response:"+vnf_instance_id_info_response.getBody().toString());
+										//break;
+									}
+									
+//									JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(
+//											ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+//									if (vnf_instance_info != null) {
+//										try {
+//											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
+//													+ vnf_instance_info.getString("ip-address"));
+//										} catch (JSONException e) {
+//											logger.error(e.getMessage());
+//										}
+//									}
 								}
 							}
 							// deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING &&
 							if (deployment_tmp.getOperationalStatus().toLowerCase().equals("terminated")
 									&& deployment_tmp.getConfigStatus().toLowerCase().equals("terminating")
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.COMPLETED);
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp);
@@ -309,12 +326,14 @@ public class MANOController {
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.FAILED);
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp);
 							}
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								BusController.getInstance().deploymentTerminationFailed(deployment_tmp);
 							}
 							deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
@@ -741,12 +760,7 @@ public class MANOController {
 			NSCreateInstanceRequestPayload nscreateinstancerequestpayload = new NSCreateInstanceRequestPayload(
 					osm4Client, deploymentdescriptor);
 			// Get Experiment ID and VIM ID and create NS Instance.
-			// String nsd_instance_id =
-			// osm4Client.createNSInstance(deploymentdescriptor.getName(),deploymentdescriptor.getInfrastructureForAll().getVIMid(),
-			// deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId());
 			logger.info("NS Instance creation payload : " + nscreateinstancerequestpayload.toJSON());
-			// String nsd_instance_id =
-			// osm4Client.createNSInstance(nscreateinstancerequestpayload.toJSON());
 			ResponseEntity<String> ns_instance_creation_entity = osm4Client
 					.createNSInstance(nscreateinstancerequestpayload.toJSON());
 			// The NS Instance ID is set
@@ -777,9 +791,7 @@ public class MANOController {
 				// String nsr_id = osm4Client.instantiateNSInstance(nsd_instance_id,
 				// nsrequestpayload.toJSON());
 				ResponseEntity<String> instantiate_ns_instance_entity = osm4Client.instantiateNSInstance(nsd_instance_id, nsrequestpayload.toJSON());
-				if (instantiate_ns_instance_entity == null
-						|| instantiate_ns_instance_entity.getStatusCode().is4xxClientError()
-						|| instantiate_ns_instance_entity.getStatusCode().is5xxServerError()) {
+				if (instantiate_ns_instance_entity == null || instantiate_ns_instance_entity.getStatusCode().is4xxClientError() || instantiate_ns_instance_entity.getStatusCode().is5xxServerError()) {
 					// NS Instantiation failed
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED);
 					deploymentdescriptor.setFeedback(instantiate_ns_instance_entity.getBody().toString());
@@ -819,25 +831,50 @@ public class MANOController {
 					"admin");
 			// Get Experiment ID and VIM ID and create NS Instance.
 			// NS instance termination
-			if (osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId()) != null) {
+//			if (osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId()) != null) {
+//				// NS Termination succeded
+//				logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
+////				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);				
+////				deploymentdescriptor.setConstituentVnfrIps("N/A");
+//
+//				if (osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null) {
+//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");
+//				} else {
+//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
+//				}
+//				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
+//						.updateDeploymentDescriptor(deploymentdescriptor);
+//				BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);
+//			} else {
+//				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
+////				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);				
+////				// NS Termination failed
+////				BusController.getInstance().terminateInstanceFailed( deploymentdescriptor );				
+//			}
+			
+			ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
+			if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
+			}
+			else
+			{
 				// NS Termination succeded
 				logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
-//				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);				
-//				deploymentdescriptor.setConstituentVnfrIps("N/A");
-
-				if (osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null) {
-					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");
-				} else {
+//				if (osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null) {
+//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");
+//				} else {
+//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
+//				}
+				ResponseEntity<String> deletion_response = osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()); 
+				if (deletion_response == null || deletion_response.getStatusCode().is4xxClientError() || deletion_response.getStatusCode().is5xxServerError()) {
 					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
 				}
-				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
-						.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);
-			} else {
-				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-//				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);				
-//				// NS Termination failed
-//				BusController.getInstance().terminateInstanceFailed( deploymentdescriptor );				
+				else
+				{
+					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
+				}
+				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+				BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
 			}
 		}
 	}

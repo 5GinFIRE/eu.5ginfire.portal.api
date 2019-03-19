@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import OSM4NBIClient.OSM4Client;
 import portal.api.bus.BusController;
@@ -216,6 +217,15 @@ public class MANOController {
 //
 //	}
 
+	public static void checkAndDeleteTerminatedOrFailedDeployments() {
+		logger.info("Check and Delete Terminated and Failed Deployments");
+		List<DeploymentDescriptor> DeploymentDescriptorsToDelete = portalRepositoryRef.getDeploymentsToBeDeleted();
+		for (DeploymentDescriptor d : DeploymentDescriptorsToDelete) {
+			// Launch the deployment
+			BusController.getInstance().deleteExperiment(d);
+		}
+	}
+	
 	public static void checkAndDeployExperimentToMANOProvider() {
 		logger.info("This will trigger the check and Deploy Experiments");
 		// Check the database for a new deployment in the next minutes
@@ -246,18 +256,25 @@ public class MANOController {
 
 	public static void checkAndUpdateRunningDeploymentDescriptors() {
 		logger.info("Update Deployment Descriptors");
-		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningAndCompletedDeployments();
+		List<DeploymentDescriptor> runningDeploymentDescriptors = portalRepositoryRef.getRunningInstantiatingAndTerminatingDeployments();
 		OSM4Client osm4Client = null;
 		// For each deployment get the status info and the IPs
 		for (int i = 0; i < runningDeploymentDescriptors.size(); i++) {
 			DeploymentDescriptor deployment_tmp = portalRepositoryRef.getDeploymentByID(runningDeploymentDescriptors.get(i).getId());
 			try {
 				// Get the MANO Provider for each deployment
-				MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails()
-						.getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
+				MANOprovider sm = portalRepositoryRef.getMANOproviderByID(deployment_tmp.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getId());
 				if (sm.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 					if (osm4Client == null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint())) {
-						osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
+						try
+						{
+							osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
+						}
+						catch(Exception e)
+						{
+							logger.error("OSM4 fails authentication");
+							return;
+						}
 					}
 					JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(runningDeploymentDescriptors.get(i).getInstanceId());
 					if (ns_instance_info != null) {
@@ -298,18 +315,7 @@ public class MANOController {
 										deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()	+ "Ν/Α");
 										logger.error("ERROR gettin constituent-vnfr-ref info. Response:"+vnf_instance_id_info_response.getBody().toString());
 										//break;
-									}
-									
-//									JSONObject vnf_instance_info = osm4Client.getVNFInstanceInfo(
-//											ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
-//									if (vnf_instance_info != null) {
-//										try {
-//											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
-//													+ vnf_instance_info.getString("ip-address"));
-//										} catch (JSONException e) {
-//											logger.error(e.getMessage());
-//										}
-//									}
+									}									
 								}
 							}
 							// deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING &&
@@ -317,7 +323,7 @@ public class MANOController {
 									&& deployment_tmp.getConfigStatus().toLowerCase().equals("terminating")
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
-								deployment_tmp.setStatus(DeploymentDescriptorStatus.COMPLETED);
+								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATED);
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp);
 							}
@@ -348,6 +354,7 @@ public class MANOController {
 		}
 		checkAndDeployExperimentToMANOProvider();
 		checkAndTerminateExperimentToMANOProvider();
+		checkAndDeleteTerminatedOrFailedDeployments();
 	}
 
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception {
@@ -481,8 +488,19 @@ public class MANOController {
 		ResponseEntity<String> response = null;
 		if (obd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			String vnfd_id = obd.getDeployId();
-			OSM4Client osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(),
-					obd.getObMANOprovider().getUsername(), obd.getObMANOprovider().getPassword(), "admin");
+//			OSM4Client osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(),
+//					obd.getObMANOprovider().getUsername(), obd.getObMANOprovider().getPassword(), "admin");
+			OSM4Client osm4Client = null;			
+			try {
+				osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(), obd.getObMANOprovider().getUsername(), obd.getObMANOprovider().getPassword(), "admin");
+			}
+		    catch(HttpStatusCodeException e) 
+			{
+				logger.error("offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting action.");
+		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
+		                .body(e.getResponseBodyAsString());
+			}						
+			
 			response = osm4Client.deleteVNFDPackage(vnfd_id);
 		}
 		if (obd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
@@ -566,8 +584,15 @@ public class MANOController {
 	public VxFOnBoardedDescriptor getVxFStatusFromOSM4Client(VxFOnBoardedDescriptor obds) {
 		ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = null;
 		try {
-			OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),
-					obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+			OSM4Client osm4Client = null;			
+			try {
+				new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+			}
+			catch(Exception e)
+			{
+				logger.error("getVxFStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+				return obds;
+			}			
 			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfds = osm4Client.getVNFDs();
 			if (vnfds != null) {
 				for (ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd v : vnfds) {
@@ -672,8 +697,15 @@ public class MANOController {
 		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd nsd = null;
 
 		try {
-			OSM4Client osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(),
-					obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+			OSM4Client osm4Client = null;			
+			try {
+				osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+			}
+			catch(Exception e)
+			{
+				logger.error("getNSDStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+				return obds;
+			}
 			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
 			if (nsds != null) {
 				for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
@@ -721,20 +753,17 @@ public class MANOController {
 		ResponseEntity<String> response = null;
 		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			String nsd_id = uexpobd.getDeployId();
-			OSM4Client osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(),
-					uexpobd.getObMANOprovider().getUsername(), uexpobd.getObMANOprovider().getPassword(), "admin");
-			//// Get nsd list
-			// ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
-			// for(ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd tmp : nsds)
-			// {
-			// // Check if nsd_id is available
-			// if(tmp.getId().equals(nsd_id))
-			// {
-			// // If it is available, call offboarding
+			OSM4Client osm4Client = null;			
+			try {
+				osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(), uexpobd.getObMANOprovider().getUsername(), uexpobd.getObMANOprovider().getPassword(), "admin");
+			}
+		    catch(HttpStatusCodeException e) 
+			{
+				logger.error("offBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
+		                .body(e.getResponseBodyAsString());
+			}						
 			response = osm4Client.deleteNSDPackage(nsd_id);
-			// return response;
-			// }
-			// }
 		}
 		if (uexpobd.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM TWO")) {
 			response = new ResponseEntity<>("Not implemented for OSMvTWO", HttpStatus.CREATED);
@@ -748,14 +777,22 @@ public class MANOController {
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
 				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getApiEndpoint(),
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getUsername(),
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getPassword(),
-					"admin");
+			OSM4Client osm4Client = null;
+			try {
+				 osm4Client = new OSM4Client(
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getApiEndpoint(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getUsername(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getPassword(),
+						"admin");
+			}
+			catch(Exception e)
+			{
+				logger.error("deployNSDToMANOProvider, OSM4 fails authentication! Aborting deployment of NSD.");
+				return;
+			}
 
 			NSCreateInstanceRequestPayload nscreateinstancerequestpayload = new NSCreateInstanceRequestPayload(
 					osm4Client, deploymentdescriptor);
@@ -820,6 +857,40 @@ public class MANOController {
 	public void terminateNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor) {
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
 				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+			if( deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED )
+			{
+				// There can be multiple MANOs for the Experiment. We need to handle that also.
+				OSM4Client osm4Client = new OSM4Client(
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getApiEndpoint(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getUsername(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getPassword(),
+						"admin");
+				ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
+				if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+					if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING)
+						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
+					if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
+						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);				
+					deploymentdescriptor.setFeedback(response.getBody().toString());				
+					logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
+				}
+				else
+				{
+					// NS Termination succeded
+					logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
+					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+					BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+				}
+			}
+		}
+	}
+
+	public void deleteNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor) {
+		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
+				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = new OSM4Client(
 					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
@@ -828,55 +899,36 @@ public class MANOController {
 							.getObMANOprovider().getUsername(),
 					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
 							.getObMANOprovider().getPassword(),
-					"admin");
-			// Get Experiment ID and VIM ID and create NS Instance.
-			// NS instance termination
-//			if (osm4Client.terminateNSInstance(deploymentdescriptor.getInstanceId()) != null) {
-//				// NS Termination succeded
-//				logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
-////				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);				
-////				deploymentdescriptor.setConstituentVnfrIps("N/A");
-//
-//				if (osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null) {
-//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");
-//				} else {
-//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-//				}
-//				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
-//						.updateDeploymentDescriptor(deploymentdescriptor);
-//				BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);
-//			} else {
-//				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-////				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);				
-////				// NS Termination failed
-////				BusController.getInstance().terminateInstanceFailed( deploymentdescriptor );				
-//			}
-			
-			ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
-			if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-				logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
+					"admin");							
+			// After TERMINATION
+			boolean force;
+			if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)
+			{
+				force=false;
 			}
 			else
 			{
-				// NS Termination succeded
-				logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
-//				if (osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()) != null) {
-//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");
-//				} else {
-//					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-//				}
-				ResponseEntity<String> deletion_response = osm4Client.deleteNSInstance(deploymentdescriptor.getInstanceId()); 
-				if (deletion_response == null || deletion_response.getStatusCode().is4xxClientError() || deletion_response.getStatusCode().is5xxServerError()) {
-					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-				}
-				else
-				{
-					logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
-				}
-				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+				force=true;
 			}
+			ResponseEntity<String> deletion_response = osm4Client.deleteNSInstanceNew(deploymentdescriptor.getInstanceId(),force); 
+			if (deletion_response.getStatusCode().is4xxClientError() || deletion_response.getStatusCode().is5xxServerError()) {
+				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.DELETION_FAILED);
+				deploymentdescriptor.setFeedback(deletion_response.getBody().toString());				
+				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
+				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final);				
+			}
+			else
+			{
+				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)
+					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.COMPLETED);
+				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
+					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REMOVED);				
+				logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
+				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+				BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				
+			}			
 		}
 	}
-
+	
 }

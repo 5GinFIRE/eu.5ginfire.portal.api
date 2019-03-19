@@ -69,7 +69,7 @@ public class BugzillaClient {
 		String status= "CONFIRMED";
 		String resolution = null;
 		
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
+		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.RUNNING )) {
 			status = "RESOLVED";
 			resolution = "FIXED";
 		} else if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.REJECTED ) || ( descriptor.getStatus() == DeploymentDescriptorStatus.FAILED )) {
@@ -88,7 +88,7 @@ public class BugzillaClient {
 
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
-		String summary = "[PORTAL] Completion Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
+		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
 
 		String description = getDeploymentDescription( descriptor );		
@@ -104,6 +104,31 @@ public class BugzillaClient {
 			resolution = "INVALID";
 		}
 		
+		
+		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
+		return b;
+		
+	}
+		
+	public static Bug transformNSDeletion2BugBody(DeploymentDescriptor descriptor) {
+
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
+		String alias = descriptor.getUuid() ;
+
+		String description = getDeploymentDescription( descriptor );		
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		
+		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED || descriptor.getStatus() == DeploymentDescriptorStatus.REMOVED ) ) {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else if ( descriptor.getStatus() == DeploymentDescriptorStatus.DELETION_FAILED ) {
+			status = "RESOLVED";
+			resolution = "INVALID";
+		}		
 		
 		Bug b = createBug(product, component, summary, alias, description, descriptor.getOwner().getEmail(), status, resolution);
 		return b;

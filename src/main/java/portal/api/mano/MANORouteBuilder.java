@@ -87,6 +87,13 @@ public class MANORouteBuilder  extends RouteBuilder{
 		.log("NS completed Successfully")
 		.doCatch(Exception.class)
 		.log("NS completion failed!").stop();
+
+		from("seda:nsd.deployment.delete?multipleConsumers=true")
+		.doTry()
+		.bean(new MANOController(),"deleteNSFromMANOProvider") //returns exception or nothing
+		.log("NS deleted Successfully")
+		.doCatch(Exception.class)
+		.log("NS deletion failed!").stop();
 		
 		//from("timer://checkAndDeployTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndDeployExperimentToMANOProvider").stop();
 		//from("timer://checkAndTerminateTimer?delay=2m&period=120000").bean(new MANOController(),"checkAndTerminateExperimentToMANOProvider").stop();

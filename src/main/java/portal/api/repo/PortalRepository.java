@@ -561,7 +561,7 @@ public class PortalRepository {
 	public List<DeploymentDescriptor> getDeploymentsToBeCompleted()
 	{		
 		List<DeploymentDescriptor> DeploymentDescriptorsToComplete = new ArrayList<>();
-		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningDeployments();
+		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningAndInstantiatingDeployments();
 		for(DeploymentDescriptor d : DeploymentDescriptor_list)
 		{
 			d.getExperimentFullDetails();
@@ -569,22 +569,36 @@ public class PortalRepository {
 			OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
 			if(d.getEndDate().before(Date.from(utc.toInstant())))
 			{
-				logger.info("Deployment "+d.getName()+" is scheduled to be completed now.");
+				logger.info("Deployment "+d.getName()+" is scheduled to be COMPLETED now.");
 				DeploymentDescriptorsToComplete.add(d);
 			}
 		}
 		return DeploymentDescriptorsToComplete;
 	}
 
+	public List<DeploymentDescriptor> getDeploymentsToBeDeleted()
+	{		
+		List<DeploymentDescriptor> deploymentDescriptorsToTerminate = new ArrayList<>();
+		List<DeploymentDescriptor> deploymentDescriptor_list = portalJpaController.readDeploymentsToBeDeleted();
+		for(DeploymentDescriptor d : deploymentDescriptor_list)
+		{
+			d.getExperimentFullDetails();
+			d.getInfrastructureForAll();			
+			logger.info("Deployment "+d.getName()+" is scheduled to be DELETED now.");
+			deploymentDescriptorsToTerminate.add(d);
+		}
+		return deploymentDescriptorsToTerminate;
+	}
+
 	public List<DeploymentDescriptor> getRunningDeployments()
 	{		
-		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningDeployments();
+		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningAndInstantiatingDeployments();
 		return RunningDeploymentDescriptor_list;
 	}	
 
-	public List<DeploymentDescriptor> getRunningAndCompletedDeployments()
+	public List<DeploymentDescriptor> getRunningInstantiatingAndTerminatingDeployments()
 	{		
-		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningAndCompletedDeployments();
+		List<DeploymentDescriptor> RunningDeploymentDescriptor_list = portalJpaController.readRunningInstantiatingAndTerminatingDeployments();
 		return RunningDeploymentDescriptor_list;
 	}	
 	/**

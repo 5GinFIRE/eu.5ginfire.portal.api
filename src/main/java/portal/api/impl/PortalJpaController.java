@@ -15,6 +15,10 @@
 
 package portal.api.impl;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -1355,13 +1359,25 @@ public class PortalJpaController {
 		return q.getResultList();		
 	}
 	
-	public List<DeploymentDescriptor> readRunningDeployments() {
+	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING");
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
 		return q.getResultList();		
 	}
 
-	public List<DeploymentDescriptor> readRunningAndCompletedDeployments() {
+	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+		return q.getResultList();		
+	}
+
+	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED");
+		return q.getResultList();		
+	}
+
+	public List<DeploymentDescriptor> readRunningInstantiatingAndTerminatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
 		return q.getResultList();		

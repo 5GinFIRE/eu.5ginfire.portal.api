@@ -271,6 +271,12 @@ public class BusController {
 		//waitAndStopForTemplate( result, template );		
 	}
 
+	public void deleteExperiment(DeploymentDescriptor deploymentdescriptor) {
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.delete?multipleConsumers=true");
+		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
+		//waitAndStopForTemplate( result, template );		
+	}
+
 	public void rejectExperiment(DeploymentDescriptor deploymentdescriptor) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.reject?multipleConsumers=true");
 		template.withBody( deploymentdescriptor ).asyncSend();				
@@ -293,6 +299,18 @@ public class BusController {
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
 
+	public void deleteInstanceSucceded(DeploymentDescriptor deploymentdescriptor) {
+		// TODO Auto-generated method stub
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.instance.deletion.success?multipleConsumers=true");
+		template.withBody( deploymentdescriptor ).asyncSend();								
+	}
+		
+	public void deleteInstanceFailed(DeploymentDescriptor deploymentdescriptor) {
+		// TODO Auto-generated method stub
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.instance.deletion.fail?multipleConsumers=true");
+		template.withBody( deploymentdescriptor ).asyncSend();								
+	}
+		
 	/**
 	 * Asynchronously sends to the routing bus (seda:vxf.update?multipleConsumers=true) that a vxf is updated
 	 * @param deployment a {@link VxFMetadata}
@@ -435,5 +453,5 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.offboard?multipleConsumers=true");
 		template.withBody( uexpobd ).asyncSend();		
 	}
-	
+
 }

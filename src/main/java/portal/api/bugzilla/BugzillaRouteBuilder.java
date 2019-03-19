@@ -425,6 +425,22 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("direct:bugzilla.bugmanage");	
 
 		/**
+		 * Automatic NS Deletion Route Success
+		 */		
+		from("seda:nsd.instance.deletion.success?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+		
+		/**
+		 * Automatic NS Deletion Route Fail
+		 */		
+		from("seda:nsd.instance.deletion.fail?multipleConsumers=true")
+		.delay(5000)
+		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
+		.to("direct:bugzilla.bugmanage");	
+		
+		/**
 		 * Reject Deployment Route Issue
 		 */
 		from("seda:nsd.deployment.reject?multipleConsumers=true")

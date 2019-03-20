@@ -919,10 +919,15 @@ public class PortalJpaController {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
 					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
 			
+		}else if ( (status!=null) && status.equals("REMOVED") ){
+			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED ORDER BY m.id";			
 		}else {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
-					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
+					+ " ORDER BY m.id";
 		}
 		
 		Query q = entityManager.createQuery( sql );

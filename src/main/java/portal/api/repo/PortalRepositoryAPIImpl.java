@@ -2786,6 +2786,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(),  "COMPLETED"  );
 			} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
+			} else if (  (status!=null) &&  status.equals( "FAILED" )){
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
+			} else if (  (status!=null) &&  status.equals( "REMOVED" )){
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
 			} else {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
 			}

@@ -246,11 +246,7 @@ public class MANOController {
 		// Foreach deployment
 		for (DeploymentDescriptor deployment_descriptor_tmp : DeploymentDescriptorsToComplete) {
 			// Terminate the deployment
-			deployment_descriptor_tmp.setStatus(DeploymentDescriptorStatus.TERMINATING);
-			deployment_descriptor_tmp.setConstituentVnfrIps("N/A");
-			DeploymentDescriptor changed_deployment_descriptor = portalRepositoryRef
-					.updateDeploymentDescriptor(deployment_descriptor_tmp);
-			BusController.getInstance().completeExperiment(changed_deployment_descriptor);
+			BusController.getInstance().completeExperiment(deployment_descriptor_tmp);
 		}
 	}
 
@@ -857,7 +853,7 @@ public class MANOController {
 	public void terminateNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor) {
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
 				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			if( deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED )
+			if( deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.RUNNING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED )
 			{
 				// There can be multiple MANOs for the Experiment. We need to handle that also.
 				OSM4Client osm4Client = new OSM4Client(
@@ -870,16 +866,15 @@ public class MANOController {
 						"admin");
 				ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
 				if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-					if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING)
-						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
-					if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
-						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);				
+					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
 					deploymentdescriptor.setFeedback(response.getBody().toString());				
 					logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
 				}
 				else
 				{
 					// NS Termination succeded
+					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);
+					deploymentdescriptor.setConstituentVnfrIps("N/A");
 					logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				

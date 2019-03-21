@@ -335,6 +335,16 @@ public class PortalRepository {
 		List<DeploymentDescriptor> ls = portalJpaController.readRejectedDeploymentDescriptors( 0, 100000);	
 		return ls;
 	}
+
+	public List<DeploymentDescriptor> getAllFailedDeploymentDescriptors() {
+		List<DeploymentDescriptor> ls = portalJpaController.readFailedDeploymentDescriptors( 0, 100000);	
+		return ls;
+	}
+	
+	public List<DeploymentDescriptor> getAllRemovedDeploymentDescriptors() {
+		List<DeploymentDescriptor> ls = portalJpaController.readRemovedDeploymentDescriptors( 0, 100000);	
+		return ls;
+	}
 	
 	public List<DeploymentDescriptor> getAllDeploymentDescriptorsByUser( Long ownerid, String status ) {
 		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptorsByUser( ownerid, 0, 100000, status);	

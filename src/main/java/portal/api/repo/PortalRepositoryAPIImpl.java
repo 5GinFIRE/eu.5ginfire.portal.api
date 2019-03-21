@@ -2202,19 +2202,32 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 			List<ExperimentMetadata> deplExps = new ArrayList<ExperimentMetadata>( userexpr );
 			List<ExperimentMetadata> pubExps = new ArrayList<ExperimentMetadata>( portalRepositoryRef.getExperiments( (long) -1 , true) );
-			
+			List<ExperimentMetadata> returnedExps = new ArrayList<ExperimentMetadata>();
 			for (ExperimentMetadata e : pubExps) {
+				
 				boolean found = false;
+				boolean onboarded = false;
 				for (ExperimentMetadata depl : deplExps) {
 					if (  depl.getId() == e.getId() ) {
 						found = true;					
 					}
-				}
-				
-				if ( !found ) {
-					deplExps.add(e);//add no duplicate pubic experiments
 				}				
-				
+				if ( !found ) {
+					deplExps.add(e);//add no duplicate public experiments
+				}				
+			}
+			for (ExperimentMetadata depl : deplExps) {
+				// If it is not already included and it has been onboarded
+				if( depl.getExperimentOnBoardDescriptors().size()>0 )
+				{
+					for(ExperimentOnBoardDescriptor eobd : depl.getExperimentOnBoardDescriptors())
+					{
+						if(eobd.getOnBoardingStatus() == OnBoardingStatus.ONBOARDED)
+						{
+							returnedExps.add(depl);
+						}
+					}
+				}
 			}
 			
 //			for (Iterator<ExperimentMetadata> iter = deplExps.listIterator(); iter.hasNext(); ) { //filter only valid
@@ -2222,10 +2235,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //			    if ( !a.isValid() ) {
 //			        iter.remove();
 //			    }
-//			}
+//			}			
 			
-			
-			return Response.ok().entity( deplExps ).build();
+			return Response.ok().entity( returnedExps ).build();
 
 		} else {
 			ResponseBuilder builder = Response.status(Status.NOT_FOUND);
@@ -2719,6 +2731,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllCompletedDeploymentDescriptors();
 				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 					deployments = portalRepositoryRef.getAllRejectedDeploymentDescriptors();
+				} else if (  (status!=null) &&  status.equals( "FAILED" )){
+					deployments = portalRepositoryRef.getAllFailedDeploymentDescriptors();
+				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
+					deployments = portalRepositoryRef.getAllRemovedDeploymentDescriptors();					
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptors();			
 				}			
@@ -2727,6 +2743,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "COMPLETED" );
 				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "REJECTED" );
+				} else if (  (status!=null) &&  status.equals( "FAILED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
+				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), null );
 				}			
@@ -2736,6 +2756,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(),  "COMPLETED"  );
 				} else if (  (status!=null) &&  status.equals( "REJECTED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
+				} else if (  (status!=null) &&  status.equals( "FAILED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
+				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
 				}			

@@ -11,7 +11,7 @@ Please check the [API documentation](https://5ginfire.github.io/eu.5ginfire.port
 
 Quick testing
 --------
-Clone all three projects:
+Clone all projects:
 
 [eu.5ginfire.portal.api](https://github.com/5GinFIRE/eu.5ginfire.portal.api)
 
@@ -26,6 +26,12 @@ Install riftioyangschema2java project. Get into the project and run
 
 Install nfv-requirements-extractor project. Get into the project and run
 `mvn clean install`
+
+[eu.5ginfire.nbi.osm4java](https://github.com/5GinFIRE/eu.5ginfire.nbi.osm4java )
+
+Install eu.5ginfire.nbi.osm4java project. Get into the project and run
+`mvn clean install`
+
 
 Get into the eu.5ginfire.portal.api project and run
 `mvn clean -Pjetty.integration jetty:run`

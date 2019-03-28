@@ -89,6 +89,7 @@ public class MANOController {
 		// PortalRepository portalRepositoryRef = new PortalRepository();
 
 		vxfobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobd.getVxf().getName()+" to "+vxfobd.getOnBoardingStatus());						
 		// This is the Deployment ID for the portal
 		vxfobd.setDeployId(UUID.randomUUID().toString());
 		VxFMetadata vxf = vxfobd.getVxf();
@@ -146,6 +147,7 @@ public class MANOController {
 				// Set the reason of the failure
 				vxfobds.setFeedbackMessage("OSM4 communication failed. Aborting VxF OnBoarding action.");
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobds.getVxf().getName()+" to "+vxfobds.getOnBoardingStatus());										
 				// Uncertify if it failed OnBoarding.
 				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
@@ -161,6 +163,7 @@ public class MANOController {
 				logger.error("VNFD Package Creation failed.");
 				// Set status
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobds.getVxf().getName()+" to "+vxfobds.getOnBoardingStatus());										
 				// Set the reason of the failure
 				vxfobds.setFeedbackMessage(response.getBody().toString());
 				// Uncertify if it failed OnBoarding.
@@ -183,6 +186,7 @@ public class MANOController {
 					osm4Client.deleteVNFDPackage(vnfd_id);
 					// Set status
 					vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+					CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobds.getVxf().getName()+" to "+vxfobds.getOnBoardingStatus());											
 					// Set the reason of the failure
 					vxfobds.setFeedbackMessage(response.getBody().toString());
 					// Uncertify if it failed OnBoarding.
@@ -193,6 +197,8 @@ public class MANOController {
 				}
 
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+				CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobds.getVxf().getName()+" to "+vxfobds.getOnBoardingStatus());											
+				
 				vxfobds.setFeedbackMessage("OnBoarding Succeeded");
 				// We select by design not to Certify upon OnBoarding but only on final version
 				// is determined.
@@ -309,6 +315,7 @@ public class MANOController {
 									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp);
 								deployment_tmp.setConstituentVnfrIps("");
@@ -343,6 +350,7 @@ public class MANOController {
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATED);
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp);
 							}
@@ -351,6 +359,7 @@ public class MANOController {
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.FAILED);
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp);
@@ -358,6 +367,7 @@ public class MANOController {
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
 								BusController.getInstance().deploymentTerminationFailed(deployment_tmp);
 							}
@@ -379,6 +389,7 @@ public class MANOController {
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception {
 
 		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
+		CentralLogger.log( CLevel.INFO, "Onboarding status change of Experiment "+uexpobd.getExperiment().getName()+" to "+uexpobd.getOnBoardingStatus());													
 		// This is the Deployment ID for the portal
 		uexpobd.setDeployId(UUID.randomUUID().toString());
 		ExperimentMetadata em = uexpobd.getExperiment();
@@ -452,6 +463,7 @@ public class MANOController {
 				// Set the reason of the failure
 				uexpobds.setFeedbackMessage("OSM communication failed. Aborting NSD Onboarding action.");
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+uexpobds.getExperiment().getName()+" to "+uexpobds.getOnBoardingStatus());																	
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
@@ -464,6 +476,7 @@ public class MANOController {
 					|| response.getStatusCode().is5xxServerError()) {
 				logger.error("Upload of NSD Package Content failed. Deleting NSD Package.");
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+uexpobds.getExperiment().getName()+" to "+uexpobds.getOnBoardingStatus());																	
 				// Set the reason of the failure
 				uexpobds.setFeedbackMessage(response.getBody().toString());
 				// Set Valid to false if it fails OnBoarding
@@ -485,6 +498,7 @@ public class MANOController {
 					logger.error("Upload of NSD Package Content failed. Deleting NSD Package.");
 					osm4Client.deleteNSDPackage(nsd_id);
 					uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+uexpobds.getExperiment().getName()+" to "+uexpobds.getOnBoardingStatus());																						
 					uexpobds.setFeedbackMessage(response.getBody().toString());
 					// Set Valid to false if it fails OnBoarding
 					uexpobds.getExperiment().setValid(false);
@@ -495,6 +509,7 @@ public class MANOController {
 				else
 				{
 					uexpobds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+uexpobds.getExperiment().getName()+" to "+uexpobds.getOnBoardingStatus());																						
 					uexpobds.setFeedbackMessage("NSD Onboarded Successfully");
 					// The Deploy ID is set as the VNFD Package id in OSMANO4Provider
 					uexpobds.setDeployId(nsd_id);
@@ -609,8 +624,10 @@ public class MANOController {
 
 		if (vnfd == null) {
 			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+obds.getVxf().getName()+" to "+obds.getOnBoardingStatus());																				
 		} else {
 			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+obds.getVxf().getName()+" to "+obds.getOnBoardingStatus());																				
 		}
 
 		obds = this.getPortalRepositoryRef().updateVxFOnBoardedDescriptor(obds);
@@ -723,8 +740,10 @@ public class MANOController {
 
 		if (nsd == null) {
 			obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+obds.getExperiment().getName()+" to "+obds.getOnBoardingStatus());																							
 		} else {
 			obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of Experiment "+obds.getExperiment().getName()+" to "+obds.getOnBoardingStatus());																							
 		}
 
 		obds = this.getPortalRepositoryRef().updateExperimentOnBoardDescriptor(obds);
@@ -855,6 +874,7 @@ public class MANOController {
 					|| ns_instance_creation_entity.getStatusCode().is5xxServerError()) {
 				// NS instance creation failed
 				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED);
+				CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());				
 				deploymentdescriptor.setFeedback(ns_instance_creation_entity.getBody().toString());
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 						.updateDeploymentDescriptor(deploymentdescriptor);
@@ -879,6 +899,7 @@ public class MANOController {
 				if (instantiate_ns_instance_entity == null || instantiate_ns_instance_entity.getStatusCode().is4xxClientError() || instantiate_ns_instance_entity.getStatusCode().is5xxServerError()) {
 					// NS Instantiation failed
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED);
+					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
 					deploymentdescriptor.setFeedback(instantiate_ns_instance_entity.getBody().toString());
 					logger.info("NS Instantiation failed. Status Code:"
 							+ instantiate_ns_instance_entity.getStatusCode().toString() + ", Payload:"
@@ -890,6 +911,7 @@ public class MANOController {
 				} else {
 					// NS Instantiation starts
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.INSTANTIATING);
+					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
 					deploymentdescriptor.setFeedback(instantiate_ns_instance_entity.getBody().toString());
 					logger.info("NS Instantiation of NS with id" + nsd_instance_id + " started.");
 					// Save the changes to DeploymentDescriptor
@@ -921,6 +943,7 @@ public class MANOController {
 					ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
 					if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
 						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
+						CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());						
 						deploymentdescriptor.setFeedback(response.getBody().toString());				
 						logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
 					}
@@ -928,6 +951,7 @@ public class MANOController {
 					{
 						// NS Termination succeded
 						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);
+						CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());
 						deploymentdescriptor.setConstituentVnfrIps("N/A");
 						logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
 						DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
@@ -983,6 +1007,7 @@ public class MANOController {
 			ResponseEntity<String> deletion_response = osm4Client.deleteNSInstanceNew(deploymentdescriptor.getInstanceId(),force); 
 			if (deletion_response.getStatusCode().is4xxClientError() || deletion_response.getStatusCode().is5xxServerError()) {
 				deploymentdescriptor.setStatus(DeploymentDescriptorStatus.DELETION_FAILED);
+				CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());				
 				deploymentdescriptor.setFeedback(deletion_response.getBody().toString());				
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
@@ -991,9 +1016,15 @@ public class MANOController {
 			else
 			{
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)
+				{
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.COMPLETED);
+					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());
+				}
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
+				{
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REMOVED);				
+					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());
+				}
 				logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 				BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				

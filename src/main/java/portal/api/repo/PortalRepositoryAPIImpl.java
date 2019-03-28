@@ -1728,6 +1728,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				OnBoardingStatus previous_status = vxfobd_tmp.getOnBoardingStatus();
 				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																						
+				
 				VxFOnBoardedDescriptor u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 
 				ResponseEntity<String> response = null;
@@ -1737,6 +1739,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				catch( HttpClientErrorException e)
 				{
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																											
 					vxfobd_tmp.setFeedbackMessage(e.getResponseBodyAsString());
 					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
@@ -1746,6 +1749,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if (response == null) {
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																											
 					vxfobd_tmp.setFeedbackMessage("Null response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + vxfobd_tmp.getId() + \" cannot be offboarded.");
 					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -1755,6 +1759,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				// UnCertify Upon OffBoarding
 				vxfobd_tmp.getVxf().setCertified(false);
 				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																										
 				vxfobd_tmp.setFeedbackMessage(response.getBody().toString());
 				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 				BusController.getInstance().offBoardVxF( u );
@@ -2510,6 +2515,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				OnBoardingStatus previous_status = expobd_tmp.getOnBoardingStatus();
 				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																										
 				ExperimentOnBoardDescriptor u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 
 				ResponseEntity<String> response = null;
@@ -2519,6 +2525,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				catch( HttpClientErrorException e)
 				{
 					expobd_tmp.setOnBoardingStatus(previous_status);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																											
 					expobd_tmp.setFeedbackMessage(e.getResponseBodyAsString());					
 					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
@@ -2528,6 +2535,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if (response == null) {
 					expobd_tmp.setOnBoardingStatus(previous_status);
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																											
 					expobd_tmp.setFeedbackMessage("Null response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + expobd_tmp.getId() + \" cannot be offboarded.");
 					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -2538,6 +2546,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				expobd_tmp.getExperiment().setValid(false);
 				expobd_tmp.setFeedbackMessage(response.getBody().toString());
 				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																															
 				u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 				BusController.getInstance().offBoardNSD(u);
 				
@@ -2880,6 +2889,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			deployment.setUuid(uuid);
 			deployment.setDateCreated(new Date());
 			deployment.setStatus(DeploymentDescriptorStatus.UNDER_REVIEW);
+			CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment.getName()+" to "+deployment.getStatus());			
 
 			u = portalRepositoryRef.getUserByID(u.getId());
 			deployment.setOwner(u); // reattach from the DB model
@@ -2999,6 +3009,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				if( receivedDeployment.getStatus() != aDeployment.getStatus() )
 				{
 					aDeployment.setStatus( receivedDeployment.getStatus() );
+					CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());					
 					aDeployment.getExperimentFullDetails();
 					aDeployment.getInfrastructureForAll();
 					
@@ -3061,6 +3072,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 				}
 				aDeployment.setStatus( receivedDeployment.getStatus() );
+				CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());				
 				aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
 				return Response.ok().entity( aDeployment ).build();
 			}
@@ -3693,6 +3705,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		OnBoardingStatus previous_status = clobd.getOnBoardingStatus();
 		clobd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+clobd.getVxf().getName()+" to "+clobd.getOnBoardingStatus());																													
 		VxFOnBoardedDescriptor updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor(clobd);
 
 		ResponseEntity<String> response = null;
@@ -3702,6 +3715,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		catch( HttpClientErrorException e)
 		{
 			updatedObd.setOnBoardingStatus(previous_status);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+updatedObd.getVxf().getName()+" to "+updatedObd.getOnBoardingStatus());																														
 			updatedObd.setFeedbackMessage(e.getResponseBodyAsString());
 			updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
@@ -3720,6 +3734,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// UnCertify Upon OffBoarding
 		updatedObd.getVxf().setCertified(false);
 		updatedObd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+updatedObd.getVxf().getName()+" to "+updatedObd.getOnBoardingStatus());																																
 		updatedObd.setFeedbackMessage(response.getBody().toString());
 		updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 		BusController.getInstance().offBoardVxF( updatedObd );
@@ -3946,6 +3961,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		OnBoardingStatus previous_status = c.getOnBoardingStatus();
 		c.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+c.getExperiment().getName()+" to "+c.getOnBoardingStatus());																																
 		ExperimentOnBoardDescriptor uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor(c);
 
 		ResponseEntity<String> response = null;
@@ -3955,6 +3971,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		catch( HttpClientErrorException e)
 		{
 			uExper.setOnBoardingStatus(previous_status);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+uExper.getExperiment().getName()+" to "+uExper.getOnBoardingStatus());																																	
 			uExper.setFeedbackMessage(e.getResponseBodyAsString());
 			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor(uExper);
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
@@ -3964,6 +3981,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if (response == null) {
 			uExper.setOnBoardingStatus(previous_status);
+			CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+uExper.getExperiment().getName()+" to "+uExper.getOnBoardingStatus());																																	
 			uExper.setFeedbackMessage("Null response on OffBoarding request.Requested NSOnBoardedDescriptor with ID=\" + c.getId() + \" cannot be offboarded.");			
 			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -3973,6 +3991,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// Set Valid to false if it is OffBoarded
 		uExper.getExperiment().setValid(false);
 		uExper.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+uExper.getExperiment().getName()+" to "+uExper.getOnBoardingStatus());																																			
 		uExper.setFeedbackMessage(response.getBody().toString());
 		uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
 		BusController.getInstance().offBoardNSD( uExper );

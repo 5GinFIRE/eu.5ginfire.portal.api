@@ -590,7 +590,7 @@ public class BugzillaClient {
 		String status= "CONFIRMED";
 		String resolution = null;		
 		
-		Bug b = createBug(product, component, summary, null, description.toString(), "ioannis.chatzis@upatras.gr", status, resolution);
+		Bug b = createBug(product, component, summary, null, description.toString(), null, status, resolution);
 		return b;
 	}
 		

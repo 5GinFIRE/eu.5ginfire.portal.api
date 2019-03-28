@@ -66,6 +66,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -1736,6 +1737,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				catch( HttpClientErrorException e)
 				{
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					vxfobd_tmp.setFeedbackMessage(e.getResponseBodyAsString());
 					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 					builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
@@ -1744,6 +1746,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if (response == null) {
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
+					vxfobd_tmp.setFeedbackMessage("Null response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + vxfobd_tmp.getId() + \" cannot be offboarded.");
 					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + vxfobd_tmp.getId() + " cannot be offboarded");
@@ -1752,6 +1755,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				// UnCertify Upon OffBoarding
 				vxfobd_tmp.getVxf().setCertified(false);
 				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+				vxfobd_tmp.setFeedbackMessage(response.getBody().toString());
 				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 				BusController.getInstance().offBoardVxF( u );
 			}
@@ -2515,6 +2519,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				catch( HttpClientErrorException e)
 				{
 					expobd_tmp.setOnBoardingStatus(previous_status);
+					expobd_tmp.setFeedbackMessage(e.getResponseBodyAsString());					
 					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 					JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 					builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
@@ -2523,6 +2528,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if (response == null) {
 					expobd_tmp.setOnBoardingStatus(previous_status);
+					expobd_tmp.setFeedbackMessage("Null response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + expobd_tmp.getId() + \" cannot be offboarded.");
 					u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + expobd_tmp.getId() + " cannot be offboarded");
@@ -2530,6 +2536,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				// UnCertify Upon OffBoarding
 				expobd_tmp.getExperiment().setValid(false);
+				expobd_tmp.setFeedbackMessage(response.getBody().toString());
 				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 				u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
 				BusController.getInstance().offBoardNSD(u);
@@ -3382,7 +3389,21 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
 		{
-			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			//OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			OSM4Client osm4Client = null;			
+			try {
+				osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
+			}
+		    catch(HttpStatusCodeException e) 
+			{
+				logger.error("getOSMVNFMetadata, OSM4 fails authentication. Aborting action.");
+				CentralLogger.log( CLevel.ERROR, "getOSMVNFMetadata, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed while getting VxF Metadata. ");
+				ResponseBuilder builder = Response.status(e.getRawStatusCode());
+				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types");
+				throw new WebApplicationException(builder.build());		
+			}						
+			
 			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfd = osm4Client.getVNFDs();
 			if (vnfd != null) {
 				return Response.ok().entity(vnfd).build();
@@ -3462,7 +3483,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 		if(sm.getSupportedMANOplatform().getName().equals("OSM FOUR"))
 		{
-			OSM4Client osm4Client = new OSM4Client(sm.getApiEndpoint(),sm.getUsername(),sm.getPassword(),"admin");
+			OSM4Client osm4Client = null;			
+			try {
+				osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
+			}
+		    catch(HttpStatusCodeException e) 
+			{
+				logger.error("getOSM_NSD_Metadata, OSM4 fails authentication. Aborting action.");
+				CentralLogger.log( CLevel.ERROR, "getOSM_NSD_Metadata, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed while getting NSD Metadata.");
+				ResponseBuilder builder = Response.status(e.getRawStatusCode());
+				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types");
+				throw new WebApplicationException(builder.build());		
+			}						
+			
 			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsd = osm4Client.getNSDs();
 			if (nsd != null) {
 				return Response.ok().entity(nsd).build();
@@ -3668,6 +3702,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		catch( HttpClientErrorException e)
 		{
 			updatedObd.setOnBoardingStatus(previous_status);
+			updatedObd.setFeedbackMessage(e.getResponseBodyAsString());
 			updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
@@ -3676,6 +3711,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if (response == null) {
 			updatedObd.setOnBoardingStatus(previous_status);
+			updatedObd.setFeedbackMessage("Null Response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + updatedObd.getId() + \" cannot be offboarded.");
 			updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested VxFOnBoardedDescriptor with ID=" + updatedObd.getId() + " cannot be offboarded");
@@ -3684,6 +3720,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// UnCertify Upon OffBoarding
 		updatedObd.getVxf().setCertified(false);
 		updatedObd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		updatedObd.setFeedbackMessage(response.getBody().toString());
 		updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
 		BusController.getInstance().offBoardVxF( updatedObd );
 		return Response.ok().entity(updatedObd).build();
@@ -3890,7 +3927,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			aMANOController.onBoardNSDToMANOProvider( c );
 		} catch (Exception e) {				
 			e.printStackTrace();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
+	    	logger.error("onExperimentBoardDescriptor, OSM4 fails authentication. Aborting Onboarding action.");
+			CentralLogger.log( CLevel.ERROR, "onExperimentBoardDescriptor, OSM4 fails authentication. Aborting Onboarding action.");																	
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested Experiment Descriptor with ID=" + c.getId() + " cannot be onboarded").build();
 		}	
 		
 		return Response.ok().entity(c).build();
@@ -3916,6 +3955,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		catch( HttpClientErrorException e)
 		{
 			uExper.setOnBoardingStatus(previous_status);
+			uExper.setFeedbackMessage(e.getResponseBodyAsString());
 			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor(uExper);
 			JSONObject result = new JSONObject(e.getResponseBodyAsString()); //Convert String to JSON Object
 			ResponseBuilder builder = Response.status(e.getRawStatusCode()).type(MediaType.TEXT_PLAIN).entity("OffBoarding Failed! "+e.getStatusText()+", "+result.getString("detail"));			
@@ -3924,6 +3964,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if (response == null) {
 			uExper.setOnBoardingStatus(previous_status);
+			uExper.setFeedbackMessage("Null response on OffBoarding request.Requested NSOnBoardedDescriptor with ID=\" + c.getId() + \" cannot be offboarded.");			
 			uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested NSOnBoardedDescriptor with ID=" + c.getId() + " cannot be offboarded");
@@ -3932,6 +3973,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		// Set Valid to false if it is OffBoarded
 		uExper.getExperiment().setValid(false);
 		uExper.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
+		uExper.setFeedbackMessage(response.getBody().toString());
 		uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
 		BusController.getInstance().offBoardNSD( uExper );
 		return Response.ok().entity(uExper).build();

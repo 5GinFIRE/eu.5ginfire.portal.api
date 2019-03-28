@@ -264,6 +264,12 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.termination.fail?multipleConsumers=true");
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
+
+	public void osm4CommunicationFailed(String message)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm.fail?multipleConsumers=true");
+		template.withBody(message).asyncSend();						
+	}
 	
 	public void completeExperiment(DeploymentDescriptor deploymentdescriptor) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete?multipleConsumers=true");

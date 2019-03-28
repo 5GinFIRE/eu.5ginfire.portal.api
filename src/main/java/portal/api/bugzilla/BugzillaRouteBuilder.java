@@ -280,6 +280,13 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("direct:bugzilla.newIssue");
 
 		/**
+		 * Create VxF OffBoard New Route
+		 */
+		from("seda:vxf.offboard?multipleConsumers=true")
+		.bean( BugzillaClient.class, "transformVxFAutomaticOffBoarding2BugBody")
+		.to("direct:bugzilla.bugmanage");
+		
+		/**
 		 * Automatic OnBoarding Route Success
 		 */		
 		from("seda:vxf.onboard.success?multipleConsumers=true")
@@ -392,6 +399,11 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
+		from("seda:communication.osm.fail?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformOSMCommunicationFail2BugBody")
+		.to("direct:bugzilla.newIssue");
+		
 		/**
 		 * NS Scheduling Route
 		 */		

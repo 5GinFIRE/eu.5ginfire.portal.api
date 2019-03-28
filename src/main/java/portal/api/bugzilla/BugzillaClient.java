@@ -478,6 +478,55 @@ public class BugzillaClient {
 		Bug b = createBug(product, component, summary, alias, description.toString(), uexpobd.getExperiment().getOwner().getEmail(), status, resolution);
 		return b;
 	}
+
+	
+	public static Bug transformVxFAutomaticOffBoarding2BugBody(VxFOnBoardedDescriptor vxfobd) {
+		
+		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
+
+		String product = "5GinFIRE Operations";
+		String component = "Offboarding" ;
+		String summary = "[PORTAL] OSM OffBoarding Action for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
+		String alias = vxfobd.getUuid() ;
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " VxF OSM OFFBOARDING ACTION \n"
+				+ "**************************************************************\n");
+		
+		description.append( "\n\n VxF: " + vxfobd.getVxf().getName());
+		description.append( "\n Owner: " +  vxfobd.getVxf().getOwner().getUsername() );
+		description.append( "\n Vendor: " +  vxfobd.getVxf().getVendor() );
+		description.append( "\n Version: " + vxfobd.getVxf().getVersion() );
+		description.append( "\n Archive: " + vxfobd.getVxf().getPackageLocation() );
+		description.append( "\n UUID: " + vxfobd.getVxf().getUuid()  );
+		description.append( "\n ID: " + vxfobd.getVxf().getId()   );
+		description.append( "\n Date Created: " + vxfobd.getVxf().getDateCreated().toString()   );
+		description.append( "\n Date Updated: " + vxfobd.getVxf().getDateUpdated().toString()   );
+
+
+		description.append( "\n" );
+		description.append( "\n VxF OffBoarding Status: " + vxfobd.getOnBoardingStatus()  );
+		description.append( "\n VxF OffBoarding Feedback: " + vxfobd.getFeedbackMessage()  );
+		 
+		description.append( "\n\n*************************************************\n");
+		description.append( "\nTo manage this , go to: " + BASE_SERVICE_URL + "/#!/vxf_edit/" + vxfobd.getVxf().getId() ); 
+		
+		String status= "CONFIRMED";
+		String resolution = null;
+		if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.OFFBOARDED ) )  {
+			status = "RESOLVED";
+			resolution = "FIXED";
+		} else  if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
+			status = "CONFIRMED";
+//			status = "RESOLVED";
+//			resolution = "INVALID";
+		}		
+		
+		Bug b = createBug(product, component, summary, alias, description.toString(), vxfobd.getVxf().getOwner().getEmail(), status, resolution);
+		return b;
+	}
 	
 	public static Bug transformNSDAutomaticOffBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
 
@@ -525,4 +574,24 @@ public class BugzillaClient {
 		return b;
 	}
 
+	public static Bug transformOSMCommunicationFail2BugBody(String message) {
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[PORTAL] OSM Communication Action";
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " OSM COMMUNICATION ACTION FAILURE\n"
+				+ "**************************************************************\n");
+
+		description.append( "\n\n "+ message);
+				 		
+		String status= "CONFIRMED";
+		String resolution = null;		
+		
+		Bug b = createBug(product, component, summary, null, description.toString(), "ioannis.chatzis@upatras.gr", status, resolution);
+		return b;
+	}
+		
 }

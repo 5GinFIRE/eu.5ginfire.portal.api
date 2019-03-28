@@ -34,6 +34,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import OSM4NBIClient.OSM4Client;
+import centralLog.api.CLevel;
+import centralLog.api.CentralLogger;
 import portal.api.bus.BusController;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
@@ -131,12 +133,31 @@ public class MANOController {
 			});
 		}
 		if (vxfobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			OSM4Client osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(),
-					vxfobds.getObMANOprovider().getUsername(), vxfobds.getObMANOprovider().getPassword(), "admin");
+			OSM4Client osm4Client = null;
+			try {
+				osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(), vxfobds.getObMANOprovider().getUsername(), vxfobds.getObMANOprovider().getPassword(), "admin");
+			}
+		    catch(Exception e) 
+			{
+				logger.error("onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				
+				CentralLogger.log( CLevel.INFO, "onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting VxF OnBoarding action.");											
+				// Set the reason of the failure
+				vxfobds.setFeedbackMessage("OSM4 communication failed. Aborting VxF OnBoarding action.");
+				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				// Uncertify if it failed OnBoarding.
+				vxfobds.getVxf().setCertified(false);
+				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
+				
+				// Uncertify if it failed OnBoarding.
+				BusController.getInstance().onBoardVxFFailed(vxfobds);				
+		        return ;
+			}						
+			
 			ResponseEntity<String> response = null;
 			response = osm4Client.createVNFDPackage();
-			if (response == null || response.getStatusCode().is4xxClientError()
-					|| response.getStatusCode().is5xxServerError()) {
+			if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
 				logger.error("VNFD Package Creation failed.");
 				// Set status
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
@@ -269,6 +290,8 @@ public class MANOController {
 						catch(Exception e)
 						{
 							logger.error("OSM4 fails authentication");
+							CentralLogger.log( CLevel.ERROR, "OSM4 fails authentication");
+							BusController.getInstance().osm4CommunicationFailed("OSM4 fails authentication");							
 							return;
 						}
 					}
@@ -416,9 +439,26 @@ public class MANOController {
 			});
 		}
 		if (uexpobds.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
-			OSM4Client osm4Client = new OSM4Client(uexpobds.getObMANOprovider().getApiEndpoint(),
-					uexpobds.getObMANOprovider().getUsername(), uexpobds.getObMANOprovider().getPassword(), "admin");
 			ResponseEntity<String> response = null;
+			OSM4Client osm4Client = null;
+			try {
+				osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(), uexpobd.getObMANOprovider().getUsername(), uexpobd.getObMANOprovider().getPassword(), "admin");
+			}
+		    catch(Exception e) 
+			{
+				logger.error("onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				CentralLogger.log( CLevel.ERROR, "onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM communication failed. Aborting NSD Onboarding action.");											
+				// Set the reason of the failure
+				uexpobds.setFeedbackMessage("OSM communication failed. Aborting NSD Onboarding action.");
+				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
+				// Set Valid to false if it fails OnBoarding
+				uexpobds.getExperiment().setValid(false);
+				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
+				BusController.getInstance().onBoardNSDFailed(uexpobds);
+				return ;
+			}						
+			
 			response = osm4Client.createNSDPackage();
 			if (response == null || response.getStatusCode().is4xxClientError()
 					|| response.getStatusCode().is5xxServerError()) {
@@ -428,8 +468,7 @@ public class MANOController {
 				uexpobds.setFeedbackMessage(response.getBody().toString());
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
-				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef
-						.updateExperimentOnBoardDescriptor(uexpobds);
+				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
 				BusController.getInstance().onBoardNSDFailed(uexpobds);
 				return;				
 			}
@@ -493,6 +532,8 @@ public class MANOController {
 		    catch(HttpStatusCodeException e) 
 			{
 				logger.error("offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				CentralLogger.log( CLevel.ERROR, "offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting VxF offboarding action.");											
 		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
 		                .body(e.getResponseBodyAsString());
 			}						
@@ -527,30 +568,30 @@ public class MANOController {
 
 	}
 
-	private void checkOSM4VxFStatus(VxFOnBoardedDescriptor obd) throws Exception {
-
-		CamelContext tempcontext = new DefaultCamelContext();
-		MANOController mcontroller = this;
-		try {
-			RouteBuilder rb = new RouteBuilder() {
-				@Override
-				public void configure() throws Exception {
-					from("timer://getVNFRepoTimer?delay=2000&period=4000&repeatCount=6&daemon=true")
-							.log("Will check OSM version FOUR VNF repo").setBody().constant(obd)
-							.bean(mcontroller, "getVxFStatusFromOSM4Client");
-				}
-			};
-			tempcontext.addRoutes(rb);
-			tempcontext.start();
-			Thread.sleep(30000);
-		} finally {
-			tempcontext.stop();
-		}
-
-	}
-
-	private void checkOSM4NSOperationalStatus(String nsd_id) throws Exception {
-	}
+//	private void checkOSM4VxFStatus(VxFOnBoardedDescriptor obd) throws Exception {
+//
+//		CamelContext tempcontext = new DefaultCamelContext();
+//		MANOController mcontroller = this;
+//		try {
+//			RouteBuilder rb = new RouteBuilder() {
+//				@Override
+//				public void configure() throws Exception {
+//					from("timer://getVNFRepoTimer?delay=2000&period=4000&repeatCount=6&daemon=true")
+//							.log("Will check OSM version FOUR VNF repo").setBody().constant(obd)
+//							.bean(mcontroller, "getVxFStatusFromOSM4Client");
+//				}
+//			};
+//			tempcontext.addRoutes(rb);
+//			tempcontext.start();
+//			Thread.sleep(30000);
+//		} finally {
+//			tempcontext.stop();
+//		}
+//
+//	}
+//
+//	private void checkOSM4NSOperationalStatus(String nsd_id) throws Exception {
+//	}
 
 	public VxFOnBoardedDescriptor getVxFStatusFromOSM2Client(VxFOnBoardedDescriptor obds) {
 
@@ -577,47 +618,49 @@ public class MANOController {
 		return obds;
 	}
 
-	public VxFOnBoardedDescriptor getVxFStatusFromOSM4Client(VxFOnBoardedDescriptor obds) {
-		ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = null;
-		try {
-			OSM4Client osm4Client = null;			
-			try {
-				new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
-			}
-			catch(Exception e)
-			{
-				logger.error("getVxFStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
-				return obds;
-			}			
-			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfds = osm4Client.getVNFDs();
-			if (vnfds != null) {
-				for (ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd v : vnfds) {
-					System.out.println(v.getId() + " vs " + obds.getDeployId());
-					if (v.getId().equalsIgnoreCase(obds.getDeployId())
-							|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
-						vnfd = v;
-						break;
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e.getStackTrace());
-			logger.error(e.getStackTrace());
-		}
-
-		// This is not necessary. We just want to be notified through logging that our
-		// Object Model did not parse successfully the VNFD.
-		// The Onboarding is verified by OSM4 NBI during Onboarding
-		// if (vnfd == null) {
-		// obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-		// } else {
-		// obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-		// }
-		// obds = this.getPortalRepositoryRef().updateVxFOnBoardedDescriptor(obds);
-
-		return obds;
-	}
+//	public VxFOnBoardedDescriptor getVxFStatusFromOSM4Client(VxFOnBoardedDescriptor obds) {
+//		ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd vnfd = null;
+//		try {
+//			OSM4Client osm4Client = null;			
+//			try {
+//				osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+//			}
+//			catch(Exception e)
+//			{
+//				logger.error("getVxFStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+//				CentralLogger.log( CLevel.ERROR, "getVxFStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+//				BusController.getInstance().osm4CommunicationFailed();											
+//				return obds;
+//			}			
+//			ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd[] vnfds = osm4Client.getVNFDs();
+//			if (vnfds != null) {
+//				for (ns.yang.nfvo.vnfd.rev170228.vnfd.catalog.Vnfd v : vnfds) {
+//					System.out.println(v.getId() + " vs " + obds.getDeployId());
+//					if (v.getId().equalsIgnoreCase(obds.getDeployId())
+//							|| v.getName().equalsIgnoreCase(obds.getVxfMANOProviderID())) {
+//						vnfd = v;
+//						break;
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			System.out.println(e.getStackTrace());
+//			logger.error(e.getStackTrace());
+//		}
+//
+//		// This is not necessary. We just want to be notified through logging that our
+//		// Object Model did not parse successfully the VNFD.
+//		// The Onboarding is verified by OSM4 NBI during Onboarding
+//		// if (vnfd == null) {
+//		// obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+//		// } else {
+//		// obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+//		// }
+//		// obds = this.getPortalRepositoryRef().updateVxFOnBoardedDescriptor(obds);
+//
+//		return obds;
+//	}
 
 	private void checkNSDStatus(ExperimentOnBoardDescriptor obd) throws Exception {
 
@@ -641,27 +684,27 @@ public class MANOController {
 
 	}
 
-	private void checkOSM4NSDStatus(ExperimentOnBoardDescriptor obd) throws Exception {
-
-		CamelContext tempcontext = new DefaultCamelContext();
-		MANOController mcontroller = this;
-		try {
-			RouteBuilder rb = new RouteBuilder() {
-				@Override
-				public void configure() throws Exception {
-					from("timer://getVNFRepoTimer?delay=10000&period=2000&repeatCount=3&daemon=true")
-							.log("Will check OSM version FOUR NSD repo").setBody().constant(obd)
-							.bean(mcontroller, "getNSDStatusFromOSM4Client");
-				}
-			};
-			tempcontext.addRoutes(rb);
-			tempcontext.start();
-			Thread.sleep(30000);
-		} finally {
-			tempcontext.stop();
-		}
-
-	}
+//	private void checkOSM4NSDStatus(ExperimentOnBoardDescriptor obd) throws Exception {
+//
+//		CamelContext tempcontext = new DefaultCamelContext();
+//		MANOController mcontroller = this;
+//		try {
+//			RouteBuilder rb = new RouteBuilder() {
+//				@Override
+//				public void configure() throws Exception {
+//					from("timer://getVNFRepoTimer?delay=10000&period=2000&repeatCount=3&daemon=true")
+//							.log("Will check OSM version FOUR NSD repo").setBody().constant(obd)
+//							.bean(mcontroller, "getNSDStatusFromOSM4Client");
+//				}
+//			};
+//			tempcontext.addRoutes(rb);
+//			tempcontext.start();
+//			Thread.sleep(30000);
+//		} finally {
+//			tempcontext.stop();
+//		}
+//
+//	}
 
 	public ExperimentOnBoardDescriptor getNSDStatusFromOSM2Client(ExperimentOnBoardDescriptor obds) {
 
@@ -689,49 +732,51 @@ public class MANOController {
 		return obds;
 	}
 
-	public ExperimentOnBoardDescriptor getNSDStatusFromOSM4Client(ExperimentOnBoardDescriptor obds) {
-		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd nsd = null;
-
-		try {
-			OSM4Client osm4Client = null;			
-			try {
-				osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
-			}
-			catch(Exception e)
-			{
-				logger.error("getNSDStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
-				return obds;
-			}
-			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
-			if (nsds != null) {
-				for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
-					// || v.getAddedId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
-					if (v.getId().equalsIgnoreCase(obds.getDeployId())
-							|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
-						nsd = v;
-						break;
-					}
-				}
-			}
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e.getStackTrace());
-			logger.error(e.getStackTrace());
-		}
-
-		// This is not necessary. We just want to be notified through logging that our
-		// Object Model did not parse successfully the NSD.
-		// The Onboarding is verified by OSM4 NBI during Onboarding
-		// if (nsd == null) {
-		// obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
-		// } else {
-		// obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
-		// }
-		//
-		// obds = this.getPortalRepositoryRef().updateExperimentOnBoardDescriptor(obds);
-
-		return obds;
-	}
+//	public ExperimentOnBoardDescriptor getNSDStatusFromOSM4Client(ExperimentOnBoardDescriptor obds) {
+//		ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd nsd = null;
+//
+//		try {
+//			OSM4Client osm4Client = null;			
+//			try {
+//				osm4Client = new OSM4Client(obds.getObMANOprovider().getApiEndpoint(), obds.getObMANOprovider().getUsername(), obds.getObMANOprovider().getPassword(), "admin");
+//			}
+//			catch(Exception e)
+//			{
+//				logger.error("getNSDStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+//				CentralLogger.log( CLevel.ERROR, "getNSDStatusFromOSM4Client, OSM4 fails authentication. Aborting action.");
+//				BusController.getInstance().osm4CommunicationFailed();											
+//				return obds;
+//			}
+//			ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd[] nsds = osm4Client.getNSDs();
+//			if (nsds != null) {
+//				for (ns.yang.nfvo.nsd.rev170228.nsd.catalog.Nsd v : nsds) {
+//					// || v.getAddedId().equalsIgnoreCase(obds.getExperimentMANOProviderID())
+//					if (v.getId().equalsIgnoreCase(obds.getDeployId())
+//							|| v.getName().equalsIgnoreCase(obds.getExperimentMANOProviderID())) {
+//						nsd = v;
+//						break;
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			logger.error(e.getMessage());
+//			System.out.println(e.getStackTrace());
+//			logger.error(e.getStackTrace());
+//		}
+//
+//		// This is not necessary. We just want to be notified through logging that our
+//		// Object Model did not parse successfully the NSD.
+//		// The Onboarding is verified by OSM4 NBI during Onboarding
+//		// if (nsd == null) {
+//		// obds.setOnBoardingStatus(OnBoardingStatus.UNKNOWN);
+//		// } else {
+//		// obds.setOnBoardingStatus(OnBoardingStatus.ONBOARDED);
+//		// }
+//		//
+//		// obds = this.getPortalRepositoryRef().updateExperimentOnBoardDescriptor(obds);
+//
+//		return obds;
+//	}
 
 	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
 		this.portalRepositoryRef = portalRepositoryRef;
@@ -756,6 +801,8 @@ public class MANOController {
 		    catch(HttpStatusCodeException e) 
 			{
 				logger.error("offBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				CentralLogger.log( CLevel.ERROR, "offBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting NSD offboarding action.");											
 		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
 		                .body(e.getResponseBodyAsString());
 			}						
@@ -787,6 +834,11 @@ public class MANOController {
 			catch(Exception e)
 			{
 				logger.error("deployNSDToMANOProvider, OSM4 fails authentication! Aborting deployment of NSD.");
+				CentralLogger.log( CLevel.ERROR, "deployNSDToMANOProvider, OSM4 fails authentication! Aborting deployment of NSD.");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting offboarding action.");											
+				// NS instance creation failed
+				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NSD deployment action.");
+				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor);
 				return;
 			}
 
@@ -856,28 +908,36 @@ public class MANOController {
 			if( deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.RUNNING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED )
 			{
 				// There can be multiple MANOs for the Experiment. We need to handle that also.
-				OSM4Client osm4Client = new OSM4Client(
-						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-								.getObMANOprovider().getApiEndpoint(),
-						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-								.getObMANOprovider().getUsername(),
-						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-								.getObMANOprovider().getPassword(),
-						"admin");
-				ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
-				if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
-					deploymentdescriptor.setFeedback(response.getBody().toString());				
-					logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
-				}
-				else
+				try
 				{
-					// NS Termination succeded
-					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);
-					deploymentdescriptor.setConstituentVnfrIps("N/A");
-					logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
-					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-					BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+					OSM4Client osm4Client = new OSM4Client(
+							deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+									.getObMANOprovider().getApiEndpoint(),
+							deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+									.getObMANOprovider().getUsername(),
+							deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+									.getObMANOprovider().getPassword(),
+							"admin");
+					ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
+					if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
+						deploymentdescriptor.setFeedback(response.getBody().toString());				
+						logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
+					}
+					else
+					{
+						// NS Termination succeded
+						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATING);
+						deploymentdescriptor.setConstituentVnfrIps("N/A");
+						logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
+						DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+						BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+					}
+				}
+				catch(Exception e)
+				{
+					BusController.getInstance().osm4CommunicationFailed("OSM communication failed. Aborting NS termination Action.");
+					CentralLogger.log( CLevel.ERROR, "terminateNSFromMANOProvider, OSM4 fails authentication. Aborting action.");										
 				}
 			}
 		}
@@ -887,14 +947,29 @@ public class MANOController {
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
 				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
-			OSM4Client osm4Client = new OSM4Client(
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getApiEndpoint(),
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getUsername(),
-					deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
-							.getObMANOprovider().getPassword(),
-					"admin");							
+			OSM4Client osm4Client = null;
+			try
+			{
+				 osm4Client = new OSM4Client(
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getApiEndpoint(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getUsername(),
+						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
+								.getObMANOprovider().getPassword(),
+						"admin");							
+			}
+			catch(Exception e)
+			{
+				logger.error("OSM4 fails authentication");
+				CentralLogger.log( CLevel.ERROR, "OSM4 fails authentication");
+				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting NS deletion action.");											
+
+				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NS deletion action.");				
+				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor);				
+				return;
+			}
 			// After TERMINATION
 			boolean force;
 			if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)

@@ -877,11 +877,14 @@ public class PortalJpaController {
 
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
-				+ "m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
-				+ "AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED "
-				+ "AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
-				+ "AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
-				+ "ORDER BY m.id");
+				+ " m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "				
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
+				+ " ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -892,7 +895,9 @@ public class PortalJpaController {
 
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
-				+ "m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id");
+				+ "( m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+				+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATED )"
+				+ "ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -914,7 +919,8 @@ public class PortalJpaController {
 
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
-				+ "m.status=portal.api.model.DeploymentDescriptorStatus.FAILED ORDER BY m.id");
+						+ "( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED ) "
+						+ " ORDER BY m.id");						
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -925,7 +931,11 @@ public class PortalJpaController {
 
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
-				+ "m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED ORDER BY m.id");
+					+ "( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED "			
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
+					+ " ORDER BY m.id");						
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
@@ -938,22 +948,31 @@ public class PortalJpaController {
 		String sql = "";
 		if ( (status!=null) && status.equals("COMPLETED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id";
-			
+					+ " AND (m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATED ) "
+					+ " ORDER BY m.id";			
 		}else if ( (status!=null) && status.equals("REJECTED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
 					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";			
 		}else if ( (status!=null) && status.equals("FAILED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED ORDER BY m.id";			
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
+					+ " ORDER BY m.id";
 		}else if ( (status!=null) && status.equals("REMOVED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED ORDER BY m.id";			
+					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED " 			
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
+					+ " ORDER BY m.id";
 		}else {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
 					+ " ORDER BY m.id";
 		}
@@ -972,23 +991,31 @@ public class PortalJpaController {
 		String sql = "";
 		if ( (status!=null) && status.equals("COMPLETED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED ORDER BY m.id";
-			
+					+ " AND (m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATED ) "
+					+ " ORDER BY m.id";						
 		}else if ( (status!=null) && status.equals("REJECTED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
 					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id";
 			
 		}else if ( (status!=null) && status.equals("FAILED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED ORDER BY m.id";			
+					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
+					+ " ORDER BY m.id";
 		}else if ( (status!=null) && status.equals("REMOVED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
-					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED ORDER BY m.id";			
+					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED " 
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
+					+ " ORDER BY m.id";			
 		}else {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REJECTED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "					
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
 					+ "ORDER BY m.id";
 		}

@@ -946,6 +946,8 @@ public class MANOController {
 						CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());						
 						deploymentdescriptor.setFeedback(response.getBody().toString());				
 						logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
+						DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+						BusController.getInstance().terminateInstanceFailed(deploymentdescriptor_final);				
 					}
 					else
 					{

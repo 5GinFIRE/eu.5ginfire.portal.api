@@ -2749,7 +2749,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllRejectedDeploymentDescriptors();
 				} else if (  (status!=null) &&  status.equals( "FAILED" )){
 					deployments = portalRepositoryRef.getAllFailedDeploymentDescriptors();
-				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
+				} else if (  (status!=null) &&  status.equals( "FAILED_OSM_REMOVED" )){
 					deployments = portalRepositoryRef.getAllRemovedDeploymentDescriptors();					
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptors();			
@@ -2761,8 +2761,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), "REJECTED" );
 				} else if (  (status!=null) &&  status.equals( "FAILED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
-				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
-					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
+				} else if (  (status!=null) &&  status.equals( "FAILED_OSM_REMOVED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED_OSM_REMOVED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByMentor(  (long) u.getId(), null );
 				}			
@@ -2774,8 +2774,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
 				} else if (  (status!=null) &&  status.equals( "FAILED" )){
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
-				} else if (  (status!=null) &&  status.equals( "REMOVED" )){
-					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
+				} else if (  (status!=null) &&  status.equals( "FAILED_OSM_REMOVED" )){
+					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED_OSM_REMOVED" );
 				} else {
 					deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
 				}			
@@ -2828,8 +2828,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REJECTED" );
 			} else if (  (status!=null) &&  status.equals( "FAILED" )){
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED" );
-			} else if (  (status!=null) &&  status.equals( "REMOVED" )){
-				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "REMOVED" );
+			} else if (  (status!=null) &&  status.equals( "FAILED_OSM_REMOVED" )){
+				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), "FAILED_OSM_REMOVED" );
 			} else {
 				deployments = portalRepositoryRef.getAllDeploymentDescriptorsByUser( (long) u.getId(), null );
 			}

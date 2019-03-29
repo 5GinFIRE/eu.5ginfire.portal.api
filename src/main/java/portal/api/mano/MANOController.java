@@ -1024,7 +1024,7 @@ public class MANOController {
 				}
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
 				{
-					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.REMOVED);				
+					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED_OSM_REMOVED);				
 					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());
 				}
 				logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					

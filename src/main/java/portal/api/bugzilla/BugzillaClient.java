@@ -122,7 +122,7 @@ public class BugzillaClient {
 		String status= "CONFIRMED";
 		String resolution = null;
 		
-		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED || descriptor.getStatus() == DeploymentDescriptorStatus.REMOVED ) ) {
+		if ( ( descriptor.getStatus() == DeploymentDescriptorStatus.COMPLETED || descriptor.getStatus() == DeploymentDescriptorStatus.FAILED_OSM_REMOVED ) ) {
 			status = "RESOLVED";
 			resolution = "FIXED";
 		} else if ( descriptor.getStatus() == DeploymentDescriptorStatus.DELETION_FAILED ) {

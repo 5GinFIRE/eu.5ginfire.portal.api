@@ -27,7 +27,7 @@ public enum DeploymentDescriptorStatus {
 		TERMINATING,
 		TERMINATION_FAILED,
 		COMPLETED,
-		REMOVED,
+		FAILED_OSM_REMOVED,
 		DELETION_FAILED
 }
 

@@ -883,7 +883,7 @@ public class PortalJpaController {
 				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
 				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "				
-				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
+				+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED "
 				+ " ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -932,7 +932,7 @@ public class PortalJpaController {
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 					+ "( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED "			
-					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED "
+					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED "
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
 					+ " ORDER BY m.id");						
@@ -958,9 +958,9 @@ public class PortalJpaController {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
 					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
 					+ " ORDER BY m.id";
-		}else if ( (status!=null) && status.equals("REMOVED") ){
+		}else if ( (status!=null) && status.equals("FAILED_OSM_REMOVED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
-					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED " 			
+					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED " 			
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
@@ -973,7 +973,7 @@ public class PortalJpaController {
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "
-					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED "
 					+ " ORDER BY m.id";
 		}
 		
@@ -1002,9 +1002,9 @@ public class PortalJpaController {
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
 					+ " AND m.status=portal.api.model.DeploymentDescriptorStatus.FAILED"			
 					+ " ORDER BY m.id";
-		}else if ( (status!=null) && status.equals("REMOVED") ){
+		}else if ( (status!=null) && status.equals("FAILED_OSM_REMOVED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
-					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.REMOVED " 
+					+ " AND ( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED " 
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 					+ " OR m.status=portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED ) "
 					+ " ORDER BY m.id";			
@@ -1016,7 +1016,7 @@ public class PortalJpaController {
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.DELETION_FAILED "
 					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED "					
-					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.REMOVED "
+					+ " AND m.status<>portal.api.model.DeploymentDescriptorStatus.FAILED_OSM_REMOVED "
 					+ "ORDER BY m.id";
 		}
 		

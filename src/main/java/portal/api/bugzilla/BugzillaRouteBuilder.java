@@ -387,7 +387,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("direct:bugzilla.bugmanage");	
 
 		/**
-		 * Automatic NS Instantiation Route Success
+		 * Automatic NS Termination Route Success
 		 */		
 		from("seda:nsd.deployment.termination.success?multipleConsumers=true")
 		.delay(30000)
@@ -399,16 +399,24 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
+		/**
+		 * OSM Communication
+		 */		
 		from("seda:communication.osm.fail?multipleConsumers=true")
 		.delay(30000)
 		.bean( BugzillaClient.class, "transformOSMCommunicationFail2BugBody")
-		.to("direct:bugzilla.newIssue");
+		.to("direct:bugzilla.bugmanage");
+		
+		from("seda:communication.osm.success?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformOSMCommunicationSuccess2BugBody")
+		.to("direct:bugzilla.bugmanage");
 		
 		/**
 		 * NS Scheduling Route
 		 */		
 		from("seda:nsd.schedule?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -416,7 +424,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Instantiation Route Fail
 		 */		
 		from("seda:nsd.deployment.instantiation.fail?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 				
@@ -424,7 +432,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Termination Route Success
 		 */		
 		from("seda:nsd.instance.termination.success?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -432,7 +440,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Termination Route Fail
 		 */		
 		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -440,7 +448,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Deletion Route Success
 		 */		
 		from("seda:nsd.instance.deletion.success?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -448,7 +456,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Deletion Route Fail
 		 */		
 		from("seda:nsd.instance.deletion.fail?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -456,7 +464,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Reject Deployment Route Issue
 		 */
 		from("seda:nsd.deployment.reject?multipleConsumers=true")
-		.delay(5000)
+		.delay(30000)
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
 		.to("direct:bugzilla.bugmanage");		
 

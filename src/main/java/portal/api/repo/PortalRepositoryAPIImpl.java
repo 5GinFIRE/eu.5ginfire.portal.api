@@ -3410,9 +3410,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			{
 				logger.error("getOSMVNFMetadata, OSM4 fails authentication. Aborting action.");
 				CentralLogger.log( CLevel.ERROR, "getOSMVNFMetadata, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed while getting VxF Metadata. ");
 				ResponseBuilder builder = Response.status(e.getRawStatusCode());
-				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types");
+				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types or failed to communication with OSM");
 				throw new WebApplicationException(builder.build());		
 			}						
 			
@@ -3503,9 +3502,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			{
 				logger.error("getOSM_NSD_Metadata, OSM4 fails authentication. Aborting action.");
 				CentralLogger.log( CLevel.ERROR, "getOSM_NSD_Metadata, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed while getting NSD Metadata.");
 				ResponseBuilder builder = Response.status(e.getRawStatusCode());
-				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types");
+				builder.entity("manoprovid with id=" + manoprovid + " does not belong to the supported types or OSM communication failure");
 				throw new WebApplicationException(builder.build());		
 			}						
 			

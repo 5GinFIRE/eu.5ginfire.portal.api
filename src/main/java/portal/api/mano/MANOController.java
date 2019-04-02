@@ -63,7 +63,7 @@ public class MANOController {
 
 	/** */
 	private static final transient Log logger = LogFactory.getLog(MANOController.class.getName());
-
+	
 	public MANOController() {
 
 	}
@@ -137,13 +137,14 @@ public class MANOController {
 			OSM4Client osm4Client = null;
 			try {
 				osm4Client = new OSM4Client(vxfobds.getObMANOprovider().getApiEndpoint(), vxfobds.getObMANOprovider().getUsername(), vxfobds.getObMANOprovider().getPassword(), "admin");
+				MANOStatus.setOsm4CommunicationStatusActive(null);													
 			}
 		    catch(Exception e) 
 			{
 				logger.error("onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
 				
 				CentralLogger.log( CLevel.INFO, "onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting VxF OnBoarding action.");											
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting VxF OnBoarding action.");																	
 				// Set the reason of the failure
 				vxfobds.setFeedbackMessage("OSM4 communication failed. Aborting VxF OnBoarding action.");
 				vxfobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
@@ -291,13 +292,14 @@ public class MANOController {
 					if (osm4Client == null || !osm4Client.getMANOApiEndpoint().equals(sm.getApiEndpoint())) {
 						try
 						{
-							osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");
+							osm4Client = new OSM4Client(sm.getApiEndpoint(), sm.getUsername(), sm.getPassword(), "admin");							
+							MANOStatus.setOsm4CommunicationStatusActive(null);
 						}
 						catch(Exception e)
 						{
 							logger.error("OSM4 fails authentication");
 							CentralLogger.log( CLevel.ERROR, "OSM4 fails authentication");
-							BusController.getInstance().osm4CommunicationFailed("OSM4 fails authentication");							
+							MANOStatus.setOsm4CommunicationStatusFailed(null);
 							return;
 						}
 					}
@@ -307,8 +309,7 @@ public class MANOController {
 							logger.info(ns_instance_info.toString());
 							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
-							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status")
-									.replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 							// Depending on the current OSM status, change the portal status.
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")
@@ -316,7 +317,7 @@ public class MANOController {
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
-								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp);
 								deployment_tmp.setConstituentVnfrIps("");
 								for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
@@ -348,7 +349,7 @@ public class MANOController {
 							if (deployment_tmp.getOperationalStatus().toLowerCase().equals("terminated")
 									&& deployment_tmp.getConfigStatus().toLowerCase().equals("terminating")
 									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
-								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATED);
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								deployment_tmp.setConstituentVnfrIps("N/A");
@@ -360,7 +361,7 @@ public class MANOController {
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.FAILED);
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
-								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								deployment_tmp.setConstituentVnfrIps("N/A");
 								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp);
 							}
@@ -368,7 +369,7 @@ public class MANOController {
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
-								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status"));
+								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								BusController.getInstance().deploymentTerminationFailed(deployment_tmp);
 							}
 							deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
@@ -454,12 +455,13 @@ public class MANOController {
 			OSM4Client osm4Client = null;
 			try {
 				osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(), uexpobd.getObMANOprovider().getUsername(), uexpobd.getObMANOprovider().getPassword(), "admin");
+				MANOStatus.setOsm4CommunicationStatusActive(null);								
 			}
 		    catch(Exception e) 
 			{
 				logger.error("onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				CentralLogger.log( CLevel.ERROR, "onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM communication failed. Aborting NSD Onboarding action.");											
+				CentralLogger.log( CLevel.ERROR, "onBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting NSD Onboarding action.");
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting NSD Onboarding action.");				
 				// Set the reason of the failure
 				uexpobds.setFeedbackMessage("OSM communication failed. Aborting NSD Onboarding action.");
 				uexpobds.setOnBoardingStatus(OnBoardingStatus.FAILED);
@@ -543,12 +545,13 @@ public class MANOController {
 			OSM4Client osm4Client = null;			
 			try {
 				osm4Client = new OSM4Client(obd.getObMANOprovider().getApiEndpoint(), obd.getObMANOprovider().getUsername(), obd.getObMANOprovider().getPassword(), "admin");
+				MANOStatus.setOsm4CommunicationStatusActive(null);								
 			}
 		    catch(HttpStatusCodeException e) 
 			{
 				logger.error("offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				CentralLogger.log( CLevel.ERROR, "offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting VxF offboarding action.");											
+				CentralLogger.log( CLevel.ERROR, "offBoardVxFFromMANOProvider, OSM4 fails authentication. Aborting VxF offboarding action.");
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting VxF offboarding action.");								
 		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
 		                .body(e.getResponseBodyAsString());
 			}						
@@ -816,12 +819,13 @@ public class MANOController {
 			OSM4Client osm4Client = null;			
 			try {
 				osm4Client = new OSM4Client(uexpobd.getObMANOprovider().getApiEndpoint(), uexpobd.getObMANOprovider().getUsername(), uexpobd.getObMANOprovider().getPassword(), "admin");
+				MANOStatus.setOsm4CommunicationStatusActive(null);								
 			}
 		    catch(HttpStatusCodeException e) 
 			{
 				logger.error("offBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
 				CentralLogger.log( CLevel.ERROR, "offBoardNSDFromMANOProvider, OSM4 fails authentication. Aborting action.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting NSD offboarding action.");											
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting NSD offboarding action.");								
 		        return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders())
 		                .body(e.getResponseBodyAsString());
 			}						
@@ -849,12 +853,13 @@ public class MANOController {
 						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
 								.getObMANOprovider().getPassword(),
 						"admin");
+					MANOStatus.setOsm4CommunicationStatusActive(null);													
 			}
 			catch(Exception e)
 			{
 				logger.error("deployNSDToMANOProvider, OSM4 fails authentication! Aborting deployment of NSD.");
 				CentralLogger.log( CLevel.ERROR, "deployNSDToMANOProvider, OSM4 fails authentication! Aborting deployment of NSD.");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting offboarding action.");											
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting deployment of NSD.");								
 				// NS instance creation failed
 				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NSD deployment action.");
 				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor);
@@ -940,6 +945,9 @@ public class MANOController {
 							deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
 									.getObMANOprovider().getPassword(),
 							"admin");
+					
+					MANOStatus.setOsm4CommunicationStatusActive(null);				
+					
 					ResponseEntity<String> response = osm4Client.terminateNSInstanceNew(deploymentdescriptor.getInstanceId()); 
 					if (response == null || response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
 						deploymentdescriptor.setStatus(DeploymentDescriptorStatus.TERMINATION_FAILED);
@@ -962,8 +970,8 @@ public class MANOController {
 				}
 				catch(Exception e)
 				{
-					BusController.getInstance().osm4CommunicationFailed("OSM communication failed. Aborting NS termination Action.");
-					CentralLogger.log( CLevel.ERROR, "terminateNSFromMANOProvider, OSM4 fails authentication. Aborting action.");										
+					MANOStatus.setOsm4CommunicationStatusFailed(" Aborting NSD termination action.");													
+					CentralLogger.log( CLevel.ERROR, "terminateNSFromMANOProvider, OSM4 fails authentication. Aborting action.");
 				}
 			}
 		}
@@ -983,14 +991,14 @@ public class MANOController {
 								.getObMANOprovider().getUsername(),
 						deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0)
 								.getObMANOprovider().getPassword(),
-						"admin");							
+						"admin");	
+					MANOStatus.setOsm4CommunicationStatusActive(null);													
 			}
 			catch(Exception e)
 			{
 				logger.error("OSM4 fails authentication");
+				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting NS deletion action.");													
 				CentralLogger.log( CLevel.ERROR, "OSM4 fails authentication");
-				BusController.getInstance().osm4CommunicationFailed("OSM4 communication failed. Aborting NS deletion action.");											
-
 				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NS deletion action.");				
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
 				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor);				
@@ -1002,7 +1010,7 @@ public class MANOController {
 			{
 				force=false;
 			}
-			else
+			else //for FAILED OR TERMINATION_FAILED instances
 			{
 				force=true;
 			}
@@ -1022,7 +1030,7 @@ public class MANOController {
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.COMPLETED);
 					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());
 				}
-				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED)
+				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATION_FAILED)
 				{
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED_OSM_REMOVED);				
 					CentralLogger.log( CLevel.INFO, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());

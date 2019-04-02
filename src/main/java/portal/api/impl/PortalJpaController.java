@@ -1442,7 +1442,7 @@ public class PortalJpaController {
 
 	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED");
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
 		return q.getResultList();		
 	}
 

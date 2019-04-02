@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import portal.api.bugzilla.model.Bug;
 import portal.api.bugzilla.model.Comment;
 import portal.api.bugzilla.model.User;
+import portal.api.mano.MANOStatus;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.DeploymentDescriptorStatus;
 import portal.api.model.DeploymentDescriptorVxFPlacement;
@@ -574,7 +575,7 @@ public class BugzillaClient {
 		return b;
 	}
 
-	public static Bug transformOSMCommunicationFail2BugBody(String message) {
+	public static Bug transformOSMCommunicationFail2BugBody() {
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
@@ -585,12 +586,32 @@ public class BugzillaClient {
 				+ " OSM COMMUNICATION ACTION FAILURE\n"
 				+ "**************************************************************\n");
 
-		description.append( "\n\n "+ message);
+		description.append( "\n\n "+ MANOStatus.getMessage());
 				 		
 		String status= "CONFIRMED";
 		String resolution = null;		
 		
-		Bug b = createBug(product, component, summary, null, description.toString(), null, status, resolution);
+		Bug b = createBug(product, component, summary, MANOStatus.getOsm4CommunicationStatusUUID(), description.toString(), null, status, resolution);
+		return b;
+	}
+		
+	public static Bug transformOSMCommunicationSuccess2BugBody() {
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[PORTAL] OSM Communication Action";
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " OSM COMMUNICATION ACTION RESTORED\n"
+				+ "**************************************************************\n");
+
+		description.append( "\n\n "+ MANOStatus.getMessage());
+				 		
+		String status = "RESOLVED";
+		String resolution = "FIXED";
+		
+		Bug b = createBug(product, component, summary, MANOStatus.getOsm4CommunicationStatusUUID(), description.toString(), null, status, resolution);
 		return b;
 	}
 		

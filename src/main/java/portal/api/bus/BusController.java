@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import portal.api.mano.MANOController;
+import portal.api.mano.MANOStatus;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
 import portal.api.model.ExperimentOnBoardDescriptor;
@@ -265,10 +266,16 @@ public class BusController {
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
 
-	public void osm4CommunicationFailed(String message)
+	public void osm4CommunicationFailed(Class<MANOStatus> manostatus)
 	{
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm.fail?multipleConsumers=true");
-		template.withBody(message).asyncSend();						
+		template.withBody(manostatus).asyncSend();						
+	}
+
+	public void osm4CommunicationRestored(Class<MANOStatus> manostatus)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm.success?multipleConsumers=true");
+		template.withBody(manostatus).asyncSend();						
 	}
 	
 	public void completeExperiment(DeploymentDescriptor deploymentdescriptor) {

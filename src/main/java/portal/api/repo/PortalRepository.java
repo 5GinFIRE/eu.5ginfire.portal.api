@@ -571,7 +571,7 @@ public class PortalRepository {
 	public List<DeploymentDescriptor> getDeploymentsToBeCompleted()
 	{		
 		List<DeploymentDescriptor> DeploymentDescriptorsToComplete = new ArrayList<>();
-		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningAndInstantiatingDeployments();
+		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningInstantiatingAndTerminatingDeployments();
 		for(DeploymentDescriptor d : DeploymentDescriptor_list)
 		{
 			d.getExperimentFullDetails();

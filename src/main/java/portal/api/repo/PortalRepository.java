@@ -588,16 +588,21 @@ public class PortalRepository {
 
 	public List<DeploymentDescriptor> getDeploymentsToBeDeleted()
 	{		
-		List<DeploymentDescriptor> deploymentDescriptorsToTerminate = new ArrayList<>();
+		List<DeploymentDescriptor> deploymentDescriptorsToDelete = new ArrayList<>();
 		List<DeploymentDescriptor> deploymentDescriptor_list = portalJpaController.readDeploymentsToBeDeleted();
 		for(DeploymentDescriptor d : deploymentDescriptor_list)
 		{
 			d.getExperimentFullDetails();
 			d.getInfrastructureForAll();			
-			logger.info("Deployment "+d.getName()+" is scheduled to be DELETED now.");
-			deploymentDescriptorsToTerminate.add(d);
+			OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
+			if(d.getEndDate().before(Date.from(utc.toInstant())))
+			{
+				logger.info("Deployment "+d.getName()+" is scheduled to be DELETED now.");
+				deploymentDescriptorsToDelete.add(d);
+			}
+			
 		}
-		return deploymentDescriptorsToTerminate;
+		return deploymentDescriptorsToDelete;
 	}
 
 	public List<DeploymentDescriptor> getRunningDeployments()

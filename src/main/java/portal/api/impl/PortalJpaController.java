@@ -64,6 +64,8 @@ public class PortalJpaController {
 
 	@PersistenceUnit
 	private EntityManagerFactory entityManagerFactory;
+	
+	//private static EntityManager entityManagerStatic; 
 
 	public void initData() {
 		PortalUser admin = readPortalUserById(1);
@@ -149,7 +151,6 @@ public class PortalJpaController {
 	public long countInstalledVxFs() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT COUNT(s) FROM InstalledVxF s");
 		return (Long) q.getSingleResult();
 	}
@@ -182,14 +183,12 @@ public class PortalJpaController {
 
 	public InstalledVxF readInstalledVxFByName(final String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (InstalledVxF) q.getSingleResult();
 	}
 
 	public InstalledVxF readInstalledVxFByUUID(final String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m WHERE m.uuid='" + uuid + "'");
 		return (q.getResultList().size() == 0) ? null : (InstalledVxF) q.getSingleResult();
 	}
@@ -197,7 +196,6 @@ public class PortalJpaController {
 	@SuppressWarnings("unchecked")
 	public List<InstalledVxF> readInstalledVxFs(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM InstalledVxF m");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -220,17 +218,14 @@ public class PortalJpaController {
 		logger.info("================= getAll() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		List<InstalledVxF> lb = entityManager.createQuery("select p from InstalledVxF p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			InstalledVxF iVxF = (InstalledVxF) iterator.next();
 			logger.info("=== InstalledVxF found: " + iVxF.getName() + ", Id: " + iVxF.getId() + ", Uuid: "
 					+ iVxF.getUuid() + ", RepoUrl: " + iVxF.getRepoUrl() + ", InstalledVersion: "
 					+ iVxF.getInstalledVersion() + ", PackageURL: " + iVxF.getPackageURL() + ", PackageLocalPath: "
-					+ iVxF.getPackageLocalPath() + ", Status: " + iVxF.getStatus());
-
+					+ iVxF.getPackageLocalPath() + ", Status: " + iVxF.getStatus());	
 		}
-
 		logger.info("================= getAll() ==================END");
 	}
 
@@ -323,16 +318,15 @@ public class PortalJpaController {
 	}
 	
 	public PortalUser readPortalUserByAPIKEY(String apikey) {
-			EntityManager entityManager = entityManagerFactory.createEntityManager();
-			Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.apikey='" + apikey + "'");
-			return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE m.apikey='" + apikey + "'");
+		return (q.getResultList().size() == 0) ? null : (PortalUser) q.getSingleResult();
 	}
 
 	public PortalUser readPortalUserById(int userid) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(PortalUser.class, userid);
-
 		// Query q = entityManager.createQuery("SELECT m FROM PortalUser m WHERE
 		// m.id=" + userid );
 		// return (q.getResultList().size()==0)?null:(PortalUser)
@@ -355,7 +349,6 @@ public class PortalJpaController {
 	@SuppressWarnings("unchecked")
 	public List<PortalUser> readUsers(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -365,7 +358,6 @@ public class PortalJpaController {
 	
 	public List<PortalUser> readMentorUsers(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM PortalUser m INNER JOIN m.roles r WHERE r=portal.api.model.UserRoleType.MENTOR");
 		//q.setParameter("inclList", "" );
 		q.setFirstResult(firstResult);
@@ -377,7 +369,6 @@ public class PortalJpaController {
 	public long countUsers() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT COUNT(s) FROM PortalUser s");
 		return (Long) q.getSingleResult();
 	}
@@ -386,7 +377,6 @@ public class PortalJpaController {
 		logger.info("================= getAllUsers() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		List<PortalUser> lb = entityManager.createQuery("select p from PortalUser p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			PortalUser bu = (PortalUser) iterator.next();
@@ -401,6 +391,7 @@ public class PortalJpaController {
 
 		}
 		logger.info("================= getAll() ==================END");
+
 	}
 
 	public void saveProduct(Product prod) {
@@ -471,6 +462,7 @@ public class PortalJpaController {
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
+	
 	}
 	
 	
@@ -496,7 +488,6 @@ public class PortalJpaController {
 
 	public Product readProductByUUID(String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.uuid='" + uuid + "'");
 		return (q.getResultList().size() == 0) ? null : (Product) q.getSingleResult();
 	}
@@ -510,9 +501,8 @@ public class PortalJpaController {
 
 	public Product readProductByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM Product m WHERE m.name LIKE '" + name + "'");
-		return (q.getResultList().size() == 0) ? null : (Product) q.getResultList().get(0);
+		return (q.getResultList().size() == 0) ? null : (Product) q.getResultList().get(0);		
 	}
 
 	// public VxFMetadata readVxFMetadataByUUID(String uuid) {
@@ -574,7 +564,6 @@ public class PortalJpaController {
 		logger.info("================= getAllProductsPrinted() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		List<Product> lb = readProducts(null, 0, 10000);
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			Product prod = (Product) iterator.next();
@@ -585,7 +574,6 @@ public class PortalJpaController {
 
 		}
 		logger.info("================= getAllProductsPrinted() ==================END");
-
 	}
 
 	public void saveSubscribedResource(SubscribedResource sm) {
@@ -619,16 +607,13 @@ public class PortalJpaController {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		return entityManager.find(SubscribedResource.class, userid);
-
 	}
 
 	public SubscribedResource readSubscribedResourceByuuid(String uuid) {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM SubscribedResource m WHERE m.uuid='" + uuid + "'");
 		return (q.getResultList().size() == 0) ? null : (SubscribedResource) q.getSingleResult();
-
 	}
 
 	public void deleteSubscribedResource(int smId) {
@@ -644,7 +629,6 @@ public class PortalJpaController {
 	public long countSubscribedResources() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT COUNT(s) FROM SubscribedResource s");
 		return (Long) q.getSingleResult();
 	}
@@ -653,12 +637,10 @@ public class PortalJpaController {
 		logger.info("================= getSubscribedResource() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		List<SubscribedResource> lb = entityManager.createQuery("select p from SubscribedResource p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			SubscribedResource sm = (SubscribedResource) iterator.next();
 			logger.info("	======> SubscribedResource found: " + sm.getURL() + ", Id: " + sm.getId());
-
 		}
 	}
 
@@ -679,7 +661,6 @@ public class PortalJpaController {
 
 	public List<SubscribedResource> readSubscribedResources(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM SubscribedResource m");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -709,6 +690,7 @@ public class PortalJpaController {
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -730,7 +712,6 @@ public class PortalJpaController {
 
 	public List<Category> readCategories(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM Category m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -799,14 +780,12 @@ public class PortalJpaController {
 		logger.info("================= getAllCategoriesPrinted() ==================START");
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		List<Category> lb = entityManager.createQuery("select p from Category p").getResultList();
 		for (Iterator iterator = lb.iterator(); iterator.hasNext();) {
 			Category sm = (Category) iterator.next();
 			logger.info("	======> Category found: " + sm.getName() + ", Id: " + sm.getId());
 
 		}
-
 	}
 
 	public void saveProperty(PortalProperty p) {
@@ -849,32 +828,26 @@ public class PortalJpaController {
 
 	public List<PortalProperty> readProperties(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM PortalProperty m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
-
 	}
 
 	public PortalProperty readPropertyByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM PortalProperty m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (PortalProperty) q.getSingleResult();
-
 	}
 
 	public PortalProperty readPropertyByID(int propid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		PortalProperty u = entityManager.find(PortalProperty.class, propid);
 		return u;
-
 	}
 
 	public List<DeploymentDescriptor> readDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 				+ " m.status<>portal.api.model.DeploymentDescriptorStatus.COMPLETED "
@@ -892,7 +865,6 @@ public class PortalJpaController {
 	
 	public List<DeploymentDescriptor> readCompletedDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 				+ "( m.status=portal.api.model.DeploymentDescriptorStatus.COMPLETED "
@@ -905,7 +877,6 @@ public class PortalJpaController {
 	
 	public List<DeploymentDescriptor> readRejectedDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 				+ "m.status=portal.api.model.DeploymentDescriptorStatus.REJECTED ORDER BY m.id");
@@ -916,19 +887,17 @@ public class PortalJpaController {
 	
 	public List<DeploymentDescriptor> readFailedDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 						+ "( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED ) "
 						+ " ORDER BY m.id");						
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
-		return q.getResultList();
+		return q.getResultList();		
 	}
 	
 	public List<DeploymentDescriptor> readRemovedDeploymentDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery(
 				"SELECT m FROM DeploymentDescriptor m  WHERE "
 					+ "( m.status=portal.api.model.DeploymentDescriptorStatus.FAILED "			
@@ -944,7 +913,6 @@ public class PortalJpaController {
 
 	public List<DeploymentDescriptor> readDeploymentDescriptorsByUser(Long ownerid, int firstResult, int maxResults, String status) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		String sql = "";
 		if ( (status!=null) && status.equals("COMPLETED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.owner.id=" + ownerid 
@@ -981,13 +949,13 @@ public class PortalJpaController {
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
 		return q.getResultList();
+		
 	}
 	
 	
 	
 	public List<DeploymentDescriptor> readDeploymentDescriptorsByMentor(Long ownerid, int firstResult, int maxResults, String status) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		String sql = "";
 		if ( (status!=null) && status.equals("COMPLETED") ){
 			sql = "SELECT m FROM DeploymentDescriptor m  WHERE m.mentor.id=" + ownerid 
@@ -1029,7 +997,6 @@ public class PortalJpaController {
 	
 	public List<DeploymentDescriptor> readDeploymentDescriptorsScheduled( int firstResult, int maxResults ) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m  WHERE m.status=portal.api.model.DeploymentDescriptorStatus.SCHEDULED ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1081,7 +1048,6 @@ public class PortalJpaController {
 	public long countMANOplatforms() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT COUNT(s) FROM MANOplatform s");
 		return (Long) q.getSingleResult();
 	}
@@ -1109,7 +1075,6 @@ public class PortalJpaController {
 
 	public MANOplatform readMANOplatformByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (MANOplatform) q.getSingleResult();
 	}
@@ -1130,14 +1095,12 @@ public class PortalJpaController {
 	public long countMANOproviders() {
 
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT COUNT(s) FROM MANOprovider s");
 		return (Long) q.getSingleResult();
 	}
 	
 	public MANOprovider readMANOproviderByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (MANOprovider) q.getSingleResult();
 	}
@@ -1174,7 +1137,6 @@ public class PortalJpaController {
 
 	public List<MANOplatform> readMANOplatforms(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM MANOplatform m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1209,7 +1171,6 @@ public class PortalJpaController {
 	
 	public List<MANOprovider> readMANOproviders(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM MANOprovider m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1251,7 +1212,6 @@ public class PortalJpaController {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		TypedQuery<MANOprovider> query = entityManager.createQuery("SELECT mp FROM MANOprovider mp WHERE mp.enabledForONBOARDING = TRUE",MANOprovider.class);
 		return query.getResultList();
-		
 	}
 	
 	public List<VxFOnBoardedDescriptor> readVxFOnBoardedDescriptors(int firstResult, int maxResults) {
@@ -1309,7 +1269,6 @@ public class PortalJpaController {
 	
 	public List<ExperimentOnBoardDescriptor> readExperimentOnBoardDescriptors(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM ExperimentOnBoardDescriptors m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1360,7 +1319,6 @@ public class PortalJpaController {
 
 	public List<Infrastructure> readInfrastructures(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m  ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1406,12 +1364,10 @@ public class PortalJpaController {
 		entityTransaction.begin();
 		entityManager.remove(c);
 		entityTransaction.commit();
-		
 	}
 
 	public Infrastructure readInfrastructureByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM Infrastructure m WHERE m.name='" + name + "'");
 		return (q.getResultList().size() == 0) ? null : (Infrastructure) q.getSingleResult();
 	}
@@ -1422,34 +1378,102 @@ public class PortalJpaController {
 		return (q.getResultList().size() == 0) ? null : (DeploymentDescriptor) q.getSingleResult();
 	}
 	
+//	public List<DeploymentDescriptor> readScheduledDeployments() {
+//		if(entityManagerStatic == null)
+//			entityManagerStatic = entityManagerFactory.createEntityManager();
+//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
+//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
+//		return q.getResultList();		
+//	}
+//	
+//	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
+//		if(entityManagerStatic == null)
+//			entityManagerStatic = entityManagerFactory.createEntityManager();
+//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
+//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
+//		return q.getResultList();		
+//	}
+//
+//	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
+//		if(entityManagerStatic == null)
+//			entityManagerStatic = entityManagerFactory.createEntityManager();
+//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
+//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+//		return q.getResultList();		
+//	}
+//
+//	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
+//		if(entityManagerStatic == null)
+//			entityManagerStatic = entityManagerFactory.createEntityManager();
+//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
+//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
+//		return q.getResultList();		
+//	}
+
 	public List<DeploymentDescriptor> readScheduledDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
-		return q.getResultList();		
+		try
+		{
+			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
+			return q.getResultList();
+		}
+		finally
+		{
+			entityManager.close();
+		}
+		
 	}
 	
 	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
-		return q.getResultList();		
+		try 
+		{
+			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
+			return q.getResultList();
+		}
+		finally
+		{
+			entityManager.close();
+		}
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-		return q.getResultList();		
+		try 
+		{
+			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+			return q.getResultList();
+		}
+		finally
+		{
+			entityManager.close();
+		}
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
-		return q.getResultList();		
+		try
+		{
+			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
+			return q.getResultList();
+		}
+		finally
+		{
+			entityManager.close();
+		}
 	}
-
+	
 	public List<DeploymentDescriptor> readRunningInstantiatingAndTerminatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-		return q.getResultList();		
+		try 
+		{
+			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+			return q.getResultList();		
+		}
+		finally
+		{
+			entityManager.close();
+		}
 	}
 	
 	/**
@@ -1465,7 +1489,6 @@ public class PortalJpaController {
 	 */
 	public List<VFImage> readVFImages(int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM VFImage m ORDER BY m.id");
 		q.setFirstResult(firstResult);
 		q.setMaxResults(maxResults);
@@ -1505,17 +1528,15 @@ public class PortalJpaController {
 	 */
 	public VFImage readVFImageByName(String name) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM VFImage m WHERE m.name='" + name + "'");
-		return (q.getResultList().size() == 0) ? null : ( VFImage ) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : ( VFImage ) q.getSingleResult();		
 	}
 
 
 	public VFImage readVFImageByUUID(String uuid) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q = entityManager.createQuery("SELECT m FROM VFImage m WHERE m.uuid='" + uuid + "'");
-		return (q.getResultList().size() == 0) ? null : (VFImage) q.getSingleResult();
+		return (q.getResultList().size() == 0) ? null : (VFImage) q.getSingleResult();		
 	}
 
 
@@ -1529,7 +1550,6 @@ public class PortalJpaController {
 	 */
 	public List<VFImage> readVFImagesForOwnerID( Long ownerid, int firstResult, int maxResults) {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-
 		Query q;
 
 		if ((ownerid != null) && (ownerid >= 0))
@@ -1558,16 +1578,4 @@ public class PortalJpaController {
 
 		return bp;
 	}
-
-
-	
-
-	
-
-
-
-
-	
-
-
 }

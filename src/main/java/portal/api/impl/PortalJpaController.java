@@ -1412,68 +1412,33 @@ public class PortalJpaController {
 
 	public List<DeploymentDescriptor> readScheduledDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try
-		{
-			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
-			return q.getResultList();
-		}
-		finally
-		{
-			entityManager.close();
-		}
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
+		return q.getResultList();
 		
 	}
 	
 	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try 
-		{
-			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
-			return q.getResultList();
-		}
-		finally
-		{
-			entityManager.close();
-		}
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
+		return q.getResultList();
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try 
-		{
-			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-			return q.getResultList();
-		}
-		finally
-		{
-			entityManager.close();
-		}
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+		return q.getResultList();
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try
-		{
-			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
-			return q.getResultList();
-		}
-		finally
-		{
-			entityManager.close();
-		}
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
+		return q.getResultList();
 	}
 	
 	public List<DeploymentDescriptor> readRunningInstantiatingAndTerminatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		try 
-		{
-			Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-			return q.getResultList();		
-		}
-		finally
-		{
-			entityManager.close();
-		}
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
+		return q.getResultList();		
 	}
 	
 	/**

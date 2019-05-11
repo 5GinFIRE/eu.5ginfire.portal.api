@@ -19,5 +19,6 @@ public enum PackagingFormat {
 
 	OSMvTWO,
 	TOSCA,
-	OSMvFOUR
+	OSMvFOUR,
+	OSMvFIVE
 }

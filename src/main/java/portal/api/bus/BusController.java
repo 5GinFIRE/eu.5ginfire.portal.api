@@ -234,14 +234,14 @@ public class BusController {
 		logger.info( "deployExperiment: to(\"seda:nsd.deploy?multipleConsumers=true\")");
 		
 		FluentProducerTemplate	template = actx.createFluentProducerTemplate().to("seda:nsd.deploy?multipleConsumers=true");
-		//template.withBody( deploymentdescriptor ).asyncSend();
-		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
-		waitAndStopForTemplate( result, template );
+		template.withBody( deploymentdescriptor ).asyncSend();
+		//Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
+		//waitAndStopForTemplate( result, template );
 		
 	}
 
-
-
+	// seda:nsd.deployment
+	
 	public void deploymentInstantiationSucceded(DeploymentDescriptor deploymentdescriptor)
 	{
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.instantiation.success?multipleConsumers=true");
@@ -265,37 +265,45 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.termination.fail?multipleConsumers=true");
 		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
-
-	public void osm4CommunicationFailed(Class<MANOStatus> manostatus)
-	{
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm.fail?multipleConsumers=true");
-		template.withBody(manostatus).asyncSend();						
-	}
-
-	public void osm4CommunicationRestored(Class<MANOStatus> manostatus)
-	{
-		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm.success?multipleConsumers=true");
-		template.withBody(manostatus).asyncSend();						
-	}
 	
 	public void completeExperiment(DeploymentDescriptor deploymentdescriptor) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.complete?multipleConsumers=true");
-		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
-		//waitAndStopForTemplate( result, template );		
+		template.withBody( deploymentdescriptor ).asyncSend();				
 	}
 
 	public void deleteExperiment(DeploymentDescriptor deploymentdescriptor) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.delete?multipleConsumers=true");
-		Future<Exchange> result = template.withBody( deploymentdescriptor ).asyncSend();		
-		//waitAndStopForTemplate( result, template );		
+		template.withBody( deploymentdescriptor ).asyncSend();						
 	}
 
 	public void rejectExperiment(DeploymentDescriptor deploymentdescriptor) {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.deployment.reject?multipleConsumers=true");
 		template.withBody( deploymentdescriptor ).asyncSend();				
 	}
+
+	public void osm4CommunicationFailed(Class<MANOStatus> manostatus)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm4.fail?multipleConsumers=true");
+		template.withBody(manostatus).asyncSend();						
+	}
+
+	public void osm4CommunicationRestored(Class<MANOStatus> manostatus)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm4.success?multipleConsumers=true");
+		template.withBody(manostatus).asyncSend();						
+	}
 	
-	
+	public void osm5CommunicationFailed(Class<MANOStatus> manostatus)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm5.fail?multipleConsumers=true");
+		template.withBody(manostatus).asyncSend();						
+	}
+
+	public void osm5CommunicationRestored(Class<MANOStatus> manostatus)
+	{
+		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:communication.osm5.success?multipleConsumers=true");
+		template.withBody(manostatus).asyncSend();						
+	}
 
 	private FluentProducerTemplate templateNSDInstTermSucc = null;
 	public void terminateInstanceSucceded(DeploymentDescriptor deploymentdescriptor)
@@ -466,5 +474,7 @@ public class BusController {
 		FluentProducerTemplate template = actx.createFluentProducerTemplate().to("seda:nsd.offboard?multipleConsumers=true");
 		template.withBody( uexpobd ).asyncSend();		
 	}
+
+
 
 }

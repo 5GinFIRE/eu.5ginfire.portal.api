@@ -575,7 +575,7 @@ public class BugzillaClient {
 		return b;
 	}
 
-	public static Bug transformOSMCommunicationFail2BugBody() {
+	public static Bug transformOSM4CommunicationFail2BugBody() {
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
@@ -595,7 +595,7 @@ public class BugzillaClient {
 		return b;
 	}
 		
-	public static Bug transformOSMCommunicationSuccess2BugBody() {
+	public static Bug transformOSM4CommunicationSuccess2BugBody() {
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
@@ -612,6 +612,46 @@ public class BugzillaClient {
 		String resolution = "FIXED";
 		
 		Bug b = createBug(product, component, summary, MANOStatus.getOsm4CommunicationStatusUUID(), description.toString(), null, status, resolution);
+		return b;
+	}
+
+	public static Bug transformOSM5CommunicationFail2BugBody() {
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[PORTAL] OSM Communication Action";
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " OSM COMMUNICATION ACTION FAILURE\n"
+				+ "**************************************************************\n");
+
+		description.append( "\n\n "+ MANOStatus.getMessage());
+				 		
+		String status= "CONFIRMED";
+		String resolution = null;		
+		
+		Bug b = createBug(product, component, summary, MANOStatus.getOsm5CommunicationStatusUUID(), description.toString(), null, status, resolution);
+		return b;
+	}
+		
+	public static Bug transformOSM5CommunicationSuccess2BugBody() {
+		String product = "5GinFIRE Operations";
+		String component = "Operations Support" ;
+		String summary = "[PORTAL] OSM Communication Action";
+		
+		StringBuilder description =  new StringBuilder( "**************************************************************\n"
+				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
+				+ "**************************************************************\n"
+				+ " OSM COMMUNICATION ACTION RESTORED\n"
+				+ "**************************************************************\n");
+
+		description.append( "\n\n "+ MANOStatus.getMessage());
+				 		
+		String status = "RESOLVED";
+		String resolution = "FIXED";
+		
+		Bug b = createBug(product, component, summary, MANOStatus.getOsm5CommunicationStatusUUID(), description.toString(), null, status, resolution);
 		return b;
 	}
 		

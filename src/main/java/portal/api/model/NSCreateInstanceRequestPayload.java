@@ -25,5 +25,9 @@ public class NSCreateInstanceRequestPayload extends NSInstantiateInstanceRequest
 	{
 		super(osm4client, deploymentdescriptor);
 	}	
+	public NSCreateInstanceRequestPayload(DeploymentDescriptor deploymentdescriptor)
+	{
+		super(deploymentdescriptor);
+	}	
 }
 

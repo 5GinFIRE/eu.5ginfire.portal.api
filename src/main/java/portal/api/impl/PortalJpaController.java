@@ -15,10 +15,6 @@
 
 package portal.api.impl;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,18 +51,21 @@ import portal.api.model.VxFOnBoardedDescriptor;
  * @author ctranoris
  * 
  */
-/**
- * @author ctranoris
- *
- */
 public class PortalJpaController {
 	private static final transient Log logger = LogFactory.getLog(PortalJpaController.class.getName());
 
 	@PersistenceUnit
 	private EntityManagerFactory entityManagerFactory;
-	
-	//private static EntityManager entityManagerStatic; 
 
+//	private static EntityManagerFactory entityManagerFactory;
+//    static {
+//        try {
+//        	entityManagerFactory = Persistence.createEntityManagerFactory("MyPu");
+//        } catch (Throwable ex) {
+//            logger.error("Initial SessionFactory creation failed", ex);
+//            throw new ExceptionInInitializerError(ex);
+//        }
+//    }	
 	public void initData() {
 		PortalUser admin = readPortalUserById(1);
 		logger.info("======================== admin  = " + admin);
@@ -1378,67 +1377,41 @@ public class PortalJpaController {
 		return (q.getResultList().size() == 0) ? null : (DeploymentDescriptor) q.getSingleResult();
 	}
 	
-//	public List<DeploymentDescriptor> readScheduledDeployments() {
-//		if(entityManagerStatic == null)
-//			entityManagerStatic = entityManagerFactory.createEntityManager();
-//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
-//		return q.getResultList();		
-//	}
-//	
-//	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
-//		if(entityManagerStatic == null)
-//			entityManagerStatic = entityManagerFactory.createEntityManager();
-//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
-//		return q.getResultList();		
-//	}
-//
-//	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
-//		if(entityManagerStatic == null)
-//			entityManagerStatic = entityManagerFactory.createEntityManager();
-//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-//		return q.getResultList();		
-//	}
-//
-//	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
-//		if(entityManagerStatic == null)
-//			entityManagerStatic = entityManagerFactory.createEntityManager();
-//		//EntityManager entityManager = entityManagerFactory.createEntityManager();
-//		Query q = entityManagerStatic.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
-//		return q.getResultList();		
-//	}
-
+	
 	public List<DeploymentDescriptor> readScheduledDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.SCHEDULED");
-		return q.getResultList();
-		
+		return q.getResultList();		
 	}
 	
 	public List<DeploymentDescriptor> readRunningAndInstantiatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
-		return q.getResultList();
+		return q.getResultList();		
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeTerminated() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-		return q.getResultList();
+		return q.getResultList();		
 	}
 
 	public List<DeploymentDescriptor> readDeploymentsToBeDeleted() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATED OR m.status = portal.api.model.DeploymentDescriptorStatus.FAILED OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATION_FAILED");
+		return q.getResultList();		
+	}
+
+	public List<DeploymentDescriptor> readRunningInstantiatingDeployments() {
+		EntityManager entityManager = entityManagerFactory.createEntityManager();
+		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING");
 		return q.getResultList();
 	}
 	
 	public List<DeploymentDescriptor> readRunningInstantiatingAndTerminatingDeployments() {
 		EntityManager entityManager = entityManagerFactory.createEntityManager();
 		Query q = entityManager.createQuery("SELECT m FROM DeploymentDescriptor m WHERE m.status = portal.api.model.DeploymentDescriptorStatus.RUNNING OR m.status = portal.api.model.DeploymentDescriptorStatus.INSTANTIATING OR m.status = portal.api.model.DeploymentDescriptorStatus.TERMINATING");
-		return q.getResultList();		
+		return q.getResultList();
 	}
 	
 	/**

@@ -400,16 +400,29 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		.to("direct:bugzilla.bugmanage");	
 
 		/**
-		 * OSM Communication
+		 * OSM4 Communication
 		 */		
-		from("seda:communication.osm.fail?multipleConsumers=true")
+		from("seda:communication.osm4.fail?multipleConsumers=true")
 		.delay(30000)
-		.bean( BugzillaClient.class, "transformOSMCommunicationFail2BugBody")
+		.bean( BugzillaClient.class, "transformOSM4CommunicationFail2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
-		from("seda:communication.osm.success?multipleConsumers=true")
+		from("seda:communication.osm4.success?multipleConsumers=true")
 		.delay(30000)
-		.bean( BugzillaClient.class, "transformOSMCommunicationSuccess2BugBody")
+		.bean( BugzillaClient.class, "transformOSM4CommunicationSuccess2BugBody")
+		.to("direct:bugzilla.bugmanage");
+		
+		/**
+		 * OSM5 Communication
+		 */		
+		from("seda:communication.osm5.fail?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformOSM5CommunicationFail2BugBody")
+		.to("direct:bugzilla.bugmanage");
+		
+		from("seda:communication.osm5.success?multipleConsumers=true")
+		.delay(30000)
+		.bean( BugzillaClient.class, "transformOSM5CommunicationSuccess2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
 		/**

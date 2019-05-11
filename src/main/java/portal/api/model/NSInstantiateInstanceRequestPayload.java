@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 University of Patras 
+ * Copyright 2018 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -109,6 +109,27 @@ public class NSInstantiateInstanceRequestPayload
 //			}						
 //			this.vld.add(vld_tmp);
 //		}
+	}
+
+	public NSInstantiateInstanceRequestPayload(DeploymentDescriptor deploymentdescriptor)
+	{
+		this.nsName = deploymentdescriptor.getName();
+		this.vimAccountId = deploymentdescriptor.getInfrastructureForAll().getVIMid();
+		// Here we need to get the ExperimentOnBoardDescriptor based on the Experiment.
+		// An Experiment might have multiple OnBoardDescriptors if it is OnBoarded to multiple OSM MANOs.
+		// We temporarily select the first (and most probably the only one). 
+		// Otherwise the user needs to define the OSM MANO where the Experiment is OnBoarded in order to instantiate.
+		this.nsdId = deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getDeployId();
+		
+		Integer count=1;
+		for(DeploymentDescriptorVxFPlacement tmp : deploymentdescriptor.getVxfPlacements())
+		{
+			VnF vnf_tmp = new VnF();
+			vnf_tmp.memberVnFIndex=count.toString();
+			vnf_tmp.vimAccount = tmp.getInfrastructure().getVIMid();
+			this.vnf.add(vnf_tmp);
+			count++;
+		}
 	}
 	
 	public String toJSON()

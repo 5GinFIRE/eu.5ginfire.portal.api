@@ -190,9 +190,9 @@ public class PortalRepository {
 	}
 
 	public void setPortalJpaController(PortalJpaController portalJpaController) {
-		this.portalJpaController = portalJpaController;
+		PortalRepository.portalJpaController = portalJpaController;
 		logger.info("======================== SETing setPortalJpaController ========================");
-		this.portalJpaController.initData();
+		PortalRepository.portalJpaController.initData();
 	}
 
 	public Collection<SubscribedResource> getSubscribedResourcesAsCollection() {
@@ -571,7 +571,8 @@ public class PortalRepository {
 	public List<DeploymentDescriptor> getDeploymentsToBeCompleted()
 	{		
 		List<DeploymentDescriptor> DeploymentDescriptorsToComplete = new ArrayList<>();
-		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningInstantiatingAndTerminatingDeployments();
+		//List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningInstantiatingAndTerminatingDeployments();
+		List<DeploymentDescriptor> DeploymentDescriptor_list = portalJpaController.readRunningInstantiatingDeployments();		
 		for(DeploymentDescriptor d : DeploymentDescriptor_list)
 		{
 			d.getExperimentFullDetails();

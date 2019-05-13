@@ -97,7 +97,7 @@ public class MANOController {
 		if (vxf == null) {
 			vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfobd.getVxfid());
 		}
-		CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxfobd.getVxf().getName()+" to "+vxfobd.getOnBoardingStatus());
+		CentralLogger.log( CLevel.INFO, "Onboarding status change of VxF "+vxf.getName()+" to "+vxfobd.getOnBoardingStatus());
 		// Set MANO Provider VxF ID
 		vxfobd.setVxfMANOProviderID(vxf.getName());
 		// Set onBoarding Date

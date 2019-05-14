@@ -600,14 +600,16 @@ public class MANOController {
 
 	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception {
 
-		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
-		CentralLogger.log( CLevel.INFO, "Onboarding status change of Experiment "+uexpobd.getExperiment().getName()+" to "+uexpobd.getOnBoardingStatus());													
+		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);											
 		// This is the Deployment ID for the portal
 		uexpobd.setDeployId(UUID.randomUUID().toString());
 		ExperimentMetadata em = uexpobd.getExperiment();
 		if (em == null) {
 			em = (ExperimentMetadata) portalRepositoryRef.getProductByID(uexpobd.getExperimentid());
 		}
+		
+
+		CentralLogger.log( CLevel.INFO, "Onboarding status change of Experiment " + em.getName() + " to "+uexpobd.getOnBoardingStatus());		
 
 		/**
 		 * The following is not OK. When we submit to OSMClient the createOnBoardPackage

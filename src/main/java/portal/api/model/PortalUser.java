@@ -68,7 +68,7 @@ public class PortalUser {
 	/**
 	 * 
 	 */
-	@ElementCollection(targetClass=UserRoleType.class)
+	@ElementCollection(targetClass=UserRoleType.class, fetch = FetchType.EAGER)
 	@Enumerated(EnumType.ORDINAL)
 	private List<UserRoleType> roles = new ArrayList<UserRoleType>();
 	

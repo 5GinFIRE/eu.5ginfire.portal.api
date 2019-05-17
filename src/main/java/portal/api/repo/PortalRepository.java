@@ -320,8 +320,8 @@ public class PortalRepository {
 	}
 
 
-	public List<DeploymentDescriptor> getAllDeploymentDescriptors() {
-		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptors( 0, 100000);	
+	public List<DeploymentDescriptor> getAllDeploymentDescriptors() {		
+		List<DeploymentDescriptor> ls = portalJpaController.readDeploymentDescriptors( 0, 100000);		
 		return ls;
 	}
 	

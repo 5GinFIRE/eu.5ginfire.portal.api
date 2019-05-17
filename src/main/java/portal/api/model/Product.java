@@ -54,7 +54,7 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id = 0;
 
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 
@@ -86,7 +86,7 @@ public class Product {
 	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	private List<Category> categories = new ArrayList<Category>();
 
-	@OneToMany(cascade = { CascadeType.ALL })
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<ProductExtensionItem> extensions = new ArrayList<ProductExtensionItem>();
 	

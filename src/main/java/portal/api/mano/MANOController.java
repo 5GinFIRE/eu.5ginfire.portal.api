@@ -86,8 +86,9 @@ public class MANOController {
 	 * @param vxfobds
 	 * @throws Exception
 	 */
-	public void onBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobd) throws Exception {
+	public void onBoardVxFToMANOProvider(int vxfobdid) throws Exception {
 
+		VxFOnBoardedDescriptor vxfobd = portalRepositoryRef.getVxFOnBoardedDescriptorByID(vxfobdid);
 		// PortalRepository portalRepositoryRef = new PortalRepository();
 
 		vxfobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
@@ -157,7 +158,7 @@ public class MANOController {
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 				
 				// Uncertify if it failed OnBoarding.
-				BusController.getInstance().onBoardVxFFailed(vxfobds);				
+				BusController.getInstance().onBoardVxFFailed(vxfobds.getId());				
 		        return ;
 			}						
 			
@@ -173,7 +174,7 @@ public class MANOController {
 				// Uncertify if it failed OnBoarding.
 				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-				BusController.getInstance().onBoardVxFFailed(vxfobds);
+				BusController.getInstance().onBoardVxFFailed(vxfobds.getId());
 				return;				
 			}
 			else
@@ -196,7 +197,7 @@ public class MANOController {
 					// Uncertify if it failed OnBoarding.
 					vxfobds.getVxf().setCertified(false);
 					VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-					BusController.getInstance().onBoardVxFFailed(vxfobds);
+					BusController.getInstance().onBoardVxFFailed(vxfobds.getId());
 					return;
 				}
 
@@ -215,7 +216,7 @@ public class MANOController {
 				vxfobds.setLastOnboarding(new Date());
 				// Save the changes to vxfobds
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-				BusController.getInstance().onBoardVxFSucceded(vxfobds);
+				BusController.getInstance().onBoardVxFSucceded(vxfobds.getId());
 				
 			}			
 		}		
@@ -242,7 +243,7 @@ public class MANOController {
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
 				
 				// Uncertify if it failed OnBoarding.
-				BusController.getInstance().onBoardVxFFailed(vxfobds);				
+				BusController.getInstance().onBoardVxFFailed(vxfobds.getId());				
 		        return ;
 			}						
 			
@@ -258,7 +259,7 @@ public class MANOController {
 				// Uncertify if it failed OnBoarding.
 				vxfobds.getVxf().setCertified(false);
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-				BusController.getInstance().onBoardVxFFailed(vxfobds);
+				BusController.getInstance().onBoardVxFFailed(vxfobds.getId());
 				return;				
 			}
 			else
@@ -281,7 +282,7 @@ public class MANOController {
 					// Uncertify if it failed OnBoarding.
 					vxfobds.getVxf().setCertified(false);
 					VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-					BusController.getInstance().onBoardVxFFailed(vxfobds);
+					BusController.getInstance().onBoardVxFFailed(vxfobds.getId());
 					return;
 				}
 
@@ -300,7 +301,7 @@ public class MANOController {
 				vxfobds.setLastOnboarding(new Date());
 				// Save the changes to vxfobds
 				VxFOnBoardedDescriptor vxfobds_final = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobds);
-				BusController.getInstance().onBoardVxFSucceded(vxfobds);
+				BusController.getInstance().onBoardVxFSucceded(vxfobds.getId());
 				
 			}
 			
@@ -338,7 +339,7 @@ public class MANOController {
 		List<DeploymentDescriptor> DeploymentDescriptorsToDelete = portalRepositoryRef.getDeploymentsToBeDeleted();
 		for (DeploymentDescriptor d : DeploymentDescriptorsToDelete) {
 			// Launch the deployment
-			BusController.getInstance().deleteExperiment(d);
+			BusController.getInstance().deleteExperiment(d.getId());
 		}
 	}
 	
@@ -350,7 +351,7 @@ public class MANOController {
 		// Foreach deployment
 		for (DeploymentDescriptor d : DeploymentDescriptorsToRun) {
 			// Launch the deployment
-			BusController.getInstance().deployExperiment(d);
+			BusController.getInstance().deployExperiment(d.getId());
 		}
 	}
 
@@ -363,7 +364,7 @@ public class MANOController {
 		for (DeploymentDescriptor deployment_descriptor_tmp : DeploymentDescriptorsToComplete) {
 			logger.debug("Deployment with id" + deployment_descriptor_tmp.getName() + " with status " + deployment_descriptor_tmp.getStatus() +" is going to be terminated");
 			// Terminate the deployment
-			BusController.getInstance().completeExperiment(deployment_descriptor_tmp);
+			BusController.getInstance().completeExperiment(deployment_descriptor_tmp.getId());
 		}
 	}
 
@@ -410,7 +411,6 @@ public class MANOController {
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp);
 								deployment_tmp.setConstituentVnfrIps("");
 								for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
 										.length(); j++) 
@@ -436,6 +436,8 @@ public class MANOController {
 										//break;
 									}									
 								}
+								deployment_tmp =  portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());								
 							}
 							// deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING &&
 							if (deployment_tmp.getOperationalStatus().toLowerCase().equals("terminated")
@@ -446,7 +448,8 @@ public class MANOController {
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setConstituentVnfrIps("N/A");
-								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp);
+								deployment_tmp =  portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp.getId());
 							}
 							// if(deployment_tmp.getStatus() != DeploymentDescriptorStatus.FAILED &&
 							// deployment_tmp.getOperationalStatus().equals("failed"))
@@ -457,7 +460,8 @@ public class MANOController {
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								deployment_tmp.setConstituentVnfrIps("N/A");
-								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp);
+								deployment_tmp =  portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp.getId());
 							}
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
@@ -465,9 +469,9 @@ public class MANOController {
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-								BusController.getInstance().deploymentTerminationFailed(deployment_tmp);
+								deployment_tmp =  portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentTerminationFailed(deployment_tmp.getId());
 							}
-							deployment_tmp =  portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
 							logger.info("NS status change is now " + deployment_tmp.getStatus());							
 						} catch (JSONException e) {
 							logger.error(e.getMessage());
@@ -520,7 +524,6 @@ public class MANOController {
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp);
 								deployment_tmp.setConstituentVnfrIps("");
 								for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
 										.length(); j++) 
@@ -546,6 +549,8 @@ public class MANOController {
 										//break;
 									}									
 								}
+								deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());
 							}
 							// deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING &&
 							if (deployment_tmp.getOperationalStatus().toLowerCase().equals("terminated")) {
@@ -557,7 +562,8 @@ public class MANOController {
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setConstituentVnfrIps("N/A");
-								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp);
+								deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentTerminationSucceded(deployment_tmp.getId());
 							}
 							// if(deployment_tmp.getStatus() != DeploymentDescriptorStatus.FAILED &&
 							// deployment_tmp.getOperationalStatus().equals("failed"))
@@ -568,7 +574,8 @@ public class MANOController {
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 								deployment_tmp.setConstituentVnfrIps("N/A");
-								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp);
+								deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentInstantiationFailed(deployment_tmp.getId());
 							}
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.TERMINATING
 									&& deployment_tmp.getOperationalStatus().equals("failed")) {
@@ -576,9 +583,9 @@ public class MANOController {
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());								
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-								BusController.getInstance().deploymentTerminationFailed(deployment_tmp);
+								deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+								BusController.getInstance().deploymentTerminationFailed(deployment_tmp.getId());
 							}
-							deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
 							logger.info("NS status change is now "+deployment_tmp.getStatus());													
 						} catch (JSONException e) {
 							logger.error(e.getMessage());
@@ -598,8 +605,9 @@ public class MANOController {
 		checkAndDeleteTerminatedOrFailedDeployments();
 	}
 
-	public void onBoardNSDToMANOProvider(ExperimentOnBoardDescriptor uexpobd) throws Exception {
-
+	public void onBoardNSDToMANOProvider(int uexpobdid) throws Exception {
+		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.getExperimentOnBoardDescriptorByID(uexpobdid);
+		
 		uexpobd.setOnBoardingStatus(OnBoardingStatus.ONBOARDING);
 		CentralLogger.log( CLevel.INFO, "Onboarding status change of Experiment "+uexpobd.getExperiment().getName()+" to "+uexpobd.getOnBoardingStatus());													
 		// This is the Deployment ID for the portal
@@ -681,7 +689,7 @@ public class MANOController {
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-				BusController.getInstance().onBoardNSDFailed(uexpobds);
+				BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 				return ;
 			}						
 			
@@ -696,7 +704,7 @@ public class MANOController {
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-				BusController.getInstance().onBoardNSDFailed(uexpobds);
+				BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 				return;				
 			}
 			else
@@ -717,7 +725,7 @@ public class MANOController {
 					// Set Valid to false if it fails OnBoarding
 					uexpobds.getExperiment().setValid(false);
 					ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-					BusController.getInstance().onBoardNSDFailed(uexpobds);
+					BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 					return;
 				}
 				else
@@ -735,7 +743,7 @@ public class MANOController {
 					// uexpobds.getExperiment().setValid(true);
 					// Save the changes to vxfobds
 					ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-					BusController.getInstance().onBoardNSDSucceded(uexpobds);
+					BusController.getInstance().onBoardNSDSucceded(uexpobds.getId());
 				}
 			}
 		}
@@ -760,7 +768,7 @@ public class MANOController {
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-				BusController.getInstance().onBoardNSDFailed(uexpobds);
+				BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 				return ;
 			}						
 			
@@ -775,7 +783,7 @@ public class MANOController {
 				// Set Valid to false if it fails OnBoarding
 				uexpobds.getExperiment().setValid(false);
 				ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-				BusController.getInstance().onBoardNSDFailed(uexpobds);
+				BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 				return;				
 			}
 			else
@@ -796,7 +804,7 @@ public class MANOController {
 					// Set Valid to false if it fails OnBoarding
 					uexpobds.getExperiment().setValid(false);
 					ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-					BusController.getInstance().onBoardNSDFailed(uexpobds);
+					BusController.getInstance().onBoardNSDFailed(uexpobds.getId());
 					return;
 				}
 				else
@@ -814,7 +822,7 @@ public class MANOController {
 					// uexpobds.getExperiment().setValid(true);
 					// Save the changes to vxfobds
 					ExperimentOnBoardDescriptor uexpobd_final = portalRepositoryRef.updateExperimentOnBoardDescriptor(uexpobds);
-					BusController.getInstance().onBoardNSDSucceded(uexpobds);
+					BusController.getInstance().onBoardNSDSucceded(uexpobds.getId());
 				}
 			}
 		}
@@ -975,7 +983,7 @@ public class MANOController {
 	}
 
 	public void setPortalRepositoryRef(PortalRepository portalRepositoryRef) {
-		this.portalRepositoryRef = portalRepositoryRef;
+		MANOController.portalRepositoryRef = portalRepositoryRef;
 	}
 
 	/**
@@ -1033,8 +1041,8 @@ public class MANOController {
 		return response;
 	}
 
-	public void deployNSDToMANOProvider(DeploymentDescriptor deploymentdescriptor) {
-
+	public void deployNSDToMANOProvider(int deploymentdescriptorid) {
+		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		// OSM4 - START
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider()
 				.getSupportedMANOplatform().getName().equals("OSM FOUR")) {
@@ -1058,7 +1066,7 @@ public class MANOController {
 				MANOStatus.setOsm4CommunicationStatusFailed(" Aborting deployment of NSD.");								
 				// NS instance creation failed
 				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NSD deployment action.");
-				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor);
+				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor.getId());
 				return;
 			}
 
@@ -1080,7 +1088,7 @@ public class MANOController {
 				deploymentdescriptor.setFeedback(ns_instance_creation_entity.getBody().toString());
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 						.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final);
+				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final.getId());
 				logger.info("NS Instance creation failed with response: "+ ns_instance_creation_entity.getBody().toString());
 			} else {
 				// String nsr_id =
@@ -1109,7 +1117,7 @@ public class MANOController {
 					// Save the changes to DeploymentDescriptor
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());
-					BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final);
+					BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final.getId());
 				} else {
 					// NS Instantiation starts
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.INSTANTIATING);
@@ -1120,7 +1128,7 @@ public class MANOController {
 					// Save the changes to DeploymentDescriptor
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 							.updateDeploymentDescriptor(deploymentdescriptor);
-					BusController.getInstance().deploymentInstantiationSucceded(deploymentdescriptor_final);
+					BusController.getInstance().deploymentInstantiationSucceded(deploymentdescriptor_final.getId());
 				}
 			}
 		}
@@ -1147,7 +1155,7 @@ public class MANOController {
 				MANOStatus.setOsm5CommunicationStatusFailed(" Aborting deployment of NSD.");								
 				// NS instance creation failed
 				deploymentdescriptor.setFeedback("OSM5 communication failed. Aborting NSD deployment action.");
-				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor);
+				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor.getId());
 				return;
 			}
 
@@ -1168,7 +1176,7 @@ public class MANOController {
 				deploymentdescriptor.setFeedback(ns_instance_creation_entity.getBody().toString());
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 						.updateDeploymentDescriptor(deploymentdescriptor);
-				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final);
+				BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final.getId());
 				logger.info("NS Instance creation failed with response: "
 						+ ns_instance_creation_entity.getBody().toString());
 			} else {
@@ -1197,7 +1205,7 @@ public class MANOController {
 					// Save the changes to DeploymentDescriptor
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 							.updateDeploymentDescriptor(deploymentdescriptor);
-					BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final);
+					BusController.getInstance().deploymentInstantiationFailed(deploymentdescriptor_final.getId());
 				} else {
 					// NS Instantiation starts
 					deploymentdescriptor.setStatus(DeploymentDescriptorStatus.INSTANTIATING);
@@ -1208,7 +1216,7 @@ public class MANOController {
 					// Save the changes to DeploymentDescriptor
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef
 							.updateDeploymentDescriptor(deploymentdescriptor);
-					BusController.getInstance().deploymentInstantiationSucceded(deploymentdescriptor_final);
+					BusController.getInstance().deploymentInstantiationSucceded(deploymentdescriptor_final.getId());
 				}
 			}
 		}
@@ -1216,7 +1224,9 @@ public class MANOController {
 		return;
 	}
 
-	public void terminateNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor) {
+	public void terminateNSFromMANOProvider(int deploymentdescriptorid) {
+		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
+		
 		// OSM4 START
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			if( deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.INSTANTIATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.RUNNING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATING || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED )
@@ -1244,7 +1254,7 @@ public class MANOController {
 						logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
 						DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 						logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());																	
-						BusController.getInstance().terminateInstanceFailed(deploymentdescriptor_final);				
+						BusController.getInstance().terminateInstanceFailed(deploymentdescriptor_final.getId());				
 					}
 					else
 					{
@@ -1256,7 +1266,7 @@ public class MANOController {
 						logger.error("Termination of NS" + deploymentdescriptor.getInstanceId() + " succeded");
 						DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 						logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());																	
-						BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+						BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final.getId());				
 					}
 				}
 				catch(Exception e)
@@ -1307,7 +1317,7 @@ public class MANOController {
 								logger.error("Termination of NS instance " + deploymentdescriptor.getInstanceId() + " failed");				
 								DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 								logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());																			
-								BusController.getInstance().terminateInstanceFailed(deploymentdescriptor_final);				
+								BusController.getInstance().terminateInstanceFailed(deploymentdescriptor_final.getId());				
 							}
 							else
 							{
@@ -1319,7 +1329,7 @@ public class MANOController {
 								logger.info("Termination of NS " + deploymentdescriptor.getInstanceId() + " with name "+ deploymentdescriptor.getName() +" succeded");
 								DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 								logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());																			
-								BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final);				
+								BusController.getInstance().terminateInstanceSucceded(deploymentdescriptor_final.getId());				
 							}
 //						}
 //					}
@@ -1339,7 +1349,8 @@ public class MANOController {
 		// OSM5 END
 	}
 
-	public void deleteNSFromMANOProvider(DeploymentDescriptor deploymentdescriptor) {
+	public void deleteNSFromMANOProvider(int deploymentdescriptorid) {
+		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = null;
@@ -1362,7 +1373,7 @@ public class MANOController {
 				CentralLogger.log( CLevel.ERROR, "OSM4 fails authentication");
 				deploymentdescriptor.setFeedback("OSM4 communication failed. Aborting NS deletion action.");				
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor);				
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor.getId());				
 				return;
 			}
 			// After TERMINATION
@@ -1384,7 +1395,7 @@ public class MANOController {
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 				logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final);				
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final.getId());				
 			}
 			else
 			{
@@ -1396,7 +1407,7 @@ public class MANOController {
 					logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				
+					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATION_FAILED)
 				{
@@ -1406,13 +1417,12 @@ public class MANOController {
 					logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				
+					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
 			}			
 		}
 		// OSM4 END
 		// OSM5 START
-		deploymentdescriptor =  portalRepositoryRef.getDeploymentByID(deploymentdescriptor.getId());
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			// After TERMINATION
@@ -1452,7 +1462,7 @@ public class MANOController {
 				CentralLogger.log( CLevel.ERROR, "OSM5 fails authentication");
 				deploymentdescriptor.setFeedback("OSM5 communication failed. Aborting NS deletion action.");				
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
-				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor);				
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor.getId());				
 				return;
 			}
 			ResponseEntity<String> deletion_response = osm5Client.deleteNSInstanceNew(deploymentdescriptor.getInstanceId(),force); 
@@ -1464,7 +1474,7 @@ public class MANOController {
 				logger.error("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " failed");
 				DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 				logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final);				
+				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final.getId());				
 			}
 			else
 			{
@@ -1476,7 +1486,7 @@ public class MANOController {
 					logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				
+					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.FAILED || deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATION_FAILED)
 				{
@@ -1486,7 +1496,7 @@ public class MANOController {
 					logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 					DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
-					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final);				
+					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
 			}			
 		}		

@@ -59,7 +59,7 @@ public class SubscribedResource {
 		this.active = active;
 	}
 
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinColumns({ @JoinColumn() })
 	private PortalUser owner = null;
 

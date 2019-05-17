@@ -67,8 +67,9 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 		/**
 		 * Create VxF Validate New Route
 		 */
+		// This needs testing 12052019
 		from("seda:vxf.new.validation?multipleConsumers=true")
-		.log( "Submit new validation request for VNF_ID=${body.getId}" )	
+		.log( "Submit new validation request for VNF_ID=${body}" )	
 		.errorHandler(deadLetterChannel("direct:dlq_validations")
 				.maximumRedeliveries( 3 ) //let's try 3 times to send it....
 				.redeliveryDelay( 30000 ).useOriginalMessage()

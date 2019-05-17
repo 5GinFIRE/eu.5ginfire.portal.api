@@ -26,100 +26,165 @@ public class MANOStatus
 	private static String osm5CommunicationStatusUUID = null;	
 	private static String message;
 	public static enum Status {Failed,Active};
+	private static java.util.concurrent.locks.ReadWriteLock lock = new java.util.concurrent.locks.ReentrantReadWriteLock();
 	
 	public static Status getOsm5CommunicationStatus() {
-		return osm5CommunicationStatus;
+		lock.readLock().lock();
+        try {		
+        	return osm5CommunicationStatus;
+        } finally {
+            lock.readLock().unlock();
+        }
 	}
 
 	public static void setOsm5CommunicationStatus(Status osm5CommunicationStatus) {
-		MANOStatus.osm5CommunicationStatus = osm5CommunicationStatus;
+        lock.writeLock().lock();
+        try {		
+    		MANOStatus.osm5CommunicationStatus = osm5CommunicationStatus;
+        } finally {
+            lock.writeLock().unlock();
+        }
 	}
 	
 	public static String getOsm5CommunicationStatusUUID() {
-		return osm5CommunicationStatusUUID;
+		lock.readLock().lock();
+        try {		
+        	return osm5CommunicationStatusUUID;
+        } finally {
+            lock.readLock().unlock();
+        }
 	}
 
 	public static void setOsm5CommunicationStatusUUID(String osm5CommunicationStatusUUID) {
-		MANOStatus.osm5CommunicationStatusUUID = osm5CommunicationStatusUUID;
+        lock.writeLock().lock();
+        try {		
+        	MANOStatus.osm5CommunicationStatusUUID = osm5CommunicationStatusUUID;
+        } finally {
+            lock.writeLock().unlock();
+        }
 	}
 
 	public static String getMessage() {
-		return message;
+		lock.readLock().lock();
+        try {		
+        	return message;
+        } finally {
+            lock.readLock().unlock();
+        }
 	}
 
 	public static void setMessage(String message) {
-		MANOStatus.message = message;
+        lock.writeLock().lock();
+        try {		
+        	MANOStatus.message = message;
+        } finally {
+            lock.writeLock().unlock();
+        }
 	}
 
 	public static Status getOsm4CommunicationStatus() {
-		return osm4CommunicationStatus;
+		lock.readLock().lock();
+        try {		
+        	return osm4CommunicationStatus;
+        } finally {
+            lock.readLock().unlock();
+        }
 	}
 	
 	public static String getOsm4CommunicationStatusUUID() {
-		return osm4CommunicationStatusUUID;
+		lock.readLock().lock();
+        try {		
+			return osm4CommunicationStatusUUID;
+	    } finally {
+	        lock.readLock().unlock();
+	    }
 	}
 	
 	public static void setOsm4CommunicationStatusUUID(String osm4CommunicationStatusUUID) {
-		MANOStatus.osm4CommunicationStatusUUID = osm4CommunicationStatusUUID;
+		lock.writeLock().lock();
+		try {		
+			MANOStatus.osm4CommunicationStatusUUID = osm4CommunicationStatusUUID;
+	    } finally {
+	        lock.writeLock().unlock();
+	    }		
 	}
 	
 	public static void setOsm4CommunicationStatusFailed(String message) {
-		if(message == null)
-		{
-			message="";
-		}
-		if(MANOStatus.osm4CommunicationStatus == Status.Active)
-		{			
-			MANOStatus.osm4CommunicationStatus = Status.Failed ;
-			MANOStatus.setMessage("OSM4 communication failed." + message);
-			MANOStatus.setOsm4CommunicationStatusUUID(UUID.randomUUID().toString());
-			System.out.println("Inside setOSM4CommunicationStatusFailed. "+MANOStatus.getOsm4CommunicationStatusUUID().toString()+","+MANOStatus.getMessage().toString());
-			BusController.getInstance().osm4CommunicationFailed(MANOStatus.class);					
-		}
+		lock.writeLock().lock();
+		try {		
+			if(message == null)
+			{
+				message="";
+			}
+			if(MANOStatus.osm4CommunicationStatus == Status.Active)
+			{			
+				MANOStatus.osm4CommunicationStatus = Status.Failed ;
+				MANOStatus.setMessage("OSM4 communication failed." + message);
+				MANOStatus.setOsm4CommunicationStatusUUID(UUID.randomUUID().toString());
+				System.out.println("Inside setOSM4CommunicationStatusFailed. "+MANOStatus.getOsm4CommunicationStatusUUID().toString()+","+MANOStatus.getMessage().toString());
+				BusController.getInstance().osm4CommunicationFailed(MANOStatus.class);					
+			}
+	    } finally {
+	        lock.writeLock().unlock();
+	    }		
 	}
 	
 	public static void setOsm5CommunicationStatusFailed(String message) {
-		if(message == null)
-		{
-			message="";
-		}
-		if(MANOStatus.osm5CommunicationStatus == Status.Active)
-		{			
-			MANOStatus.osm5CommunicationStatus = Status.Failed ;
-			MANOStatus.setMessage("OSM5 communication failed." + message);
-			MANOStatus.setOsm5CommunicationStatusUUID(UUID.randomUUID().toString());
-			System.out.println("Inside setOSM5CommunicationStatusFailed. "+MANOStatus.getOsm5CommunicationStatusUUID().toString()+","+MANOStatus.getMessage().toString());
-			BusController.getInstance().osm5CommunicationFailed(MANOStatus.class);					
-		}
+		lock.writeLock().lock();
+		try {		
+			if(message == null)
+			{
+				message="";
+			}
+			if(MANOStatus.osm5CommunicationStatus == Status.Active)
+			{			
+				MANOStatus.osm5CommunicationStatus = Status.Failed ;
+				MANOStatus.setMessage("OSM5 communication failed." + message);
+				MANOStatus.setOsm5CommunicationStatusUUID(UUID.randomUUID().toString());
+				System.out.println("Inside setOSM5CommunicationStatusFailed. "+MANOStatus.getOsm5CommunicationStatusUUID().toString()+","+MANOStatus.getMessage().toString());
+				BusController.getInstance().osm5CommunicationFailed(MANOStatus.class);					
+			}
+	    } finally {
+	        lock.writeLock().unlock();
+	    }		
 	}
 	
 	public static void setOsm4CommunicationStatusActive(String message)
 	{
-		if(message == null)
-		{
-			message="";
-		}
-		if(MANOStatus.osm4CommunicationStatus == Status.Failed)
-		{
-			MANOStatus.osm4CommunicationStatus = Status.Active ;
-			MANOStatus.setMessage("OSM4 communication restored." + message);
-			BusController.getInstance().osm4CommunicationRestored(MANOStatus.class);					
-		}		
+		lock.writeLock().lock();
+		try {		
+			if(message == null)
+			{
+				message="";
+			}
+			if(MANOStatus.osm4CommunicationStatus == Status.Failed)
+			{
+				MANOStatus.osm4CommunicationStatus = Status.Active ;
+				MANOStatus.setMessage("OSM4 communication restored." + message);
+				BusController.getInstance().osm4CommunicationRestored(MANOStatus.class);					
+			}		
+	    } finally {
+	        lock.writeLock().unlock();
+	    }				
 	}
 
 	public static void setOsm5CommunicationStatusActive(String message) {
-		// TODO Auto-generated method stub
-		if(message == null)
-		{
-			message="";
-		}
-		if(MANOStatus.osm5CommunicationStatus == Status.Failed)
-		{
-			MANOStatus.osm5CommunicationStatus = Status.Active ;
-			MANOStatus.setMessage("OSM5 communication restored." + message);
-			BusController.getInstance().osm5CommunicationRestored(MANOStatus.class);					
-		}		
-		
+		lock.writeLock().lock();
+		try {		
+			// TODO Auto-generated method stub
+			if(message == null)
+			{
+				message="";
+			}
+			if(MANOStatus.osm5CommunicationStatus == Status.Failed)
+			{
+				MANOStatus.osm5CommunicationStatus = Status.Active ;
+				MANOStatus.setMessage("OSM5 communication restored." + message);
+				BusController.getInstance().osm5CommunicationRestored(MANOStatus.class);					
+			}		
+	    } finally {
+	        lock.writeLock().unlock();
+	    }				
 	}
 }
 

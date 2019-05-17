@@ -56,18 +56,18 @@ public class VxFMetadata extends Product{
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.LAZY)
+	@OneToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<MANOplatform> supportedMANOPlatforms = new ArrayList<MANOplatform>();
 
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.LAZY)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<VxFOnBoardedDescriptor> vxfOnBoardedDescriptors = new ArrayList<VxFOnBoardedDescriptor>();
 	
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.LAZY)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
 	@JoinTable()
 	private List<VFImage> vfimagesVDU = new ArrayList<>();
 	

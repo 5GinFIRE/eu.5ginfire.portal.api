@@ -39,7 +39,6 @@ import portal.api.model.ValidationStatus;
 import portal.api.model.VxFMetadata;
 import portal.api.model.VxFOnBoardedDescriptor;
 import portal.api.repo.PortalRepository;
-import portal.api.validation.ci.ValidationJobResult;
 
 public class BugzillaClient {
 
@@ -50,6 +49,10 @@ public class BugzillaClient {
 	/** */
 	private static String BASE_SERVICE_URL = "https://portal.5ginfire.eu";
 
+
+
+	private static final PortalRepository portalRepositoryRef = new PortalRepository();
+
 	/** */
 	private static final String BUGHEADER =   "*************************************************\n"
 											+ "THIS IS AN AUTOMATED ISSUE CREATED BY PORTAL API.\n"
@@ -58,14 +61,16 @@ public class BugzillaClient {
 
 		
 	
-	public static Bug transformNSInstantiation2BugBody(DeploymentDescriptor descriptor) {
+	public static Bug transformNSInstantiation2BugBody(int deploymentdescriptorid) {
+
+		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
 
-		String description = getDeploymentDescription( descriptor );		
+		String description = getDeploymentDescription( deploymentdescriptorid );		
 		
 		String status= "CONFIRMED";
 		String resolution = null;
@@ -85,14 +90,17 @@ public class BugzillaClient {
 		return b;		
 	}
 
-	public static Bug transformNSTermination2BugBody(DeploymentDescriptor descriptor) {
-
+	public static Bug transformNSTermination2BugBody(int deploymentdescriptorid) {
+		logger.debug("transformNSTermination2BugBody("+deploymentdescriptorid+")");
+		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
+		logger.debug("transformNSTermination2BugBody"+descriptor.toString());
+		
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
 
-		String description = getDeploymentDescription( descriptor );		
+		String description = getDeploymentDescription( deploymentdescriptorid );		
 		
 		String status= "CONFIRMED";
 		String resolution = null;
@@ -111,14 +119,16 @@ public class BugzillaClient {
 		
 	}
 		
-	public static Bug transformNSDeletion2BugBody(DeploymentDescriptor descriptor) {
+	public static Bug transformNSDeletion2BugBody(int deploymentdescriptorid) {
 
+		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
+		
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
 
-		String description = getDeploymentDescription( descriptor );		
+		String description = getDeploymentDescription( deploymentdescriptorid );		
 		
 		String status= "CONFIRMED";
 		String resolution = null;
@@ -136,14 +146,17 @@ public class BugzillaClient {
 		
 	}
 		
-	public static Bug transformDeployment2BugBody(DeploymentDescriptor descriptor) {
-
+	public static Bug transformDeployment2BugBody(int deploymentdescriptorid) {
+		logger.debug("transformDeployment2BugBody("+deploymentdescriptorid+")");
+		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
+		logger.debug("transformDeployment2BugBody"+descriptor.toString());
+		
 		String product = "5GinFIRE Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
 
-		String description = getDeploymentDescription( descriptor );		
+		String description = getDeploymentDescription( deploymentdescriptorid );		
 		
 		String status= "CONFIRMED";
 		String resolution = null;
@@ -168,9 +181,9 @@ public class BugzillaClient {
 	}
 	
 	
-	public static Comment transformDeployment2BugComment(DeploymentDescriptor descriptor) {
+	public static Comment transformDeployment2BugComment(int deploymentdescriptorid) {
 		
-		String description = getDeploymentDescription( descriptor );
+		String description = getDeploymentDescription( deploymentdescriptorid );
 				
 		Comment b = createComment( description);
 		
@@ -182,7 +195,9 @@ public class BugzillaClient {
 	 * @param descriptor
 	 * @return
 	 */
-	private static String getDeploymentDescription(DeploymentDescriptor descriptor) {
+	private static String getDeploymentDescription(int deploymentdescriptorid) {
+
+		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		StringBuilder description =  new StringBuilder( BUGHEADER );
 
 		description.append( "\nSTATUS: " + descriptor.getStatus() + "\n");
@@ -267,8 +282,9 @@ public class BugzillaClient {
 	}
 	
 	
-	public static User transformUser2BugzillaUser(PortalUser portalUser){
+	public static User transformUser2BugzillaUser(int portaluserid){
 		
+		PortalUser portalUser = portalRepositoryRef.getUserByID(portaluserid);
 		User u = new User();
 		u.setEmail( portalUser.getEmail()  );
 		u.setFullName( portalUser.getName() );
@@ -278,8 +294,9 @@ public class BugzillaClient {
 	}
 
 
-	public static Bug transformVxFValidation2BugBody(VxFMetadata vxf) {
-
+	public static Bug transformVxFValidation2BugBody(long vxfmetadataid) {
+		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfmetadataid);
+		
 		logger.info( "In transformVxFValidation2BugBody: alias = " + vxf.getUuid());
 		String product = "5GinFIRE Operations";
 		String component = "Validation" ;
@@ -331,7 +348,9 @@ public class BugzillaClient {
 		return b;
 	}
 	
-	public static Bug transformVxFAutomaticOnBoarding2BugBody(VxFOnBoardedDescriptor vxfobd) {
+	public static Bug transformVxFAutomaticOnBoarding2BugBody(int vxfobdid) {
+		
+		VxFOnBoardedDescriptor vxfobd = portalRepositoryRef.getVxFOnBoardedDescriptorByID(vxfobdid);
 		
 		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
 
@@ -429,8 +448,9 @@ public class BugzillaClient {
 		return b;
 	}
 	
-	public static Bug transformNSDAutomaticOnBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
-
+	public static Bug transformNSDAutomaticOnBoarding2BugBody(int uexpobdid) {
+		
+		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.getExperimentOnBoardDescriptorByID(uexpobdid);
 		logger.info( "In transformNSDAutomaticOnBoarding2BugBody: alias = " + uexpobd.getUuid());
 		
 		String product = "5GinFIRE Operations";
@@ -481,8 +501,8 @@ public class BugzillaClient {
 	}
 
 	
-	public static Bug transformVxFAutomaticOffBoarding2BugBody(VxFOnBoardedDescriptor vxfobd) {
-		
+	public static Bug transformVxFAutomaticOffBoarding2BugBody(int vxfobdid) {
+		VxFOnBoardedDescriptor vxfobd = portalRepositoryRef.getVxFOnBoardedDescriptorByID(vxfobdid);
 		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
 
 		String product = "5GinFIRE Operations";
@@ -529,8 +549,8 @@ public class BugzillaClient {
 		return b;
 	}
 	
-	public static Bug transformNSDAutomaticOffBoarding2BugBody(ExperimentOnBoardDescriptor uexpobd) {
-
+	public static Bug transformNSDAutomaticOffBoarding2BugBody(int uexpobdid) {
+		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.getExperimentOnBoardDescriptorByID(uexpobdid); 
 		String product = "5GinFIRE Operations";
 		String component = "Offboarding" ;
 		String summary = "[PORTAL] OSM OffBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
@@ -583,7 +603,7 @@ public class BugzillaClient {
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " OSM COMMUNICATION ACTION FAILURE\n"
+				+ " OSM4 COMMUNICATION ACTION FAILURE\n"
 				+ "**************************************************************\n");
 
 		description.append( "\n\n "+ MANOStatus.getMessage());
@@ -603,7 +623,7 @@ public class BugzillaClient {
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " OSM COMMUNICATION ACTION RESTORED\n"
+				+ " OSM4 COMMUNICATION ACTION RESTORED\n"
 				+ "**************************************************************\n");
 
 		description.append( "\n\n "+ MANOStatus.getMessage());
@@ -623,7 +643,7 @@ public class BugzillaClient {
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " OSM COMMUNICATION ACTION FAILURE\n"
+				+ " OSM5 COMMUNICATION ACTION FAILURE\n"
 				+ "**************************************************************\n");
 
 		description.append( "\n\n "+ MANOStatus.getMessage());
@@ -643,7 +663,7 @@ public class BugzillaClient {
 		StringBuilder description =  new StringBuilder( "**************************************************************\n"
 				+ "THIS IS AN AUTOMATED ISSUE UPDATE CREATED BY PORTAL API.\n"
 				+ "**************************************************************\n"
-				+ " OSM COMMUNICATION ACTION RESTORED\n"
+				+ " OSM5 COMMUNICATION ACTION RESTORED\n"
 				+ "**************************************************************\n");
 
 		description.append( "\n\n "+ MANOStatus.getMessage());

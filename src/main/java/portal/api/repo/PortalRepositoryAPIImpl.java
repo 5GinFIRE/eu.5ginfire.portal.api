@@ -248,22 +248,22 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			throw new WebApplicationException(builder.build());
 		}
 
-		PortalUser u = portalRepositoryRef.getUserByUsername(user.getUsername());
-		if (u != null) {
+		PortalUser portaluser = portalRepositoryRef.getUserByUsername(user.getUsername());
+		if (portaluser != null) {
 			return Response.status(Status.BAD_REQUEST).entity("Username exists").build();
 		}
 
-		u = portalRepositoryRef.getUserByEmail(user.getEmail());
-		if (u != null) {
+		portaluser = portalRepositoryRef.getUserByEmail(user.getEmail());
+		if (portaluser != null) {
 			return Response.status(Status.BAD_REQUEST).entity("Email exists").build();
 		}
 
 		user.setApikey( UUID.randomUUID().toString() );
-		u = portalRepositoryRef.addPortalUserToUsers(user);
+		portaluser = portalRepositoryRef.addPortalUserToUsers(user);
 
-		if (u != null) {
-			BusController.getInstance().newUserAdded( u );			
-			return Response.ok().entity(u).build();
+		if (portaluser != null) {
+			BusController.getInstance().newUserAdded( portaluser.getId() );			
+			return Response.ok().entity(portaluser).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity("Requested user with username=" + user.getUsername() + " cannot be installed");
@@ -1442,8 +1442,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (vxf != null) {
 
-			BusController.getInstance().newVxFAdded( vxf );
-			BusController.getInstance().validateVxF(vxf);
+			BusController.getInstance().newVxFAdded( vxf.getId() );
+			BusController.getInstance().validateVxF(vxf.getId());
 			
 			//======================================================
 			// AUTOMATIC ONBOARDING PROCESS -START
@@ -1484,7 +1484,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					
 					// Send the message for automatic onboarding
-					BusController.getInstance().onBoardVxFAdded( obd );
+					BusController.getInstance().onBoardVxFAdded( obd.getId() );
 				}
 			}
 			if(MANOprovidersEnabledForOnboarding.size()>0 && vxf.getPackagingFormat() == PackagingFormat.OSMvFIVE)
@@ -1519,7 +1519,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					
 					// Send the message for automatic onboarding
-					BusController.getInstance().onBoardVxFAdded( obd );
+					BusController.getInstance().onBoardVxFAdded( obd.getId() );
 				}
 			}
 			// AUTOMATIC ONBOARDING PROCESS -END
@@ -1578,7 +1578,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		if (vxf != null) { 
 
 			
-			BusController.getInstance().updatedVxF(vxf);
+			BusController.getInstance().updatedVxF(vxf.getId());
 			//notify only if validation changed
 
 			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must re-trigger validation
@@ -1586,7 +1586,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
 				if ( !vxfFileNamePosted.equals("unknown") ){
 					
-					BusController.getInstance().validateVxF(vxf);
+					BusController.getInstance().validateVxF(vxf.getId());
 				}
 			}
 			 
@@ -2090,11 +2090,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																										
 				vxfobd_tmp.setFeedbackMessage(response.getBody().toString());
 				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
-				BusController.getInstance().offBoardVxF( u );
+				BusController.getInstance().offBoardVxF( u.getId() );
 			}
 		}
 		portalRepositoryRef.deleteProduct(vxfid);
-		BusController.getInstance().deletedVxF( vxf );											
+		BusController.getInstance().deletedVxF( vxf.getId() );											
 	}
 
 	@GET
@@ -2688,8 +2688,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (experiment != null) {
 
-			BusController.getInstance().newNSDAdded( experiment );		
-			BusController.getInstance().validateNSD( experiment );
+			BusController.getInstance().newNSDAdded( experiment.getId() );		
+			BusController.getInstance().validateNSD( experiment.getId() );
 
 			//======================================================
 			// AUTOMATIC ONBOARDING PROCESS -START
@@ -2736,7 +2736,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					
 					//set proper scheme (http or https)
 					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
-					BusController.getInstance().onBoardNSD( obd );
+					BusController.getInstance().onBoardNSD( obd.getId() );
 				}
 			}
 			if(MANOprovidersEnabledForOnboarding.size()>0 && experiment.getPackagingFormat() == PackagingFormat.OSMvFIVE)
@@ -2777,7 +2777,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					
 					//set proper scheme (http or https)
 					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
-					BusController.getInstance().onBoardNSD( obd );
+					BusController.getInstance().onBoardNSD( obd.getId() );
 				}
 			}
 
@@ -2834,13 +2834,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 		if ( expmeta != null) { 
 
-			BusController.getInstance().updateNSD(expmeta);	
+			BusController.getInstance().updateNSD(expmeta.getId());	
 			
 			if ( AttachmentUtil.getAttachmentByName("prodFile", ats) != null ) { //if the descriptor changed then we must re-trigger validation
 				Attachment prodFile =  AttachmentUtil.getAttachmentByName("prodFile", ats);
 				String vxfFileNamePosted = AttachmentUtil.getFileName(prodFile.getHeaders());
 				if ( !vxfFileNamePosted.equals("unknown") ){
-					BusController.getInstance().validationUpdateNSD(expmeta);
+					BusController.getInstance().validationUpdateNSD(expmeta.getId());
 				}
 			}
 			
@@ -2918,12 +2918,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																															
 				u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);
-				BusController.getInstance().offBoardNSD(u);
+				BusController.getInstance().offBoardNSD(u.getId());
 				
 			}
 		}
 		portalRepositoryRef.deleteProduct(appid);
-		BusController.getInstance().deletedExperiment(nsd);											
+		BusController.getInstance().deletedExperiment(nsd.getId());											
 	}
 
 	// categories API
@@ -3279,7 +3279,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 //			deployment = portalRepositoryRef.getDeploymentByUUID( deployment.getUuid() );//reattach from model
 			
-			BusController.getInstance().newDeploymentRequest( deployment );	
+			BusController.getInstance().newDeploymentRequest( deployment.getId() );	
 
 //			String adminemail = PortalRepository.getPropertyByName("adminEmail").getValue();
 //			if ((adminemail != null) && (!adminemail.equals(""))) {
@@ -3406,11 +3406,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{							
-								BusController.getInstance().scheduleExperiment( aDeployment );								
+								BusController.getInstance().scheduleExperiment( aDeployment.getId() );								
 							}
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE"))
 							{							
-								BusController.getInstance().scheduleExperiment( aDeployment );								
+								BusController.getInstance().scheduleExperiment( aDeployment.getId() );								
 							}
 						}
 					}
@@ -3425,7 +3425,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								//aMANOController.deployNSDToMANOProvider(prevDeployment);
 								//Then try asynchronously
 	
-								BusController.getInstance().deployExperiment( aDeployment );	
+								BusController.getInstance().deployExperiment( aDeployment.getId() );	
 							}
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE"))
 							{
@@ -3434,18 +3434,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								//aMANOController.deployNSDToMANOProvider(prevDeployment);
 								//Then try asynchronously
 	
-								BusController.getInstance().deployExperiment( aDeployment );	
+								BusController.getInstance().deployExperiment( aDeployment.getId() );	
 							}
 						}
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.COMPLETED && aDeployment.getInstanceId() != null)
 					{
-						BusController.getInstance().completeExperiment( aDeployment );						
+						BusController.getInstance().completeExperiment( aDeployment.getId() );						
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.REJECTED && aDeployment.getInstanceId() == null)
 					{
 
-						BusController.getInstance().rejectExperiment( aDeployment );
+						BusController.getInstance().rejectExperiment( aDeployment.getId() );
 						logger.info("Deployment Rejected");
 					
 
@@ -4135,20 +4135,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}/onboard")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response onBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor c) {
+	public Response onBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor vxfobd) {
 
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
 		
 		try {
-			aMANOController.onBoardVxFToMANOProvider( c );
+			aMANOController.onBoardVxFToMANOProvider( vxfobd.getId() );
 		} catch (Exception e) {				
 			e.printStackTrace();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + c.getId() + " cannot be onboarded").build();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested VxFOnBoardedDescriptor with ID=" + vxfobd.getId() + " cannot be onboarded").build();
 		}			
 		
-		return Response.ok().entity(c).build();
+		return Response.ok().entity(vxfobd).build();
 
 	}
 	
@@ -4168,7 +4168,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		ResponseEntity<String> response = null;
 		try {
-			response = aMANOController.offBoardVxFFromMANOProvider( updatedObd );
+			response = aMANOController.offBoardVxFFromMANOProvider( updatedObd );			
 		}
 		catch( HttpClientErrorException e)
 		{
@@ -4195,7 +4195,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+updatedObd.getVxf().getName()+" to "+updatedObd.getOnBoardingStatus());																																
 		updatedObd.setFeedbackMessage(response.getBody().toString());
 		updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( updatedObd );
-		BusController.getInstance().offBoardVxF( updatedObd );
+		BusController.getInstance().offBoardVxF( updatedObd.getId() );
 		return Response.ok().entity(updatedObd).build();
 		
 	}
@@ -4357,7 +4357,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/experimentobds/{mpid}/onboard")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response onExperimentBoardDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor c) {
+	public Response onExperimentBoardDescriptor(@PathParam("mpid") int mpid, final ExperimentOnBoardDescriptor experimentonboarddescriptor) {
 
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
@@ -4397,15 +4397,15 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 //		logger.info("NSD Package Location: " + em.getPackageLocation());		
 //		
 		try {
-			aMANOController.onBoardNSDToMANOProvider( c );
+			aMANOController.onBoardNSDToMANOProvider( experimentonboarddescriptor.getId() );
 		} catch (Exception e) {				
 			e.printStackTrace();
 	    	logger.error("onExperimentBoardDescriptor, OSM4 fails authentication. Aborting Onboarding action.");
 			CentralLogger.log( CLevel.ERROR, "onExperimentBoardDescriptor, OSM4 fails authentication. Aborting Onboarding action.");																	
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested Experiment Descriptor with ID=" + c.getId() + " cannot be onboarded").build();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Requested Experiment Descriptor with ID=" + experimentonboarddescriptor.getId() + " cannot be onboarded").build();
 		}	
 		
-		return Response.ok().entity(c).build();
+		return Response.ok().entity(experimentonboarddescriptor).build();
 	}
 
 	@PUT
@@ -4452,7 +4452,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+uExper.getExperiment().getName()+" to "+uExper.getOnBoardingStatus());																																			
 		uExper.setFeedbackMessage(response.getBody().toString());
 		uExper = portalRepositoryRef.updateExperimentOnBoardDescriptor( uExper );
-		BusController.getInstance().offBoardNSD( uExper );
+		BusController.getInstance().offBoardNSD( uExper.getId() );
 		return Response.ok().entity(uExper).build();
 	}
 	
@@ -4624,8 +4624,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		vxf = (VxFMetadata) portalRepositoryRef.updateProductInfo( vxf );
 		
 		
-		BusController.getInstance().updatedVxF( vxf );		
-		BusController.getInstance().updatedValidationJob( vxf );		
+		BusController.getInstance().updatedVxF( vxf.getId() );		
+		BusController.getInstance().updatedValidationJob( vxf.getId() );		
 		
 		VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxfid) ; //rereading this, seems to keep the DB connection
 		return Response.ok().entity( vxfr ).build();

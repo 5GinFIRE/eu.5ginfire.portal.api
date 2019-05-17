@@ -323,7 +323,7 @@ public class BugzillaClient {
 
 		description.append( "\n"    );
 		description.append( "\n Validation Status: " + vxf.getValidationStatus()  );
-		description.append( "\n Certified: " + String.valueOf( vxf.isCertified() ).toUpperCase() );
+		//description.append( "\n Certified: " + String.valueOf( vxf.isCertified() ).toUpperCase() );
 		
 		description.append( "\n Validation jobs: "    );
 		for (ValidationJob j : vxf.getValidationJobs()) {

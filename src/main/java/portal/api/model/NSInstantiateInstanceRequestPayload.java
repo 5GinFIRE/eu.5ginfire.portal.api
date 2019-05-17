@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 University of Patras 
+ * Copyright 2017 University of Patras 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License.
@@ -12,6 +12,7 @@
  * 
  * See the License for the specific language governing permissions and limitations under the License.
  */
+
 package portal.api.model;
 
 import java.util.ArrayList;

@@ -136,8 +136,10 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 		public void process(Exchange exchange) throws Exception {
 
 			Map<String, Object> headers = exchange.getIn().getHeaders(); 
-			VxFMetadata m = exchange.getIn().getBody( VxFMetadata.class ); 
-		    headers.put("id", m.getId()  );
+			//VxFMetadata m = exchange.getIn().getBody( VxFMetadata.class );
+		    //headers.put("id", m.getId()  );
+			long id = Long.parseLong(exchange.getIn().getBody().toString());
+			headers.put("id", id);
 		    String encoding = Base64.getEncoder().encodeToString( (JENKINSCIKEY).getBytes() );
 		    headers.put("Authorization",  "Basic " + encoding  );
 		    
@@ -150,7 +152,7 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 //		    aBug.setAlias( null ); //dont put any Alias		
 //		    aBug.setCc( null );
 		    
-		    exchange.getOut().setBody( ""  );
+		    exchange.getOut().setBody( "" );
 		    // copy attachements from IN to OUT to propagate them
 		    exchange.getOut().setAttachments(exchange.getIn().getAttachments());
 			

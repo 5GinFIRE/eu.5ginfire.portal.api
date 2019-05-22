@@ -2077,7 +2077,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				
 				if (response == null) {
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
-					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																											
+					try
+					{
+						CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																											
+					}
+					catch(Exception e)
+					{
+						CentralLogger.log( CLevel.INFO, "No related VxF found for "+vxfobd_tmp.getId()+" in status  "+vxfobd_tmp.getOnBoardingStatus());					
+					}
 					vxfobd_tmp.setFeedbackMessage("Null response on OffBoarding request.Requested VxFOnBoardedDescriptor with ID=\" + vxfobd_tmp.getId() + \" cannot be offboarded.");
 					u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -2087,7 +2094,14 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				// UnCertify Upon OffBoarding
 				vxfobd_tmp.getVxf().setCertified(false);
 				vxfobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
-				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());																										
+				try
+				{
+					CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+vxfobd_tmp.getVxf().getName()+" to "+vxfobd_tmp.getOnBoardingStatus());
+				}
+				catch(Exception e)
+				{
+					CentralLogger.log( CLevel.INFO, "No related VxF found for "+vxfobd_tmp.getId()+" in status  "+vxfobd_tmp.getOnBoardingStatus());					
+				}
 				vxfobd_tmp.setFeedbackMessage(response.getBody().toString());
 				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 				BusController.getInstance().offBoardVxF( u.getId() );

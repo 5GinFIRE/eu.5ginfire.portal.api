@@ -47,7 +47,8 @@ public class BugzillaClient {
 
 
 	/** */
-	private static String BASE_SERVICE_URL = "https://portal.5ginfire.eu";
+	private static String BASE_SERVICE_URL = PortalRepository.getPropertyByName("maindomain").getValue();
+	private static String PORTAL_TITLE = PortalRepository.getPropertyByName("portaltitle").getValue();
 
 
 
@@ -62,10 +63,10 @@ public class BugzillaClient {
 		
 	
 	public static Bug transformNSInstantiation2BugBody(int deploymentdescriptorid) {
-
+		
 		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
@@ -95,7 +96,7 @@ public class BugzillaClient {
 		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		logger.debug("transformNSTermination2BugBody"+descriptor.toString());
 		
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
@@ -123,7 +124,7 @@ public class BugzillaClient {
 
 		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
@@ -151,7 +152,7 @@ public class BugzillaClient {
 		DeploymentDescriptor descriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		logger.debug("transformDeployment2BugBody"+descriptor.toString());
 		
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] Deployment Request of NSD:" + descriptor.getExperiment().getName() + ",User: " + descriptor.getOwner().getUsername();
 		String alias = descriptor.getUuid() ;
@@ -298,7 +299,7 @@ public class BugzillaClient {
 		VxFMetadata vxf = (VxFMetadata) portalRepositoryRef.getProductByID(vxfmetadataid);
 		
 		logger.info( "In transformVxFValidation2BugBody: alias = " + vxf.getUuid());
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Validation" ;
 		String summary = "[PORTAL] Validation Request for VxF:" + vxf.getName() + ", Owner: " + vxf.getOwner().getUsername();
 		String alias = vxf.getUuid() ;
@@ -354,7 +355,7 @@ public class BugzillaClient {
 		
 		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
 
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Onboarding" ;
 		String summary = "[PORTAL] OSM OnBoarding Action for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
 		String alias = vxfobd.getUuid() ;
@@ -406,7 +407,7 @@ public class BugzillaClient {
 	public static Bug transformNSDValidation2BugBody(ExperimentMetadata nsd) {
 		logger.info( "In transformNSDValidation2BugBody: alias = " + nsd.getUuid());
 
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Validation" ;
 		String summary = "[PORTAL] Validation Request for NSD:" + nsd.getName() + ", Owner: " + nsd.getOwner().getUsername();
 		String alias = nsd.getUuid() ;
@@ -453,7 +454,7 @@ public class BugzillaClient {
 		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.getExperimentOnBoardDescriptorByID(uexpobdid);
 		logger.info( "In transformNSDAutomaticOnBoarding2BugBody: alias = " + uexpobd.getUuid());
 		
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Onboarding" ;
 		String summary = "[PORTAL] OSM OnBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
 		String alias = uexpobd.getUuid() ;
@@ -505,7 +506,7 @@ public class BugzillaClient {
 		VxFOnBoardedDescriptor vxfobd = portalRepositoryRef.getVxFOnBoardedDescriptorByID(vxfobdid);
 		logger.info( "In transformVxFAutomaticOnBoarding2BugBody: alias = " + vxfobd.getUuid());
 
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Offboarding" ;
 		String summary = "[PORTAL] OSM OffBoarding Action for VxF:" + vxfobd.getVxf().getName() + ", Owner: " + vxfobd.getVxf().getOwner().getUsername();
 		String alias = vxfobd.getUuid() ;
@@ -551,7 +552,7 @@ public class BugzillaClient {
 	
 	public static Bug transformNSDAutomaticOffBoarding2BugBody(int uexpobdid) {
 		ExperimentOnBoardDescriptor uexpobd = portalRepositoryRef.getExperimentOnBoardDescriptorByID(uexpobdid); 
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Offboarding" ;
 		String summary = "[PORTAL] OSM OffBoarding Action for NSD:" + uexpobd.getExperiment().getName() + ", Owner: " + uexpobd.getExperiment().getOwner().getUsername();
 		String alias = uexpobd.getUuid() ;
@@ -596,7 +597,7 @@ public class BugzillaClient {
 	}
 
 	public static Bug transformOSM4CommunicationFail2BugBody() {
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
 		
@@ -616,7 +617,7 @@ public class BugzillaClient {
 	}
 		
 	public static Bug transformOSM4CommunicationSuccess2BugBody() {
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
 		
@@ -636,7 +637,7 @@ public class BugzillaClient {
 	}
 
 	public static Bug transformOSM5CommunicationFail2BugBody() {
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
 		
@@ -656,7 +657,7 @@ public class BugzillaClient {
 	}
 		
 	public static Bug transformOSM5CommunicationSuccess2BugBody() {
-		String product = "5GinFIRE Operations";
+		String product = PORTAL_TITLE + " Operations";
 		String component = "Operations Support" ;
 		String summary = "[PORTAL] OSM Communication Action";
 		

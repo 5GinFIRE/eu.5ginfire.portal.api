@@ -392,9 +392,9 @@ public class BugzillaClient {
 			status = "RESOLVED";
 			resolution = "FIXED";
 		} else  if ( vxfobd.getOnBoardingStatus().equals( OnBoardingStatus.FAILED ) ) {
-			status = "CONFIRMED";
-//			status = "RESOLVED";
-//			resolution = "INVALID";
+//			status = "CONFIRMED";
+			status = "RESOLVED";
+			resolution = "INVALID";
 		}		
 		
 		Bug b = createBug(product, component, summary, alias, description.toString(), vxfobd.getVxf().getOwner().getEmail(), status, resolution);

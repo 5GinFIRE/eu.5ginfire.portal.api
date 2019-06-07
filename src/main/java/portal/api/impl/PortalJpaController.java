@@ -137,6 +137,10 @@ public class PortalJpaController {
 			PortalProperty p = new PortalProperty("centrallogerurl", "");
 			saveProperty(p);
 		}
+		if (readPropertyByName("portaltitle") == null){
+			PortalProperty p = new PortalProperty("portaltitle", "5GinFIRE");
+			saveProperty(p);
+		}
 		
 		
 	}

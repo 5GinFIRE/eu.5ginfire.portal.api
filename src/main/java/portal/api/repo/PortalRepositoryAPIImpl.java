@@ -297,7 +297,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (r.getStatusInfo().getStatusCode() == Status.OK.getStatusCode()) {
 			logger.info("Email message: " + msg);
-			String subj = "[5GinFIREPortal] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+			String subj = "[" + PortalRepository.getPropertyByName("portaltitle").getValue() + "] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
 			EmailUtil.SendRegistrationActivationEmail(user.getEmail(), msg, subj);
 		}
 

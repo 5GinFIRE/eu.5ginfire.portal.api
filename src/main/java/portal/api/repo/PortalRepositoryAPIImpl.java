@@ -21,19 +21,11 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -62,7 +54,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -87,7 +78,6 @@ import centralLog.api.CentralLogger;
 import portal.api.bugzilla.model.ErrorMsg;
 import portal.api.bus.BusController;
 import portal.api.mano.MANOController;
-import portal.api.mano.MANOService;
 import portal.api.model.Category;
 import portal.api.model.ConstituentVxF;
 import portal.api.model.DeploymentDescriptor;
@@ -297,7 +287,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (r.getStatusInfo().getStatusCode() == Status.OK.getStatusCode()) {
 			logger.info("Email message: " + msg);
-			String subj = "[5GinFIREPortal] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+			String subj = "[" + PortalRepository.getPropertyByName("portaltitle").getValue() + "] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
 			EmailUtil.SendRegistrationActivationEmail(user.getEmail(), msg, subj);
 		}
 
@@ -373,6 +363,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 
 		if (u != null) {
+
+			BusController.getInstance().newUserAdded( user.getId() );			
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);

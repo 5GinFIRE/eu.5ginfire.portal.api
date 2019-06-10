@@ -290,6 +290,11 @@ public class BugzillaClient {
 		u.setEmail( portalUser.getEmail()  );
 		u.setFullName( portalUser.getName() );
 		u.setPassword( UUID.randomUUID().toString() ); //no password. The user needs to reset it in the other system (e.g. Bugzilla)
+		
+
+		logger.info( "In transformUser2BugzillaUser: portaluserid = " + portaluserid);
+		
+		
 		return u;
 		
 	}

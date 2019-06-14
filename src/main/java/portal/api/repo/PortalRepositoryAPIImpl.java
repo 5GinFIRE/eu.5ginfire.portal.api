@@ -611,6 +611,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					catch (NullPointerException e)
 					{
+						e.printStackTrace();
 						return null;
 					}
 					logger.info("After "+prod.getPackageLocation());
@@ -636,6 +637,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					catch (NullPointerException e)
 					{
+						e.printStackTrace();
 						return null;
 					}					
 				}

@@ -263,7 +263,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		if (PortalRepository.getPropertyByName("jenkinsciurl").getValue() != null) {
 			jenkinsURL = PortalRepository.getPropertyByName("jenkinsciurl").getValue();
 		}
-		if ( ( jenkinsURL != null ) && !jenkinsURL.equals( "" ) ){
+		if ( ( jenkinsURL != null ) && ( !jenkinsURL.equals( "" ) ) ){
 			from("seda:vxf.new.validation?multipleConsumers=true")
 			.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
 			.to("direct:bugzilla.newIssue");

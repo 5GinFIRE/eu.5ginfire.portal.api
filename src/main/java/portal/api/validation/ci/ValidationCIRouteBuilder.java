@@ -40,9 +40,9 @@ import portal.api.repo.PortalRepository;
  */
 public class ValidationCIRouteBuilder extends RouteBuilder {
 
-	private static String JENKINSCIKEY = "5ginfire@test";
+	private static String JENKINSCIKEY = "";
 	private static String PIPELINE_TOKEN = "test";	 
-	private static String JENKINSCIURL = "localhost:13000";
+	private static String JENKINSCIURL = "";
 	
 	public void configure() {
 

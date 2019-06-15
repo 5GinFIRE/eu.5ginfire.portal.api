@@ -79,6 +79,7 @@ public class ValidationCIRouteBuilder extends RouteBuilder {
 				.logHandled(true)
 				//.retriesExhaustedLogLevel(LoggingLevel.WARN)
 				.retryAttemptedLogLevel( LoggingLevel.WARN) )
+		.delay(30000)
 		.setHeader(Exchange.HTTP_METHOD, constant(org.apache.camel.component.http4.HttpMethods.POST))
 		.process( headerExtractProcessor )
 		.toD( "http4://" + JENKINSCIURL + "/job/validation_pipeline/buildWithParameters?token=" + PIPELINE_TOKEN + "&VNF_ID=${header.id}")

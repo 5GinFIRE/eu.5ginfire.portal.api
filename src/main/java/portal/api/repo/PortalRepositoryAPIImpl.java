@@ -1434,7 +1434,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		if (vxf != null) {
 
-			BusController.getInstance().newVxFAdded( vxf.getId() );
 			BusController.getInstance().validateVxF(vxf.getId());
 			
 			//======================================================
@@ -3412,10 +3411,20 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						{
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR"))
 							{							
+								aDeployment.setStatus( receivedDeployment.getStatus() );
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+								logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+								aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+								logger.info("NS status change is now "+aDeployment.getStatus());															
 								BusController.getInstance().scheduleExperiment( aDeployment.getId() );								
 							}
 							if(tmpExperimentOnBoardDescriptor.getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE"))
 							{							
+								aDeployment.setStatus( receivedDeployment.getStatus() );
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+								logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+								aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+								logger.info("NS status change is now "+aDeployment.getStatus());															
 								BusController.getInstance().scheduleExperiment( aDeployment.getId() );								
 							}
 						}
@@ -3430,6 +3439,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								//Initially we try synchronously
 								//aMANOController.deployNSDToMANOProvider(prevDeployment);
 								//Then try asynchronously
+								aDeployment.setStatus( receivedDeployment.getStatus() );
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+								logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+								aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+								logger.info("NS status change is now "+aDeployment.getStatus());															
 	
 								BusController.getInstance().deployExperiment( aDeployment.getId() );	
 							}
@@ -3440,21 +3454,33 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 								//aMANOController.deployNSDToMANOProvider(prevDeployment);
 								//Then try asynchronously
 	
+								aDeployment.setStatus( receivedDeployment.getStatus() );
+								CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+								logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+								aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+								logger.info("NS status change is now "+aDeployment.getStatus());															
 								BusController.getInstance().deployExperiment( aDeployment.getId() );	
 							}
 						}
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.COMPLETED && aDeployment.getInstanceId() != null)
 					{
+						aDeployment.setStatus( receivedDeployment.getStatus() );
+						CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+						logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+						aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+						logger.info("NS status change is now "+aDeployment.getStatus());															
 						BusController.getInstance().completeExperiment( aDeployment.getId() );						
 					}
 					else if( receivedDeployment.getStatus() == DeploymentDescriptorStatus.REJECTED && aDeployment.getInstanceId() == null)
 					{
-
+						aDeployment.setStatus( receivedDeployment.getStatus() );
+						CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
+						logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
+						aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
+						logger.info("NS status change is now "+aDeployment.getStatus());															
 						BusController.getInstance().rejectExperiment( aDeployment.getId() );
-						logger.info("Deployment Rejected");
-					
-
+						logger.info("Deployment Rejected");				
 					}
 					else
 					{
@@ -3463,11 +3489,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						throw new WebApplicationException(builder.build());					
 					}
 				}
-				aDeployment.setStatus( receivedDeployment.getStatus() );
-				CentralLogger.log( CLevel.INFO, "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());
-				logger.info( "Status change of deployment "+aDeployment.getName()+" to "+aDeployment.getStatus());							
-				aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
-				logger.info("NS status change is now "+aDeployment.getStatus());															
 				return Response.ok().entity( aDeployment ).build();
 			}
 

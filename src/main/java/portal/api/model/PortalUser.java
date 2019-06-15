@@ -331,6 +331,4 @@ public class PortalUser {
 		p.setEmail(this.getEmail());
 		return p;
 	}
-	
-	
 }

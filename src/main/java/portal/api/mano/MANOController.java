@@ -309,31 +309,6 @@ public class MANOController {
 		// OSM4 END
 	}
 
-	// Catch an VxF Onboarding Message
-	// NOT USED
-//	private void onCatchBoardVxFToMANOProvider(VxFOnBoardedDescriptor vxfobds) throws Exception {
-//
-//		CamelContext tempcontext = new DefaultCamelContext();
-//		MANOController mcontroller = this;
-//		try {
-//			RouteBuilder rb = new RouteBuilder() {
-//				@Override
-//				public void configure() throws Exception {
-//					from("seda:vxf.create?multipleConsumers=true")
-//							.log("Will OnBoard VNF package")
-//							.setBody().constant(vxfobds)
-//							.bean(mcontroller, "onBoardVxFToMANOProvider");
-//				}
-//			};
-//			tempcontext.addRoutes(rb);
-//			tempcontext.start();
-//			Thread.sleep(30000);
-//		} finally {
-//			tempcontext.stop();
-//		}
-//
-//	}
-
 	public static void checkAndDeleteTerminatedOrFailedDeployments() {
 		logger.info("Check and Delete Terminated and Failed Deployments");
 		List<DeploymentDescriptor> DeploymentDescriptorsToDelete = portalRepositoryRef.getDeploymentsToBeDeleted();
@@ -403,10 +378,10 @@ public class MANOController {
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
 							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 							// Depending on the current OSM status, change the portal status.
+//							&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
+//							&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")								
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
-									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")
-									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
-									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
+									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());

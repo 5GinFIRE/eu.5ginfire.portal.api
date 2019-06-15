@@ -154,8 +154,5 @@ public class ExperimentMetadata extends Product{
 		p.setUuid( this.getUuid() );
 		
 		return p;
-	}
-	
-	
-
+	}	
 }

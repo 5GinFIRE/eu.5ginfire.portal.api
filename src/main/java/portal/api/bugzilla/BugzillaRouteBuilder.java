@@ -259,10 +259,18 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		/**
 		 * Create VxF Validate New Route
 		 */
-		from("seda:vxf.new.validation?multipleConsumers=true")
-		.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
-		.to("direct:bugzilla.newIssue");
+		String jenkinsURL = null;
+		if (PortalRepository.getPropertyByName("jenkinsciurl").getValue() != null) {
+			jenkinsURL = PortalRepository.getPropertyByName("jenkinsciurl").getValue();
+		}
+		if ( ( jenkinsURL != null ) && ( !jenkinsURL.equals( "" ) ) ){
+			from("seda:vxf.new.validation?multipleConsumers=true")
+			.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
+			.to("direct:bugzilla.newIssue");
+		}
 		
+		
+	
 		
 		/**
 		 * Update Validation Route

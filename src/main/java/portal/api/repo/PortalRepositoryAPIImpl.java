@@ -363,8 +363,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		
 
 		if (u != null) {
-
-			BusController.getInstance().newUserAdded( user.getId() );			
+	
 			return Response.ok().entity(u).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
@@ -612,6 +611,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					catch (NullPointerException e)
 					{
+						e.printStackTrace();
 						return null;
 					}
 					logger.info("After "+prod.getPackageLocation());
@@ -637,6 +637,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					catch (NullPointerException e)
 					{
+						e.printStackTrace();
 						return null;
 					}					
 				}

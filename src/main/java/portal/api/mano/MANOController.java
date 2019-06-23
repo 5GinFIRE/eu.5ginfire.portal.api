@@ -374,6 +374,41 @@ public class MANOController {
 					if (ns_instance_info != null) {
 						try {
 							logger.info(ns_instance_info.toString());
+							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.RUNNING)
+							{
+								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status")) || !deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status")) || !deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "")))
+								{
+									logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
+									CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
+									deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+									deployment_tmp.setConstituentVnfrIps("");
+									for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
+											.length(); j++) 
+									{
+										if (j > 0) {
+											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
+										}
+										ResponseEntity<String> vnf_instance_id_info_response = osm5Client.getVNFInstanceInfoNew(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+										if(!vnf_instance_id_info_response.getStatusCode().is4xxClientError() && !vnf_instance_id_info_response.getStatusCode().is5xxServerError() )
+										{
+											JSONObject vnf_instance_info = new JSONObject(vnf_instance_id_info_response.getBody());
+											try {
+												deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
+														+ vnf_instance_info.getString("ip-address"));
+											} catch (JSONException e) {
+												logger.error(e.getMessage());
+											}																				
+										}
+										else
+										{
+											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()	+ "Ν/Α");
+											logger.error("ERROR gettin constituent-vnfr-ref info. Response:"+vnf_instance_id_info_response.getBody().toString());
+										}									
+									}
+									deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+									BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());									
+								}
+							}
 							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
 							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
@@ -487,14 +522,51 @@ public class MANOController {
 					{
 						try {
 							logger.info(ns_instance_info.toString());
+							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.RUNNING)
+							{
+								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status"))||!deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status"))||!deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "")))
+								{
+									logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
+									CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
+									deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+									deployment_tmp.setConstituentVnfrIps("");
+									for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
+											.length(); j++) 
+									{
+										if (j > 0) {
+											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
+										}
+										ResponseEntity<String> vnf_instance_id_info_response = osm5Client.getVNFInstanceInfoNew(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+										if(!vnf_instance_id_info_response.getStatusCode().is4xxClientError() && !vnf_instance_id_info_response.getStatusCode().is5xxServerError() )
+										{
+											JSONObject vnf_instance_info = new JSONObject(vnf_instance_id_info_response.getBody());
+											try {
+												deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
+														+ vnf_instance_info.getString("ip-address"));
+											} catch (JSONException e) {
+												logger.error(e.getMessage());
+											}																				
+										}
+										else
+										{
+											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()	+ "Ν/Α");
+											logger.error("ERROR gettin constituent-vnfr-ref info. Response:"+vnf_instance_id_info_response.getBody().toString());
+										}									
+									}
+									deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
+									BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());									
+								}
+							}
+							
 							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
 							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
 							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 							// Depending on the current OSM status, change the portal status.
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")
-									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
-									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")) {
+//									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
+//									&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")
+									) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
 								logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
 								CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());

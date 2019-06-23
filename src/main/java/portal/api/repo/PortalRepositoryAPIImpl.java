@@ -1433,10 +1433,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		}
 
 
-		if (vxf != null) {
-
-			BusController.getInstance().validateVxF(vxf.getId());
-			
+		if (vxf != null) {		
 			//======================================================
 			// AUTOMATIC ONBOARDING PROCESS -START
 			// Need to select MANO Provider, convert vxfMetadata to VxFOnBoardedDescriptor and pass it as an input.
@@ -1516,14 +1513,13 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 			// AUTOMATIC ONBOARDING PROCESS -END
 			//======================================================
-			
 			VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxf.getId()) ; //rereading this, seems to keep the DB connection
+			BusController.getInstance().validateVxF(vxfr.getId());			
 			return Response.ok().entity(vxfr).build();
 		} else {
 			ResponseBuilder builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 			builder.entity( new ErrorMsg( "Requested entity cannot be installed. " + emsg )  );						
-			throw new WebApplicationException(builder.build());
-			
+			throw new WebApplicationException(builder.build());			
 		}
 
 	}
@@ -4609,25 +4605,31 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	/**
 	 * Validation Result
 	 */
-	
-	
 	@PUT
 	@Path("/admin/validationjobs/{vxf_id}")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public Response updateUvalidationjob(@PathParam("vxf_id") int vxfid, ValidationJobResult vresult) {
-		logger.info("Received PUT ValidationJobResult for vxfid: " + vresult.getVxfid() );
-		
-
+		logger.info("Received PUT ValidationJobResult for vxfid: " + vresult.getVxfid() );		
 		
 		if ( !sc.isUserInRole( UserRoleType.PORTALADMIN.name() ) && !sc.isUserInRole(UserRoleType.TESTBED_PROVIDER.name() ) ){
 			 return Response.status(Status.FORBIDDEN ).build();
 		}
-
-		Product prod = portalRepositoryRef.getProductByID( vxfid) ;
 		
-		if ((prod == null) || (! (prod instanceof VxFMetadata) ) )
+		vxfid = vresult.getVxfid();
+		
+		Product prod = portalRepositoryRef.getProductByID(vxfid) ;
+		
+		if ( prod == null )
 		{
+			logger.info("updateUvalidationjob: prod == null for VXF with id=" + vxfid + ". Return Status NOT_FOUND");		
+			CentralLogger.log( CLevel.INFO, "updateUvalidationjob: prod == null for VXF with id=" + vxfid + ". Return Status NOT_FOUND");																						
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		if ( !(prod instanceof VxFMetadata) )
+		{
+			logger.info("updateUvalidationjob: prod not instance of VxFMetadata for VXF with id=" + vxfid + ". Return Status NOT_FOUND");		
+			CentralLogger.log( CLevel.INFO, "updateUvalidationjob: prod == null for VXF with id=" + vxfid + ". Return Status NOT_FOUND");																						
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		
@@ -4649,8 +4651,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 		vxf.getValidationJobs().add( validationJob );
 
 		// save product
-		vxf = (VxFMetadata) portalRepositoryRef.updateProductInfo( vxf );
-		
+		vxf = (VxFMetadata) portalRepositoryRef.updateProductInfo( vxf );		
 		
 		BusController.getInstance().updatedVxF( vxf.getId() );		
 		BusController.getInstance().updatedValidationJob( vxf.getId() );		

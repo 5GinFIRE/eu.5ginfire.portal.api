@@ -265,6 +265,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		}
 		if ( ( jenkinsURL != null ) && ( !jenkinsURL.equals( "" ) ) ){
 			from("seda:vxf.new.validation?multipleConsumers=true")
+			.delay(30000)			
 			.bean( BugzillaClient.class, "transformVxFValidation2BugBody")
 			.to("direct:bugzilla.newIssue");
 		}
@@ -298,6 +299,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Success
 		 */		
 		from("seda:vxf.onboard.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
@@ -308,6 +310,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Fail
 		 */		
 		from("seda:vxf.onboard.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
@@ -317,6 +320,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Result
 		 */		
 		from("seda:vxf.onboard.result?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformVxFAutomaticOnBoarding2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
@@ -367,6 +371,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Success
 		 */		
 		from("seda:nsd.onboard.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
@@ -376,6 +381,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic OnBoarding Route Fail
 		 */		
 		from("seda:nsd.onboard.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSDAutomaticOnBoarding2BugBody")
 		.process( BugHeaderExtractProcessor )
 		.to("direct:bugzilla.updateIssue");
@@ -385,6 +391,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Instantiation Route Success
 		 */		
 		from("seda:nsd.deployment.instantiation.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -392,10 +399,12 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Termination Route Success
 		 */		
 		from("seda:nsd.deployment.termination.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
 		from("seda:nsd.deployment.termination.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -403,10 +412,12 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * OSM4 Communication
 		 */		
 		from("seda:communication.osm4.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformOSM4CommunicationFail2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
 		from("seda:communication.osm4.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformOSM4CommunicationSuccess2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
@@ -414,10 +425,12 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * OSM5 Communication
 		 */		
 		from("seda:communication.osm5.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformOSM5CommunicationFail2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
 		from("seda:communication.osm5.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformOSM5CommunicationSuccess2BugBody")
 		.to("direct:bugzilla.bugmanage");
 		
@@ -425,6 +438,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * NS Scheduling Route
 		 */		
 		from("seda:nsd.schedule?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -432,6 +446,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Instantiation Route Fail
 		 */		
 		from("seda:nsd.deployment.instantiation.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSInstantiation2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 				
@@ -439,6 +454,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Termination Route Success
 		 */		
 		from("seda:nsd.instance.termination.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -446,6 +462,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Termination Route Fail
 		 */		
 		from("seda:nsd.instance.termination.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSTermination2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 
@@ -453,6 +470,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Deletion Route Success
 		 */		
 		from("seda:nsd.instance.deletion.success?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -460,6 +478,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Automatic NS Deletion Route Fail
 		 */		
 		from("seda:nsd.instance.deletion.fail?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformNSDeletion2BugBody")
 		.to("direct:bugzilla.bugmanage");	
 		
@@ -467,6 +486,7 @@ public class BugzillaRouteBuilder extends RouteBuilder {
 		 * Reject Deployment Route Issue
 		 */
 		from("seda:nsd.deployment.reject?multipleConsumers=true")
+		.delay(30000)		
 		.bean( BugzillaClient.class, "transformDeployment2BugBody")
 		.to("direct:bugzilla.bugmanage");		
 

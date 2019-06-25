@@ -2078,6 +2078,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					builder = Response.status(Status.INTERNAL_SERVER_ERROR);
 					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + vxfobd_tmp.getId() + " cannot be offboarded");
 					throw new WebApplicationException(builder.build());
+				} else {
+					vxfobd_tmp.setFeedbackMessage(response.getBody().toString());					
 				}
 				// UnCertify Upon OffBoarding
 				vxfobd_tmp.getVxf().setCertified(false);
@@ -2090,7 +2092,6 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				{
 					CentralLogger.log( CLevel.INFO, "No related VxF found for "+vxfobd_tmp.getId()+" in status  "+vxfobd_tmp.getOnBoardingStatus());					
 				}
-				vxfobd_tmp.setFeedbackMessage(response.getBody().toString());
 				u = portalRepositoryRef.updateVxFOnBoardedDescriptor(vxfobd_tmp);
 				BusController.getInstance().offBoardVxF( u.getId() );
 			}

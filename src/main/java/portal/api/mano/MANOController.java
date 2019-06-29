@@ -1444,7 +1444,7 @@ public class MANOController {
 				logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
 				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final.getId());				
 			}
-			else
+			else if (deletion_response.getStatusCode().is2xxSuccessful())
 			{
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)
 				{
@@ -1466,7 +1466,20 @@ public class MANOController {
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
 					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
-			}			
+			}
+			else 
+			{
+				try
+				{
+					CentralLogger.log( CLevel.ERROR, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus() +" replied with false code "+ deletion_response.getStatusCodeValue() + "and body" + deletion_response.getBody());
+					logger.error( "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus() +" replied with false code "+ deletion_response.getStatusCodeValue() + "and body" + deletion_response.getBody());
+				}
+				catch(Exception e)
+				{
+					CentralLogger.log( CLevel.ERROR, "Deletion failed with message" + e.getMessage());
+					logger.error("Deletion failed with message" + e.getMessage());
+				}
+			}
 		}
 		// OSM4 END
 		// OSM5 START
@@ -1523,7 +1536,7 @@ public class MANOController {
 				logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
 				BusController.getInstance().deleteInstanceFailed(deploymentdescriptor_final.getId());				
 			}
-			else
+			else if (deletion_response.getStatusCode().is2xxSuccessful())
 			{
 				if(deploymentdescriptor.getStatus() == DeploymentDescriptorStatus.TERMINATED)
 				{
@@ -1545,7 +1558,20 @@ public class MANOController {
 					logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
 					BusController.getInstance().deleteInstanceSucceded(deploymentdescriptor_final.getId());				
 				}
-			}			
+			}
+			else 
+			{
+				try
+				{
+					CentralLogger.log( CLevel.ERROR, "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus() +" replied with false code "+ deletion_response.getStatusCodeValue() + "and body" + deletion_response.getBody());
+					logger.error( "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus() +" replied with false code "+ deletion_response.getStatusCodeValue() + "and body" + deletion_response.getBody());
+				}
+				catch(Exception e)
+				{
+					CentralLogger.log( CLevel.ERROR, "Deletion failed with message" + e.getMessage());
+					logger.error("Deletion failed with message" + e.getMessage());
+				}
+			}
 		}		
 	}
 	// OSM5 END

@@ -27,6 +27,8 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import centralLog.api.CLevel;
+import centralLog.api.CentralLogger;
 import portal.api.model.Category;
 import portal.api.model.DeploymentDescriptor;
 import portal.api.model.ExperimentMetadata;
@@ -1644,6 +1646,12 @@ public class PortalJpaController {
 			DeploymentDescriptor resis = entityManager.merge(d);
 			entityTransaction.commit();
 			return resis;
+		} catch(Exception e) {
+	
+		    entityManager.getTransaction().rollback();
+			logger.info("Update of deployment " + d.getName() + " failed with message " + e.getMessage());
+			CentralLogger.log(CLevel.INFO, "Update of deployment " + d.getName() + " failed with message " + e.getMessage());
+			return d;
 		}
 		finally
 		{

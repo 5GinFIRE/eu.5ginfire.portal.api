@@ -1398,9 +1398,10 @@ public class MANOController {
 	}
 
 	public void deleteNSFromMANOProvider(int deploymentdescriptorid) {
-		logger.error("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
+		logger.info("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
 		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+			logger.info("Descriptor targets an OSM FOUR deploymentdescriptorid: " + deploymentdescriptorid);		
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = null;
 			try
@@ -1486,6 +1487,7 @@ public class MANOController {
 		// OSM4 END
 		// OSM5 START
 		else if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE")) {
+			logger.info("Descriptor targets an OSM FIVE deploymentdescriptorid: " + deploymentdescriptorid);		
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			// After TERMINATION
 			boolean force;
@@ -1576,11 +1578,11 @@ public class MANOController {
 			}
 		} else {
 			//if this is not a suported OSM then just complete
+			logger.info("Descriptor targets an older not supported OSM deploymentdescriptorid: " + deploymentdescriptorid);		
 			deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED_OSM_REMOVED);	
 			logger.info( "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
-			logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
 			DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
-			logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
+			logger.info("NS status changed is now :" + deploymentdescriptor_final.getStatus());															
 		}
 	}
 	// OSM5 END

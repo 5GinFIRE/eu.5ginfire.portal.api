@@ -598,7 +598,7 @@ public class PortalRepository {
 			OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
 			if(d.getEndDate().before(Date.from(utc.toInstant())))
 			{
-				logger.info("Deployment "+d.getName()+" is scheduled to be DELETED now.");
+				logger.info("Deployment id:" + d.getId() + ", name:"+ d.getName() + ", status:"+ d.getStatus()  +" is scheduled to be DELETED now.");
 				deploymentDescriptorsToDelete.add(d);
 			}
 			

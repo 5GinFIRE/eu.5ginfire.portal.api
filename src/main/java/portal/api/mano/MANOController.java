@@ -314,6 +314,7 @@ public class MANOController {
 		List<DeploymentDescriptor> DeploymentDescriptorsToDelete = portalRepositoryRef.getDeploymentsToBeDeleted();
 		for (DeploymentDescriptor d : DeploymentDescriptorsToDelete) {
 			// Launch the deployment
+			logger.info("Send to bus control to delete: " + d.getId());
 			BusController.getInstance().deleteExperiment(d.getId());
 		}
 	}
@@ -1397,6 +1398,7 @@ public class MANOController {
 	}
 
 	public void deleteNSFromMANOProvider(int deploymentdescriptorid) {
+		logger.error("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
 		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
@@ -1483,7 +1485,7 @@ public class MANOController {
 		}
 		// OSM4 END
 		// OSM5 START
-		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE")) {
+		else if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE")) {
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			// After TERMINATION
 			boolean force;
@@ -1572,7 +1574,14 @@ public class MANOController {
 					logger.error("Deletion failed with message" + e.getMessage());
 				}
 			}
-		}		
+		} else {
+			//if this is not a suported OSM then just complete
+			deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED_OSM_REMOVED);	
+			logger.info( "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
+			logger.info("Deletion of NS instance " + deploymentdescriptor.getInstanceId() + " succeded");					
+			DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
+			logger.info("NS status change is now "+deploymentdescriptor_final.getStatus());															
+		}
 	}
 	// OSM5 END
 	

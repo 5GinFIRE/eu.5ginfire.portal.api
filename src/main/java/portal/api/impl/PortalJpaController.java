@@ -1644,6 +1644,7 @@ public class PortalJpaController {
 	
 			entityTransaction.begin();
 			DeploymentDescriptor resis = entityManager.merge(d);
+			entityManager.flush();
 			entityTransaction.commit();
 			return resis;
 		} catch(Exception e) {

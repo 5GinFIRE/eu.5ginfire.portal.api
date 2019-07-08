@@ -1401,15 +1401,16 @@ public class MANOController {
 		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 
 		logger.info("Will delete with deploymentdescriptorid : " + deploymentdescriptorid);		
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails() );		
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors() );		
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0) );		
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider() );	
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform() );		
-		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName());		
+		String aMANOplatform = "";
+		try {	
+			aMANOplatform = deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName();
+			logger.info("MANOplatform: " + aMANOplatform);			
+		}catch (Exception e) {
+			aMANOplatform = "UNKNOWN";
+		}		
 		
 		
-		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
+		if ( aMANOplatform.equals("OSM FOUR")) {
 			logger.info("Descriptor targets an OSM FOUR deploymentdescriptorid: " + deploymentdescriptorid);		
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			OSM4Client osm4Client = null;
@@ -1495,7 +1496,7 @@ public class MANOController {
 		}
 		// OSM4 END
 		// OSM5 START
-		else if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FIVE")) {
+		else if ( aMANOplatform.equals("OSM FIVE")) {
 			logger.info("Descriptor targets an OSM FIVE deploymentdescriptorid: " + deploymentdescriptorid);		
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
 			// After TERMINATION

@@ -1398,8 +1398,12 @@ public class MANOController {
 	}
 
 	public void deleteNSFromMANOProvider(int deploymentdescriptorid) {
-		logger.info("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
 		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
+
+		logger.info("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName());		
+		
+		
 		if (deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName().equals("OSM FOUR")) {
 			logger.info("Descriptor targets an OSM FOUR deploymentdescriptorid: " + deploymentdescriptorid);		
 			// There can be multiple MANOs for the Experiment. We need to handle that also.
@@ -1580,7 +1584,7 @@ public class MANOController {
 			//if this is not a suported OSM then just complete
 			logger.info("Descriptor targets an older not supported OSM deploymentdescriptorid: " + deploymentdescriptorid);		
 			deploymentdescriptor.setStatus(DeploymentDescriptorStatus.FAILED_OSM_REMOVED);	
-			logger.info( "Status change of deployment "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
+			logger.info( "Status change of deployment " + deploymentdescriptor.getId()+", "+deploymentdescriptor.getName()+" to "+deploymentdescriptor.getStatus());					
 			DeploymentDescriptor deploymentdescriptor_final = portalRepositoryRef.updateDeploymentDescriptor(deploymentdescriptor);
 			logger.info("NS status changed is now :" + deploymentdescriptor_final.getStatus());															
 		}

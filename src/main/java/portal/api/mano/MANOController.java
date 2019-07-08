@@ -1400,7 +1400,12 @@ public class MANOController {
 	public void deleteNSFromMANOProvider(int deploymentdescriptorid) {
 		DeploymentDescriptor deploymentdescriptor = portalRepositoryRef.getDeploymentByID(deploymentdescriptorid);
 
-		logger.info("Will delete with deploymentdescriptorid: " + deploymentdescriptorid);		
+		logger.info("Will delete with deploymentdescriptorid : " + deploymentdescriptorid);		
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails() );		
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors() );		
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0) );		
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider() );	
+		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform() );		
 		logger.info("MANOplatform: " + deploymentdescriptor.getExperimentFullDetails().getExperimentOnBoardDescriptors().get(0).getObMANOprovider().getSupportedMANOplatform().getName());		
 		
 		

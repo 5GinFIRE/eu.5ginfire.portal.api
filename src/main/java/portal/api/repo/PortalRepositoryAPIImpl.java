@@ -3486,6 +3486,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						builder.entity("Inconsistent status change");
 						throw new WebApplicationException(builder.build());					
 					}
+				} else {
+
+					logger.info( "Previous status is the same so just update deployment info");					
+					aDeployment = portalRepositoryRef.updateDeploymentDescriptor(aDeployment);
 				}
 				return Response.ok().entity( aDeployment ).build();
 			}

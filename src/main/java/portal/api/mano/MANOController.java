@@ -402,7 +402,7 @@ public class MANOController {
 										if (j > 0) {
 											deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps() + ", ");
 										}
-										ResponseEntity<String> vnf_instance_id_info_response = osm5Client.getVNFInstanceInfoNew(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
+										ResponseEntity<String> vnf_instance_id_info_response = osm4Client.getVNFInstanceInfoNew(ns_instance_info.getJSONArray("constituent-vnfr-ref").get(j).toString());
 										if(!vnf_instance_id_info_response.getStatusCode().is4xxClientError() && !vnf_instance_id_info_response.getStatusCode().is5xxServerError() )
 										{
 											JSONObject vnf_instance_info = new JSONObject(vnf_instance_id_info_response.getBody());
@@ -410,7 +410,9 @@ public class MANOController {
 												deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
 														+ vnf_instance_info.getString("ip-address"));
 											} catch (JSONException e) {
+												logger.error( "Cannot set setConstituentVnfrIps" );
 												logger.error(e.getMessage());
+												logger.error(e.getLocalizedMessage() );
 											}																				
 										}
 										else

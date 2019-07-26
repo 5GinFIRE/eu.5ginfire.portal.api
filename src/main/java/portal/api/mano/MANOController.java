@@ -525,10 +525,22 @@ public class MANOController {
 							logger.info(ns_instance_info.toString());
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.RUNNING)
 							{
-								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status"))||!deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status"))||!deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "")))
+								logger.info("Status of deployment "+deployment_tmp.getName()+" is reported as: "+deployment_tmp.getStatus() );
+								logger.info( deployment_tmp.getName()+": getOperationalStatus= "+deployment_tmp.getOperationalStatus() );
+								logger.info( deployment_tmp.getName()+": getConfigStatus= "+deployment_tmp.getConfigStatus() );
+								logger.info( deployment_tmp.getName()+": getDetailedStatus= "+deployment_tmp.getDetailedStatus() );
+								
+								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status"))
+										||!deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status"))
+										||!deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""))
+										)
 								{
-									logger.info("Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
-									CentralLogger.log( CLevel.INFO, "Status change of deployment "+deployment_tmp.getName()+" to "+deployment_tmp.getStatus());
+									logger.info("Further checks on ns_instance_info: Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
+									logger.info( deployment_tmp.getName()+": operational-status= "+ ns_instance_info.getString("operational-status") );
+									logger.info( deployment_tmp.getName()+": config-status= "+ns_instance_info.getString("config-status") );
+									logger.info( deployment_tmp.getName()+": detailed-status= "+ ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "") );
+									
+									CentralLogger.log( CLevel.INFO, "Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
 									deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 									deployment_tmp.setConstituentVnfrIps("");
 									for (int j = 0; j < ns_instance_info.getJSONArray("constituent-vnfr-ref")
@@ -634,7 +646,7 @@ public class MANOController {
 								deployment_tmp = portalRepositoryRef.updateDeploymentDescriptor(deployment_tmp);
 								BusController.getInstance().deploymentTerminationFailed(deployment_tmp.getId());
 							}
-							logger.info("NS status change is now "+deployment_tmp.getStatus());													
+							logger.info("NS "+ deployment_tmp.getName() + " status is now "+deployment_tmp.getStatus());													
 						} catch (JSONException e) {
 							logger.error(e.getMessage());
 						}

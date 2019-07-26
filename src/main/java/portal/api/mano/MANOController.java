@@ -409,6 +409,13 @@ public class MANOController {
 											try {
 												deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
 														+ vnf_instance_info.getString("ip-address"));
+												deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
+												deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
+												deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+												// Depending on the current OSM status, change the portal status.
+//												&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
+//												&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")		
+												
 											} catch (JSONException e) {
 												logger.error( "Cannot set setConstituentVnfrIps" );
 												logger.error(e.getMessage());
@@ -425,12 +432,7 @@ public class MANOController {
 									BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());									
 								}
 							}
-							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
-							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
-							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-							// Depending on the current OSM status, change the portal status.
-//							&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")
-//							&& deployment_tmp.getDetailedStatus().toLowerCase().equals("done")								
+													
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")) {
 								deployment_tmp.setStatus(DeploymentDescriptorStatus.RUNNING);
@@ -571,6 +573,11 @@ public class MANOController {
 											try {
 												deployment_tmp.setConstituentVnfrIps(deployment_tmp.getConstituentVnfrIps()
 														+ vnf_instance_info.getString("ip-address"));
+												deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
+												deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
+												deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+												// Depending on the current OSM status, change the portal status.
+												
 											} catch (JSONException e) {
 												logger.error(e.getMessage());
 											}																				
@@ -586,10 +593,7 @@ public class MANOController {
 								}
 							}
 							
-							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
-							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
-							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
-							// Depending on the current OSM status, change the portal status.
+							
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")
 //									&& deployment_tmp.getConfigStatus().toLowerCase().equals("configured")

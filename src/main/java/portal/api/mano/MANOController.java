@@ -374,22 +374,28 @@ public class MANOController {
 					JSONObject ns_instance_info = osm4Client.getNSInstanceInfo(runningDeploymentDescriptors.get(i).getInstanceId());
 					if (ns_instance_info != null) {
 						try {
+							logger.info("Checking deployment response:"+deployment_tmp.getName()+"" );
 							logger.info(ns_instance_info.toString());
+
+							logger.info("Status of deployment "+deployment_tmp.getName()+" in PORTAL: " );
+							logger.info( deployment_tmp.getName()+": getStatus=: "+deployment_tmp.getStatus() );
+							logger.info( deployment_tmp.getName()+": getOperationalStatus= "+deployment_tmp.getOperationalStatus() );
+							logger.info( deployment_tmp.getName()+": getConfigStatus= "+deployment_tmp.getConfigStatus() );
+							logger.info( deployment_tmp.getName()+": getDetailedStatus= "+deployment_tmp.getDetailedStatus() );
+							logger.info("Status of deployment "+deployment_tmp.getName()+" in ns_instance_info: " );
+							logger.info( deployment_tmp.getName()+": operational-status= "+ ns_instance_info.getString("operational-status") );
+							logger.info( deployment_tmp.getName()+": config-status= "+ns_instance_info.getString("config-status") );
+							logger.info( deployment_tmp.getName()+": detailed-status= "+ ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "") );
+							
+							
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.RUNNING)
 							{
-								logger.info("Status of deployment "+deployment_tmp.getName()+" is reported as: "+deployment_tmp.getStatus() );
-								logger.info( deployment_tmp.getName()+": getOperationalStatus= "+deployment_tmp.getOperationalStatus() );
-								logger.info( deployment_tmp.getName()+": getConfigStatus= "+deployment_tmp.getConfigStatus() );
-								logger.info( deployment_tmp.getName()+": getDetailedStatus= "+deployment_tmp.getDetailedStatus() );
 								
 								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status")) 
 										|| !deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status")) 
 										|| !deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "")))
 								{
-									logger.info("Further checks on ns_instance_info: Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
-									logger.info( deployment_tmp.getName()+": operational-status= "+ ns_instance_info.getString("operational-status") );
-									logger.info( deployment_tmp.getName()+": config-status= "+ns_instance_info.getString("config-status") );
-									logger.info( deployment_tmp.getName()+": detailed-status= "+ ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "") );
+									
 									
 									CentralLogger.log( CLevel.INFO, "Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
 									
@@ -432,6 +438,11 @@ public class MANOController {
 									BusController.getInstance().deploymentInstantiationSucceded(deployment_tmp.getId());									
 								}
 							}
+							
+
+							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
+							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
+							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 													
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")) {
@@ -540,23 +551,29 @@ public class MANOController {
 					{
 						try {
 							logger.info(ns_instance_info.toString());
+							logger.info("Checking deployment response:"+deployment_tmp.getName()+"" );
+							logger.info(ns_instance_info.toString());
+
+							logger.info("Status of deployment "+deployment_tmp.getName()+" in PORTAL: " );
+							logger.info( deployment_tmp.getName()+": getStatus=: "+deployment_tmp.getStatus() );
+							logger.info( deployment_tmp.getName()+": getOperationalStatus= "+deployment_tmp.getOperationalStatus() );
+							logger.info( deployment_tmp.getName()+": getConfigStatus= "+deployment_tmp.getConfigStatus() );
+							logger.info( deployment_tmp.getName()+": getDetailedStatus= "+deployment_tmp.getDetailedStatus() );
+							logger.info("Status of deployment "+deployment_tmp.getName()+" in ns_instance_info: " );
+							logger.info( deployment_tmp.getName()+": operational-status= "+ ns_instance_info.getString("operational-status") );
+							logger.info( deployment_tmp.getName()+": config-status= "+ns_instance_info.getString("config-status") );
+							logger.info( deployment_tmp.getName()+": detailed-status= "+ ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "") );
+							
+							
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.RUNNING)
 							{
-								logger.info("Status of deployment "+deployment_tmp.getName()+" is reported as: "+deployment_tmp.getStatus() );
-								logger.info( deployment_tmp.getName()+": getOperationalStatus= "+deployment_tmp.getOperationalStatus() );
-								logger.info( deployment_tmp.getName()+": getConfigStatus= "+deployment_tmp.getConfigStatus() );
-								logger.info( deployment_tmp.getName()+": getDetailedStatus= "+deployment_tmp.getDetailedStatus() );
 								
 								if(!deployment_tmp.getOperationalStatus().equals(ns_instance_info.getString("operational-status"))
 										||!deployment_tmp.getConfigStatus().equals(ns_instance_info.getString("config-status"))
 										||!deployment_tmp.getDetailedStatus().equals(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""))
 										)
 								{
-									logger.info("Further checks on ns_instance_info: Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
-									logger.info( deployment_tmp.getName()+": operational-status= "+ ns_instance_info.getString("operational-status") );
-									logger.info( deployment_tmp.getName()+": config-status= "+ns_instance_info.getString("config-status") );
-									logger.info( deployment_tmp.getName()+": detailed-status= "+ ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", "") );
-									
+
 									CentralLogger.log( CLevel.INFO, "Status of deployment "+deployment_tmp.getName()+" is "+deployment_tmp.getStatus());
 									deployment_tmp.setFeedback(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
 									deployment_tmp.setConstituentVnfrIps("");
@@ -593,6 +610,10 @@ public class MANOController {
 								}
 							}
 							
+							deployment_tmp.setOperationalStatus(ns_instance_info.getString("operational-status"));
+							deployment_tmp.setConfigStatus(ns_instance_info.getString("config-status"));
+							deployment_tmp.setDetailedStatus(ns_instance_info.getString("detailed-status").replaceAll("\\n", " ").replaceAll("\'", "'").replaceAll("\\\\", ""));
+						
 							
 							if (deployment_tmp.getStatus() == DeploymentDescriptorStatus.INSTANTIATING
 									&& deployment_tmp.getOperationalStatus().toLowerCase().equals("running")

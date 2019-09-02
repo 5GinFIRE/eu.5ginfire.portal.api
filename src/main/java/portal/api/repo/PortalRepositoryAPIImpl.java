@@ -1441,10 +1441,12 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Get the MANO providers which are set for automatic onboarding
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
+			logger.info("vxf.getPackagingFormat() : " + vxf.getPackagingFormat());
 			if(MANOprovidersEnabledForOnboarding.size()>0 && vxf.getPackagingFormat() == PackagingFormat.OSMvFOUR)
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
+					logger.info("Will onboard to MANOprovider : " + mp.getName() );
 					//Create VxfOnboardedDescriptor
 					VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
 					// Get the first one for now			
@@ -1480,6 +1482,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
+					logger.info("Will onboard to MANOprovider : " + mp.getName() );
 					//Create VxfOnboardedDescriptor
 					VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
 					// Get the first one for now			

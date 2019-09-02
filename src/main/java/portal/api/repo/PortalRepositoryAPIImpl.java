@@ -1442,7 +1442,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
 			logger.info("vxf.getPackagingFormat() : " + vxf.getPackagingFormat());
-			if(MANOprovidersEnabledForOnboarding.size()>0 && vxf.getPackagingFormat() == PackagingFormat.OSMvFOUR)
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().equals( PackagingFormat.OSMvFOUR)))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -1478,7 +1478,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					BusController.getInstance().onBoardVxFAdded( obd.getId() );
 				}
 			}
-			if(MANOprovidersEnabledForOnboarding.size()>0 && vxf.getPackagingFormat() == PackagingFormat.OSMvFIVE)
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().equals( PackagingFormat.OSMvFIVE)) )
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -2702,9 +2702,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			// Need to select MANO Provider, convert vxfMetadata to VxFOnBoardedDescriptor and pass it as an input.
 			
 			// Get the MANO providers which are set for automatic onboarding
+
+			logger.info("experiment.getPackagingFormat() : " + experiment.getPackagingFormat());
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
-			if(MANOprovidersEnabledForOnboarding.size()>0 && experiment.getPackagingFormat() == PackagingFormat.OSMvFOUR)
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().equals(PackagingFormat.OSMvFOUR)))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -2745,7 +2747,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					BusController.getInstance().onBoardNSD( obd.getId() );
 				}
 			}
-			if(MANOprovidersEnabledForOnboarding.size()>0 && experiment.getPackagingFormat() == PackagingFormat.OSMvFIVE)
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().equals(PackagingFormat.OSMvFIVE)))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{

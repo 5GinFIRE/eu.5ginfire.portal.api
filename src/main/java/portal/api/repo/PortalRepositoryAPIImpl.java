@@ -1442,82 +1442,82 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
 			logger.info("vxf.getPackagingFormat() : " + vxf.getPackagingFormat());
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )))
-			{
-				logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
-				logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFOUR.name() );
+			
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
-					logger.info("Will onboard to MANOprovider : " + mp.getName() );
+					if  (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )){
+						logger.info("Will onboard to MANOprovider : " + mp.getName() );
+						//Create VxfOnboardedDescriptor
+						VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
+						// Get the first one for now			
+						obd.setObMANOprovider(mp);
+						obd.setUuid( UUID.randomUUID().toString() );
+						VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( vxf.getId() );
+						// Fill the VxFMetadata of VxFOnBoardedDescriptor
+						obd.setVxf( refVxF );
+						// Update the VxFMetadata Object with the obd Object
+						refVxF.getVxfOnBoardedDescriptors().add( obd ) ;				
+						
+						// ???????
+						obd.setVxf( refVxF );
+						
+						// save product
+						refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );					
+						
+						// save VxFonBoardedDescriptor or not ???
+						obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
+						
+						//set proper scheme (http or https)
+						MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getRequestURL().toString()  );
+						
+						if ( obd.getVxf().getOwner() == null ) {
+							logger.error( " ========> obd.getVxf().getOwner() == null " );
+						}
+						
+						// Send the message for automatic onboarding
+						BusController.getInstance().onBoardVxFAdded( obd.getId() );						
+						
+					}
+					if (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) 
+					{
+						logger.info("Will onboard to MANOprovider : " + mp.getName() );
 					//Create VxfOnboardedDescriptor
-					VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
-					// Get the first one for now			
-					obd.setObMANOprovider(mp);
-					obd.setUuid( UUID.randomUUID().toString() );
-					VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( vxf.getId() );
-					// Fill the VxFMetadata of VxFOnBoardedDescriptor
-					obd.setVxf( refVxF );
-					// Update the VxFMetadata Object with the obd Object
-					refVxF.getVxfOnBoardedDescriptors().add( obd ) ;				
-					
-					// ???????
-					obd.setVxf( refVxF );
-					
-					// save product
-					refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );					
-					
-					// save VxFonBoardedDescriptor or not ???
-					obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
-					
-					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getRequestURL().toString()  );
-					
-					if ( obd.getVxf().getOwner() == null ) {
-						logger.error( " ========> obd.getVxf().getOwner() == null " );
+						VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
+						// Get the first one for now			
+						obd.setObMANOprovider(mp);
+						obd.setUuid( UUID.randomUUID().toString() );
+						VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( vxf.getId() );
+						// Fill the VxFMetadata of VxFOnBoardedDescriptor
+						obd.setVxf( refVxF );
+						// Update the VxFMetadata Object with the obd Object
+						refVxF.getVxfOnBoardedDescriptors().add( obd ) ;				
+						
+						// ???????
+						obd.setVxf( refVxF );
+						
+						// save product
+						refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );					
+						
+						// save VxFonBoardedDescriptor or not ???
+						obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
+						
+						//set proper scheme (http or https)
+						MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getRequestURL().toString()  );
+						
+						if ( obd.getVxf().getOwner() == null ) {
+							logger.error( " ========> obd.getVxf().getOwner() == null " );
+						}
+						
+						// Send the message for automatic onboarding
+						BusController.getInstance().onBoardVxFAdded( obd.getId() );
+						
 					}
 					
-					// Send the message for automatic onboarding
-					BusController.getInstance().onBoardVxFAdded( obd.getId() );
+					
+					
 				}
-			}
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) )
-			{
-				logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
-				logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFIVE.name() );
-				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
-				{
-					logger.info("Will onboard to MANOprovider : " + mp.getName() );
-					//Create VxfOnboardedDescriptor
-					VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
-					// Get the first one for now			
-					obd.setObMANOprovider(mp);
-					obd.setUuid( UUID.randomUUID().toString() );
-					VxFMetadata refVxF =  ( VxFMetadata )portalRepositoryRef.getProductByID( vxf.getId() );
-					// Fill the VxFMetadata of VxFOnBoardedDescriptor
-					obd.setVxf( refVxF );
-					// Update the VxFMetadata Object with the obd Object
-					refVxF.getVxfOnBoardedDescriptors().add( obd ) ;				
-					
-					// ???????
-					obd.setVxf( refVxF );
-					
-					// save product
-					refVxF = (VxFMetadata) portalRepositoryRef.updateProductInfo( refVxF );					
-					
-					// save VxFonBoardedDescriptor or not ???
-					obd = portalRepositoryRef.updateVxFOnBoardedDescriptor(obd);
-					
-					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getRequestURL().toString()  );
-					
-					if ( obd.getVxf().getOwner() == null ) {
-						logger.error( " ========> obd.getVxf().getOwner() == null " );
-					}
-					
-					// Send the message for automatic onboarding
-					BusController.getInstance().onBoardVxFAdded( obd.getId() );
-				}
-			}
+			
+
 			// AUTOMATIC ONBOARDING PROCESS -END
 			//======================================================
 			VxFMetadata vxfr = (VxFMetadata) portalRepositoryRef.getProductByID( vxf.getId()) ; //rereading this, seems to keep the DB connection
@@ -2710,88 +2710,89 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("experiment.getPackagingFormat() : " + experiment.getPackagingFormat());
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFOUR.name())))
-			{
+			
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
-					//Create NSDOnboardDescriptor
-					ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
-					// Get the first one for now			
-					obd.setObMANOprovider(mp);
-					obd.setUuid( UUID.randomUUID().toString() ); 
-					ExperimentMetadata refNSD =  ( ExperimentMetadata )portalRepositoryRef.getProductByID( experiment.getId() );
-					// Fill the NSDMetadata of NSDOnBoardedDescriptor
-					obd.setExperiment( refNSD );
-					// Update the NSDMetadata Object with the obd Object
-					refNSD.getExperimentOnBoardDescriptors().add( obd ) ;				
-					
-					// ???????
-					obd.setExperiment( refNSD );
-					
-					// save product
-					refNSD = (ExperimentMetadata) portalRepositoryRef.updateProductInfo( refNSD );
-					// save VxFonBoardedDescriptor or not ???
-					obd = portalRepositoryRef.updateExperimentOnBoardDescriptor(obd);
-					
-	//				try
-	//				{
-	//					aMANOController.onBoardNSDToMANOProvider(obd);					
-	//				}
-	//				catch(Exception e)
-	//				{
-	//					System.out.println("OnBoarding Failed");					
-	//					System.out.println(e.getMessage());
-	//					e.printStackTrace();
-	//				}
-					// Send the message for automatic onboarding
-					//BusController.getInstance().newNSDAdded( vxf );
-					
-					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
-					BusController.getInstance().onBoardNSD( obd.getId() );
+					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFOUR.name())))
+					{
+						//Create NSDOnboardDescriptor
+						ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
+						// Get the first one for now			
+						obd.setObMANOprovider(mp);
+						obd.setUuid( UUID.randomUUID().toString() ); 
+						ExperimentMetadata refNSD =  ( ExperimentMetadata )portalRepositoryRef.getProductByID( experiment.getId() );
+						// Fill the NSDMetadata of NSDOnBoardedDescriptor
+						obd.setExperiment( refNSD );
+						// Update the NSDMetadata Object with the obd Object
+						refNSD.getExperimentOnBoardDescriptors().add( obd ) ;				
+						
+						// ???????
+						obd.setExperiment( refNSD );
+						
+						// save product
+						refNSD = (ExperimentMetadata) portalRepositoryRef.updateProductInfo( refNSD );
+						// save VxFonBoardedDescriptor or not ???
+						obd = portalRepositoryRef.updateExperimentOnBoardDescriptor(obd);
+						
+		//				try
+		//				{
+		//					aMANOController.onBoardNSDToMANOProvider(obd);					
+		//				}
+		//				catch(Exception e)
+		//				{
+		//					System.out.println("OnBoarding Failed");					
+		//					System.out.println(e.getMessage());
+		//					e.printStackTrace();
+		//				}
+						// Send the message for automatic onboarding
+						//BusController.getInstance().newNSDAdded( vxf );
+						
+						//set proper scheme (http or https)
+						MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
+						BusController.getInstance().onBoardNSD( obd.getId() );
+						
+					}
+					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFIVE.name())))
+					{//Create NSDOnboardDescriptor
+						ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
+						// Get the first one for now			
+						obd.setObMANOprovider(mp);
+						obd.setUuid( UUID.randomUUID().toString() ); 
+						ExperimentMetadata refNSD =  ( ExperimentMetadata )portalRepositoryRef.getProductByID( experiment.getId() );
+						// Fill the NSDMetadata of NSDOnBoardedDescriptor
+						obd.setExperiment( refNSD );
+						// Update the NSDMetadata Object with the obd Object
+						refNSD.getExperimentOnBoardDescriptors().add( obd ) ;				
+						
+						// ???????
+						obd.setExperiment( refNSD );
+						
+						// save product
+						refNSD = (ExperimentMetadata) portalRepositoryRef.updateProductInfo( refNSD );
+						// save VxFonBoardedDescriptor or not ???
+						obd = portalRepositoryRef.updateExperimentOnBoardDescriptor(obd);
+						
+		//				try
+		//				{
+		//					aMANOController.onBoardNSDToMANOProvider(obd);					
+		//				}
+		//				catch(Exception e)
+		//				{
+		//					System.out.println("OnBoarding Failed");					
+		//					System.out.println(e.getMessage());
+		//					e.printStackTrace();
+		//				}
+						// Send the message for automatic onboarding
+						//BusController.getInstance().newNSDAdded( vxf );
+						
+						//set proper scheme (http or https)
+						MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
+						BusController.getInstance().onBoardNSD( obd.getId() );
+						
+					}
 				}
-			}
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFIVE.name())))
-			{
-				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
-				{
-					//Create NSDOnboardDescriptor
-					ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
-					// Get the first one for now			
-					obd.setObMANOprovider(mp);
-					obd.setUuid( UUID.randomUUID().toString() ); 
-					ExperimentMetadata refNSD =  ( ExperimentMetadata )portalRepositoryRef.getProductByID( experiment.getId() );
-					// Fill the NSDMetadata of NSDOnBoardedDescriptor
-					obd.setExperiment( refNSD );
-					// Update the NSDMetadata Object with the obd Object
-					refNSD.getExperimentOnBoardDescriptors().add( obd ) ;				
-					
-					// ???????
-					obd.setExperiment( refNSD );
-					
-					// save product
-					refNSD = (ExperimentMetadata) portalRepositoryRef.updateProductInfo( refNSD );
-					// save VxFonBoardedDescriptor or not ???
-					obd = portalRepositoryRef.updateExperimentOnBoardDescriptor(obd);
-					
-	//				try
-	//				{
-	//					aMANOController.onBoardNSDToMANOProvider(obd);					
-	//				}
-	//				catch(Exception e)
-	//				{
-	//					System.out.println("OnBoarding Failed");					
-	//					System.out.println(e.getMessage());
-	//					e.printStackTrace();
-	//				}
-					// Send the message for automatic onboarding
-					//BusController.getInstance().newNSDAdded( vxf );
-					
-					//set proper scheme (http or https)
-					MANOController.setHTTPSCHEME( ws.getHttpServletRequest().getScheme().toString() );
-					BusController.getInstance().onBoardNSD( obd.getId() );
-				}
-			}
+			
+			
 
 			// AUTOMATIC ONBOARDING PROCESS -END
 			//======================================================

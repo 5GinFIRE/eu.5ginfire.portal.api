@@ -973,9 +973,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			//*************LOAD THE Product Object from the NSD Descriptor START************************************
 			// Check if a vnfd with this id already exists in the DB
 			Product existingmff = portalRepositoryRef.getProductByName( ns.getAddedId() );														
-			if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
-				throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
-			}
+//			if ( ( existingmff != null  ) && ( existingmff instanceof  ExperimentMetadata )) {
+//				throw new IOException( "Descriptor with same name already exists. No updates were performed." );	
+//			}
 			prod.setName(ns.getAddedId());
 			prod.setVersion(ns.getVersion());
 			prod.setVendor(ns.getVendor());
@@ -1099,9 +1099,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			//*************LOAD THE Product Object from the VNFD Descriptor START************************************
 			// Check if a vnfd with this id already exists in the DB
 			Product existingvmf = portalRepositoryRef.getProductByName( vnfd.getAddedId());														
-			if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
-				throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );				
-			}
+//			if ( ( existingvmf != null  ) && ( existingvmf instanceof  VxFMetadata )) {
+//				throw new IOException( "Descriptor with same name already exists. No updates were performed. Please change the name of the descriptor" );				
+//			}
 			// Get the name for the db							
 			prod.setName(vnfd.getAddedId());
 			prod.setVersion(vnfd.getVersion());

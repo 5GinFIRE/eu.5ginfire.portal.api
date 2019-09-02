@@ -1445,7 +1445,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
-					if  (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() ))
+					if  ( vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )  && ( mp.getSupportedMANOplatform().getVersion().equals( "OSM FOUR" )  )      )
 					{
 						logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
 						logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFOUR.name() );
@@ -1481,7 +1481,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						BusController.getInstance().onBoardVxFAdded( obd.getId() );						
 						
 					}
-					if (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) 
+					if (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name()) && ( mp.getSupportedMANOplatform().getVersion().equals( "OSM FIVE" )  )  ) 
 					{
 						logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
 						logger.info("PackagingFormat.OSMvFIVE.name() : " + PackagingFormat.OSMvFIVE.name() );
@@ -2718,7 +2718,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
-					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFOUR.name())))
+					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFOUR.name()))  && ( mp.getSupportedMANOplatform().getVersion().equals( "OSM FOUR" )  ))
 					{
 						//Create NSDOnboardDescriptor
 						ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
@@ -2757,7 +2757,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 						BusController.getInstance().onBoardNSD( obd.getId() );
 						
 					}
-					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFIVE.name())))
+					if(  (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFIVE.name()))  && ( mp.getSupportedMANOplatform().getVersion().equals( "OSM FIVE" )  ))
 					{//Create NSDOnboardDescriptor
 						ExperimentOnBoardDescriptor obd = new ExperimentOnBoardDescriptor( );
 						// Get the first one for now			

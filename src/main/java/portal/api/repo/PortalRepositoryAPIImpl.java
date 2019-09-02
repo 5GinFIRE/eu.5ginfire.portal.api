@@ -4185,15 +4185,18 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 	@Path("/admin/vxfobds/{mpid}/offboard")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor clobd) {
+	public Response offBoardDescriptor(@PathParam("mpid") int mpid, final VxFOnBoardedDescriptor robd) {
 
 		if ( !checkUserIDorIsAdmin( -1 ) ){
 			return Response.status(Status.FORBIDDEN ).build() ;
 		}
-		OnBoardingStatus previous_status = clobd.getOnBoardingStatus();
-		clobd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
-		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+clobd.getVxf().getName()+" to "+clobd.getOnBoardingStatus());																													
-		VxFOnBoardedDescriptor updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor(clobd);
+
+		VxFOnBoardedDescriptor obds = portalRepositoryRef.getVxFOnBoardedDescriptorByID(mpid);
+
+		OnBoardingStatus previous_status = obds.getOnBoardingStatus();
+		obds.setOnBoardingStatus(OnBoardingStatus.OFFBOARDING);
+		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+obds.getVxf().getName()+" to "+obds.getOnBoardingStatus());																													
+		VxFOnBoardedDescriptor updatedObd = portalRepositoryRef.updateVxFOnBoardedDescriptor( obds );
 
 		ResponseEntity<String> response = null;
 		try {

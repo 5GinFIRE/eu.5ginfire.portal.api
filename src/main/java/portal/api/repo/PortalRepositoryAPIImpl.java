@@ -1444,6 +1444,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("vxf.getPackagingFormat() : " + vxf.getPackagingFormat());
 			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )))
 			{
+				logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
+				logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFOUR.name() );
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
 					logger.info("Will onboard to MANOprovider : " + mp.getName() );
@@ -1480,6 +1482,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			}
 			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) )
 			{
+				logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
+				logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFIVE.name() );
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
 					logger.info("Will onboard to MANOprovider : " + mp.getName() );

@@ -1445,7 +1445,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
-					if  (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )){
+					if  (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() ))
+					{
+						logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
+						logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFOUR.name() );
 						logger.info("Will onboard to MANOprovider : " + mp.getName() );
 						//Create VxfOnboardedDescriptor
 						VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
@@ -1480,6 +1483,8 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					}
 					if (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) 
 					{
+						logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
+						logger.info("PackagingFormat.OSMvFIVE.name() : " + PackagingFormat.OSMvFIVE.name() );
 						logger.info("Will onboard to MANOprovider : " + mp.getName() );
 					//Create VxfOnboardedDescriptor
 						VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();

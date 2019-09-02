@@ -1442,7 +1442,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
 			logger.info("vxf.getPackagingFormat() : " + vxf.getPackagingFormat());
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().equals( PackagingFormat.OSMvFOUR)))
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -1478,7 +1478,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					BusController.getInstance().onBoardVxFAdded( obd.getId() );
 				}
 			}
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().equals( PackagingFormat.OSMvFIVE)) )
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFIVE.name())) )
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -2706,7 +2706,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			logger.info("experiment.getPackagingFormat() : " + experiment.getPackagingFormat());
 			
 			List<MANOprovider> MANOprovidersEnabledForOnboarding=portalRepositoryRef.getMANOprovidersEnabledForOnboarding();
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().equals(PackagingFormat.OSMvFOUR)))
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFOUR.name())))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -2747,7 +2747,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					BusController.getInstance().onBoardNSD( obd.getId() );
 				}
 			}
-			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().equals(PackagingFormat.OSMvFIVE)))
+			if( (MANOprovidersEnabledForOnboarding.size()>0) && (experiment.getPackagingFormat().name().equals(PackagingFormat.OSMvFIVE.name())))
 			{
 				for(MANOprovider mp : MANOprovidersEnabledForOnboarding)
 				{
@@ -4227,7 +4227,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 			return builder.build();							
 		}
 		// UnCertify Upon OffBoarding
-		updatedObd.getVxf().setCertified(false);
+		//updatedObd.getVxf().setCertified(false);
 		updatedObd.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 		CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+updatedObd.getVxf().getName()+" to "+updatedObd.getOnBoardingStatus());																																
 		updatedObd.setFeedbackMessage(response.getBody().toString());

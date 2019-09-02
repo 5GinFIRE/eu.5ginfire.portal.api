@@ -1447,9 +1447,9 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				{
 					if  ( vxf.getPackagingFormat().name().equals( PackagingFormat.OSMvFOUR.name() )  && ( mp.getSupportedMANOplatform().getVersion().equals( "OSM FOUR" )  )      )
 					{
-						logger.info("vxf.getPackagingFormat().name() : " +vxf.getPackagingFormat().name() );
-						logger.info("PackagingFormat.OSMvFOUR.name() : " + PackagingFormat.OSMvFOUR.name() );
-						logger.info("Will onboard to MANOprovider : " + mp.getName() );
+						logger.info("vxf.getPackagingFormat().name(): " +vxf.getPackagingFormat().name() );
+						logger.info("PackagingFormat.OSMvFOUR.name(): " + PackagingFormat.OSMvFOUR.name() );
+						logger.info("Will onboard to MANOprovider: " + mp.getName() );
 						//Create VxfOnboardedDescriptor
 						VxFOnBoardedDescriptor obd = new VxFOnBoardedDescriptor();
 						// Get the first one for now			

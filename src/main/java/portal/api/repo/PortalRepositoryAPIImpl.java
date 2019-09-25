@@ -2932,7 +2932,10 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 				}
 				// UnCertify Upon OffBoarding
 				expobd_tmp.getExperiment().setValid(false);
-				expobd_tmp.setFeedbackMessage(response.getBody().toString());
+				if ( (response!=null) && ( response.getBody() != null ) ){
+					expobd_tmp.setFeedbackMessage(response.getBody().toString());
+				}
+				
 				expobd_tmp.setOnBoardingStatus(OnBoardingStatus.OFFBOARDED);
 				CentralLogger.log( CLevel.INFO, "Onboarding Status change of VxF "+expobd_tmp.getExperiment().getName()+" to "+expobd_tmp.getOnBoardingStatus());																															
 				u = portalRepositoryRef.updateExperimentOnBoardDescriptor(expobd_tmp);

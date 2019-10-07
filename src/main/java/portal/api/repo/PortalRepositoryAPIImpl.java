@@ -2075,7 +2075,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					throw new WebApplicationException(builder.build());
 				}        
 				
-				if (response == null) {
+				if ( (response == null) || (response.getBody() == null) ) {
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
 					try
 					{

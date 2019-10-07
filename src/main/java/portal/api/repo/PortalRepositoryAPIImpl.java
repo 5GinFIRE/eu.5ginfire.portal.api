@@ -2075,7 +2075,7 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					throw new WebApplicationException(builder.build());
 				}        
 				
-				if ( (response == null) || (response.getBody() == null) ) {
+				if (response == null) {
 					vxfobd_tmp.setOnBoardingStatus(previous_status);
 					try
 					{
@@ -2091,7 +2091,11 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 					builder.entity("Requested VxFOnBoardedDescriptor with ID=" + vxfobd_tmp.getId() + " cannot be offboarded");
 					throw new WebApplicationException(builder.build());
 				} else {
-					vxfobd_tmp.setFeedbackMessage(response.getBody().toString());					
+					if ( (response.getBody() != null)) {
+						vxfobd_tmp.setFeedbackMessage(response.getBody().toString());						
+					} else {
+						vxfobd_tmp.setFeedbackMessage("OK");
+					}
 				}
 				// UnCertify Upon OffBoarding
 				vxfobd_tmp.getVxf().setCertified(false);

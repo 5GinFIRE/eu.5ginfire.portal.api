@@ -293,6 +293,29 @@ public class PortalRepositoryAPIImpl implements IPortalRepositoryAPI {
 
 		return r;
 	}
+	
+	@POST
+	@Path("/admin/sendconfirmmail/{userid}")
+	@Produces("application/json")
+	@Consumes("multipart/form-data")
+	public Response resendNewRegisterUser(@PathParam("userid") int userid, List<Attachment> ats) {
+
+		logger.info("Received POST resendNewRegisterUser for userid: " + userid);
+		PortalUser portaluser = portalRepositoryRef.getUserByID(userid);
+		logger.info("Received POST resendNewRegisterUser for portaluser: " + portaluser.getUsername());
+		
+		
+
+		String msg = AttachmentUtil.getAttachmentStringValue("emailmessage", ats);
+
+		logger.info("Email message: " + msg);
+		String subj = "[" + PortalRepository.getPropertyByName("portaltitle").getValue() + "] " + PortalRepository.getPropertyByName("activationEmailSubject").getValue();
+		EmailUtil.SendRegistrationActivationEmail(portaluser.getEmail(), msg, subj);
+		
+
+		return Response.ok().entity(portaluser).build();
+	}
+	
 
 	@POST
 	@Path("/register/verify")

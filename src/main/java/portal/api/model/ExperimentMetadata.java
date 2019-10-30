@@ -68,14 +68,14 @@ public class ExperimentMetadata extends Product{
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  })
 	@JoinTable()
 	private List<ExperimentOnBoardDescriptor> experimentOnBoardDescriptors = new ArrayList<ExperimentOnBoardDescriptor>();
 	
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = { CascadeType.ALL })
 	@JoinTable()
 	private List<ConstituentVxF> constituentVxF = new ArrayList<ConstituentVxF>();
 	

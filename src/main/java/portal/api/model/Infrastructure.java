@@ -57,7 +57,7 @@ public class Infrastructure {
 	@Basic()
 	private String vimid = null;
 
-	@ManyToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable()
 	private List<VFImage> supportedImages = new ArrayList<>();
 	

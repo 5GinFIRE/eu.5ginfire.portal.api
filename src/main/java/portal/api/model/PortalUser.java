@@ -68,14 +68,14 @@ public class PortalUser {
 	/**
 	 * 
 	 */
-	@ElementCollection(targetClass=UserRoleType.class, fetch = FetchType.EAGER)
+	@ElementCollection(targetClass=UserRoleType.class)
 	@Enumerated(EnumType.ORDINAL)
 	private List<UserRoleType> roles = new ArrayList<UserRoleType>();
 	
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable()
 	private List<Product> products = new ArrayList<Product>();
 	
@@ -83,7 +83,7 @@ public class PortalUser {
 	/**
 	 * 
 	 */
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  })
 	@JoinTable()
 	private List<VFImage> vfimages = new ArrayList<VFImage>();
 	
@@ -92,11 +92,11 @@ public class PortalUser {
 		return roles;
 	}
 
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  })
 	@JoinTable()
 	private List<DeploymentDescriptor> deployments = new ArrayList<DeploymentDescriptor>();
 	
-	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  }, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {  CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH  })
 	@JoinTable()
 	private List<SubscribedResource> subscribedResources = new ArrayList<SubscribedResource>();
 	

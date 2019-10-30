@@ -36,7 +36,7 @@ public class ExperimentOnBoardDescriptor extends OnBoardDescriptor{
 
 		
 
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinColumns({ @JoinColumn() })
 	private ExperimentMetadata experiment;
 		

@@ -68,6 +68,14 @@ public class ConstituentVxF {
 	public void setVxfref(VxFMetadata vxfref) {
 		this.vxfref = vxfref;
 	}
+	
+	public long getvxfid() {
+		if ( this.vxfref != null ) {
+			return this.vxfref.getId();			
+		}
+		
+		return 0;
+	}
     
 	
 	

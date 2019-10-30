@@ -158,7 +158,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -179,7 +179,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -202,7 +202,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -218,7 +218,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -233,7 +233,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -252,7 +252,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -273,7 +273,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -298,7 +298,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -331,7 +331,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -353,7 +353,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 
@@ -392,7 +392,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -407,7 +407,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -422,7 +422,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}												
 	}
@@ -437,7 +437,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -453,7 +453,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}												
 	}
@@ -472,7 +472,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -492,7 +492,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -510,7 +510,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}												
 	}
@@ -529,7 +529,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -547,7 +547,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -576,7 +576,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -596,7 +596,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -619,7 +619,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -670,7 +670,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	
@@ -701,7 +701,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -717,7 +717,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -733,7 +733,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -750,7 +750,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -788,7 +788,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -809,7 +809,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -835,7 +835,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -861,7 +861,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -884,7 +884,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -905,7 +905,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -921,7 +921,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -938,7 +938,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -958,7 +958,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -975,7 +975,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -996,7 +996,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1019,7 +1019,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1037,7 +1037,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1072,7 +1072,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1099,7 +1099,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1117,7 +1117,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1139,7 +1139,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1155,7 +1155,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1176,7 +1176,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1197,7 +1197,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1221,7 +1221,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1243,7 +1243,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1265,7 +1265,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1287,7 +1287,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 
@@ -1308,7 +1308,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1326,7 +1326,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1342,7 +1342,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1358,7 +1358,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 		
@@ -1386,7 +1386,7 @@ public class PortalJpaController {
 			return result;
 		} finally {
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}
 	}
@@ -1408,7 +1408,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}
 	}
@@ -1428,7 +1428,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}		
 	}
@@ -1449,7 +1449,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}		
 	}
@@ -1473,7 +1473,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}		
 		
@@ -1524,7 +1524,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1576,7 +1576,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}		
 		
@@ -1596,7 +1596,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}		
 		
@@ -1616,7 +1616,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1631,7 +1631,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1657,7 +1657,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1677,7 +1677,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 
@@ -1694,7 +1694,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1709,7 +1709,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 	}
@@ -1731,7 +1731,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}				
 
@@ -1747,7 +1747,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}						
 	}
@@ -1767,7 +1767,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -1783,7 +1783,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -1798,7 +1798,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -1820,7 +1820,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 
@@ -1843,7 +1843,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -1863,7 +1863,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 
@@ -1884,7 +1884,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -1904,7 +1904,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -1925,7 +1925,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -1946,7 +1946,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}											
 	}
@@ -1966,7 +1966,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -1983,7 +1983,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -1999,7 +1999,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2017,7 +2017,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2038,7 +2038,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -2059,7 +2059,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2080,7 +2080,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -2094,7 +2094,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2114,7 +2114,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2135,7 +2135,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2156,7 +2156,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -2176,7 +2176,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2191,7 +2191,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -2209,7 +2209,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2237,7 +2237,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -2257,7 +2257,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -2277,7 +2277,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2293,7 +2293,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2309,7 +2309,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2326,7 +2326,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 	}
 	
@@ -2340,7 +2340,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 	}
 
@@ -2354,7 +2354,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 	}
 
@@ -2368,7 +2368,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 	}
 
@@ -2382,7 +2382,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 	}
 	
@@ -2396,7 +2396,7 @@ public class PortalJpaController {
 		}
 		finally
 		{
-			entityManager.close();
+			//entityManager.close();
 		}
 		
 	}
@@ -2425,7 +2425,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 	}
@@ -2444,7 +2444,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2470,7 +2470,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}											
 	}
@@ -2489,7 +2489,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2506,7 +2506,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}										
 	}
@@ -2538,7 +2538,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		
@@ -2564,7 +2564,7 @@ public class PortalJpaController {
 		finally
 		{
 		    if (entityManager != null) {
-		        entityManager.close();
+		        //entityManager.close();
 		    }
 		}								
 		

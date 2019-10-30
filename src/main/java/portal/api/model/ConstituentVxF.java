@@ -28,7 +28,7 @@ import javax.persistence.OneToOne;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity(name = "ConstituentVxF")
-@JsonIgnoreProperties(value = { "vxfref"  })
+@JsonIgnoreProperties(value = { "vxfref", "vxfid"  })
 public class ConstituentVxF {
 
 	@Id
